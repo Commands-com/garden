@@ -145,9 +145,7 @@ Resources:
   CloudFrontDistribution:
     Type: AWS::CloudFront::Distribution
     DependsOn:
-      - FeedbackFunctionUrl
-      - ReactionsFunctionUrl
-      - HealthFunctionUrl
+      - ApiStage
     Properties:
       DistributionConfig:
         Enabled: true
@@ -182,31 +180,9 @@ Resources:
             S3OriginConfig:
               OriginAccessIdentity: ''
 
-          # Lambda Function URL origins (one per API endpoint)
-          - Id: FeedbackApiOrigin
-            DomainName: !Select
-              - 2
-              - !Split ['/', !GetAtt FeedbackFunctionUrl.FunctionUrl]
-            CustomOriginConfig:
-              OriginProtocolPolicy: https-only
-              HTTPSPort: 443
-              OriginSSLProtocols:
-                - TLSv1.2
-
-          - Id: ReactionsApiOrigin
-            DomainName: !Select
-              - 2
-              - !Split ['/', !GetAtt ReactionsFunctionUrl.FunctionUrl]
-            CustomOriginConfig:
-              OriginProtocolPolicy: https-only
-              HTTPSPort: 443
-              OriginSSLProtocols:
-                - TLSv1.2
-
-          - Id: HealthApiOrigin
-            DomainName: !Select
-              - 2
-              - !Split ['/', !GetAtt HealthFunctionUrl.FunctionUrl]
+          # API Gateway origin
+          - Id: ApiGatewayOrigin
+            DomainName: !Sub '${ApiGateway}.execute-api.${AWS::Region}.amazonaws.com'
             CustomOriginConfig:
               OriginProtocolPolicy: https-only
               HTTPSPort: 443
@@ -235,7 +211,7 @@ Resources:
         CacheBehaviors:
           # /api/feedback* -> Feedback Lambda
           - PathPattern: '/api/feedback*'
-            TargetOriginId: FeedbackApiOrigin
+            TargetOriginId: ApiGatewayOrigin
             ViewerProtocolPolicy: redirect-to-https
             Compress: true
             CachePolicyId: 4135ea2d-6df8-44a3-9df3-4b5a84be39ad  # AWS managed CachingDisabled
@@ -254,7 +230,7 @@ Resources:
 
           # /api/reactions* -> Reactions Lambda
           - PathPattern: '/api/reactions*'
-            TargetOriginId: ReactionsApiOrigin
+            TargetOriginId: ApiGatewayOrigin
             ViewerProtocolPolicy: redirect-to-https
             Compress: true
             CachePolicyId: 4135ea2d-6df8-44a3-9df3-4b5a84be39ad  # AWS managed CachingDisabled
@@ -273,7 +249,7 @@ Resources:
 
           # /api/health* -> Health Lambda
           - PathPattern: '/api/health*'
-            TargetOriginId: HealthApiOrigin
+            TargetOriginId: ApiGatewayOrigin
             ViewerProtocolPolicy: redirect-to-https
             Compress: true
             CachePolicyId: 4135ea2d-6df8-44a3-9df3-4b5a84be39ad  # AWS managed CachingDisabled
@@ -617,6 +593,90 @@ Resources:
                   - !GetAtt RunsTable.Arn
 
   # ==========================================================================
+  # API Gateway (HTTP API)
+  # ==========================================================================
+  ApiGateway:
+    Type: AWS::ApiGatewayV2::Api
+    Properties:
+      Name: !Sub '${AWS::StackName}-api'
+      ProtocolType: HTTP
+      CorsConfiguration:
+        AllowHeaders:
+          - content-type
+          - origin
+        AllowMethods:
+          - GET
+          - POST
+          - OPTIONS
+        AllowOrigins:
+          - !If
+            - UseCustomDomain
+            - !Sub 'https://${CustomDomainName}'
+            - '*'
+
+  ApiStage:
+    Type: AWS::ApiGatewayV2::Stage
+    Properties:
+      ApiId: !Ref ApiGateway
+      StageName: '$default'
+      AutoDeploy: true
+
+  # --- Feedback routes ---
+  FeedbackIntegration:
+    Type: AWS::ApiGatewayV2::Integration
+    Properties:
+      ApiId: !Ref ApiGateway
+      IntegrationType: AWS_PROXY
+      IntegrationUri: !GetAtt FeedbackFunction.Arn
+      PayloadFormatVersion: '2.0'
+
+  FeedbackRoute:
+    Type: AWS::ApiGatewayV2::Route
+    Properties:
+      ApiId: !Ref ApiGateway
+      RouteKey: 'POST /api/feedback'
+      Target: !Sub 'integrations/${FeedbackIntegration}'
+
+  # --- Reactions routes ---
+  ReactionsIntegration:
+    Type: AWS::ApiGatewayV2::Integration
+    Properties:
+      ApiId: !Ref ApiGateway
+      IntegrationType: AWS_PROXY
+      IntegrationUri: !GetAtt ReactionsFunction.Arn
+      PayloadFormatVersion: '2.0'
+
+  ReactionsPostRoute:
+    Type: AWS::ApiGatewayV2::Route
+    Properties:
+      ApiId: !Ref ApiGateway
+      RouteKey: 'POST /api/reactions'
+      Target: !Sub 'integrations/${ReactionsIntegration}'
+
+  ReactionsGetRoute:
+    Type: AWS::ApiGatewayV2::Route
+    Properties:
+      ApiId: !Ref ApiGateway
+      RouteKey: 'GET /api/reactions'
+      Target: !Sub 'integrations/${ReactionsIntegration}'
+
+  # --- Health routes ---
+  HealthIntegration:
+    Type: AWS::ApiGatewayV2::Integration
+    Properties:
+      ApiId: !Ref ApiGateway
+      IntegrationType: AWS_PROXY
+      IntegrationUri: !GetAtt HealthFunction.Arn
+      PayloadFormatVersion: '2.0'
+
+  HealthRoute:
+    Type: AWS::ApiGatewayV2::Route
+    Properties:
+      ApiId: !Ref ApiGateway
+      RouteKey: 'GET /api/health'
+      Target: !Sub 'integrations/${HealthIntegration}'
+
+  # ==========================================================================
   # Lambda Functions
   # ==========================================================================
   FeedbackFunction:
@@ -640,36 +700,15 @@ Resources:
         Variables:
           FEEDBACK_TABLE: !Ref FeedbackTable
           MODERATION_TABLE: !Ref ModerationTable
-          ALLOWED_ORIGIN: !If
-            - UseCustomDomain
-            - !Sub 'https://${CustomDomainName}'
-            - '*'
+          ALLOWED_ORIGIN: '*'
 
-  FeedbackFunctionUrl:
-    Type: AWS::Lambda::Url
-    Properties:
-      AuthType: NONE
-      TargetFunctionArn: !GetAtt FeedbackFunction.Arn
-      Cors:
-        AllowCredentials: false
-        AllowHeaders:
-          - content-type
-          - origin
-        AllowMethods:
-          - POST
-        AllowOrigins:
-          - !If
-            - UseCustomDomain
-            - !Sub 'https://${CustomDomainName}'
-            - '*'
-
-  FeedbackFunctionUrlPermission:
+  FeedbackApiPermission:
     Type: AWS::Lambda::Permission
     Properties:
       FunctionName: !Ref FeedbackFunction
-      Action: lambda:InvokeFunctionUrl
-      Principal: '*'
-      FunctionUrlAuthType: NONE
+      Action: lambda:InvokeFunction
+      Principal: apigateway.amazonaws.com
+      SourceArn: !Sub 'arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${ApiGateway}/*'
 
   ReactionsFunction:
     Type: AWS::Lambda::Function
@@ -691,37 +730,15 @@ Resources:
       Environment:
         Variables:
           REACTIONS_TABLE: !Ref ReactionsTable
-          ALLOWED_ORIGIN: !If
-            - UseCustomDomain
-            - !Sub 'https://${CustomDomainName}'
-            - '*'
+          ALLOWED_ORIGIN: '*'
 
-  ReactionsFunctionUrl:
-    Type: AWS::Lambda::Url
-    Properties:
-      AuthType: NONE
-      TargetFunctionArn: !GetAtt ReactionsFunction.Arn
-      Cors:
-        AllowCredentials: false
-        AllowHeaders:
-          - content-type
-          - origin
-        AllowMethods:
-          - POST
-          - GET
-        AllowOrigins:
-          - !If
-            - UseCustomDomain
-            - !Sub 'https://${CustomDomainName}'
-            - '*'
-
-  ReactionsFunctionUrlPermission:
+  ReactionsApiPermission:
     Type: AWS::Lambda::Permission
     Properties:
       FunctionName: !Ref ReactionsFunction
-      Action: lambda:InvokeFunctionUrl
-      Principal: '*'
-      FunctionUrlAuthType: NONE
+      Action: lambda:InvokeFunction
+      Principal: apigateway.amazonaws.com
+      SourceArn: !Sub 'arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${ApiGateway}/*'
 
   HealthFunction:
     Type: AWS::Lambda::Function
@@ -744,30 +761,13 @@ Resources:
         Variables:
           RUNS_TABLE: !Ref RunsTable
 
-  HealthFunctionUrl:
-    Type: AWS::Lambda::Url
-    Properties:
-      AuthType: NONE
-      TargetFunctionArn: !GetAtt HealthFunction.Arn
-      Cors:
-        AllowCredentials: false
-        AllowHeaders:
-          - content-type
-        AllowMethods:
-          - GET
-        AllowOrigins:
-          - !If
-            - UseCustomDomain
-            - !Sub 'https://${CustomDomainName}'
-            - '*'
-
-  HealthFunctionUrlPermission:
+  HealthApiPermission:
     Type: AWS::Lambda::Permission
     Properties:
       FunctionName: !Ref HealthFunction
-      Action: lambda:InvokeFunctionUrl
-      Principal: '*'
-      FunctionUrlAuthType: NONE
+      Action: lambda:InvokeFunction
+      Principal: apigateway.amazonaws.com
+      SourceArn: !Sub 'arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${ApiGateway}/*'
 
   # ==========================================================================
   # IAM - Deployment Policy (for CI / deploy scripts)
@@ -890,17 +890,9 @@ Outputs:
     Description: S3 bucket ARN
     Value: !GetAtt SiteBucket.Arn
 
-  FeedbackFunctionUrl:
-    Description: Feedback Lambda Function URL
-    Value: !GetAtt FeedbackFunctionUrl.FunctionUrl
-
-  ReactionsFunctionUrl:
-    Description: Reactions Lambda Function URL
-    Value: !GetAtt ReactionsFunctionUrl.FunctionUrl
-
-  HealthFunctionUrl:
-    Description: Health Lambda Function URL
-    Value: !GetAtt HealthFunctionUrl.FunctionUrl
+  ApiGatewayUrl:
+    Description: API Gateway endpoint URL
+    Value: !Sub 'https://${ApiGateway}.execute-api.${AWS::Region}.amazonaws.com'
 
   FeedbackTableName:
     Description: Feedback DynamoDB table name

@@ -203,9 +203,9 @@
                 el('a', {
                   href: getDayUrl(day.date),
                   className: 'font-semibold',
-                  style: 'text-decoration: none;',
+                  style: 'text-decoration: none; display: block;',
                 }, day.title || 'Untitled'),
-                el('span', { className: 'text-sm text-muted ml-3' }, formatDateShort(day.date))
+                el('span', { className: 'text-sm text-muted', style: 'display: block; margin-top: 0.25rem;' }, formatDateShort(day.date))
               ),
               day.status
                 ? el('span', { className: `badge badge--${day.status}` }, day.status)
