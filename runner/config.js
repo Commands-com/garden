@@ -89,6 +89,11 @@ function env(name, defaultValue) {
  * @property {Object} runner
  * @property {string} runner.commandsCliPath
  * @property {string} runner.controllerProfileId
+ * @property {string} runner.exploreTeamId
+ * @property {string} runner.specTeamId
+ * @property {string} runner.implementationTeamId
+ * @property {string} runner.validationTeamId
+ * @property {string} runner.reviewTeamId
  * @property {number} runner.maxTokenBudget
  * @property {number} runner.maxWallClockMinutes
  * @property {string} runner.artifactBaseDir
@@ -118,6 +123,11 @@ const config = {
   runner: {
     commandsCliPath: env('COMMANDS_CLI_PATH', 'commands-com'),
     controllerProfileId: env('CONTROLLER_PROFILE_ID', ''),
+    exploreTeamId: env('EXPLORE_TEAM_ID', ''),
+    specTeamId: env('SPEC_TEAM_ID', ''),
+    implementationTeamId: env('IMPLEMENTATION_TEAM_ID', ''),
+    validationTeamId: env('VALIDATION_TEAM_ID', ''),
+    reviewTeamId: env('REVIEW_TEAM_ID', ''),
     maxTokenBudget: Number(env('MAX_TOKEN_BUDGET', '500000')),
     maxWallClockMinutes: Number(env('MAX_WALL_CLOCK_MINUTES', '120')),
     artifactBaseDir: env('ARTIFACT_BASE_DIR', 'content/days'),

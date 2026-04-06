@@ -1,6 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://commandgarden.com/schemas/decision.v1.json",
+  "$id": "https://commandgarden.com/schemas/decision.v2.json",
   "title": "Decision",
   "description": "Daily pipeline decision record — candidates, scores, winner, and rationale. Supports v1 (single scorer) and v2 (multi-model judge panel).",
   "type": "object",

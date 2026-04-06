@@ -121,13 +121,14 @@
       <p class="site-footer__text">
         Powered by <a href="https://commands.com" class="site-footer__link">Commands.com</a>
       </p>
-      <span class="site-footer__meta">artifact schema v1</span>
+      <span class="site-footer__meta">artifact schema v2</span>
     </div>
   </footer>
 
   <script type="module">
     import {
       loadLatestDay,
+      getReactions,
       formatDate,
       getDayUrl,
       el,
@@ -163,6 +164,7 @@
         }
 
         const { manifest, day, artifacts } = result;
+        const reactions = await getReactions(day.date);
 
         // Today's date
         const dateEl = document.getElementById('todays-date');
@@ -180,7 +182,7 @@
 
           // Reactions
           const reactionsEl = el('div', { className: 'mt-4' });
-          reactionsEl.appendChild(renderReactions(day.date));
+          reactionsEl.appendChild(renderReactions(day.date, reactions));
           winnerContainer.appendChild(reactionsEl);
         } else {
           showError(winnerContainer, 'Decision pending', 'Today\'s decision has not been finalized yet.');

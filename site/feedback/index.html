@@ -153,13 +153,14 @@
       <p class="site-footer__text">
         Powered by <a href="https://commands.com" class="site-footer__link">Commands.com</a>
       </p>
-      <span class="site-footer__meta">artifact schema v1</span>
+      <span class="site-footer__meta">artifact schema v2</span>
     </div>
   </footer>
 
   <script type="module">
     import {
       getManifest,
+      getReactions,
       formatDateShort,
       getDayUrl,
       el,
@@ -188,7 +189,14 @@
 
         container.innerHTML = '';
 
-        sorted.forEach((day) => {
+        const daysWithReactions = await Promise.all(
+          sorted.map(async (day) => ({
+            day,
+            reactions: await getReactions(day.date),
+          }))
+        );
+
+        daysWithReactions.forEach(({ day, reactions }) => {
           const card = el('div', { className: 'card mb-4' },
             el('div', { className: 'd-flex items-center justify-between mb-3' },
               el('div', {},
@@ -206,7 +214,7 @@
             day.summary
               ? el('p', { className: 'text-sm text-muted mb-3' }, day.summary)
               : null,
-            renderReactions(day.date)
+            renderReactions(day.date, reactions)
           );
           container.appendChild(card);
         });

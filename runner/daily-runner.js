@@ -223,6 +223,21 @@ function setupSignalHandlers() {
   process.on('SIGINT', () => handler('SIGINT'));
 }
 
+function getMissingRunnerConfig() {
+  const required = [
+    ['CONTROLLER_PROFILE_ID', config.runner.controllerProfileId],
+    ['EXPLORE_TEAM_ID', config.runner.exploreTeamId],
+    ['SPEC_TEAM_ID', config.runner.specTeamId],
+    ['IMPLEMENTATION_TEAM_ID', config.runner.implementationTeamId],
+    ['VALIDATION_TEAM_ID', config.runner.validationTeamId],
+    ['REVIEW_TEAM_ID', config.runner.reviewTeamId],
+  ];
+
+  return required
+    .filter(([, value]) => !String(value || '').trim())
+    .map(([envName]) => envName);
+}
+
 // ---------------------------------------------------------------------------
 // Pipeline orchestration
 // ---------------------------------------------------------------------------
@@ -684,6 +699,14 @@ async function main() {
   log(`Command Garden Daily Runner — ${runDate}`);
   log('==========================================================');
 
+  const missingConfig = getMissingRunnerConfig();
+  if (missingConfig.length > 0) {
+    const reason = `Missing required runner config: ${missingConfig.join(', ')}`;
+    logError(reason);
+    log('Set these values in .env using your saved room team IDs or exact team names.');
+    process.exit(1);
+  }
+
   // 1. Create dated artifact directory
   const artifactDir = path.join(PROJECT_ROOT, config.runner.artifactBaseDir, runDate);
   fs.mkdirSync(artifactDir, { recursive: true });
@@ -753,6 +776,11 @@ async function main() {
     ARTIFACT_DIR: artifactDir,
     PROJECT_DIRECTORY: config.site.repoPath,
     CONTROLLER_PROFILE_ID: config.runner.controllerProfileId,
+    EXPLORE_TEAM_ID: config.runner.exploreTeamId,
+    SPEC_TEAM_ID: config.runner.specTeamId,
+    IMPLEMENTATION_TEAM_ID: config.runner.implementationTeamId,
+    VALIDATION_TEAM_ID: config.runner.validationTeamId,
+    REVIEW_TEAM_ID: config.runner.reviewTeamId,
     FEEDBACK_DIGEST_PATH: feedbackDigestPath,
     TOKEN_BUDGET: String(config.runner.maxTokenBudget || 500000),
   });

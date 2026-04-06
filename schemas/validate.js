@@ -23,11 +23,17 @@ for (const [artifact, schemaFile] of Object.entries(SCHEMAS)) {
 }
 
 // Determine target directory
-const targetDir = process.argv[2];
+let targetDir = process.argv[2];
 if (!targetDir) {
-  console.error('Usage: node schemas/validate.js <artifact-directory>');
-  console.error('Example: node schemas/validate.js content/days/2026-04-05');
-  process.exit(1);
+  const defaultDir = path.resolve(schemasDir, '..', 'content', 'days', '_example');
+  if (fs.existsSync(defaultDir)) {
+    targetDir = defaultDir;
+    console.log(`No artifact directory provided — validating ${defaultDir}`);
+  } else {
+    console.error('Usage: node schemas/validate.js <artifact-directory>');
+    console.error('Example: node schemas/validate.js content/days/2026-04-05');
+    process.exit(1);
+  }
 }
 
 const resolvedDir = path.resolve(targetDir);

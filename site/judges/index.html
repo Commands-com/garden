@@ -59,7 +59,7 @@
               change build on what came before? Will it make tomorrow's changes easier and
               more valuable? Does it maintain the health of the whole system?"
             </p>
-            <p class="judge-card__model"></p>
+            <p class="judge-card__model">Model: <span class="judge-card__model-name">—</span></p>
           </article>
 
           <!-- The Visitor -->
@@ -72,7 +72,7 @@
               for the first time understand this? Is it immediately useful? Does it reduce
               confusion rather than add complexity?"
             </p>
-            <p class="judge-card__model"></p>
+            <p class="judge-card__model">Model: <span class="judge-card__model-name">—</span></p>
           </article>
 
           <!-- The Explorer -->
@@ -85,7 +85,7 @@
               we haven't done before? Will it make the garden more interesting? Does it take
               a creative risk that could pay off?"
             </p>
-            <p class="judge-card__model"></p>
+            <p class="judge-card__model">Model: <span class="judge-card__model-name">—</span></p>
           </article>
 
         </div>
@@ -229,7 +229,7 @@
       <p class="site-footer__text">
         Powered by <a href="https://commands.com" class="site-footer__link">Commands.com</a>
       </p>
-      <span class="site-footer__meta">artifact schema v1</span>
+      <span class="site-footer__meta">artifact schema v2</span>
     </div>
   </footer>
 
@@ -257,9 +257,9 @@
           const judge = judgePanel.find((j) => j.lens === lens);
           if (!judge) return;
 
-          const modelEl = card.querySelector('.judge-card__model');
-          if (modelEl && judge.modelFamily) {
-            modelEl.textContent = `Currently backed by ${judge.modelFamily}`;
+          const modelNameEl = card.querySelector('.judge-card__model-name');
+          if (modelNameEl) {
+            modelNameEl.textContent = judge.model || judge.displayName || judge.modelFamily || '—';
           }
         });
       } catch (err) {

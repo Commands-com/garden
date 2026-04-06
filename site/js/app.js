@@ -133,6 +133,16 @@ async function loadLatestDay() {
   return { manifest, day: latest, artifacts };
 }
 
+async function getReactions(dayDate) {
+  if (!dayDate) return {};
+  const encoded = encodeURIComponent(dayDate);
+  const data = await fetchOptional(`${CONFIG.apiBaseUrl}/reactions?dayDate=${encoded}`, 'json');
+  if (data && typeof data.reactions === 'object' && data.reactions) {
+    return data.reactions;
+  }
+  return {};
+}
+
 // ---------- Date Formatting ----------
 function formatDate(dateStr) {
   const date = new Date(dateStr + 'T12:00:00');
@@ -294,6 +304,7 @@ export {
   getAdjacentDays,
   loadDay,
   loadLatestDay,
+  getReactions,
   formatDate,
   formatDateShort,
   relativeTime,

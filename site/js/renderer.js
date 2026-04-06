@@ -439,19 +439,20 @@ function renderJudgePanel(judgePanel) {
 
   judgePanel.forEach((judge) => {
     const icon = lensIcons[judge.lens] || '\u{1F916}';
-    const displayName = judge.displayName || judge.lens || 'Judge';
-    const modelFamily = judge.modelFamily || 'Unknown';
+    const model = judge.model || judge.displayName || 'Unknown model';
     const lens = judge.lens
       ? judge.lens.charAt(0).toUpperCase() + judge.lens.slice(1)
       : '';
 
     const card = el('article', { className: 'judge-card' },
       el('div', { className: 'judge-card__icon' }, icon),
-      el('h3', { className: 'judge-card__name' }, displayName),
-      el('p', { className: 'judge-card__role' }, lens),
-      el('p', { className: 'judge-card__model' },
-        `Backed by ${modelFamily}`
-      )
+      el('h3', { className: 'judge-card__name' }, lens || judge.displayName || 'Judge'),
+      el('p', { className: 'judge-card__role' }, model),
+      lens
+        ? el('p', { className: 'judge-card__model' },
+            `Lens: ${lens}`
+          )
+        : null
     );
     grid.appendChild(card);
   });
@@ -474,11 +475,11 @@ function renderReviewerBreakdown(candidate) {
   );
 
   breakdown.forEach((entry) => {
-    // The actual shape is { reviewer: { displayName, modelFamily, lens, ... }, overallScore, dimensionScores, keep, mustChange, risks }
+    // The actual shape is { reviewer: { displayName, modelFamily, lens, model, ... }, overallScore, dimensionScores, keep, mustChange, risks }
     const reviewerInfo = entry.reviewer || entry;
-    const displayName = reviewerInfo.displayName || reviewerInfo.lens || 'Judge';
-    const modelFamily = reviewerInfo.modelFamily || '';
+    const model = reviewerInfo.model || reviewerInfo.displayName || 'Judge';
     const lens = reviewerInfo.lens || '';
+    const lensLabel = lens ? lens.charAt(0).toUpperCase() + lens.slice(1) : '';
     const score = entry.overallScore ?? entry.score ?? null;
 
     const reviewCard = el('div', {
@@ -486,17 +487,14 @@ function renderReviewerBreakdown(candidate) {
       style: 'border-left: 3px solid var(--color-sage);',
     });
 
-    // Header: judge name, model family, lens, overall score
+    // Header: model name, lens, overall score
     const header = el('div', {
       className: 'd-flex items-center gap-2 mb-3',
       style: 'flex-wrap: wrap;',
     },
-      el('strong', {}, displayName),
-      modelFamily
-        ? el('span', { className: 'tag' }, modelFamily)
-        : null,
-      lens
-        ? el('span', { className: 'tag tag--green' }, lens)
+      el('strong', {}, model),
+      lensLabel
+        ? el('span', { className: 'tag tag--green' }, lensLabel)
         : null,
       score != null
         ? el('span', { className: 'badge badge--shipped ml-2' }, `Score: ${score}`)

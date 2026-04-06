@@ -200,7 +200,7 @@
       <p class="site-footer__text">
         Powered by <a href="https://commands.com" class="site-footer__link">Commands.com</a>
       </p>
-      <span class="site-footer__meta">artifact schema v1</span>
+      <span class="site-footer__meta">artifact schema v2</span>
     </div>
   </footer>
 
@@ -211,6 +211,7 @@
       getDayByDate,
       getAdjacentDays,
       loadDay,
+      getReactions,
       formatDate,
       getDayUrl,
       getDateFromUrl,
@@ -256,6 +257,7 @@
         // Load artifacts
         const artifacts = await loadDay(dateStr);
         const dayMeta = getDayByDate(manifest, dateStr);
+        const reactions = await getReactions(dateStr);
 
         // Render header
         renderHeader(dateStr, dayMeta);
@@ -323,7 +325,7 @@
         // Reactions
         const reactionsContainer = document.getElementById('reactions-container');
         reactionsContainer.innerHTML = '';
-        reactionsContainer.appendChild(renderReactions(dateStr));
+        reactionsContainer.appendChild(renderReactions(dateStr, reactions));
 
         // Day navigation
         renderDayNav(manifest, dateStr);
