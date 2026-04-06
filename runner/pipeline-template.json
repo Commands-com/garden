@@ -9,9 +9,6 @@
   "controllerProfileId": "{{CONTROLLER_PROFILE_ID}}",
   "projectDirectory": "{{PROJECT_DIRECTORY}}",
   "retentionMode": "persist_local",
-  "limits": {
-    "tokenBudget": {{TOKEN_BUDGET}}
-  },
   "orchestratorConfig": {
     "pipeline": [
       {
