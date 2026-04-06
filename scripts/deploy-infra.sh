@@ -79,6 +79,8 @@ DYNAMO_TABLE_PREFIX="${DYNAMO_TABLE_PREFIX:-command-garden}"
 AWS_REGION="${AWS_REGION:-us-east-1}"
 LAMBDA_CODE_BUCKET="${LAMBDA_CODE_BUCKET:-}"
 LAMBDA_CODE_VERSION="${LAMBDA_CODE_VERSION:-latest}"
+CUSTOM_DOMAIN_NAME="${CUSTOM_DOMAIN_NAME:-}"
+ACM_CERTIFICATE_ARN="${ACM_CERTIFICATE_ARN:-}"
 
 # Build AWS CLI flags
 AWS_FLAGS=()
@@ -221,6 +223,12 @@ if $LAMBDA_PARAMS_SET; then
     "ParameterKey=LambdaCodeVersion,ParameterValue=$LAMBDA_CODE_VERSION"
   )
 fi
+if [[ -n "$CUSTOM_DOMAIN_NAME" ]]; then
+  PARAMS+=("ParameterKey=CustomDomainName,ParameterValue=$CUSTOM_DOMAIN_NAME")
+fi
+if [[ -n "$ACM_CERTIFICATE_ARN" ]]; then
+  PARAMS+=("ParameterKey=AcmCertificateArn,ParameterValue=$ACM_CERTIFICATE_ARN")
+fi
 
 if $STACK_EXISTS; then
   echo "Stack exists. Running update..."
@@ -231,7 +239,7 @@ if $STACK_EXISTS; then
     --stack-name "$STACK_NAME" \
     --template-body "file://$DEPLOY_TEMPLATE" \
     --parameters "${PARAMS[@]}" \
-    --capabilities CAPABILITY_IAM \
+    --capabilities CAPABILITY_NAMED_IAM \
     ${AWS_FLAGS[@]+"${AWS_FLAGS[@]}"} 2>&1) || UPDATE_EXIT=$?
 
   if [[ $UPDATE_EXIT -ne 0 ]]; then
@@ -260,7 +268,7 @@ else
     --stack-name "$STACK_NAME" \
     --template-body "file://$DEPLOY_TEMPLATE" \
     --parameters "${PARAMS[@]}" \
-    --capabilities CAPABILITY_IAM \
+    --capabilities CAPABILITY_NAMED_IAM \
     ${AWS_FLAGS[@]+"${AWS_FLAGS[@]}"}
 
   WAIT_ACTION="stack-create-complete"

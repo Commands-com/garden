@@ -223,7 +223,7 @@ Resources:
             TargetOriginId: FeedbackApiOrigin
             ViewerProtocolPolicy: redirect-to-https
             Compress: true
-            CachePolicyId: !Ref NoCachePolicy
+            CachePolicyId: 4135ea2d-6df8-44a3-9df3-4b5a84be39ad  # AWS managed CachingDisabled
             OriginRequestPolicyId: !Ref ApiOriginRequestPolicy
             AllowedMethods:
               - GET
@@ -242,7 +242,7 @@ Resources:
             TargetOriginId: ReactionsApiOrigin
             ViewerProtocolPolicy: redirect-to-https
             Compress: true
-            CachePolicyId: !Ref NoCachePolicy
+            CachePolicyId: 4135ea2d-6df8-44a3-9df3-4b5a84be39ad  # AWS managed CachingDisabled
             OriginRequestPolicyId: !Ref ApiOriginRequestPolicy
             AllowedMethods:
               - GET
@@ -261,7 +261,7 @@ Resources:
             TargetOriginId: HealthApiOrigin
             ViewerProtocolPolicy: redirect-to-https
             Compress: true
-            CachePolicyId: !Ref NoCachePolicy
+            CachePolicyId: 4135ea2d-6df8-44a3-9df3-4b5a84be39ad  # AWS managed CachingDisabled
             OriginRequestPolicyId: !Ref ApiOriginRequestPolicy
             AllowedMethods:
               - GET
@@ -322,23 +322,7 @@ Resources:
 
   # ---- CloudFront Cache Policies ----
 
-  NoCachePolicy:
-    Type: AWS::CloudFront::CachePolicy
-    Properties:
-      CachePolicyConfig:
-        Name: !Sub '${AWS::StackName}-no-cache'
-        DefaultTTL: 0
-        MaxTTL: 0
-        MinTTL: 0
-        ParametersInCacheKeyAndForwardedToOrigin:
-          CookiesConfig:
-            CookieBehavior: none
-          HeadersConfig:
-            HeaderBehavior: none
-          QueryStringsConfig:
-            QueryStringBehavior: all
-          EnableAcceptEncodingGzip: true
-          EnableAcceptEncodingBrotli: true
+  # Using AWS managed CachingDisabled policy: 4135ea2d-6df8-44a3-9df3-4b5a84be39ad
 
   ApiOriginRequestPolicy:
     Type: AWS::CloudFront::OriginRequestPolicy
@@ -658,7 +642,6 @@ Resources:
           - origin
         AllowMethods:
           - POST
-          - OPTIONS
         AllowOrigins:
           - !If
             - UseCustomDomain
@@ -711,7 +694,6 @@ Resources:
         AllowMethods:
           - POST
           - GET
-          - OPTIONS
         AllowOrigins:
           - !If
             - UseCustomDomain
@@ -758,7 +740,6 @@ Resources:
           - content-type
         AllowMethods:
           - GET
-          - OPTIONS
         AllowOrigins:
           - !If
             - UseCustomDomain
