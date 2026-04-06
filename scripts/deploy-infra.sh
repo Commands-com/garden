@@ -80,6 +80,7 @@ AWS_REGION="${AWS_REGION:-us-east-1}"
 LAMBDA_CODE_BUCKET="${LAMBDA_CODE_BUCKET:-}"
 LAMBDA_CODE_VERSION="${LAMBDA_CODE_VERSION:-latest}"
 CUSTOM_DOMAIN_NAME="${CUSTOM_DOMAIN_NAME:-}"
+ALTERNATE_DOMAIN_NAME="${ALTERNATE_DOMAIN_NAME:-}"
 ACM_CERTIFICATE_ARN="${ACM_CERTIFICATE_ARN:-}"
 
 # Build AWS CLI flags
@@ -225,6 +226,9 @@ if $LAMBDA_PARAMS_SET; then
 fi
 if [[ -n "$CUSTOM_DOMAIN_NAME" ]]; then
   PARAMS+=("ParameterKey=CustomDomainName,ParameterValue=$CUSTOM_DOMAIN_NAME")
+fi
+if [[ -n "$ALTERNATE_DOMAIN_NAME" ]]; then
+  PARAMS+=("ParameterKey=AlternateDomainName,ParameterValue=$ALTERNATE_DOMAIN_NAME")
 fi
 if [[ -n "$ACM_CERTIFICATE_ARN" ]]; then
   PARAMS+=("ParameterKey=AcmCertificateArn,ParameterValue=$ACM_CERTIFICATE_ARN")
