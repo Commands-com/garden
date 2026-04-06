@@ -65,7 +65,7 @@
         <div class="section__header">
           <span class="section__label">Step 2</span>
           <h2 class="section__title">How candidates scored</h2>
-          <p class="section__subtitle">Full scoring breakdown across all six dimensions.</p>
+          <p class="section__subtitle">Full scoring breakdown across all scoring dimensions.</p>
         </div>
         <div id="score-table-container">
           <div class="skeleton skeleton--card"></div>
@@ -90,11 +90,25 @@
       </div>
     </section>
 
-    <!-- 4. Feedback that influenced today -->
-    <section class="section" id="feedback-section">
+    <!-- 4. Judge Panel -->
+    <section class="section" id="judges-section">
       <div class="container">
         <div class="section__header">
           <span class="section__label">Step 4</span>
+          <h2 class="section__title">Judge Panel</h2>
+          <p class="section__subtitle">The AI judges who evaluated candidates for this day.</p>
+        </div>
+        <div id="judges-panel-container">
+          <div class="skeleton skeleton--card"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 5. Feedback that influenced today -->
+    <section class="section" id="feedback-section">
+      <div class="container">
+        <div class="section__header">
+          <span class="section__label">Step 5</span>
           <h2 class="section__title">Feedback that influenced today</h2>
           <p class="section__subtitle">Community input that shaped the decision.</p>
         </div>
@@ -104,11 +118,11 @@
       </div>
     </section>
 
-    <!-- 5. What changed in the product -->
+    <!-- 6. What changed in the product -->
     <section class="section" id="build-section">
       <div class="container">
         <div class="section__header">
-          <span class="section__label">Step 5</span>
+          <span class="section__label">Step 6</span>
           <h2 class="section__title">What changed in the product</h2>
         </div>
         <div id="build-summary-container" class="card">
@@ -120,11 +134,11 @@
       </div>
     </section>
 
-    <!-- 6. Review findings -->
+    <!-- 7. Review findings -->
     <section class="section" id="review-section">
       <div class="container">
         <div class="section__header">
-          <span class="section__label">Step 6</span>
+          <span class="section__label">Step 7</span>
           <h2 class="section__title">Review findings</h2>
         </div>
         <div id="review-container" class="card">
@@ -135,11 +149,11 @@
       </div>
     </section>
 
-    <!-- 7. Test results -->
+    <!-- 8. Test results -->
     <section class="section" id="tests-section">
       <div class="container">
         <div class="section__header">
-          <span class="section__label">Step 7</span>
+          <span class="section__label">Step 8</span>
           <h2 class="section__title">Test results</h2>
         </div>
         <div id="test-results-container">
@@ -209,6 +223,7 @@
       renderCandidates,
       renderWinner,
       renderScoreTable,
+      renderJudgePanel,
       renderFeedbackDigest,
       renderMarkdown,
       renderTestResults,
@@ -265,6 +280,13 @@
             return renderWinner(artifacts.decision.winner, artifacts.decision.rationale);
           }
           return emptyNote('No winner data available.');
+        });
+
+        renderSection('judges-panel-container', () => {
+          if (artifacts.decision && artifacts.decision.judgePanel) {
+            return renderJudgePanel(artifacts.decision.judgePanel);
+          }
+          return emptyNote('No judge panel data available for this day.');
         });
 
         renderSection('feedback-digest-container', () => {

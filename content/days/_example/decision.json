@@ -1,118 +1,794 @@
 {
-  "schemaVersion": 1,
+  "schemaVersion": 2,
   "runDate": "2026-04-05",
   "generatedAt": "2026-04-05T09:42:00.000Z",
-  "scoringDimensions": [
-    { "name": "compoundingValue", "weight": 30, "description": "Prefer moves that create new surfaces future days can build on" },
-    { "name": "usefulness", "weight": 20, "description": "Reward concrete user value" },
-    { "name": "feasibility", "weight": 20, "description": "Keep the daily cadence honest" },
-    { "name": "artifactClarity", "weight": 15, "description": "Visitors should understand the result" },
-    { "name": "novelty", "weight": 5, "description": "Preserve surprise without letting it dominate" },
-    { "name": "feedbackPull", "weight": 5, "description": "Let the audience influence, not dictate" },
-    { "name": "shareability", "weight": 5, "description": "Prefer changes that are naturally legible and discussable in public" }
+  "judgePanel": [
+    {
+      "agentId": "judge-claude-gardener",
+      "displayName": "Claude (Gardener)",
+      "modelFamily": "claude",
+      "provider": "anthropic",
+      "model": "claude-sonnet-4-20250514",
+      "lens": "gardener",
+      "conceptKey": "compounding-steward"
+    },
+    {
+      "agentId": "judge-gpt-visitor",
+      "displayName": "GPT (Visitor)",
+      "modelFamily": "gpt",
+      "provider": "openai",
+      "model": "gpt-4o-2024-08-06",
+      "lens": "visitor",
+      "conceptKey": "first-impression-advocate"
+    },
+    {
+      "agentId": "judge-gemini-explorer",
+      "displayName": "Gemini (Explorer)",
+      "modelFamily": "gemini",
+      "provider": "google",
+      "model": "gemini-2.0-flash",
+      "lens": "explorer",
+      "conceptKey": "novelty-scout"
+    }
   ],
   "candidates": [
     {
       "id": "candidate-1",
       "title": "Add interactive site map showing all shipped features",
       "summary": "A visual map on the homepage showing every feature shipped to date, clustered by theme, with links to each daily entry.",
-      "scores": {
-        "compoundingValue": 85,
-        "usefulness": 78,
-        "feasibility": 70,
-        "artifactClarity": 82,
-        "novelty": 65,
-        "feedbackPull": 40,
-        "shareability": 80
+      "averageScore": 7.9,
+      "reviewCount": 3,
+      "dimensionAverages": {
+        "compoundingValue": {
+          "label": "Compounding Value",
+          "average": 8.7,
+          "reviewCount": 3
+        },
+        "usefulnessClarity": {
+          "label": "Usefulness & Clarity",
+          "average": 7.8,
+          "reviewCount": 3
+        },
+        "feasibility": {
+          "label": "Feasibility",
+          "average": 6.8,
+          "reviewCount": 3
+        },
+        "legibility": {
+          "label": "Legibility",
+          "average": 8,
+          "reviewCount": 3
+        },
+        "noveltySurprise": {
+          "label": "Novelty & Surprise",
+          "average": 7.2,
+          "reviewCount": 3
+        },
+        "continuity": {
+          "label": "Continuity",
+          "average": 8.3,
+          "reviewCount": 3
+        },
+        "shareability": {
+          "label": "Shareability",
+          "average": 8.3,
+          "reviewCount": 3
+        }
       },
-      "totalScore": 76.3,
-      "rank": 1,
-      "feedbackReferences": ["Multiple users asked for a way to see everything built so far"]
+      "reviewerBreakdown": [
+        {
+          "reviewer": {
+            "agentId": "judge-claude-gardener",
+            "displayName": "Claude (Gardener)",
+            "modelFamily": "claude",
+            "lens": "gardener"
+          },
+          "overallScore": 8.4,
+          "dimensionScores": {
+            "compoundingValue": 9.2,
+            "usefulnessClarity": 8,
+            "feasibility": 6.5,
+            "legibility": 8.2,
+            "noveltySurprise": 6.2,
+            "continuity": 9,
+            "shareability": 8
+          },
+          "keep": [
+            "Every future day auto-populates the map — maximum compounding surface",
+            "Addresses the most common visitor question: 'what has been built?'"
+          ],
+          "mustChange": [
+            "Needs progressive disclosure — 50+ nodes will overwhelm without clustering"
+          ],
+          "risks": [
+            "Performance may degrade as day count grows past 100"
+          ]
+        },
+        {
+          "reviewer": {
+            "agentId": "judge-gpt-visitor",
+            "displayName": "GPT (Visitor)",
+            "modelFamily": "gpt",
+            "lens": "visitor"
+          },
+          "overallScore": 7.8,
+          "dimensionScores": {
+            "compoundingValue": 8,
+            "usefulnessClarity": 8.2,
+            "feasibility": 7.2,
+            "legibility": 8.5,
+            "noveltySurprise": 7,
+            "continuity": 7.8,
+            "shareability": 8.8
+          },
+          "keep": [
+            "First-time visitors immediately understand the project scope",
+            "Visual clustering by theme is more intuitive than a chronological list"
+          ],
+          "mustChange": [
+            "Must have a clear call-to-action — visitors should know what to click first"
+          ],
+          "risks": [
+            "If the visual design is cluttered, visitors will bounce instead of explore"
+          ]
+        },
+        {
+          "reviewer": {
+            "agentId": "judge-gemini-explorer",
+            "displayName": "Gemini (Explorer)",
+            "modelFamily": "gemini",
+            "lens": "explorer"
+          },
+          "overallScore": 7.6,
+          "dimensionScores": {
+            "compoundingValue": 8.8,
+            "usefulnessClarity": 7.2,
+            "feasibility": 6.8,
+            "legibility": 7.3,
+            "noveltySurprise": 8.5,
+            "continuity": 8.2,
+            "shareability": 8
+          },
+          "keep": [
+            "An interactive map of an AI's own output is inherently novel and meta",
+            "Creates a 'wow' moment — visitors can see the full scope at a glance"
+          ],
+          "mustChange": [
+            "Add hover-state previews so exploration feels rewarding without leaving the map"
+          ],
+          "risks": [
+            "Risk of looking like a generic node graph — needs distinctive visual identity"
+          ]
+        }
+      ],
+      "keep": [
+        "Every future day auto-populates the map — maximum compounding surface",
+        "First-time visitors immediately understand the project scope",
+        "An interactive map of an AI's own output is inherently novel and meta"
+      ],
+      "mustChange": [
+        "Needs progressive disclosure — 50+ nodes will overwhelm without clustering",
+        "Must have a clear call-to-action for first-time visitors"
+      ],
+      "risks": [
+        "Performance may degrade as day count grows past 100",
+        "Risk of looking like a generic node graph without distinctive styling"
+      ],
+      "feedbackReferences": [
+        "Multiple users asked for a way to see everything built so far"
+      ]
     },
     {
       "id": "candidate-2",
       "title": "Add dark mode toggle",
       "summary": "Implement a dark color scheme with a toggle in the navigation, persisted via localStorage.",
-      "scores": {
-        "compoundingValue": 45,
-        "usefulness": 82,
-        "feasibility": 90,
-        "artifactClarity": 75,
-        "novelty": 30,
-        "feedbackPull": 60,
-        "shareability": 50
+      "averageScore": 6.4,
+      "reviewCount": 3,
+      "dimensionAverages": {
+        "compoundingValue": {
+          "label": "Compounding Value",
+          "average": 4.3,
+          "reviewCount": 3
+        },
+        "usefulnessClarity": {
+          "label": "Usefulness & Clarity",
+          "average": 8.2,
+          "reviewCount": 3
+        },
+        "feasibility": {
+          "label": "Feasibility",
+          "average": 9,
+          "reviewCount": 3
+        },
+        "legibility": {
+          "label": "Legibility",
+          "average": 6.7,
+          "reviewCount": 3
+        },
+        "noveltySurprise": {
+          "label": "Novelty & Surprise",
+          "average": 2.7,
+          "reviewCount": 3
+        },
+        "continuity": {
+          "label": "Continuity",
+          "average": 4.8,
+          "reviewCount": 3
+        },
+        "shareability": {
+          "label": "Shareability",
+          "average": 4.5,
+          "reviewCount": 3
+        }
       },
-      "totalScore": 63.0,
-      "rank": 2,
-      "feedbackReferences": ["Two users requested dark mode"]
+      "reviewerBreakdown": [
+        {
+          "reviewer": {
+            "agentId": "judge-claude-gardener",
+            "displayName": "Claude (Gardener)",
+            "modelFamily": "claude",
+            "lens": "gardener"
+          },
+          "overallScore": 5.8,
+          "dimensionScores": {
+            "compoundingValue": 4,
+            "usefulnessClarity": 7.8,
+            "feasibility": 9.2,
+            "legibility": 6.5,
+            "noveltySurprise": 2,
+            "continuity": 4.5,
+            "shareability": 4.2
+          },
+          "keep": [
+            "Solid utility — dark mode is a genuine accessibility improvement"
+          ],
+          "mustChange": [
+            "Must ensure every existing component has dark-mode-compatible styles"
+          ],
+          "risks": [
+            "Low compounding value — dark mode doesn't create new surfaces for future days"
+          ]
+        },
+        {
+          "reviewer": {
+            "agentId": "judge-gpt-visitor",
+            "displayName": "GPT (Visitor)",
+            "modelFamily": "gpt",
+            "lens": "visitor"
+          },
+          "overallScore": 7.2,
+          "dimensionScores": {
+            "compoundingValue": 4.8,
+            "usefulnessClarity": 8.8,
+            "feasibility": 9,
+            "legibility": 7.2,
+            "noveltySurprise": 2.8,
+            "continuity": 5.2,
+            "shareability": 5
+          },
+          "keep": [
+            "Visitors expect dark mode in 2026 — its absence is noticeable",
+            "Toggle in nav is discoverable without instructions"
+          ],
+          "mustChange": [
+            "Respect prefers-color-scheme so it just works for most visitors"
+          ],
+          "risks": [
+            "If dark mode has contrast issues, it hurts accessibility instead of helping"
+          ]
+        },
+        {
+          "reviewer": {
+            "agentId": "judge-gemini-explorer",
+            "displayName": "Gemini (Explorer)",
+            "modelFamily": "gemini",
+            "lens": "explorer"
+          },
+          "overallScore": 6.2,
+          "dimensionScores": {
+            "compoundingValue": 4.2,
+            "usefulnessClarity": 8,
+            "feasibility": 8.8,
+            "legibility": 6.3,
+            "noveltySurprise": 3.2,
+            "continuity": 4.8,
+            "shareability": 4.3
+          },
+          "keep": [
+            "Practical quality-of-life improvement"
+          ],
+          "mustChange": [
+            "Needs a smooth transition animation to feel polished, not jarring"
+          ],
+          "risks": [
+            "Completely unsurprising — won't generate any social media interest"
+          ]
+        }
+      ],
+      "keep": [
+        "Solid utility — dark mode is a genuine accessibility improvement",
+        "Visitors expect dark mode in 2026 — its absence is noticeable"
+      ],
+      "mustChange": [
+        "Must ensure every existing component has dark-mode-compatible styles",
+        "Respect prefers-color-scheme for automatic switching"
+      ],
+      "risks": [
+        "Low compounding value — doesn't create new surfaces for future days",
+        "Contrast issues could hurt accessibility instead of helping"
+      ],
+      "feedbackReferences": [
+        "Two users requested dark mode"
+      ]
     },
     {
       "id": "candidate-3",
       "title": "Add reading time estimates to daily entries",
       "summary": "Calculate and display estimated reading time for each daily entry page based on content length.",
-      "scores": {
-        "compoundingValue": 30,
-        "usefulness": 55,
-        "feasibility": 95,
-        "artifactClarity": 70,
-        "novelty": 25,
-        "feedbackPull": 10,
-        "shareability": 20
+      "averageScore": 4.6,
+      "reviewCount": 3,
+      "dimensionAverages": {
+        "compoundingValue": {
+          "label": "Compounding Value",
+          "average": 2.8,
+          "reviewCount": 3
+        },
+        "usefulnessClarity": {
+          "label": "Usefulness & Clarity",
+          "average": 5.5,
+          "reviewCount": 3
+        },
+        "feasibility": {
+          "label": "Feasibility",
+          "average": 9.5,
+          "reviewCount": 3
+        },
+        "legibility": {
+          "label": "Legibility",
+          "average": 5.7,
+          "reviewCount": 3
+        },
+        "noveltySurprise": {
+          "label": "Novelty & Surprise",
+          "average": 1.5,
+          "reviewCount": 3
+        },
+        "continuity": {
+          "label": "Continuity",
+          "average": 3.5,
+          "reviewCount": 3
+        },
+        "shareability": {
+          "label": "Shareability",
+          "average": 1.8,
+          "reviewCount": 3
+        }
       },
-      "totalScore": 49.0,
-      "rank": 3,
+      "reviewerBreakdown": [
+        {
+          "reviewer": {
+            "agentId": "judge-claude-gardener",
+            "displayName": "Claude (Gardener)",
+            "modelFamily": "claude",
+            "lens": "gardener"
+          },
+          "overallScore": 4.2,
+          "dimensionScores": {
+            "compoundingValue": 2.5,
+            "usefulnessClarity": 5,
+            "feasibility": 9.5,
+            "legibility": 5.5,
+            "noveltySurprise": 1,
+            "continuity": 3,
+            "shareability": 1.5
+          },
+          "keep": [
+            "Trivial to implement — near-zero risk"
+          ],
+          "mustChange": [
+            "Reading time alone is too thin for a daily entry — needs to be bundled with something"
+          ],
+          "risks": [
+            "Almost no compounding value — a one-and-done change"
+          ]
+        },
+        {
+          "reviewer": {
+            "agentId": "judge-gpt-visitor",
+            "displayName": "GPT (Visitor)",
+            "modelFamily": "gpt",
+            "lens": "visitor"
+          },
+          "overallScore": 5.2,
+          "dimensionScores": {
+            "compoundingValue": 3,
+            "usefulnessClarity": 6.2,
+            "feasibility": 9.5,
+            "legibility": 6,
+            "noveltySurprise": 1.5,
+            "continuity": 3.8,
+            "shareability": 2
+          },
+          "keep": [
+            "Visitors can decide which entries to read based on time commitment"
+          ],
+          "mustChange": [
+            "Show reading time in the archive listing too, not just on the detail page"
+          ],
+          "risks": [
+            "If daily entries are all short (1-2 min), the feature feels pointless"
+          ]
+        },
+        {
+          "reviewer": {
+            "agentId": "judge-gemini-explorer",
+            "displayName": "Gemini (Explorer)",
+            "modelFamily": "gemini",
+            "lens": "explorer"
+          },
+          "overallScore": 4.5,
+          "dimensionScores": {
+            "compoundingValue": 3,
+            "usefulnessClarity": 5.3,
+            "feasibility": 9.5,
+            "legibility": 5.5,
+            "noveltySurprise": 2,
+            "continuity": 3.7,
+            "shareability": 2
+          },
+          "keep": [
+            "Safe, low-effort change that won't break anything"
+          ],
+          "mustChange": [
+            "Needs visual design attention — a plain '3 min read' label looks generic"
+          ],
+          "risks": [
+            "Zero novelty — won't excite anyone or generate conversation"
+          ]
+        }
+      ],
+      "keep": [
+        "Trivial to implement — near-zero risk",
+        "Visitors can decide which entries to read based on time commitment"
+      ],
+      "mustChange": [
+        "Too thin for a standalone daily entry — should be bundled",
+        "Show reading time in archive listing, not just detail pages"
+      ],
+      "risks": [
+        "Almost no compounding value — a one-and-done change",
+        "Zero novelty — won't generate conversation"
+      ],
       "feedbackReferences": []
     },
     {
       "id": "candidate-4",
       "title": "Build an RSS feed for daily entries",
       "summary": "Generate an RSS/Atom feed updated daily so visitors can subscribe via feed readers.",
-      "scores": {
-        "compoundingValue": 60,
-        "usefulness": 70,
-        "feasibility": 85,
-        "artifactClarity": 50,
-        "novelty": 20,
-        "feedbackPull": 35,
-        "shareability": 40
+      "averageScore": 6.1,
+      "reviewCount": 3,
+      "dimensionAverages": {
+        "compoundingValue": {
+          "label": "Compounding Value",
+          "average": 6.3,
+          "reviewCount": 3
+        },
+        "usefulnessClarity": {
+          "label": "Usefulness & Clarity",
+          "average": 7,
+          "reviewCount": 3
+        },
+        "feasibility": {
+          "label": "Feasibility",
+          "average": 8.7,
+          "reviewCount": 3
+        },
+        "legibility": {
+          "label": "Legibility",
+          "average": 4.8,
+          "reviewCount": 3
+        },
+        "noveltySurprise": {
+          "label": "Novelty & Surprise",
+          "average": 2.2,
+          "reviewCount": 3
+        },
+        "continuity": {
+          "label": "Continuity",
+          "average": 6,
+          "reviewCount": 3
+        },
+        "shareability": {
+          "label": "Shareability",
+          "average": 4,
+          "reviewCount": 3
+        }
       },
-      "totalScore": 58.25,
-      "rank": 4,
-      "feedbackReferences": ["One user asked about RSS support"]
+      "reviewerBreakdown": [
+        {
+          "reviewer": {
+            "agentId": "judge-claude-gardener",
+            "displayName": "Claude (Gardener)",
+            "modelFamily": "claude",
+            "lens": "gardener"
+          },
+          "overallScore": 6.5,
+          "dimensionScores": {
+            "compoundingValue": 7,
+            "usefulnessClarity": 7.2,
+            "feasibility": 8.8,
+            "legibility": 4.5,
+            "noveltySurprise": 1.5,
+            "continuity": 6.5,
+            "shareability": 3.8
+          },
+          "keep": [
+            "Creates a permanent distribution channel — every future day flows through it automatically",
+            "Standard protocol means zero maintenance burden"
+          ],
+          "mustChange": [
+            "Must include full content, not just titles — truncated RSS feeds frustrate readers"
+          ],
+          "risks": [
+            "RSS audience is small and declining — limited reach compared to social"
+          ]
+        },
+        {
+          "reviewer": {
+            "agentId": "judge-gpt-visitor",
+            "displayName": "GPT (Visitor)",
+            "modelFamily": "gpt",
+            "lens": "visitor"
+          },
+          "overallScore": 6,
+          "dimensionScores": {
+            "compoundingValue": 5.8,
+            "usefulnessClarity": 7.2,
+            "feasibility": 8.5,
+            "legibility": 5,
+            "noveltySurprise": 2.2,
+            "continuity": 5.8,
+            "shareability": 4
+          },
+          "keep": [
+            "Power users and developers expect RSS — its absence signals 'not serious'"
+          ],
+          "mustChange": [
+            "Need an obvious subscribe button — most visitors won't look for /feed.xml"
+          ],
+          "risks": [
+            "Most casual visitors don't use RSS — this serves a niche audience"
+          ]
+        },
+        {
+          "reviewer": {
+            "agentId": "judge-gemini-explorer",
+            "displayName": "Gemini (Explorer)",
+            "modelFamily": "gemini",
+            "lens": "explorer"
+          },
+          "overallScore": 5.7,
+          "dimensionScores": {
+            "compoundingValue": 6.2,
+            "usefulnessClarity": 6.6,
+            "feasibility": 8.7,
+            "legibility": 5,
+            "noveltySurprise": 2.9,
+            "continuity": 5.7,
+            "shareability": 4.2
+          },
+          "keep": [
+            "Good infrastructure investment even if few use it today"
+          ],
+          "mustChange": [
+            "Include structured metadata (tags, feature type) in the feed items"
+          ],
+          "risks": [
+            "Not visually interesting — hard to make a compelling social post about an RSS feed"
+          ]
+        }
+      ],
+      "keep": [
+        "Creates a permanent distribution channel that auto-updates",
+        "Power users and developers expect RSS"
+      ],
+      "mustChange": [
+        "Include full content, not just titles",
+        "Need a visible subscribe button on the site"
+      ],
+      "risks": [
+        "RSS audience is small — limited reach compared to social",
+        "Not visually interesting — hard to generate social engagement"
+      ],
+      "feedbackReferences": [
+        "One user asked about RSS support"
+      ]
     },
     {
       "id": "candidate-5",
       "title": "Add a 'random day' button to the archive",
       "summary": "A button in the archive that takes visitors to a randomly selected past daily entry.",
-      "scores": {
-        "compoundingValue": 20,
-        "usefulness": 40,
-        "feasibility": 95,
-        "artifactClarity": 60,
-        "novelty": 75,
-        "feedbackPull": 15,
-        "shareability": 60
+      "averageScore": 5.1,
+      "reviewCount": 3,
+      "dimensionAverages": {
+        "compoundingValue": {
+          "label": "Compounding Value",
+          "average": 2.5,
+          "reviewCount": 3
+        },
+        "usefulnessClarity": {
+          "label": "Usefulness & Clarity",
+          "average": 4.2,
+          "reviewCount": 3
+        },
+        "feasibility": {
+          "label": "Feasibility",
+          "average": 9.5,
+          "reviewCount": 3
+        },
+        "legibility": {
+          "label": "Legibility",
+          "average": 5.3,
+          "reviewCount": 3
+        },
+        "noveltySurprise": {
+          "label": "Novelty & Surprise",
+          "average": 7.3,
+          "reviewCount": 3
+        },
+        "continuity": {
+          "label": "Continuity",
+          "average": 3,
+          "reviewCount": 3
+        },
+        "shareability": {
+          "label": "Shareability",
+          "average": 5.8,
+          "reviewCount": 3
+        }
       },
-      "totalScore": 44.75,
-      "rank": 5,
+      "reviewerBreakdown": [
+        {
+          "reviewer": {
+            "agentId": "judge-claude-gardener",
+            "displayName": "Claude (Gardener)",
+            "modelFamily": "claude",
+            "lens": "gardener"
+          },
+          "overallScore": 4,
+          "dimensionScores": {
+            "compoundingValue": 1.8,
+            "usefulnessClarity": 3.5,
+            "feasibility": 9.5,
+            "legibility": 5,
+            "noveltySurprise": 6,
+            "continuity": 2.2,
+            "shareability": 4.8
+          },
+          "keep": [
+            "Encourages visitors to explore older entries they'd otherwise never find"
+          ],
+          "mustChange": [
+            "Should weight toward higher-quality entries to avoid sending visitors to weak days"
+          ],
+          "risks": [
+            "Minimal compounding — a button that exists and never changes"
+          ]
+        },
+        {
+          "reviewer": {
+            "agentId": "judge-gpt-visitor",
+            "displayName": "GPT (Visitor)",
+            "modelFamily": "gpt",
+            "lens": "visitor"
+          },
+          "overallScore": 5,
+          "dimensionScores": {
+            "compoundingValue": 2.5,
+            "usefulnessClarity": 4.5,
+            "feasibility": 9.5,
+            "legibility": 5.5,
+            "noveltySurprise": 7.2,
+            "continuity": 3.2,
+            "shareability": 5.5
+          },
+          "keep": [
+            "Fun and surprising — the kind of interaction that sparks delight",
+            "Good for returning visitors who want to discover something new"
+          ],
+          "mustChange": [
+            "Show a preview card before navigating so visitors know what they're getting"
+          ],
+          "risks": [
+            "Might feel gimmicky if there are only a handful of entries to randomize"
+          ]
+        },
+        {
+          "reviewer": {
+            "agentId": "judge-gemini-explorer",
+            "displayName": "Gemini (Explorer)",
+            "modelFamily": "gemini",
+            "lens": "explorer"
+          },
+          "overallScore": 6.3,
+          "dimensionScores": {
+            "compoundingValue": 3.2,
+            "usefulnessClarity": 4.6,
+            "feasibility": 9.5,
+            "legibility": 5.5,
+            "noveltySurprise": 8.8,
+            "continuity": 3.6,
+            "shareability": 7.2
+          },
+          "keep": [
+            "Highest novelty of all candidates — visitors love randomness as a discovery mechanic",
+            "Could be a signature interaction for Command Garden"
+          ],
+          "mustChange": [
+            "Add a fun animation or transition to make the randomness feel intentional"
+          ],
+          "risks": [
+            "If the archive is small, randomness is just a different kind of sequential browsing"
+          ]
+        }
+      ],
+      "keep": [
+        "Encourages exploration of older entries",
+        "Highest novelty — visitors love randomness as a discovery mechanic"
+      ],
+      "mustChange": [
+        "Weight toward higher-quality entries",
+        "Show a preview card before navigating"
+      ],
+      "risks": [
+        "Minimal compounding — a button that exists and never changes",
+        "Feels gimmicky if there are few entries to randomize"
+      ],
       "feedbackReferences": []
     }
   ],
   "winner": {
     "candidateId": "candidate-1",
-    "title": "Add interactive site map showing all shipped features"
+    "title": "Add interactive site map showing all shipped features",
+    "summary": "A visual map on the homepage showing every feature shipped to date, clustered by theme, with links to each daily entry.",
+    "averageScore": 7.9
   },
-  "rationale": "The site map creates a durable new surface that every future day's entry will automatically appear in. It addresses a real navigation gap — as daily entries accumulate, visitors need a way to see the full picture. It also directly responds to feedback asking for a 'big picture' view. While dark mode scored well on usefulness and feasibility, the site map compounds significantly more value over time.",
+  "featureType": "interaction",
+  "tags": [
+    "navigation",
+    "visualization",
+    "site-map",
+    "compounding"
+  ],
   "feedbackInfluence": [
     {
       "summary": "Several visitors asked for a way to see all features at a glance rather than scrolling through the archive chronologically.",
       "impact": "high"
     },
     {
-      "summary": "Two requests for dark mode pushed that candidate into the top 3.",
+      "summary": "Two requests for dark mode pushed that candidate into second place.",
       "impact": "medium"
     }
   ],
+  "artifacts": {
+    "spec": "spec.md",
+    "buildSummary": "build-summary.md",
+    "review": "review.md",
+    "testResults": "test-results.json",
+    "feedbackDigest": "feedback-digest.json"
+  },
+  "outreachSummary": {
+    "postUri": "at://did:plc:example/app.bsky.feed.post/abc123",
+    "postsLiked": 8,
+    "accountsFollowed": 3,
+    "mentionsHandled": 1,
+    "searchQueries": [
+      "AI building websites",
+      "autonomous software agent",
+      "AI shipping code daily"
+    ],
+    "executedAt": "2026-04-05T14:30:00.000Z"
+  },
   "bluesky_post": {
     "headline": "Our AI just built itself a map of everything it's ever shipped",
     "body": "Command Garden now has an interactive site map — every feature the autonomous pipeline has shipped, clustered by theme, explorable in one view. The AI chose this over dark mode because it compounds more. Here's why.",
@@ -134,7 +810,12 @@
       "howDoesItWork": "Every morning, a 5-stage pipeline runs: explore candidates, pick a winner, write a spec, implement it, test it, review it, and ship it. Today it built an interactive map of everything it's ever shipped. All artifacts are public.",
       "genericQuestion": "Good question — the whole point of Command Garden is radical transparency. Every decision, every candidate, every score is published. Check out today's entry to see the full trail."
     },
-    "hashtagsToUse": ["CommandGarden", "AIAgent", "AutonomousSoftware", "BuildInPublic"],
+    "hashtagsToUse": [
+      "CommandGarden",
+      "AIAgent",
+      "AutonomousSoftware",
+      "BuildInPublic"
+    ],
     "maxDailyActions": 15,
     "growthNotes": "Early days — follower count is low so we should prioritize discoverability. Engaging in AI agent and indie hacker threads is higher leverage than posting into the void. The interactive site map is visually compelling — lead with the screenshot in today's post."
   }

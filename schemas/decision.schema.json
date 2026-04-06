@@ -2,22 +2,40 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://commandgarden.com/schemas/decision.v1.json",
   "title": "Decision",
-  "description": "Daily pipeline decision record — candidates, scores, winner, and rationale.",
+  "description": "Daily pipeline decision record — candidates, scores, winner, and rationale. Supports v1 (single scorer) and v2 (multi-model judge panel).",
   "type": "object",
-  "required": ["schemaVersion", "runDate", "generatedAt", "candidates", "winner", "rationale", "scoringDimensions"],
+  "required": ["schemaVersion", "runDate", "generatedAt", "candidates", "winner"],
   "properties": {
-    "schemaVersion": { "type": "integer", "const": 1 },
+    "schemaVersion": { "type": "integer", "enum": [1, 2] },
     "runDate": { "type": "string", "pattern": "^\\d{4}-\\d{2}-\\d{2}$" },
     "generatedAt": { "type": "string", "format": "date-time" },
     "scoringDimensions": {
       "type": "array",
+      "description": "v1 uses {name, weight, description}; v2 uses {id, label} from the explore_room's DECISION_DIMENSIONS.",
       "items": {
         "type": "object",
-        "required": ["name", "weight"],
         "properties": {
           "name": { "type": "string" },
+          "id": { "type": "string" },
+          "label": { "type": "string" },
           "weight": { "type": "number", "minimum": 0, "maximum": 100 },
           "description": { "type": "string" }
+        }
+      }
+    },
+    "judgePanel": {
+      "type": "array",
+      "description": "The multi-model judge panel that evaluated candidates for this day.",
+      "items": {
+        "type": "object",
+        "properties": {
+          "agentId": { "type": "string" },
+          "displayName": { "type": "string" },
+          "modelFamily": { "type": ["string", "null"], "description": "e.g. 'claude', 'gpt', 'gemini'" },
+          "provider": { "type": ["string", "null"] },
+          "model": { "type": ["string", "null"] },
+          "lens": { "type": ["string", "null"], "description": "e.g. 'gardener', 'visitor', 'explorer'" },
+          "conceptKey": { "type": "string" }
         }
       }
     },
@@ -27,7 +45,7 @@
       "maxItems": 7,
       "items": {
         "type": "object",
-        "required": ["id", "title", "summary", "scores", "totalScore", "rank"],
+        "required": ["id", "title", "summary"],
         "properties": {
           "id": { "type": "string" },
           "title": { "type": "string" },
@@ -47,6 +65,49 @@
           },
           "totalScore": { "type": "number" },
           "rank": { "type": "integer", "minimum": 1 },
+          "averageScore": { "type": "number", "description": "Average score across all judges (v2)" },
+          "reviewCount": { "type": "integer", "description": "Number of judges that scored this candidate" },
+          "dimensionAverages": {
+            "type": "object",
+            "description": "Per-dimension averages across all judges. Keys are dimension IDs.",
+            "additionalProperties": {
+              "type": "object",
+              "properties": {
+                "label": { "type": "string" },
+                "average": { "type": ["number", "null"] },
+                "reviewCount": { "type": "integer" }
+              }
+            }
+          },
+          "reviewerBreakdown": {
+            "type": "array",
+            "description": "Per-judge scoring breakdown.",
+            "items": {
+              "type": "object",
+              "properties": {
+                "reviewer": {
+                  "type": "object",
+                  "properties": {
+                    "agentId": { "type": "string" },
+                    "displayName": { "type": "string" },
+                    "modelFamily": { "type": ["string", "null"] },
+                    "lens": { "type": ["string", "null"] }
+                  }
+                },
+                "overallScore": { "type": ["number", "null"] },
+                "dimensionScores": {
+                  "type": "object",
+                  "additionalProperties": { "type": ["number", "null"] }
+                },
+                "keep": { "type": "array", "items": { "type": "string" } },
+                "mustChange": { "type": "array", "items": { "type": "string" } },
+                "risks": { "type": "array", "items": { "type": "string" } }
+              }
+            }
+          },
+          "keep": { "type": "array", "items": { "type": "string" } },
+          "mustChange": { "type": "array", "items": { "type": "string" } },
+          "risks": { "type": "array", "items": { "type": "string" } },
           "feedbackReferences": {
             "type": "array",
             "items": { "type": "string" }
@@ -55,11 +116,12 @@
       }
     },
     "winner": {
-      "type": "object",
-      "required": ["candidateId", "title"],
+      "type": ["object", "null"],
       "properties": {
         "candidateId": { "type": "string" },
-        "title": { "type": "string" }
+        "title": { "type": "string" },
+        "summary": { "type": "string" },
+        "averageScore": { "type": "number" }
       }
     },
     "rationale": { "type": "string" },

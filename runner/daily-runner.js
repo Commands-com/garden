@@ -423,51 +423,27 @@ function captureGitBaseline() {
 }
 
 /**
- * Attempt to extract handoff payloads from the pipeline's final status output.
+ * Fetch the finalized pipeline report via the CLI `report` subcommand.
+ * This is the canonical way to get per-stage handoff payloads after
+ * the pipeline completes — replaces the old extractHandoffPayloads approach.
  *
- * The control-room's full pipelineReport (which contains per-stage handoff
- * payloads in `pipelineReport.stages[*].handoffPayloads[].data`) is generated
- * internally but is NOT exposed through any current CLI command — the CLI only
- * supports: saved, start, status, approve, stop, list.
- *
- * As a best-effort, we check whether the final status JSON itself includes
- * any embedded report data (future CLI versions may include it). If not,
- * generateCanonicalArtifacts will fall back to scanning the artifact directory
- * for files the pipeline stages wrote directly.
- *
- * @param {string} finalStatusJson - The raw JSON string from the final pipeline status poll
- * @returns {Object|null} Parsed handoff payloads keyed by stageId, or null
+ * @param {string} roomId - The pipeline room ID
+ * @returns {Promise<Object|null>} Parsed report data, or null
  */
-function extractHandoffPayloads(finalStatusJson) {
+async function fetchPipelineReport(roomId) {
+  if (!roomId) return null;
+
+  const cli = config.runner.commandsCliPath;
   try {
-    const parsed = JSON.parse(finalStatusJson);
-
-    // Check for pipelineReport embedded in the status (future-proof)
-    const stages = parsed.pipelineReport?.stages;
-    if (Array.isArray(stages)) {
-      const payloads = {};
-      for (const stage of stages) {
-        if (!stage.stageId) continue;
-        // The control-room stores handoff data as handoffPayloads[].data
-        const handoffArr = stage.handoffPayloads;
-        if (Array.isArray(handoffArr) && handoffArr.length > 0) {
-          // Use the first handoff payload's data field
-          payloads[stage.stageId] = handoffArr[0].data || handoffArr[0];
-        }
-      }
-      if (Object.keys(payloads).length > 0) return payloads;
+    const result = await spawnAsync(cli, ['pipeline', 'report', roomId, '--json']);
+    if (result.code !== 0) {
+      log(`Pipeline report command failed (code ${result.code}): ${result.stderr.slice(0, 200)}`);
+      return null;
     }
-
-    // Also check for flat handoffPayloads or stageOutputs (legacy shapes)
-    if (parsed.handoffPayloads && typeof parsed.handoffPayloads === 'object') {
-      return parsed.handoffPayloads;
-    }
-    if (parsed.stageOutputs && typeof parsed.stageOutputs === 'object') {
-      return parsed.stageOutputs;
-    }
-
-    return null;
-  } catch {
+    const parsed = JSON.parse(result.stdout.trim());
+    return parsed;
+  } catch (err) {
+    log(`Failed to fetch pipeline report: ${err.message}`);
     return null;
   }
 }
@@ -484,60 +460,89 @@ function extractHandoffPayloads(finalStatusJson) {
  *
  * @param {string} artifactDir
  * @param {string} runDate
- * @param {string|null} pipelineOutput - Raw JSON string from the final pipeline status poll
+ * @param {Object|null} pipelineReport - Parsed report data from fetchPipelineReport()
  * @param {string|null} gitBaselineSha - The git SHA captured before the pipeline started
  */
-function generateCanonicalArtifacts(artifactDir, runDate, pipelineOutput, gitBaselineSha) {
-  // Try to extract handoff payloads from the pipeline status output.
-  // Currently the CLI does not expose the full pipelineReport with handoff data,
-  // so this will typically return null and we fall back to file scanning below.
-  const handoffs = pipelineOutput ? extractHandoffPayloads(pipelineOutput) : null;
+function generateCanonicalArtifacts(artifactDir, runDate, pipelineReport, gitBaselineSha) {
+  // Extract per-stage handoff payloads from the pipeline report
+  const handoffs = {};
+  const reportPayload = pipelineReport?.reportPayload || pipelineReport;
+  const pReport = reportPayload?.report?.pipelineReport || reportPayload?.pipelineReport || {};
+  const stages = Array.isArray(pReport.stages) ? pReport.stages : [];
+  for (const stage of stages) {
+    if (!stage.stageId) continue;
+    const payloadArr = stage.handoffPayloads || [];
+    if (payloadArr.length > 0) {
+      handoffs[stage.stageId] = payloadArr[0].data || payloadArr[0];
+    }
+  }
 
   // ---- decision.json ----
   const decisionPath = path.join(artifactDir, 'decision.json');
   if (!fs.existsSync(decisionPath)) {
-    // Try to reconstruct from explore + implementation handoff payloads
-    const explorePayload = handoffs?.explore || handoffs?.Explore || null;
-    const implPayload = handoffs?.implementation || handoffs?.Implementation || null;
+    // The concept_bundle.v1 payload from explore_room exposes:
+    //   candidates  — full candidate records (conceptKey, title, aggregateScores, reviewerBreakdown, ...)
+    //   leaderboard — lightweight ranked list (conceptId, averageScore, dimensionAverages, ...)
+    //   selectedConcept — the winning concept (id, title, aggregateScores, reviewerBreakdown, ...)
+    //   judgePanel  — array of judge metadata objects
+    //   decision    — { scoringDimensions: [{id, label}], selectedConceptId, ... }
+    const explorePayload = handoffs.explore || null;
+    if (explorePayload) {
+      const candidateRecords = explorePayload.candidates || [];
+      const leaderboard = explorePayload.leaderboard || [];
+      const selected = explorePayload.selectedConcept || null;
+      const scoringDims = explorePayload.decision?.scoringDimensions || [];
 
-    if (implPayload || explorePayload) {
-      log('Generating decision.json from pipeline handoff payloads');
+      // Build candidates from candidateRecords (full shape), enriched with
+      // leaderboard rankings. Fall back to leaderboard if candidates is empty.
+      const source = candidateRecords.length > 0 ? candidateRecords : leaderboard;
       const decision = {
-        schemaVersion: 1,
+        schemaVersion: 2,
         runDate,
         generatedAt: new Date().toISOString(),
-        candidates: explorePayload?.candidates || [],
-        winner: implPayload?.winner || explorePayload?.winner || null,
-        rationale: implPayload?.rationale || explorePayload?.rationale || '',
-        scoringDimensions: [
-          { name: 'compoundingValue', weight: 30 },
-          { name: 'usefulness', weight: 20 },
-          { name: 'feasibility', weight: 20 },
-          { name: 'artifactClarity', weight: 15 },
-          { name: 'novelty', weight: 5 },
-          { name: 'feedbackPull', weight: 5 },
-          { name: 'shareability', weight: 5 },
-        ],
+        judgePanel: explorePayload.judgePanel || [],
+        scoringDimensions: scoringDims,
+        candidates: source.map((c, idx) => {
+          // candidateRecords use conceptKey; leaderboard uses conceptId
+          const id = c.conceptKey || c.conceptId || c.id || `candidate-${idx + 1}`;
+          // Scores live under aggregateScores in the full shape
+          const agg = c.aggregateScores || {};
+          return {
+            id,
+            title: c.title || c.conceptTitle || 'Untitled',
+            summary: c.oneLiner || c.summary || '',
+            averageScore: agg.overall ?? c.averageScore ?? 0,
+            reviewCount: agg.reviewCount ?? c.reviewCount ?? 0,
+            dimensionAverages: agg.dimensions || c.dimensionAverages || {},
+            reviewerBreakdown: c.reviewerBreakdown || [],
+            rank: c.rank ?? (idx + 1),
+            keep: c.keep || [],
+            mustChange: c.mustChange || c.improvementTargets || [],
+            risks: c.risks || [],
+          };
+        }),
+        winner: selected ? {
+          candidateId: selected.id || selected.conceptKey || 'candidate-1',
+          title: selected.title || 'Untitled',
+          summary: selected.oneLiner || selected.summary || '',
+          averageScore: selected.aggregateScores?.overall ?? selected.averageScore ?? 0,
+        } : null,
+        rationale: selected
+          ? `Selected as the highest-scoring candidate with an average score of ${(selected.aggregateScores?.overall || 0).toFixed(1)} across ${selected.aggregateScores?.reviewCount || 0} judge(s).`
+          : '',
       };
       fs.writeFileSync(decisionPath, JSON.stringify(decision, null, 2), 'utf8');
     } else {
       log('Warning: decision.json not found and no handoff payloads available — writing minimal placeholder');
       const placeholder = {
-        schemaVersion: 1,
+        schemaVersion: 2,
         runDate,
         generatedAt: new Date().toISOString(),
         _warning: 'Auto-generated placeholder — pipeline did not produce decision.json',
-        scoringDimensions: [
-          { name: 'compoundingValue', weight: 30 },
-          { name: 'usefulness', weight: 20 },
-          { name: 'feasibility', weight: 20 },
-          { name: 'artifactClarity', weight: 15 },
-          { name: 'novelty', weight: 5 },
-          { name: 'feedbackPull', weight: 5 },
-          { name: 'shareability', weight: 5 },
-        ],
+        judgePanel: [],
+        scoringDimensions: [],
         candidates: [],
-        winner: { candidateId: 'unknown', title: 'Unknown' },
+        winner: null,
         rationale: 'Pipeline did not produce a decision artifact.',
       };
       fs.writeFileSync(decisionPath, JSON.stringify(placeholder, null, 2), 'utf8');
@@ -810,11 +815,17 @@ async function main() {
     // Token usage is already tracked by pollPipelineStatus from metrics.aggregateMetrics.totalTokens
     const tokenUsage = pipelineResult.tokenUsage || null;
 
-    // Generate canonical artifacts — try to extract from pipeline status output,
-    // fall back to scanning the artifact directory for known filenames.
+    // Fetch the pipeline report and generate canonical artifacts from it.
+    log('Fetching pipeline report...');
+    const report = await fetchPipelineReport(currentRoomId);
+    if (report) {
+      log('Pipeline report fetched — generating artifacts from report data');
+    } else {
+      log('Warning: could not fetch pipeline report — falling back to file scanning');
+    }
     log('Generating canonical artifacts...');
     try {
-      generateCanonicalArtifacts(artifactDir, runDate, pipelineResult.output, gitBaselineSha);
+      generateCanonicalArtifacts(artifactDir, runDate, report, gitBaselineSha);
     } catch (err) {
       logError(`Canonical artifact generation failed: ${err.message}`);
     }

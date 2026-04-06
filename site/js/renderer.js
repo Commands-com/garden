@@ -196,7 +196,7 @@ function renderCandidates(candidates, limit = 0) {
   }
 
   const sorted = [...candidates].sort(
-    (a, b) => (b.totalScore || 0) - (a.totalScore || 0)
+    (a, b) => (b.averageScore ?? b.totalScore ?? 0) - (a.averageScore ?? a.totalScore ?? 0)
   );
   const toShow = limit > 0 ? sorted.slice(0, limit) : sorted;
 
@@ -211,7 +211,8 @@ function renderCandidates(candidates, limit = 0) {
       el('div', { className: 'candidate-card__rank' }, String(rank)),
       el('h4', { className: 'candidate-card__title' }, candidate.title || 'Untitled'),
       el('p', { className: 'candidate-card__summary' }, candidate.summary || ''),
-      renderCandidateScores(candidate)
+      renderCandidateScores(candidate),
+      candidate.reviewerBreakdown ? renderReviewerBreakdown(candidate) : null
     );
     grid.appendChild(card);
   });
@@ -220,54 +221,83 @@ function renderCandidates(candidates, limit = 0) {
 }
 
 function renderCandidateScores(candidate) {
-  const scores = candidate.scores || {};
   const container = el('div', { className: 'candidate-card__scores' });
 
-  const dimensions = [
-    { key: 'compoundingValue', label: 'Compounding Value', weight: 30 },
-    { key: 'usefulness', label: 'Usefulness', weight: 20 },
-    { key: 'feasibility', label: 'Feasibility', weight: 20 },
-    { key: 'artifactClarity', label: 'Artifact Clarity', weight: 15 },
-    { key: 'novelty', label: 'Novelty', weight: 5 },
-    { key: 'feedbackPull', label: 'Feedback Pull', weight: 5 },
-    { key: 'shareability', label: 'Shareability', weight: 5 },
-  ];
+  // v2 shape: dimensionAverages keyed by dimension ID
+  if (candidate.dimensionAverages) {
+    const dimAvgs = candidate.dimensionAverages;
+    for (const [dimId, dimData] of Object.entries(dimAvgs)) {
+      const avg = dimData.average;
+      if (avg == null) continue;
+      // Scale 1-10 to 0-100% for the bar
+      const pct = Math.round((avg / 10) * 100);
+      container.appendChild(
+        el('div', { className: 'score-bar' },
+          el('span', { className: 'score-bar__label' }, dimData.label || dimId),
+          el('div', { className: 'score-bar__track' },
+            el('div', {
+              className: 'score-bar__fill',
+              style: `width: ${pct}%`,
+            })
+          ),
+          el('span', { className: 'score-bar__value' }, String(avg))
+        )
+      );
+    }
+  } else {
+    // v1 fallback: flat scores object with hardcoded dimensions
+    const scores = candidate.scores || {};
+    const dimensions = [
+      { key: 'compoundingValue', label: 'Compounding Value' },
+      { key: 'usefulness', label: 'Usefulness' },
+      { key: 'feasibility', label: 'Feasibility' },
+      { key: 'artifactClarity', label: 'Artifact Clarity' },
+      { key: 'novelty', label: 'Novelty' },
+      { key: 'feedbackPull', label: 'Feedback Pull' },
+      { key: 'shareability', label: 'Shareability' },
+    ];
 
-  for (const dim of dimensions) {
-    const val = scores[dim.key];
-    if (val == null) continue;
-    const pct = Math.round(val);
-
-    container.appendChild(
-      el('div', { className: 'score-bar' },
-        el('span', { className: 'score-bar__label' }, dim.label),
-        el('div', { className: 'score-bar__track' },
-          el('div', {
-            className: 'score-bar__fill',
-            style: `width: ${pct}%`,
-          })
-        ),
-        el('span', { className: 'score-bar__value' }, String(val))
-      )
-    );
+    for (const dim of dimensions) {
+      const val = scores[dim.key];
+      if (val == null) continue;
+      const pct = Math.round(val);
+      container.appendChild(
+        el('div', { className: 'score-bar' },
+          el('span', { className: 'score-bar__label' }, dim.label),
+          el('div', { className: 'score-bar__track' },
+            el('div', {
+              className: 'score-bar__fill',
+              style: `width: ${pct}%`,
+            })
+          ),
+          el('span', { className: 'score-bar__value' }, String(val))
+        )
+      );
+    }
   }
 
-  // Total
-  if (candidate.totalScore != null) {
+  // Total — v2 uses averageScore, v1 uses totalScore
+  const totalScore = candidate.averageScore ?? candidate.totalScore;
+  if (totalScore != null) {
+    // For v2 (1-10 scale), map to percentage; for v1 (0-100 scale), use directly
+    const isV2 = candidate.averageScore != null;
+    const pct = isV2
+      ? Math.min(100, Math.round((totalScore / 10) * 100))
+      : Math.min(100, Math.round(totalScore));
     container.appendChild(
       el('div', { className: 'score-bar mt-2' },
         el('span', {
           className: 'score-bar__label font-semibold',
-        }, 'Total'),
+        }, 'Average'),
         el('div', { className: 'score-bar__track' },
           el('div', {
             className: 'score-bar__fill score-bar__fill--gold',
-            style: `width: ${Math.min(100, Math.round(candidate.totalScore))}%`,
+            style: `width: ${pct}%`,
           })
         ),
         el('span', {
           className: 'score-bar__value font-bold',
-        }, String(candidate.totalScore))
+        }, String(totalScore))
       )
     );
   }
@@ -278,15 +308,20 @@ function renderCandidateScores(candidate) {
 // ---------- Winner Renderer ----------
 function renderWinner(winner, rationale) {
   const winnerData = winner || {};
+  const score = winnerData.averageScore ?? winnerData.totalScore;
+  const scoreLabel = winnerData.averageScore != null ? 'Avg Score' : 'Score';
   return el('div', { className: 'winner-highlight' },
     el('div', { className: 'winner-highlight__badge' }, '\u2713 Winner'),
     el('h2', { className: 'winner-highlight__title' }, winnerData.title || 'Untitled'),
     rationale
       ? el('p', { className: 'winner-highlight__rationale' }, rationale)
       : null,
-    winnerData.totalScore != null
+    winnerData.rationale && !rationale
+      ? el('p', { className: 'winner-highlight__rationale' }, winnerData.rationale)
+      : null,
+    score != null
       ? el('div', { className: 'winner-highlight__score' },
-          `Score: ${winnerData.totalScore}`
+          `${scoreLabel}: ${score}`
         )
       : null
   );
@@ -299,11 +334,24 @@ function renderScoreTable(candidates) {
   }
 
   const sorted = [...candidates].sort(
-    (a, b) => (b.totalScore || 0) - (a.totalScore || 0)
+    (a, b) => (b.averageScore ?? b.totalScore ?? 0) - (a.averageScore ?? a.totalScore ?? 0)
   );
 
-  const dimensions = ['compoundingValue', 'usefulness', 'feasibility', 'artifactClarity', 'novelty', 'feedbackPull', 'shareability'];
-  const dimLabels = ['Compounding Value', 'Usefulness', 'Feasibility', 'Artifact Clarity', 'Novelty', 'Feedback Pull', 'Shareability'];
+  // Detect v2 shape: read dimension columns dynamically from first candidate's dimensionAverages
+  const firstCandidate = sorted[0];
+  const isV2 = !!firstCandidate.dimensionAverages;
+
+  let dimensions, dimLabels;
+  if (isV2) {
+    dimensions = Object.keys(firstCandidate.dimensionAverages);
+    dimLabels = dimensions.map(
+      (key) => firstCandidate.dimensionAverages[key].label || key
+    );
+  } else {
+    // v1 fallback: hardcoded dimensions
+    dimensions = ['compoundingValue', 'usefulness', 'feasibility', 'artifactClarity', 'novelty', 'feedbackPull', 'shareability'];
+    dimLabels = ['Compounding Value', 'Usefulness', 'Feasibility', 'Artifact Clarity', 'Novelty', 'Feedback Pull', 'Shareability'];
+  }
 
   const table = el('table', { className: 'score-table' });
 
@@ -331,18 +379,31 @@ function renderScoreTable(candidates) {
       )
     );
 
-    const scores = candidate.scores || {};
-    dimensions.forEach((dim) => {
-      row.appendChild(
-        el('td', { className: 'score-table__score' },
-          scores[dim] != null ? String(scores[dim]) : '-'
-        )
-      );
-    });
+    if (isV2) {
+      const dimAvgs = candidate.dimensionAverages || {};
+      dimensions.forEach((dim) => {
+        const dimData = dimAvgs[dim];
+        row.appendChild(
+          el('td', { className: 'score-table__score' },
+            dimData && dimData.average != null ? String(dimData.average) : '-'
+          )
+        );
+      });
+    } else {
+      const scores = candidate.scores || {};
+      dimensions.forEach((dim) => {
+        row.appendChild(
+          el('td', { className: 'score-table__score' },
+            scores[dim] != null ? String(scores[dim]) : '-'
+          )
+        );
+      });
+    }
 
+    const totalScore = candidate.averageScore ?? candidate.totalScore;
     row.appendChild(
       el('td', { className: 'score-table__score score-table__total' },
-        candidate.totalScore != null ? String(candidate.totalScore) : '-'
+        totalScore != null ? String(totalScore) : '-'
       )
     );
 
@@ -353,6 +414,164 @@ function renderScoreTable(candidates) {
   // Wrap in scrollable container
   const wrapper = el('div', { style: 'overflow-x: auto;' }, table);
   return wrapper;
+}
+
+// ---------- Judge Panel Renderer ----------
+function renderJudgePanel(judgePanel) {
+  if (!judgePanel || judgePanel.length === 0) {
+    return el('div', { className: 'empty-state' },
+      el('div', { className: 'empty-state__icon' }, '\u2696\uFE0F'),
+      el('h3', { className: 'empty-state__title' }, 'No judge panel data'),
+      el('p', { className: 'empty-state__message' }, 'Judge panel information is not available for this day.')
+    );
+  }
+
+  const lensIcons = {
+    gardener: '\u{1F33F}',
+    visitor: '\u{1F441}\uFE0F',
+    explorer: '\u{1F9ED}',
+  };
+
+  const grid = el('div', {
+    className: 'd-grid gap-4',
+    style: 'grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));',
+  });
+
+  judgePanel.forEach((judge) => {
+    const icon = lensIcons[judge.lens] || '\u{1F916}';
+    const displayName = judge.displayName || judge.lens || 'Judge';
+    const modelFamily = judge.modelFamily || 'Unknown';
+    const lens = judge.lens
+      ? judge.lens.charAt(0).toUpperCase() + judge.lens.slice(1)
+      : '';
+
+    const card = el('article', { className: 'judge-card' },
+      el('div', { className: 'judge-card__icon' }, icon),
+      el('h3', { className: 'judge-card__name' }, displayName),
+      el('p', { className: 'judge-card__role' }, lens),
+      el('p', { className: 'judge-card__model' },
+        `Backed by ${modelFamily}`
+      )
+    );
+    grid.appendChild(card);
+  });
+
+  return grid;
+}
+
+// ---------- Reviewer Breakdown Renderer ----------
+function renderReviewerBreakdown(candidate) {
+  const breakdown = candidate.reviewerBreakdown;
+  if (!breakdown || breakdown.length === 0) {
+    return null;
+  }
+
+  const container = el('div', { className: 'reviewer-breakdown mt-4' });
+  container.appendChild(
+    el('h4', { className: 'text-sm font-semibold text-muted uppercase tracking-wide mb-3' },
+      'Individual Judge Reviews'
+    )
+  );
+
+  breakdown.forEach((entry) => {
+    // The actual shape is { reviewer: { displayName, modelFamily, lens, ... }, overallScore, dimensionScores, keep, mustChange, risks }
+    const reviewerInfo = entry.reviewer || entry;
+    const displayName = reviewerInfo.displayName || reviewerInfo.lens || 'Judge';
+    const modelFamily = reviewerInfo.modelFamily || '';
+    const lens = reviewerInfo.lens || '';
+    const score = entry.overallScore ?? entry.score ?? null;
+
+    const reviewCard = el('div', {
+      className: 'card mb-4',
+      style: 'border-left: 3px solid var(--color-sage);',
+    });
+
+    // Header: judge name, model family, lens, overall score
+    const header = el('div', {
+      className: 'd-flex items-center gap-2 mb-3',
+      style: 'flex-wrap: wrap;',
+    },
+      el('strong', {}, displayName),
+      modelFamily
+        ? el('span', { className: 'tag' }, modelFamily)
+        : null,
+      lens
+        ? el('span', { className: 'tag tag--green' }, lens)
+        : null,
+      score != null
+        ? el('span', { className: 'badge badge--shipped ml-2' }, `Score: ${score}`)
+        : null
+    );
+    reviewCard.appendChild(header);
+
+    // Per-dimension scores
+    if (entry.dimensionScores && Object.keys(entry.dimensionScores).length > 0) {
+      const dimContainer = el('div', { className: 'mb-3' });
+      for (const [dimId, dimData] of Object.entries(entry.dimensionScores)) {
+        const val = typeof dimData === 'object' ? dimData.score : dimData;
+        const label = typeof dimData === 'object' && dimData.label ? dimData.label : dimId;
+        if (val == null) continue;
+        const pct = Math.round((val / 10) * 100);
+        dimContainer.appendChild(
+          el('div', { className: 'score-bar' },
+            el('span', { className: 'score-bar__label' }, label),
+            el('div', { className: 'score-bar__track' },
+              el('div', {
+                className: 'score-bar__fill',
+                style: `width: ${pct}%`,
+              })
+            ),
+            el('span', { className: 'score-bar__value' }, String(val))
+          )
+        );
+      }
+      reviewCard.appendChild(dimContainer);
+    }
+
+    // Keep / Must Change / Risks feedback
+    if (entry.keep && entry.keep.length > 0) {
+      const keepList = el('ul', { className: 'text-sm mb-2' });
+      entry.keep.forEach((item) => {
+        keepList.appendChild(el('li', {}, '\u2705 ', item));
+      });
+      reviewCard.appendChild(
+        el('div', { className: 'mb-2' },
+          el('strong', { className: 'text-sm' }, 'Keep:'),
+          keepList
+        )
+      );
+    }
+
+    if (entry.mustChange && entry.mustChange.length > 0) {
+      const changeList = el('ul', { className: 'text-sm mb-2' });
+      entry.mustChange.forEach((item) => {
+        changeList.appendChild(el('li', {}, '\u26A0\uFE0F ', item));
+      });
+      reviewCard.appendChild(
+        el('div', { className: 'mb-2' },
+          el('strong', { className: 'text-sm' }, 'Must Change:'),
+          changeList
+        )
+      );
+    }
+
+    if (entry.risks && entry.risks.length > 0) {
+      const riskList = el('ul', { className: 'text-sm mb-2' });
+      entry.risks.forEach((item) => {
+        riskList.appendChild(el('li', {}, '\u{1F6A9} ', item));
+      });
+      reviewCard.appendChild(
+        el('div', { className: 'mb-2' },
+          el('strong', { className: 'text-sm' }, 'Risks:'),
+          riskList
+        )
+      );
+    }
+
+    container.appendChild(reviewCard);
+  });
+
+  return container;
 }
 
 // ---------- Feedback Digest Renderer ----------
@@ -701,6 +920,8 @@ export {
   renderCandidates,
   renderWinner,
   renderScoreTable,
+  renderJudgePanel,
+  renderReviewerBreakdown,
   renderFeedbackDigest,
   renderTestResults,
   renderTimeline,

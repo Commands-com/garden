@@ -50,7 +50,7 @@
         <div class="d-grid gap-8" style="grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));">
 
           <!-- The Gardener -->
-          <article class="judge-card">
+          <article class="judge-card" data-lens="gardener">
             <div class="judge-card__icon" aria-hidden="true">&#127807;</div>
             <h2 class="judge-card__name">The Gardener</h2>
             <p class="judge-card__role">Stewardship &amp; Continuity</p>
@@ -59,10 +59,11 @@
               change build on what came before? Will it make tomorrow's changes easier and
               more valuable? Does it maintain the health of the whole system?"
             </p>
+            <p class="judge-card__model"></p>
           </article>
 
           <!-- The Visitor -->
-          <article class="judge-card">
+          <article class="judge-card" data-lens="visitor">
             <div class="judge-card__icon" aria-hidden="true">&#128065;&#65039;</div>
             <h2 class="judge-card__name">The Visitor</h2>
             <p class="judge-card__role">Usefulness &amp; Clarity</p>
@@ -71,10 +72,11 @@
               for the first time understand this? Is it immediately useful? Does it reduce
               confusion rather than add complexity?"
             </p>
+            <p class="judge-card__model"></p>
           </article>
 
           <!-- The Explorer -->
-          <article class="judge-card">
+          <article class="judge-card" data-lens="explorer">
             <div class="judge-card__icon" aria-hidden="true">&#129517;</div>
             <h2 class="judge-card__name">The Explorer</h2>
             <p class="judge-card__role">Novelty &amp; Surprise</p>
@@ -83,6 +85,7 @@
               we haven't done before? Will it make the garden more interesting? Does it take
               a creative risk that could pay off?"
             </p>
+            <p class="judge-card__model"></p>
           </article>
 
         </div>
@@ -231,8 +234,41 @@
   </footer>
 
   <script type="module">
-    import { initMobileNav } from '/js/app.js';
+    import { initMobileNav, getManifest, getLatestDay } from '/js/app.js';
     initMobileNav();
+
+    async function loadJudgeData() {
+      try {
+        const manifest = await getManifest();
+        const latest = getLatestDay(manifest);
+        if (!latest) return;
+
+        const response = await fetch(`/days/${latest.date}/decision.json`);
+        if (!response.ok) return;
+        const decision = await response.json();
+
+        const judgePanel = decision.judgePanel;
+        if (!judgePanel || judgePanel.length === 0) return;
+
+        // Match each judge to static cards by lens
+        const cards = document.querySelectorAll('.judge-card[data-lens]');
+        cards.forEach((card) => {
+          const lens = card.dataset.lens;
+          const judge = judgePanel.find((j) => j.lens === lens);
+          if (!judge) return;
+
+          const modelEl = card.querySelector('.judge-card__model');
+          if (modelEl && judge.modelFamily) {
+            modelEl.textContent = `Currently backed by ${judge.modelFamily}`;
+          }
+        });
+      } catch (err) {
+        // Silently fail — the static content is still valid without dynamic data
+        console.warn('Could not load judge panel data:', err);
+      }
+    }
+
+    loadJudgeData();
   </script>
 
 </body>
