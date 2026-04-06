@@ -467,109 +467,79 @@ function renderReviewerBreakdown(candidate) {
     return null;
   }
 
-  const container = el('div', { className: 'reviewer-breakdown mt-4' });
-  container.appendChild(
-    el('h4', { className: 'text-sm font-semibold text-muted uppercase tracking-wide mb-3' },
-      'Individual Judge Reviews'
-    )
+  const lensIcons = { gardener: '\u{1F33F}', visitor: '\u{1F441}\uFE0F', explorer: '\u{1F9ED}' };
+
+  const wrapper = el('details', { className: 'reviewer-breakdown mt-4' });
+  const summary = el('summary', { className: 'reviewer-breakdown__toggle' },
+    `Individual Judge Reviews (${breakdown.length})`
   );
+  wrapper.appendChild(summary);
+
+  const list = el('div', { className: 'reviewer-breakdown__list' });
 
   breakdown.forEach((entry) => {
-    // The actual shape is { reviewer: { displayName, modelFamily, lens, model, ... }, overallScore, dimensionScores, keep, mustChange, risks }
     const reviewerInfo = entry.reviewer || entry;
     const model = reviewerInfo.model || reviewerInfo.displayName || 'Judge';
     const lens = reviewerInfo.lens || '';
     const lensLabel = lens ? lens.charAt(0).toUpperCase() + lens.slice(1) : '';
+    const icon = lensIcons[lens] || '\u{1F916}';
     const score = entry.overallScore ?? entry.score ?? null;
 
-    const reviewCard = el('div', {
-      className: 'card mb-4',
-      style: 'border-left: 3px solid var(--color-sage);',
-    });
-
-    // Header: model name, lens, overall score
-    const header = el('div', {
-      className: 'd-flex items-center gap-2 mb-3',
-      style: 'flex-wrap: wrap;',
-    },
-      el('strong', {}, model),
-      lensLabel
-        ? el('span', { className: 'tag tag--green' }, lensLabel)
-        : null,
+    const detail = el('details', { className: 'reviewer-card' });
+    const detailSummary = el('summary', { className: 'reviewer-card__header' },
+      el('span', { className: 'reviewer-card__identity' },
+        el('span', { className: 'reviewer-card__icon' }, icon),
+        el('strong', {}, lensLabel || model),
+        el('span', { className: 'reviewer-card__model text-muted text-sm' }, model)
+      ),
       score != null
-        ? el('span', { className: 'badge badge--shipped ml-2' }, `Score: ${score}`)
+        ? el('span', { className: 'badge badge--shipped' }, String(score))
         : null
     );
-    reviewCard.appendChild(header);
+    detail.appendChild(detailSummary);
+
+    const body = el('div', { className: 'reviewer-card__body' });
 
     // Per-dimension scores
     if (entry.dimensionScores && Object.keys(entry.dimensionScores).length > 0) {
-      const dimContainer = el('div', { className: 'mb-3' });
       for (const [dimId, dimData] of Object.entries(entry.dimensionScores)) {
         const val = typeof dimData === 'object' ? dimData.score : dimData;
         const label = typeof dimData === 'object' && dimData.label ? dimData.label : dimId;
         if (val == null) continue;
         const pct = Math.round((val / 10) * 100);
-        dimContainer.appendChild(
+        body.appendChild(
           el('div', { className: 'score-bar' },
             el('span', { className: 'score-bar__label' }, label),
             el('div', { className: 'score-bar__track' },
-              el('div', {
-                className: 'score-bar__fill',
-                style: `width: ${pct}%`,
-              })
+              el('div', { className: 'score-bar__fill', style: `width: ${pct}%` })
             ),
             el('span', { className: 'score-bar__value' }, String(val))
           )
         );
       }
-      reviewCard.appendChild(dimContainer);
     }
 
-    // Keep / Must Change / Risks feedback
-    if (entry.keep && entry.keep.length > 0) {
-      const keepList = el('ul', { className: 'text-sm mb-2' });
-      entry.keep.forEach((item) => {
-        keepList.appendChild(el('li', {}, '\u2705 ', item));
-      });
-      reviewCard.appendChild(
-        el('div', { className: 'mb-2' },
-          el('strong', { className: 'text-sm' }, 'Keep:'),
-          keepList
-        )
-      );
-    }
+    // Keep / Must Change / Risks
+    const feedbackItems = [
+      [entry.keep, 'Keep', '\u2705'],
+      [entry.mustChange, 'Must Change', '\u26A0\uFE0F'],
+      [entry.risks, 'Risks', '\u{1F6A9}'],
+    ];
+    feedbackItems.forEach(([items, heading, emoji]) => {
+      if (!items || items.length === 0) return;
+      const ul = el('ul', { className: 'text-sm mb-2' });
+      items.forEach((item) => ul.appendChild(el('li', {}, `${emoji} ${item}`)));
+      body.appendChild(el('div', { className: 'mb-2' },
+        el('strong', { className: 'text-sm' }, `${heading}:`), ul
+      ));
+    });
 
-    if (entry.mustChange && entry.mustChange.length > 0) {
-      const changeList = el('ul', { className: 'text-sm mb-2' });
-      entry.mustChange.forEach((item) => {
-        changeList.appendChild(el('li', {}, '\u26A0\uFE0F ', item));
-      });
-      reviewCard.appendChild(
-        el('div', { className: 'mb-2' },
-          el('strong', { className: 'text-sm' }, 'Must Change:'),
-          changeList
-        )
-      );
-    }
-
-    if (entry.risks && entry.risks.length > 0) {
-      const riskList = el('ul', { className: 'text-sm mb-2' });
-      entry.risks.forEach((item) => {
-        riskList.appendChild(el('li', {}, '\u{1F6A9} ', item));
-      });
-      reviewCard.appendChild(
-        el('div', { className: 'mb-2' },
-          el('strong', { className: 'text-sm' }, 'Risks:'),
-          riskList
-        )
-      );
-    }
-
-    container.appendChild(reviewCard);
+    detail.appendChild(body);
+    list.appendChild(detail);
   });
 
-  return container;
+  wrapper.appendChild(list);
+  return wrapper;
 }
 
 // ---------- Feedback Digest Renderer ----------
