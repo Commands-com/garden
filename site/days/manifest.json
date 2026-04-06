@@ -1,4 +1,11 @@
 {
   "schemaVersion": 1,
-  "days": []
+  "days": [
+    {
+      "date": "2026-04-06",
+      "status": "shipped",
+      "title": "\"How It Works\" pipeline explainer section",
+      "summary": "Add a static, visual step-by-step explainer to the homepage showing the 5-stage autonomous pipeline."
+    }
+  ]
 }

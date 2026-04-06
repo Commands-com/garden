@@ -12,3 +12,4 @@ dist/
 .DS_Store
 runner/*.log
 runner/state/
+test-results/

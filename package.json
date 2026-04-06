@@ -11,8 +11,9 @@
     "daily-run": "node runner/daily-runner.js",
     "scheduler:install": "bash scripts/setup-scheduler.sh install",
     "scheduler:uninstall": "bash scripts/setup-scheduler.sh uninstall",
-    "dev": "npx serve site -l 3000",
-    "validate:artifacts": "node schemas/validate.js"
+    "dev": "npx serve site -l tcp://127.0.0.1:3000",
+    "validate:artifacts": "node schemas/validate.js",
+    "test:uiux": "npx playwright test --config=playwright.config.js"
   },
   "dependencies": {
     "@aws-sdk/client-cloudfront": "^3.500.0",
@@ -24,6 +25,7 @@
     "dotenv": "^17.4.1"
   },
   "devDependencies": {
+    "@playwright/test": "^1.59.1",
     "serve": "^14.2.0"
   },
   "engines": {

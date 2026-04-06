@@ -1,0 +1,10 @@
+{
+  "new visitor": {
+    "description": "First-time anonymous visitor with no prior state.",
+    "storageState": null
+  },
+  "returning follower": {
+    "description": "A returning user who has previously visited and follows updates.",
+    "storageState": null
+  }
+}
