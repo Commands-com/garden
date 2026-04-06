@@ -1,0 +1,231 @@
+{
+  "schemaVersion": 2,
+  "runDate": "2026-04-06",
+  "generatedAt": "2026-04-06T10:00:00.000Z",
+  "judgePanel": [
+    {
+      "agentId": "judge-claude-gardener",
+      "displayName": "Claude (Gardener)",
+      "modelFamily": "claude",
+      "provider": "anthropic",
+      "model": "claude-sonnet-4-20250514",
+      "lens": "gardener",
+      "conceptKey": "compounding-steward"
+    },
+    {
+      "agentId": "judge-gpt-visitor",
+      "displayName": "GPT (Visitor)",
+      "modelFamily": "gpt",
+      "provider": "openai",
+      "model": "gpt-4o-2024-08-06",
+      "lens": "visitor",
+      "conceptKey": "first-impression-advocate"
+    },
+    {
+      "agentId": "judge-gemini-explorer",
+      "displayName": "Gemini (Explorer)",
+      "modelFamily": "gemini",
+      "provider": "google",
+      "model": "gemini-2.0-flash",
+      "lens": "explorer",
+      "conceptKey": "novelty-scout"
+    }
+  ],
+  "candidates": [
+    {
+      "id": "candidate-1",
+      "title": "\"How It Works\" pipeline explainer section",
+      "summary": "Add a static, visual step-by-step explainer to the homepage showing the 5-stage autonomous pipeline: Explore, Score, Build, Test, Ship.",
+      "averageScore": 8.2,
+      "reviewCount": 3,
+      "dimensionAverages": {
+        "compoundingValue": { "label": "Compounding Value", "average": 7.5, "reviewCount": 3 },
+        "usefulnessClarity": { "label": "Usefulness & Clarity", "average": 9.0, "reviewCount": 3 },
+        "feasibility": { "label": "Feasibility", "average": 9.5, "reviewCount": 3 },
+        "legibility": { "label": "Legibility", "average": 8.8, "reviewCount": 3 },
+        "noveltySurprise": { "label": "Novelty & Surprise", "average": 6.5, "reviewCount": 3 },
+        "continuity": { "label": "Continuity", "average": 7.8, "reviewCount": 3 },
+        "shareability": { "label": "Shareability", "average": 8.3, "reviewCount": 3 }
+      },
+      "reviewerBreakdown": [
+        {
+          "reviewer": {
+            "agentId": "judge-claude-gardener",
+            "displayName": "Claude (Gardener)",
+            "modelFamily": "claude",
+            "lens": "gardener"
+          },
+          "overallScore": 8.5,
+          "dimensionScores": {
+            "compoundingValue": 7.8,
+            "usefulnessClarity": 9.2,
+            "feasibility": 9.5,
+            "legibility": 9.0,
+            "noveltySurprise": 6.0,
+            "continuity": 8.0,
+            "shareability": 8.5
+          },
+          "keep": [
+            "Explains the system before visitors see empty states — sets the right expectation",
+            "Pure HTML/CSS means zero maintenance overhead"
+          ],
+          "mustChange": [
+            "Descriptions must stay high-level so they don't go stale as the pipeline evolves"
+          ],
+          "risks": [
+            "If pipeline stages change names, the section needs a manual update"
+          ]
+        },
+        {
+          "reviewer": {
+            "agentId": "judge-gpt-visitor",
+            "displayName": "GPT (Visitor)",
+            "modelFamily": "gpt",
+            "lens": "visitor"
+          },
+          "overallScore": 8.0,
+          "dimensionScores": {
+            "compoundingValue": 7.0,
+            "usefulnessClarity": 9.0,
+            "feasibility": 9.5,
+            "legibility": 8.5,
+            "noveltySurprise": 7.0,
+            "continuity": 7.5,
+            "shareability": 8.0
+          },
+          "keep": [
+            "First-time visitors immediately understand what Command Garden does",
+            "Visual pipeline is screenshot-worthy for social media"
+          ],
+          "mustChange": [
+            "Ensure responsive layout doesn't break on narrow viewports"
+          ],
+          "risks": [
+            "Section could feel like marketing fluff if descriptions are too vague"
+          ]
+        },
+        {
+          "reviewer": {
+            "agentId": "judge-gemini-explorer",
+            "displayName": "Gemini (Explorer)",
+            "modelFamily": "gemini",
+            "lens": "explorer"
+          },
+          "overallScore": 8.0,
+          "dimensionScores": {
+            "compoundingValue": 7.7,
+            "usefulnessClarity": 8.8,
+            "feasibility": 9.5,
+            "legibility": 9.0,
+            "noveltySurprise": 6.5,
+            "continuity": 8.0,
+            "shareability": 8.5
+          },
+          "keep": [
+            "Makes the empty garden feel intentional rather than broken",
+            "Emoji icons give it personality without adding asset dependencies"
+          ],
+          "mustChange": [
+            "Add connector arrows between steps for desktop to reinforce the flow"
+          ],
+          "risks": [
+            "Low novelty — explainer sections are common, needs strong visual execution"
+          ]
+        }
+      ],
+      "keep": [
+        "Explains the system before visitors see empty states",
+        "Pure HTML/CSS with zero dependencies",
+        "Screenshot-worthy visual for social sharing"
+      ],
+      "mustChange": [
+        "Keep descriptions high-level to avoid staleness",
+        "Ensure responsive layout works on all viewports"
+      ],
+      "risks": [
+        "Pipeline stage names could change in the future",
+        "Explainer sections are common — needs strong visual execution"
+      ],
+      "feedbackReferences": [
+        "Multiple visitors were confused by empty states on the homepage"
+      ]
+    },
+    {
+      "id": "candidate-2",
+      "title": "Add a 'Garden Status' live indicator",
+      "summary": "Show a real-time status badge indicating which pipeline stage is currently running.",
+      "averageScore": 6.8,
+      "reviewCount": 3,
+      "dimensionAverages": {
+        "compoundingValue": { "label": "Compounding Value", "average": 7.0, "reviewCount": 3 },
+        "usefulnessClarity": { "label": "Usefulness & Clarity", "average": 7.2, "reviewCount": 3 },
+        "feasibility": { "label": "Feasibility", "average": 4.5, "reviewCount": 3 },
+        "legibility": { "label": "Legibility", "average": 6.8, "reviewCount": 3 },
+        "noveltySurprise": { "label": "Novelty & Surprise", "average": 8.0, "reviewCount": 3 },
+        "continuity": { "label": "Continuity", "average": 7.0, "reviewCount": 3 },
+        "shareability": { "label": "Shareability", "average": 7.2, "reviewCount": 3 }
+      },
+      "keep": [
+        "Real-time status creates a reason to revisit",
+        "Highly novel — visitors can watch the AI work"
+      ],
+      "mustChange": [
+        "Requires a new API endpoint or polling mechanism — too complex for day 2"
+      ],
+      "risks": [
+        "Low feasibility — needs backend infrastructure that doesn't exist yet"
+      ],
+      "feedbackReferences": []
+    },
+    {
+      "id": "candidate-3",
+      "title": "Add a contributor credits section",
+      "summary": "Display the AI models and tools involved in building the site, with links to their documentation.",
+      "averageScore": 5.5,
+      "reviewCount": 3,
+      "dimensionAverages": {
+        "compoundingValue": { "label": "Compounding Value", "average": 3.5, "reviewCount": 3 },
+        "usefulnessClarity": { "label": "Usefulness & Clarity", "average": 6.0, "reviewCount": 3 },
+        "feasibility": { "label": "Feasibility", "average": 9.0, "reviewCount": 3 },
+        "legibility": { "label": "Legibility", "average": 5.5, "reviewCount": 3 },
+        "noveltySurprise": { "label": "Novelty & Surprise", "average": 4.0, "reviewCount": 3 },
+        "continuity": { "label": "Continuity", "average": 4.5, "reviewCount": 3 },
+        "shareability": { "label": "Shareability", "average": 5.0, "reviewCount": 3 }
+      },
+      "keep": [
+        "Transparency is a core value — credits reinforce that"
+      ],
+      "mustChange": [
+        "Needs to auto-update as the tool stack changes"
+      ],
+      "risks": [
+        "Low compounding value — static content that rarely changes"
+      ],
+      "feedbackReferences": []
+    }
+  ],
+  "winner": {
+    "candidateId": "candidate-1",
+    "title": "\"How It Works\" pipeline explainer section",
+    "summary": "Add a static, visual step-by-step explainer to the homepage showing the 5-stage autonomous pipeline: Explore, Score, Build, Test, Ship.",
+    "averageScore": 8.2
+  },
+  "rationale": "The explainer section scored highest across all judges because it directly addresses the most pressing visitor confusion: seeing empty states on a brand-new site. By showing the 5-stage pipeline visually, visitors understand the system is intentionally just starting, not broken. Its pure HTML/CSS implementation makes it the most feasible candidate with zero ongoing maintenance. The visual pipeline is also screenshot-worthy, making it shareable on social media.",
+  "featureType": "content",
+  "tags": [
+    "homepage",
+    "explainer",
+    "pipeline",
+    "onboarding",
+    "visual"
+  ],
+  "feedbackInfluence": [
+    {
+      "summary": "Visitors were confused by empty states on the homepage, not understanding the site had just launched.",
+      "impact": "high"
+    }
+  ],
+  "artifacts": {
+    "spec": "spec.md"
+  }
+}

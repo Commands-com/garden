@@ -1541,3 +1541,69 @@
   padding-bottom: var(--space-2);
   border-bottom: var(--border-default);
 }
+
+/* ---------- Pipeline (How It Works) ---------- */
+.pipeline {
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  gap: var(--space-4);
+}
+
+.pipeline__step {
+  background: var(--surface-card);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+  padding: var(--space-6);
+  text-align: center;
+  flex: 1;
+  border: var(--border-default);
+}
+
+.pipeline__step-icon {
+  font-size: 2.5rem;
+  line-height: 1;
+  margin-bottom: var(--space-3);
+}
+
+.pipeline__step-name {
+  font-weight: var(--weight-bold);
+  color: var(--color-text-dark);
+  font-size: var(--text-base);
+  margin-bottom: var(--space-2);
+}
+
+.pipeline__step-desc {
+  color: var(--color-text-muted);
+  font-size: var(--text-sm);
+  line-height: var(--leading-normal);
+  margin: 0;
+}
+
+.pipeline__connector {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-accent-gold);
+  font-size: var(--text-xl);
+  font-weight: var(--weight-bold);
+  padding-top: var(--space-8);
+  flex-shrink: 0;
+}
+
+@media (max-width: 639px) {
+  .pipeline {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .pipeline__step {
+    width: 100%;
+    max-width: 20rem;
+  }
+
+  .pipeline__connector {
+    transform: rotate(90deg);
+    padding-top: 0;
+  }
+}
