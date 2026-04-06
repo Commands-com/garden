@@ -868,6 +868,33 @@ async function main() {
       await sendAlert(`Command Garden (${runDate}): Pipeline succeeded but artifact upload failed: ${err.message}`);
     }
 
+    // Deploy infrastructure if CloudFormation template or Lambda code changed
+    log('Checking for infrastructure changes...');
+    try {
+      const infraChanged = await spawnAsync('git', [
+        'diff', gitBaselineSha || 'HEAD~1', '--name-only', '--', 'infra/',
+      ], { cwd: config.site.repoPath });
+      const changedInfraFiles = (infraChanged.stdout || '').trim();
+      if (changedInfraFiles) {
+        log(`Infrastructure files changed:\n${changedInfraFiles}`);
+        log('Running deploy-infra.sh...');
+        const infraResult = await spawnAsync('bash', [
+          path.join(config.site.repoPath, 'scripts', 'deploy-infra.sh'),
+          '--env', process.env.ENVIRONMENT || 'prod',
+        ], { cwd: config.site.repoPath, timeout: 10 * 60 * 1000 });
+        log(`Infrastructure deploy complete (exit ${infraResult.exitCode})`);
+        if (infraResult.exitCode !== 0) {
+          logError(`Infrastructure deploy failed:\n${infraResult.stderr || infraResult.stdout}`);
+          await sendAlert(`Command Garden (${runDate}): Infra deploy failed — site deploy will proceed`);
+        }
+      } else {
+        log('No infrastructure changes detected — skipping infra deploy');
+      }
+    } catch (err) {
+      logError(`Infrastructure deploy check failed: ${err.message}`);
+      // Non-fatal — continue with site deploy
+    }
+
     // Publish site assets (HTML/CSS/JS) to S3 — the pipeline may have modified site files
     log('Publishing site assets to S3...');
     try {
