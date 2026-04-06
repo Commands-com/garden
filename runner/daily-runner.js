@@ -14,6 +14,7 @@ const {
   updateManifest,
   invalidateCloudFront,
   updateRunMetadata,
+  publishSiteAssets,
 } = require('./artifact-publisher');
 const { publishToBluesky, executeOutreach, collectBlueskyMetrics } = require('./bluesky-publisher');
 
@@ -228,65 +229,163 @@ function setupSignalHandlers() {
 
 /**
  * Start the pipeline by spawning the commands-com CLI.
+ * Returns the roomId for subsequent status polling.
  * @param {string} pipelineConfigPath - Path to the rendered pipeline config file
- * @returns {Promise<{code: number, stdout: string, stderr: string}>}
+ * @returns {Promise<{code: number, stdout: string, stderr: string, roomId: string|null}>}
  */
 async function startPipeline(pipelineConfigPath) {
   const cli = config.runner.commandsCliPath;
-  log(`Starting pipeline: ${cli} pipeline start --pipeline-config ${pipelineConfigPath}`);
+  log(`Starting pipeline: ${cli} pipeline start --pipeline-config ${pipelineConfigPath} --json`);
 
-  return spawnAsync(cli, [
+  const result = await spawnAsync(cli, [
     'pipeline',
     'start',
     '--pipeline-config',
     pipelineConfigPath,
+    '--json',
   ]);
+
+  // Extract roomId from JSON output
+  let roomId = null;
+  try {
+    const parsed = JSON.parse(result.stdout.trim());
+    roomId = parsed.roomId || parsed.id || null;
+  } catch {
+    // Try to extract roomId from text output
+    const match = result.stdout.match(/roomId[:\s]+(\S+)/i);
+    if (match) roomId = match[1];
+  }
+
+  return { ...result, roomId };
 }
 
 /**
  * Poll pipeline status until completion or timeout.
+ * Tracks cumulative token usage and halts if budget is exceeded.
+ *
+ * The CLI `pipeline status <roomId> --json` returns a payload shaped like:
+ *   {
+ *     state: "running" | "stopped",
+ *     stopReason: "completed" | "failed" | "error" | ... (only when stopped),
+ *     metrics: {
+ *       aggregateMetrics: { totalTokens: number, ... },
+ *       currentStageLabel: { value: "Explore" | "Spec" | ... },
+ *       stageLog: { rows: [{ stageId, label, status, ... }] }
+ *     }
+ *   }
+ *
+ * @param {string|null} roomId - The pipeline room ID to poll
  * @param {number} maxMinutes
- * @returns {Promise<{status: string, output: string, failedStage?: string}>}
+ * @returns {Promise<{status: string, output: string, roomId: string|null, failedStage?: string, tokenUsage?: number}>}
  */
-async function pollPipelineStatus(maxMinutes) {
+async function pollPipelineStatus(roomId, maxMinutes) {
   const cli = config.runner.commandsCliPath;
   const deadline = Date.now() + maxMinutes * 60_000;
+  const maxTokenBudget = config.runner.maxTokenBudget;
+  let cumulativeTokens = 0;
+
+  const statusArgs = roomId
+    ? ['pipeline', 'status', roomId, '--json']
+    : ['pipeline', 'status', '--json'];
 
   while (Date.now() < deadline) {
     await new Promise((resolve) => setTimeout(resolve, POLL_INTERVAL_MS));
 
-    const result = await spawnAsync(cli, ['pipeline', 'status']);
+    const result = await spawnAsync(cli, statusArgs);
     const output = result.stdout.trim();
 
     // Try to parse JSON status
     try {
       const statusObj = JSON.parse(output);
-      if (statusObj.status === 'completed' || statusObj.status === 'success') {
-        return { status: 'success', output };
+      const state = statusObj.state; // "running" or "stopped"
+      const stopReason = statusObj.stopReason; // only present when state === "stopped"
+
+      // Track token usage from metrics.aggregateMetrics.totalTokens.
+      // The control-room only populates this field when the pipeline config
+      // includes a top-level limits.tokenBudget (which we now render from
+      // config.runner.maxTokenBudget). Also check aggregateTokens.value as
+      // an alternative path the control-room may emit.
+      const totalTokens =
+        statusObj.metrics?.aggregateMetrics?.totalTokens ??
+        statusObj.metrics?.aggregateTokens?.value ??
+        null;
+      if (totalTokens != null) {
+        cumulativeTokens = totalTokens;
       }
-      if (statusObj.status === 'failed' || statusObj.status === 'error') {
+
+      // Check token budget
+      if (maxTokenBudget > 0 && cumulativeTokens > maxTokenBudget) {
+        log(`Token budget exceeded: ${cumulativeTokens} > ${maxTokenBudget}`);
+        // Attempt to stop the pipeline gracefully
+        if (roomId) {
+          try {
+            log(`Issuing pipeline stop for roomId: ${roomId}`);
+            await spawnAsync(cli, ['pipeline', 'stop', roomId]);
+          } catch (stopErr) {
+            log(`Warning: could not stop pipeline: ${stopErr.message}`);
+          }
+        }
+        const currentStage = statusObj.metrics?.currentStageLabel?.value || 'budget-exceeded';
+        return {
+          status: 'failed',
+          output: `Token budget exceeded (${cumulativeTokens} / ${maxTokenBudget})`,
+          roomId,
+          failedStage: currentStage,
+          tokenUsage: cumulativeTokens,
+        };
+      }
+
+      // When the pipeline has stopped, check stopReason to determine success/failure.
+      // The control-room uses 'pipeline_complete' for successful completion and
+      // 'stage_failed' for failures (see pipeline-cli.ts exit code mapping).
+      if (state === 'stopped') {
+        if (stopReason === 'pipeline_complete') {
+          return { status: 'success', output, roomId, tokenUsage: cumulativeTokens || null };
+        }
+        // Any other stopReason (stage_failed, error, cancelled, etc.) is a failure
+        const failedStage = detectFailedStage(statusObj) || stopReason || 'unknown';
         return {
           status: 'failed',
           output,
-          failedStage: statusObj.currentStage || statusObj.failedStage || 'unknown',
+          roomId,
+          failedStage,
+          tokenUsage: cumulativeTokens || null,
         };
       }
-      // Still running — log progress
-      const stage = statusObj.currentStage || 'unknown';
-      log(`Pipeline running — stage: ${stage}`);
+
+      // Still running — log progress using metrics.currentStageLabel.value
+      const stage = statusObj.metrics?.currentStageLabel?.value || 'unknown';
+      log(`Pipeline running — stage: ${stage}${cumulativeTokens ? ` (tokens: ${cumulativeTokens})` : ''}`);
     } catch {
       // Non-JSON output — check for text markers
       if (/completed|success/i.test(output)) {
-        return { status: 'success', output };
+        return { status: 'success', output, roomId, tokenUsage: cumulativeTokens || null };
       }
       if (/failed|error/i.test(output)) {
-        return { status: 'failed', output, failedStage: 'unknown' };
+        return { status: 'failed', output, roomId, failedStage: 'unknown', tokenUsage: cumulativeTokens || null };
       }
       log(`Pipeline running — raw status: ${output.slice(0, 120)}`);
     }
   }
 
-  return { status: 'timeout', output: 'Wall-clock timeout exceeded' };
+  return { status: 'timeout', output: 'Wall-clock timeout exceeded', roomId, tokenUsage: cumulativeTokens || null };
+}
+
+/**
+ * Inspect the stageLog rows in a status payload to find the stage that failed.
+ * @param {Object} statusObj - Parsed pipeline status JSON
+ * @returns {string|null} The stageId or label of the failed stage, or null
+ */
+function detectFailedStage(statusObj) {
+  const rows = statusObj.metrics?.stageLog?.rows;
+  if (!Array.isArray(rows)) return null;
+
+  for (const row of rows) {
+    if (row.status === 'failed' || row.status === 'error') {
+      return row.stageId || row.label || null;
+    }
+  }
+  return null;
 }
 
 /**
@@ -299,6 +398,271 @@ function stageNumber(failedStage) {
   const names = ['explore', 'spec', 'implementation', 'validation', 'review'];
   const idx = names.findIndex((n) => failedStage.toLowerCase().includes(n));
   return idx >= 0 ? idx + 1 : -1;
+}
+
+// ---------------------------------------------------------------------------
+// Canonical artifact generation
+// ---------------------------------------------------------------------------
+
+/**
+ * Capture the current git HEAD SHA so we can compute a meaningful diff
+ * against the actual pre-run baseline after the pipeline completes.
+ * @returns {string|null} The HEAD SHA, or null if not in a git repo
+ */
+function captureGitBaseline() {
+  try {
+    const { execSync } = require('child_process');
+    return execSync('git rev-parse HEAD', {
+      cwd: PROJECT_ROOT,
+      encoding: 'utf8',
+      timeout: 5_000,
+    }).trim();
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * Attempt to extract handoff payloads from the pipeline's final status output.
+ *
+ * The control-room's full pipelineReport (which contains per-stage handoff
+ * payloads in `pipelineReport.stages[*].handoffPayloads[].data`) is generated
+ * internally but is NOT exposed through any current CLI command — the CLI only
+ * supports: saved, start, status, approve, stop, list.
+ *
+ * As a best-effort, we check whether the final status JSON itself includes
+ * any embedded report data (future CLI versions may include it). If not,
+ * generateCanonicalArtifacts will fall back to scanning the artifact directory
+ * for files the pipeline stages wrote directly.
+ *
+ * @param {string} finalStatusJson - The raw JSON string from the final pipeline status poll
+ * @returns {Object|null} Parsed handoff payloads keyed by stageId, or null
+ */
+function extractHandoffPayloads(finalStatusJson) {
+  try {
+    const parsed = JSON.parse(finalStatusJson);
+
+    // Check for pipelineReport embedded in the status (future-proof)
+    const stages = parsed.pipelineReport?.stages;
+    if (Array.isArray(stages)) {
+      const payloads = {};
+      for (const stage of stages) {
+        if (!stage.stageId) continue;
+        // The control-room stores handoff data as handoffPayloads[].data
+        const handoffArr = stage.handoffPayloads;
+        if (Array.isArray(handoffArr) && handoffArr.length > 0) {
+          // Use the first handoff payload's data field
+          payloads[stage.stageId] = handoffArr[0].data || handoffArr[0];
+        }
+      }
+      if (Object.keys(payloads).length > 0) return payloads;
+    }
+
+    // Also check for flat handoffPayloads or stageOutputs (legacy shapes)
+    if (parsed.handoffPayloads && typeof parsed.handoffPayloads === 'object') {
+      return parsed.handoffPayloads;
+    }
+    if (parsed.stageOutputs && typeof parsed.stageOutputs === 'object') {
+      return parsed.stageOutputs;
+    }
+
+    return null;
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * Ensure canonical artifacts exist in the artifact directory.
+ *
+ * Strategy:
+ * 1. If the pipeline status JSON includes handoff payloads, extract artifacts
+ *    directly from those (preferred — this is the real pipeline output).
+ * 2. Fall back to scanning the artifact directory for known alternative file
+ *    names produced by different room implementations.
+ * 3. Build-summary is computed from the recorded git baseline, not HEAD~1.
+ *
+ * @param {string} artifactDir
+ * @param {string} runDate
+ * @param {string|null} pipelineOutput - Raw JSON string from the final pipeline status poll
+ * @param {string|null} gitBaselineSha - The git SHA captured before the pipeline started
+ */
+function generateCanonicalArtifacts(artifactDir, runDate, pipelineOutput, gitBaselineSha) {
+  // Try to extract handoff payloads from the pipeline status output.
+  // Currently the CLI does not expose the full pipelineReport with handoff data,
+  // so this will typically return null and we fall back to file scanning below.
+  const handoffs = pipelineOutput ? extractHandoffPayloads(pipelineOutput) : null;
+
+  // ---- decision.json ----
+  const decisionPath = path.join(artifactDir, 'decision.json');
+  if (!fs.existsSync(decisionPath)) {
+    // Try to reconstruct from explore + implementation handoff payloads
+    const explorePayload = handoffs?.explore || handoffs?.Explore || null;
+    const implPayload = handoffs?.implementation || handoffs?.Implementation || null;
+
+    if (implPayload || explorePayload) {
+      log('Generating decision.json from pipeline handoff payloads');
+      const decision = {
+        schemaVersion: 1,
+        runDate,
+        generatedAt: new Date().toISOString(),
+        candidates: explorePayload?.candidates || [],
+        winner: implPayload?.winner || explorePayload?.winner || null,
+        rationale: implPayload?.rationale || explorePayload?.rationale || '',
+        scoringDimensions: [
+          { name: 'compoundingValue', weight: 30 },
+          { name: 'usefulness', weight: 20 },
+          { name: 'feasibility', weight: 20 },
+          { name: 'artifactClarity', weight: 15 },
+          { name: 'novelty', weight: 5 },
+          { name: 'feedbackPull', weight: 5 },
+          { name: 'shareability', weight: 5 },
+        ],
+      };
+      fs.writeFileSync(decisionPath, JSON.stringify(decision, null, 2), 'utf8');
+    } else {
+      log('Warning: decision.json not found and no handoff payloads available — writing minimal placeholder');
+      const placeholder = {
+        schemaVersion: 1,
+        runDate,
+        generatedAt: new Date().toISOString(),
+        _warning: 'Auto-generated placeholder — pipeline did not produce decision.json',
+        scoringDimensions: [
+          { name: 'compoundingValue', weight: 30 },
+          { name: 'usefulness', weight: 20 },
+          { name: 'feasibility', weight: 20 },
+          { name: 'artifactClarity', weight: 15 },
+          { name: 'novelty', weight: 5 },
+          { name: 'feedbackPull', weight: 5 },
+          { name: 'shareability', weight: 5 },
+        ],
+        candidates: [],
+        winner: { candidateId: 'unknown', title: 'Unknown' },
+        rationale: 'Pipeline did not produce a decision artifact.',
+      };
+      fs.writeFileSync(decisionPath, JSON.stringify(placeholder, null, 2), 'utf8');
+    }
+  }
+
+  // ---- test-results.json ----
+  const testResultsPath = path.join(artifactDir, 'test-results.json');
+  if (!fs.existsSync(testResultsPath)) {
+    // Try handoff payload from validation stage first
+    const validationPayload = handoffs?.validation || handoffs?.Validation || null;
+    if (validationPayload) {
+      log('Generating test-results.json from validation handoff payload');
+      const normalized = {
+        schemaVersion: 1,
+        runDate,
+        generatedAt: new Date().toISOString(),
+        summary: {
+          totalScenarios: validationPayload.summary?.totalScenarios || validationPayload.total || 0,
+          passed: validationPayload.summary?.passed || validationPayload.passed || 0,
+          failed: validationPayload.summary?.failed || validationPayload.failed || 0,
+          passRate: validationPayload.summary?.passRate || validationPayload.passRate || 0,
+        },
+        scenarios: validationPayload.scenarios || [],
+      };
+      fs.writeFileSync(testResultsPath, JSON.stringify(normalized, null, 2), 'utf8');
+    } else {
+      // Fall back to scanning for alternative filenames
+      const altNames = ['validation-report.json', 'validation.json', 'test-report.json'];
+      for (const alt of altNames) {
+        const altPath = path.join(artifactDir, alt);
+        if (fs.existsSync(altPath)) {
+          try {
+            const raw = fs.readFileSync(altPath, 'utf8');
+            const data = JSON.parse(raw);
+            const normalized = {
+              schemaVersion: 1,
+              runDate,
+              generatedAt: new Date().toISOString(),
+              summary: {
+                totalScenarios: data.summary?.totalScenarios || data.total || 0,
+                passed: data.summary?.passed || data.passed || 0,
+                failed: data.summary?.failed || data.failed || 0,
+                passRate: data.summary?.passRate || data.passRate || 0,
+              },
+              scenarios: data.scenarios || [],
+            };
+            fs.writeFileSync(testResultsPath, JSON.stringify(normalized, null, 2), 'utf8');
+            log(`Generated test-results.json from ${alt}`);
+            break;
+          } catch {
+            // Skip malformed files
+          }
+        }
+      }
+    }
+  }
+
+  // ---- review.md ----
+  const reviewPath = path.join(artifactDir, 'review.md');
+  if (!fs.existsSync(reviewPath)) {
+    // Try handoff payload from review stage
+    const reviewPayload = handoffs?.review || handoffs?.Review || null;
+    if (reviewPayload) {
+      log('Generating review.md from review handoff payload');
+      const content = reviewPayload.summary || reviewPayload.findings || JSON.stringify(reviewPayload, null, 2);
+      fs.writeFileSync(reviewPath, `# Review — ${runDate}\n\n${content}`, 'utf8');
+    } else {
+      const altNames = ['review-summary.md', 'review-findings.md', 'review-findings.json'];
+      for (const alt of altNames) {
+        const altPath = path.join(artifactDir, alt);
+        if (fs.existsSync(altPath)) {
+          try {
+            const raw = fs.readFileSync(altPath, 'utf8');
+            if (alt.endsWith('.json')) {
+              const data = JSON.parse(raw);
+              const md = `# Review — ${runDate}\n\n${data.summary || data.findings || JSON.stringify(data, null, 2)}`;
+              fs.writeFileSync(reviewPath, md, 'utf8');
+            } else {
+              fs.copyFileSync(altPath, reviewPath);
+            }
+            log(`Generated review.md from ${alt}`);
+            break;
+          } catch {
+            // Skip
+          }
+        }
+      }
+    }
+  }
+
+  // ---- build-summary.md ----
+  // Use the captured git baseline SHA instead of HEAD~1 so the diff
+  // reflects exactly what the pipeline changed, not an unrelated prior commit.
+  const buildSummaryPath = path.join(artifactDir, 'build-summary.md');
+  if (!fs.existsSync(buildSummaryPath)) {
+    try {
+      const { execSync } = require('child_process');
+      const diffRef = gitBaselineSha || 'HEAD~1';
+      const diffStat = execSync(`git diff --stat ${diffRef} 2>/dev/null || echo "No git diff available"`, {
+        cwd: PROJECT_ROOT,
+        encoding: 'utf8',
+        timeout: 10_000,
+      }).trim();
+
+      const md = [
+        `# Build Summary — ${runDate}`,
+        '',
+        `**Baseline:** \`${diffRef.slice(0, 12)}\``,
+        '',
+        '## Files Changed',
+        '',
+        '```',
+        diffStat,
+        '```',
+        '',
+        'Generated automatically by the daily runner.',
+        '',
+      ].join('\n');
+      fs.writeFileSync(buildSummaryPath, md, 'utf8');
+      log('Generated build-summary.md from git diff');
+    } catch {
+      // Non-fatal — skip build summary
+    }
+  }
 }
 
 // ---------------------------------------------------------------------------
@@ -385,6 +749,7 @@ async function main() {
     PROJECT_DIRECTORY: config.site.repoPath,
     CONTROLLER_PROFILE_ID: config.runner.controllerProfileId,
     FEEDBACK_DIGEST_PATH: feedbackDigestPath,
+    TOKEN_BUDGET: String(config.runner.maxTokenBudget || 500000),
   });
 
   // Write rendered config to temp file
@@ -394,21 +759,29 @@ async function main() {
   registerTempFile(pipelineConfigPath);
   log(`Pipeline config written to ${pipelineConfigPath}`);
 
-  // 5. Start the pipeline
+  // 5. Capture git baseline before the pipeline starts, so we can compute
+  //    an accurate diff for build-summary.md after the run finishes.
+  const gitBaselineSha = captureGitBaseline();
+  if (gitBaselineSha) {
+    log(`Git baseline captured: ${gitBaselineSha.slice(0, 12)}`);
+  }
+
+  // 6. Start the pipeline
   const startResult = await startPipeline(pipelineConfigPath);
   if (startResult.code !== 0) {
     const reason = `Pipeline failed to start: ${startResult.stderr || startResult.stdout}`;
     logError(reason);
-    await publishFailedRun(config, runDate, reason);
+    await publishFailedRun(config, runDate, reason, artifactDir);
     await sendAlert(`Command Garden daily run FAILED to start (${runDate}): ${reason}`);
     cleanupTempFiles();
     process.exit(1);
   }
-  log('Pipeline started successfully');
+  let currentRoomId = startResult.roomId;
+  log(`Pipeline started successfully${currentRoomId ? ` (roomId: ${currentRoomId})` : ''}`);
 
   // 6. Poll status
   log(`Polling pipeline status every ${POLL_INTERVAL_MS / 1000}s (timeout: ${config.runner.maxWallClockMinutes}min)...`);
-  let pipelineResult = await pollPipelineStatus(config.runner.maxWallClockMinutes);
+  let pipelineResult = await pollPipelineStatus(currentRoomId, config.runner.maxWallClockMinutes);
 
   // 7. Handle retry for Stage 1-2 failures
   if (pipelineResult.status === 'failed') {
@@ -418,7 +791,8 @@ async function main() {
 
       const retryResult = await startPipeline(pipelineConfigPath);
       if (retryResult.code === 0) {
-        pipelineResult = await pollPipelineStatus(config.runner.maxWallClockMinutes);
+        currentRoomId = retryResult.roomId;
+        pipelineResult = await pollPipelineStatus(currentRoomId, config.runner.maxWallClockMinutes);
       } else {
         pipelineResult.status = 'failed';
         pipelineResult.output += '\nRetry also failed to start.';
@@ -433,13 +807,16 @@ async function main() {
   if (pipelineResult.status === 'success') {
     log(`Pipeline completed successfully in ${durationMin} minutes`);
 
-    // Extract any token usage from pipeline output
-    let tokenUsage = null;
+    // Token usage is already tracked by pollPipelineStatus from metrics.aggregateMetrics.totalTokens
+    const tokenUsage = pipelineResult.tokenUsage || null;
+
+    // Generate canonical artifacts — try to extract from pipeline status output,
+    // fall back to scanning the artifact directory for known filenames.
+    log('Generating canonical artifacts...');
     try {
-      const parsed = JSON.parse(pipelineResult.output);
-      tokenUsage = parsed.tokenUsage || parsed.tokens || null;
-    } catch {
-      // not JSON or no token field
+      generateCanonicalArtifacts(artifactDir, runDate, pipelineResult.output, gitBaselineSha);
+    } catch (err) {
+      logError(`Canonical artifact generation failed: ${err.message}`);
     }
 
     // Publish artifacts to S3
@@ -452,6 +829,16 @@ async function main() {
       await sendAlert(`Command Garden (${runDate}): Pipeline succeeded but artifact upload failed: ${err.message}`);
     }
 
+    // Publish site assets (HTML/CSS/JS) to S3 — the pipeline may have modified site files
+    log('Publishing site assets to S3...');
+    try {
+      const siteKeys = await publishSiteAssets(config);
+      log(`Published ${siteKeys.length} site asset(s) to S3`);
+    } catch (err) {
+      logError(`Site asset publishing failed: ${err.message}`);
+      await sendAlert(`Command Garden (${runDate}): Pipeline succeeded but site publish failed: ${err.message}`);
+    }
+
     // Update manifest
     log('Updating manifest.json...');
     try {
@@ -459,36 +846,42 @@ async function main() {
       const decisionData = readJsonSafe(path.join(artifactDir, 'decision.json'));
       const manifestEntry = {
         date: runDate,
-        title: decisionData?.title || decisionData?.headline || `Day ${runDate}`,
-        summary: decisionData?.summary || '',
-        status: 'published',
+        title: decisionData?.title || decisionData?.headline || decisionData?.winner?.title || `Day ${runDate}`,
+        summary: decisionData?.summary || decisionData?.rationale?.slice(0, 200) || '',
+        status: 'shipped',
+        featureType: decisionData?.featureType || null,
+        tags: decisionData?.tags || [],
       };
       await updateManifest(config, runDate, manifestEntry);
     } catch (err) {
       logError(`Manifest update failed: ${err.message}`);
     }
 
-    // Invalidate CloudFront
+    // Invalidate CloudFront — use a broad wildcard because publishSiteAssets
+    // may delete/rename files across any prefix, and enumerating every changed
+    // path is fragile. A single `/*` invalidation costs the same as up to 15
+    // individual paths on the AWS free tier.
     log('Invalidating CloudFront cache...');
     try {
-      await invalidateCloudFront(config, [
-        '/index.html',
-        '/archive/*',
-        `/days/${runDate}/*`,
-        '/days/manifest.json',
-      ]);
+      await invalidateCloudFront(config, ['/*']);
     } catch (err) {
       logError(`CloudFront invalidation failed: ${err.message}`);
     }
 
+    // Determine the public site URL (CloudFront domain or custom domain)
+    const siteUrl = process.env.SITE_URL || (
+      config.site.customDomain
+        ? `https://${config.site.customDomain}`
+        : null
+    );
+
     // Post to Bluesky
     log('Publishing to Bluesky...');
+    let bskyPostUri = null;
     try {
-      const siteUrl = config.site.distributionId
-        ? `https://${config.site.distributionId}` // Will be replaced with actual domain
-        : null;
       const bskyResult = await publishToBluesky(config, runDate, artifactDir, siteUrl);
       if (bskyResult.posted) {
+        bskyPostUri = bskyResult.uri;
         log(`Bluesky post published: ${bskyResult.uri}`);
       } else {
         log(`Bluesky post skipped: ${bskyResult.error}`);
@@ -500,6 +893,7 @@ async function main() {
 
     // Bluesky outreach — engage with relevant conversations to grow audience
     log('Running Bluesky outreach...');
+    let outreachSummary = null;
     try {
       const outreachResult = await executeOutreach(config, runDate, artifactDir);
       if (outreachResult.executed) {
@@ -507,12 +901,36 @@ async function main() {
         if (outreachResult.errors.length > 0) {
           log(`Bluesky outreach had ${outreachResult.errors.length} non-fatal error(s)`);
         }
+        // Record outreach actions for the public artifact trail (spec requirement: no hidden promotional behavior)
+        outreachSummary = {
+          postUri: bskyPostUri || null,
+          postsLiked: outreachResult.postsLiked || 0,
+          accountsFollowed: outreachResult.accountsFollowed || 0,
+          mentionsHandled: outreachResult.mentionsHandled || 0,
+          searchQueries: (outreachResult.searchQueries || []).map(q => q.query),
+          executedAt: new Date().toISOString(),
+        };
       } else {
         log(`Bluesky outreach skipped: ${outreachResult.error}`);
       }
     } catch (err) {
       logError(`Bluesky outreach failed: ${err.message}`);
       // Non-fatal
+    }
+
+    // Write outreach summary into decision.json for public artifact trail
+    if (outreachSummary) {
+      try {
+        const decisionPath = path.join(artifactDir, 'decision.json');
+        const decisionRaw = readJsonSafe(decisionPath);
+        if (decisionRaw) {
+          decisionRaw.outreachSummary = outreachSummary;
+          fs.writeFileSync(decisionPath, JSON.stringify(decisionRaw, null, 2), 'utf8');
+          log('Recorded outreach summary in decision.json');
+        }
+      } catch (err) {
+        logError(`Failed to record outreach summary: ${err.message}`);
+      }
     }
 
     // Update run metadata in DynamoDB
@@ -546,11 +964,24 @@ async function main() {
 
     logError(reason);
 
-    // Record failure
+    // Record failure — publish to failed/ prefix, not live days/
     try {
-      await publishFailedRun(config, runDate, reason);
+      await publishFailedRun(config, runDate, reason, artifactDir);
     } catch (err) {
       logError(`Failed to publish failure record: ${err.message}`);
+    }
+
+    // Update manifest with failed status so the archive shows the failure
+    try {
+      await updateManifest(config, runDate, {
+        date: runDate,
+        title: `Failed run — ${runDate}`,
+        summary: reason.slice(0, 200),
+        status: 'failed',
+      });
+      log('Updated manifest.json with failed status');
+    } catch (err) {
+      logError(`Manifest update for failure failed: ${err.message}`);
     }
 
     try {

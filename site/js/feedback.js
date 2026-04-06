@@ -141,9 +141,7 @@ async function submitFeedback(type, text) {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         type,
-        text: text.trim(),
-        submittedAt: new Date().toISOString(),
-        userAgent: navigator.userAgent,
+        content: text.trim(),
       }),
     });
 

@@ -224,18 +224,19 @@ function renderCandidateScores(candidate) {
   const container = el('div', { className: 'candidate-card__scores' });
 
   const dimensions = [
-    { key: 'impact', label: 'Impact' },
-    { key: 'feasibility', label: 'Feasibility' },
-    { key: 'novelty', label: 'Novelty' },
-    { key: 'continuity', label: 'Continuity' },
-    { key: 'clarity', label: 'Clarity' },
-    { key: 'delight', label: 'Delight' },
+    { key: 'compoundingValue', label: 'Compounding Value', weight: 30 },
+    { key: 'usefulness', label: 'Usefulness', weight: 20 },
+    { key: 'feasibility', label: 'Feasibility', weight: 20 },
+    { key: 'artifactClarity', label: 'Artifact Clarity', weight: 15 },
+    { key: 'novelty', label: 'Novelty', weight: 5 },
+    { key: 'feedbackPull', label: 'Feedback Pull', weight: 5 },
+    { key: 'shareability', label: 'Shareability', weight: 5 },
   ];
 
   for (const dim of dimensions) {
     const val = scores[dim.key];
     if (val == null) continue;
-    const pct = Math.round((val / 10) * 100);
+    const pct = Math.round(val);
 
     container.appendChild(
       el('div', { className: 'score-bar' },
@@ -261,7 +262,7 @@ function renderCandidateScores(candidate) {
         el('div', { className: 'score-bar__track' },
           el('div', {
             className: 'score-bar__fill score-bar__fill--gold',
-            style: `width: ${Math.round((candidate.totalScore / 60) * 100)}%`,
+            style: `width: ${Math.min(100, Math.round(candidate.totalScore))}%`,
           })
         ),
         el('span', {
@@ -285,7 +286,7 @@ function renderWinner(winner, rationale) {
       : null,
     winnerData.totalScore != null
       ? el('div', { className: 'winner-highlight__score' },
-          `Score: ${winnerData.totalScore} / 60`
+          `Score: ${winnerData.totalScore}`
         )
       : null
   );
@@ -301,8 +302,8 @@ function renderScoreTable(candidates) {
     (a, b) => (b.totalScore || 0) - (a.totalScore || 0)
   );
 
-  const dimensions = ['impact', 'feasibility', 'novelty', 'continuity', 'clarity', 'delight'];
-  const dimLabels = ['Impact', 'Feasibility', 'Novelty', 'Continuity', 'Clarity', 'Delight'];
+  const dimensions = ['compoundingValue', 'usefulness', 'feasibility', 'artifactClarity', 'novelty', 'feedbackPull', 'shareability'];
+  const dimLabels = ['Compounding Value', 'Usefulness', 'Feasibility', 'Artifact Clarity', 'Novelty', 'Feedback Pull', 'Shareability'];
 
   const table = el('table', { className: 'score-table' });
 
@@ -356,7 +357,18 @@ function renderScoreTable(candidates) {
 
 // ---------- Feedback Digest Renderer ----------
 function renderFeedbackDigest(data) {
-  if (!data || (!data.items && !data.themes)) {
+  // The actual schema uses: data.suggestions, data.bugs, data.confusion, data.recurringThemes
+  const hasFeedback = data && (
+    (data.suggestions && data.suggestions.length > 0) ||
+    (data.bugs && data.bugs.length > 0) ||
+    (data.confusion && data.confusion.length > 0) ||
+    (data.recurringThemes && data.recurringThemes.length > 0) ||
+    // Legacy field support
+    (data.items && data.items.length > 0) ||
+    (data.themes && data.themes.length > 0)
+  );
+
+  if (!data || !hasFeedback) {
     return el('div', { className: 'empty-state' },
       el('div', { className: 'empty-state__icon' }, '\u{1F4AC}'),
       el('h3', { className: 'empty-state__title' }, 'No feedback data'),
@@ -366,35 +378,80 @@ function renderFeedbackDigest(data) {
 
   const container = el('div');
 
-  // Themes summary
-  if (data.themes && data.themes.length > 0) {
+  // Recurring themes (spec field: recurringThemes; legacy: themes)
+  const themes = data.recurringThemes || data.themes || [];
+  if (themes.length > 0) {
     const themesSection = el('div', { className: 'mb-6' });
     themesSection.appendChild(
-      el('h4', { className: 'text-sm font-semibold text-muted uppercase tracking-wide mb-3' }, 'Themes')
+      el('h4', { className: 'text-sm font-semibold text-muted uppercase tracking-wide mb-3' }, 'Recurring Themes')
     );
     const tagsContainer = el('div', { className: 'd-flex flex-wrap gap-2' });
-    data.themes.forEach((theme) => {
+    themes.forEach((theme) => {
       tagsContainer.appendChild(el('span', { className: 'tag tag--green' }, theme));
     });
     themesSection.appendChild(tagsContainer);
     container.appendChild(themesSection);
   }
 
-  // Summary
-  if (data.summary) {
+  // Summary stats
+  if (data.summary && typeof data.summary === 'object') {
+    const s = data.summary;
+    container.appendChild(
+      el('p', { className: 'text-sm text-muted mb-6' },
+        `${s.totalItems || 0} feedback items (${s.byType?.suggestion || 0} suggestions, ${s.byType?.bug || 0} bugs, ${s.byType?.confusion || 0} confusion)`
+      )
+    );
+  } else if (data.summary && typeof data.summary === 'string') {
     container.appendChild(
       el('p', { className: 'text-sm text-muted mb-6' }, data.summary)
     );
   }
 
-  // Individual feedback items
-  if (data.items && data.items.length > 0) {
+  // Render feedback items by type (spec schema: suggestions, bugs, confusion arrays)
+  const feedbackTypes = [
+    { key: 'suggestions', label: 'Suggestions', icon: '\u{1F4A1}' },
+    { key: 'bugs', label: 'Bugs', icon: '\u{1F41B}' },
+    { key: 'confusion', label: 'Confusion', icon: '\u{1F914}' },
+  ];
+
+  for (const ft of feedbackTypes) {
+    const items = data[ft.key];
+    if (!items || items.length === 0) continue;
+
+    const section = el('div', { className: 'mb-4' });
+    section.appendChild(
+      el('h4', { className: 'text-sm font-semibold text-muted uppercase tracking-wide mb-3' },
+        `${ft.icon} ${ft.label} (${items.length})`)
+    );
+
+    items.forEach((item) => {
+      const content = item.content || item.text || '';
+      const countBadge = item.count && item.count > 1
+        ? el('span', { className: 'badge badge--shipped ml-2' }, `×${item.count}`)
+        : null;
+
+      section.appendChild(
+        el('div', { className: 'feedback-item' },
+          el('div', { className: 'feedback-item__type' }, ft.label),
+          el('p', { className: 'feedback-item__text' }, content, countBadge),
+          item.dayDate
+            ? el('span', { className: 'feedback-item__meta' }, `from ${item.dayDate}`)
+            : null
+        )
+      );
+    });
+
+    container.appendChild(section);
+  }
+
+  // Legacy support: render data.items if present (old schema)
+  if (data.items && data.items.length > 0 && !data.suggestions) {
     const itemsContainer = el('div');
     data.items.forEach((item) => {
       itemsContainer.appendChild(
         el('div', { className: 'feedback-item' },
           el('div', { className: 'feedback-item__type' }, item.type || 'Feedback'),
-          el('p', { className: 'feedback-item__text' }, item.text || ''),
+          el('p', { className: 'feedback-item__text' }, item.text || item.content || ''),
           item.receivedAt
             ? el('span', { className: 'feedback-item__meta' }, relativeTime(item.receivedAt))
             : null
@@ -419,10 +476,12 @@ function renderTestResults(data) {
 
   const container = el('div');
 
-  // Summary bar
-  const passed = data.passed || 0;
-  const failed = data.failed || 0;
-  const total = data.total || passed + failed;
+  // Summary bar — support both nested (data.summary.passed) and flat (data.passed) schemas
+  const summary = data.summary || {};
+  const passed = summary.passed ?? data.passed ?? 0;
+  const failed = summary.failed ?? data.failed ?? 0;
+  const total = summary.totalScenarios ?? data.total ?? (passed + failed);
+  const passRate = summary.passRate ?? data.passRate ?? null;
 
   const summaryBar = el('div', {
     className: 'd-flex items-center gap-4 mb-6 p-4 card',
@@ -434,7 +493,10 @@ function renderTestResults(data) {
       failed > 0
         ? el('span', { className: 'badge badge--fail' }, `${failed} failed`)
         : null,
-      el('span', { className: 'text-sm text-muted' }, `${total} total`)
+      el('span', { className: 'text-sm text-muted' }, `${total} total`),
+      passRate != null
+        ? el('span', { className: 'text-xs text-muted ml-2' }, `(${passRate}% pass rate)`)
+        : null
     )
   );
 
@@ -528,11 +590,10 @@ function renderTimeline(manifest, options = {}) {
 function renderReactions(dayDate, reactions = {}) {
   const reactionTypes = [
     { emoji: '\u{1F331}', label: 'Sprout', key: 'sprout' },
-    { emoji: '\u{1F33F}', label: 'Herb', key: 'herb' },
-    { emoji: '\u{1F333}', label: 'Tree', key: 'tree' },
-    { emoji: '\u2B50', label: 'Star', key: 'star' },
-    { emoji: '\u{1F41B}', label: 'Bug', key: 'bug' },
-    { emoji: '\u{1F4A1}', label: 'Idea', key: 'idea' },
+    { emoji: '\u{1F525}', label: 'Fire', key: 'fire' },
+    { emoji: '\u{1F914}', label: 'Thinking', key: 'thinking' },
+    { emoji: '\u2764\uFE0F', label: 'Heart', key: 'heart' },
+    { emoji: '\u{1F680}', label: 'Rocket', key: 'rocket' },
   ];
 
   const bar = el('div', { className: 'reaction-bar' });
@@ -591,9 +652,8 @@ async function handleReaction(btn, reactionKey, dayDate) {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        date: dayDate,
+        dayDate,
         reaction: reactionKey,
-        action: isActive ? 'remove' : 'add',
       }),
     });
   } catch {

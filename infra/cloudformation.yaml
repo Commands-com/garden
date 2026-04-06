@@ -21,6 +21,16 @@ Parameters:
     Type: String
     Description: Name for the S3 bucket that hosts site content
 
+  LambdaCodeBucket:
+    Type: String
+    Default: ''
+    Description: S3 bucket containing Lambda deployment packages (leave empty to use inline placeholder code)
+
+  LambdaCodeVersion:
+    Type: String
+    Default: 'latest'
+    Description: Version key prefix for Lambda deployment packages in S3
+
   CustomDomainName:
     Type: String
     Default: ''
@@ -48,6 +58,8 @@ Conditions:
     !And
       - !Condition HasCustomDomain
       - !Condition HasAcmCertificate
+  HasLambdaCodeBucket:
+    !Not [!Equals [!Ref LambdaCodeBucket, '']]
 
 # ---------------------------------------------------------------------------
 # Resources
@@ -155,11 +167,31 @@ Resources:
             S3OriginConfig:
               OriginAccessIdentity: ''
 
-          # Lambda Function URL origin (API)
-          - Id: LambdaApiOrigin
+          # Lambda Function URL origins (one per API endpoint)
+          - Id: FeedbackApiOrigin
             DomainName: !Select
               - 2
               - !Split ['/', !GetAtt FeedbackFunctionUrl.FunctionUrl]
+            CustomOriginConfig:
+              OriginProtocolPolicy: https-only
+              HTTPSPort: 443
+              OriginSSLProtocols:
+                - TLSv1.2
+
+          - Id: ReactionsApiOrigin
+            DomainName: !Select
+              - 2
+              - !Split ['/', !GetAtt ReactionsFunctionUrl.FunctionUrl]
+            CustomOriginConfig:
+              OriginProtocolPolicy: https-only
+              HTTPSPort: 443
+              OriginSSLProtocols:
+                - TLSv1.2
+
+          - Id: HealthApiOrigin
+            DomainName: !Select
+              - 2
+              - !Split ['/', !GetAtt HealthFunctionUrl.FunctionUrl]
             CustomOriginConfig:
               OriginProtocolPolicy: https-only
               HTTPSPort: 443
@@ -175,6 +207,9 @@ Resources:
           ViewerProtocolPolicy: redirect-to-https
           Compress: true
           CachePolicyId: !Ref DefaultCachePolicy
+          FunctionAssociations:
+            - EventType: viewer-request
+              FunctionARN: !GetAtt UrlRewriteFunction.FunctionMetadata.FunctionARN
           AllowedMethods:
             - GET
             - HEAD
@@ -183,9 +218,9 @@ Resources:
             - HEAD
 
         CacheBehaviors:
-          # /api/* -> Lambda Function URL (no caching)
-          - PathPattern: '/api/*'
-            TargetOriginId: LambdaApiOrigin
+          # /api/feedback* -> Feedback Lambda
+          - PathPattern: '/api/feedback*'
+            TargetOriginId: FeedbackApiOrigin
             ViewerProtocolPolicy: redirect-to-https
             Compress: true
             CachePolicyId: !Ref NoCachePolicy
@@ -198,6 +233,40 @@ Resources:
               - POST
               - PATCH
               - DELETE
+            CachedMethods:
+              - GET
+              - HEAD
+
+          # /api/reactions* -> Reactions Lambda
+          - PathPattern: '/api/reactions*'
+            TargetOriginId: ReactionsApiOrigin
+            ViewerProtocolPolicy: redirect-to-https
+            Compress: true
+            CachePolicyId: !Ref NoCachePolicy
+            OriginRequestPolicyId: !Ref ApiOriginRequestPolicy
+            AllowedMethods:
+              - GET
+              - HEAD
+              - OPTIONS
+              - PUT
+              - POST
+              - PATCH
+              - DELETE
+            CachedMethods:
+              - GET
+              - HEAD
+
+          # /api/health* -> Health Lambda
+          - PathPattern: '/api/health*'
+            TargetOriginId: HealthApiOrigin
+            ViewerProtocolPolicy: redirect-to-https
+            Compress: true
+            CachePolicyId: !Ref NoCachePolicy
+            OriginRequestPolicyId: !Ref ApiOriginRequestPolicy
+            AllowedMethods:
+              - GET
+              - HEAD
+              - OPTIONS
             CachedMethods:
               - GET
               - HEAD
@@ -243,13 +312,13 @@ Resources:
 
         CustomErrorResponses:
           - ErrorCode: 404
-            ResponseCode: 200
+            ResponseCode: 404
             ResponsePagePath: /index.html
-            ErrorCachingMinTTL: 60
+            ErrorCachingMinTTL: 10
           - ErrorCode: 403
-            ResponseCode: 200
+            ResponseCode: 403
             ResponsePagePath: /index.html
-            ErrorCachingMinTTL: 60
+            ErrorCachingMinTTL: 10
 
   # ---- CloudFront Cache Policies ----
 
@@ -347,8 +416,8 @@ Resources:
     Properties:
       CachePolicyConfig:
         Name: !Sub '${AWS::StackName}-default-cache'
-        DefaultTTL: 3600
-        MaxTTL: 86400
+        DefaultTTL: 300
+        MaxTTL: 3600
         MinTTL: 0
         ParametersInCacheKeyAndForwardedToOrigin:
           CookiesConfig:
@@ -379,6 +448,8 @@ Resources:
           AttributeType: S
         - AttributeName: type
           AttributeType: S
+        - AttributeName: sourceIpHash
+          AttributeType: S
       KeySchema:
         - AttributeName: feedbackId
           KeyType: HASH
@@ -393,6 +464,14 @@ Resources:
               KeyType: RANGE
           Projection:
             ProjectionType: ALL
+        - IndexName: SourceIpIndex
+          KeySchema:
+            - AttributeName: sourceIpHash
+              KeyType: HASH
+            - AttributeName: createdAt
+              KeyType: RANGE
+          Projection:
+            ProjectionType: KEYS_ONLY
 
   ReactionsTable:
     Type: AWS::DynamoDB::Table
@@ -403,6 +482,9 @@ Resources:
       BillingMode: PAY_PER_REQUEST
       PointInTimeRecoverySpecification:
         PointInTimeRecoveryEnabled: true
+      TimeToLiveSpecification:
+        AttributeName: ttl
+        Enabled: true
       AttributeDefinitions:
         - AttributeName: dayDate
           AttributeType: S
@@ -476,6 +558,11 @@ Resources:
                 Resource:
                   - !GetAtt FeedbackTable.Arn
                   - !Sub '${FeedbackTable.Arn}/index/*'
+              - Effect: Allow
+                Action:
+                  - dynamodb:PutItem
+                Resource:
+                  - !GetAtt ModerationTable.Arn
 
   ReactionsFunctionRole:
     Type: AWS::IAM::Role
@@ -542,18 +629,22 @@ Resources:
       Role: !GetAtt FeedbackFunctionRole.Arn
       MemorySize: 256
       Timeout: 10
-      Code:
-        ZipFile: |
-          exports.handler = async (event) => {
-            return { statusCode: 200, body: JSON.stringify({ message: 'Feedback endpoint placeholder' }) };
-          };
+      Code: !If
+        - HasLambdaCodeBucket
+        - S3Bucket: !Ref LambdaCodeBucket
+          S3Key: !Sub '${LambdaCodeVersion}/feedback.zip'
+        - ZipFile: |
+            exports.handler = async (event) => {
+              return { statusCode: 200, body: JSON.stringify({ message: 'Feedback endpoint — deploy real code with scripts/deploy-lambdas.sh' }) };
+            };
       Environment:
         Variables:
           FEEDBACK_TABLE: !Ref FeedbackTable
+          MODERATION_TABLE: !Ref ModerationTable
           ALLOWED_ORIGIN: !If
             - UseCustomDomain
             - !Sub 'https://${CustomDomainName}'
-            - !Sub 'https://${CloudFrontDistribution.DomainName}'
+            - '*'
 
   FeedbackFunctionUrl:
     Type: AWS::Lambda::Url
@@ -569,7 +660,10 @@ Resources:
           - POST
           - OPTIONS
         AllowOrigins:
-          - '*'
+          - !If
+            - UseCustomDomain
+            - !Sub 'https://${CustomDomainName}'
+            - '*'
 
   FeedbackFunctionUrlPermission:
     Type: AWS::Lambda::Permission
@@ -588,18 +682,21 @@ Resources:
       Role: !GetAtt ReactionsFunctionRole.Arn
       MemorySize: 256
       Timeout: 10
-      Code:
-        ZipFile: |
-          exports.handler = async (event) => {
-            return { statusCode: 200, body: JSON.stringify({ message: 'Reactions endpoint placeholder' }) };
-          };
+      Code: !If
+        - HasLambdaCodeBucket
+        - S3Bucket: !Ref LambdaCodeBucket
+          S3Key: !Sub '${LambdaCodeVersion}/reactions.zip'
+        - ZipFile: |
+            exports.handler = async (event) => {
+              return { statusCode: 200, body: JSON.stringify({ message: 'Reactions endpoint — deploy real code with scripts/deploy-lambdas.sh' }) };
+            };
       Environment:
         Variables:
           REACTIONS_TABLE: !Ref ReactionsTable
           ALLOWED_ORIGIN: !If
             - UseCustomDomain
             - !Sub 'https://${CustomDomainName}'
-            - !Sub 'https://${CloudFrontDistribution.DomainName}'
+            - '*'
 
   ReactionsFunctionUrl:
     Type: AWS::Lambda::Url
@@ -616,7 +713,10 @@ Resources:
           - GET
           - OPTIONS
         AllowOrigins:
-          - '*'
+          - !If
+            - UseCustomDomain
+            - !Sub 'https://${CustomDomainName}'
+            - '*'
 
   ReactionsFunctionUrlPermission:
     Type: AWS::Lambda::Permission
@@ -635,11 +735,14 @@ Resources:
       Role: !GetAtt HealthFunctionRole.Arn
       MemorySize: 128
       Timeout: 5
-      Code:
-        ZipFile: |
-          exports.handler = async (event) => {
-            return { statusCode: 200, body: JSON.stringify({ status: 'ok' }) };
-          };
+      Code: !If
+        - HasLambdaCodeBucket
+        - S3Bucket: !Ref LambdaCodeBucket
+          S3Key: !Sub '${LambdaCodeVersion}/health.zip'
+        - ZipFile: |
+            exports.handler = async (event) => {
+              return { statusCode: 200, body: JSON.stringify({ status: 'ok — deploy real code with scripts/deploy-lambdas.sh' }) };
+            };
       Environment:
         Variables:
           RUNS_TABLE: !Ref RunsTable
@@ -657,7 +760,10 @@ Resources:
           - GET
           - OPTIONS
         AllowOrigins:
-          - '*'
+          - !If
+            - UseCustomDomain
+            - !Sub 'https://${CustomDomainName}'
+            - '*'
 
   HealthFunctionUrlPermission:
     Type: AWS::Lambda::Permission
@@ -722,6 +828,32 @@ Resources:
                 aws:PrincipalTag/department: engineering
       ManagedPolicyArns:
         - !Ref DeploymentPolicy
+
+  # ==========================================================================
+  # CloudFront Function — URL Rewrite for subdirectory index pages
+  # ==========================================================================
+  UrlRewriteFunction:
+    Type: AWS::CloudFront::Function
+    Properties:
+      Name: !Sub '${AWS::StackName}-url-rewrite'
+      AutoPublish: true
+      FunctionCode: |
+        function handler(event) {
+          var request = event.request;
+          var uri = request.uri;
+          // If URI ends with '/' append index.html
+          if (uri.endsWith('/')) {
+            request.uri += 'index.html';
+          }
+          // If URI has no extension and does not end with '/', append /index.html
+          else if (!uri.includes('.') && !uri.startsWith('/api/') && !uri.startsWith('/days/manifest')) {
+            request.uri += '/index.html';
+          }
+          return request;
+        }
+      FunctionConfig:
+        Comment: Rewrite directory paths to index.html for multi-page site
+        Runtime: cloudfront-js-2.0
 
 # ---------------------------------------------------------------------------
 # Outputs

@@ -6,7 +6,8 @@
   <meta name="description" content="Command Garden — Meet the AI judge panel that evaluates daily changes.">
   <meta name="theme-color" content="#1a4d2e">
   <title>Judges — Command Garden</title>
-  <link rel="icon" href="/favicon.ico" type="image/x-icon">
+  <link rel="icon" href="/images/favicon.png" type="image/png">
+  <link rel="apple-touch-icon" href="/images/apple-touch-icon.png">
   <link rel="stylesheet" href="/css/design-system.css">
   <link rel="stylesheet" href="/css/components.css">
 </head>
@@ -16,7 +17,7 @@
   <nav class="nav" role="navigation" aria-label="Main navigation">
     <div class="container nav__inner">
       <a href="/" class="nav__logo">
-        <span class="nav__logo-icon" aria-hidden="true">&#127793;</span>
+        <img src="/images/logo.png" alt="" class="nav__logo-img" width="28" height="28">
         <span>Command Garden</span>
       </a>
       <button class="nav__mobile-toggle" aria-label="Toggle menu" aria-expanded="false">
@@ -95,8 +96,8 @@
           <span class="section__label">Methodology</span>
           <h2 class="section__title">Scoring Dimensions</h2>
           <p class="section__subtitle">
-            Each candidate is evaluated across six dimensions, scored 1-10.
-            The final ranking is a weighted sum.
+            Each candidate is evaluated across seven dimensions, scored 0-100.
+            The final ranking is a weighted sum where weights are percentages summing to 100.
           </p>
         </div>
 
@@ -112,39 +113,45 @@
             </thead>
             <tbody>
               <tr>
-                <td class="score-table__candidate">Impact</td>
-                <td class="score-table__score">2.0x</td>
-                <td>How much meaningful value does this add to the product?</td>
+                <td class="score-table__candidate">Compounding Value</td>
+                <td class="score-table__score">30%</td>
+                <td>Prefer moves that create new surfaces future days can build on</td>
                 <td><span class="tag tag--green">The Gardener</span></td>
+              </tr>
+              <tr>
+                <td class="score-table__candidate">Usefulness</td>
+                <td class="score-table__score">20%</td>
+                <td>Reward concrete user value — is this immediately useful to visitors?</td>
+                <td><span class="tag">The Visitor</span></td>
               </tr>
               <tr>
                 <td class="score-table__candidate">Feasibility</td>
-                <td class="score-table__score">1.5x</td>
-                <td>Can this be built correctly in a single day?</td>
+                <td class="score-table__score">20%</td>
+                <td>Can this be built correctly in a single daily run?</td>
                 <td><span class="tag tag--green">The Gardener</span></td>
               </tr>
               <tr>
+                <td class="score-table__candidate">Artifact Clarity</td>
+                <td class="score-table__score">15%</td>
+                <td>Will visitors understand the result from the published artifacts?</td>
+                <td><span class="tag">The Visitor</span></td>
+              </tr>
+              <tr>
                 <td class="score-table__candidate">Novelty</td>
-                <td class="score-table__score">1.0x</td>
+                <td class="score-table__score">5%</td>
                 <td>Does this try something new or explore an untested direction?</td>
                 <td><span class="tag tag--gold">The Explorer</span></td>
               </tr>
               <tr>
-                <td class="score-table__candidate">Continuity</td>
-                <td class="score-table__score">1.5x</td>
-                <td>Does this build on prior work and strengthen the system's trajectory?</td>
-                <td><span class="tag tag--green">The Gardener</span></td>
-              </tr>
-              <tr>
-                <td class="score-table__candidate">Clarity</td>
-                <td class="score-table__score">1.0x</td>
-                <td>Is it easy to understand and use for a new visitor?</td>
+                <td class="score-table__candidate">Feedback Pull</td>
+                <td class="score-table__score">5%</td>
+                <td>Does this respond to or incorporate community feedback?</td>
                 <td><span class="tag">The Visitor</span></td>
               </tr>
               <tr>
-                <td class="score-table__candidate">Delight</td>
-                <td class="score-table__score">1.0x</td>
-                <td>Does it bring joy, surprise, or aesthetic pleasure?</td>
+                <td class="score-table__candidate">Shareability</td>
+                <td class="score-table__score">5%</td>
+                <td>Is this naturally legible and discussable in a social feed?</td>
                 <td><span class="tag tag--gold">The Explorer</span></td>
               </tr>
             </tbody>
@@ -186,7 +193,7 @@
             <div class="timeline-entry__date">Midday</div>
             <h4 class="timeline-entry__title">Judges evaluate and score</h4>
             <p class="timeline-entry__summary">
-              Each judge persona independently scores all candidates across the six
+              Each judge persona independently scores all candidates across the seven
               dimensions. Scores are combined using the weighted formula.
             </p>
           </div>

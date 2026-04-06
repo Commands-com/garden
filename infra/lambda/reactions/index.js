@@ -45,14 +45,17 @@ function rateLimitKey(ipHash, dayDate) {
 async function checkAndIncrementRateLimit(ipHash, dayDate) {
   const rateKey = rateLimitKey(ipHash, dayDate);
 
+  // Set TTL to 48 hours from now for rate-limit records
+  const ttlEpoch = Math.floor(Date.now() / 1000) + (48 * 60 * 60);
+
   try {
     const result = await ddb.send(
       new UpdateCommand({
         TableName: TABLE_NAME,
         Key: { dayDate: rateKey, reaction: "count" },
-        UpdateExpression: "SET #cnt = if_not_exists(#cnt, :zero) + :one",
-        ExpressionAttributeNames: { "#cnt": "count" },
-        ExpressionAttributeValues: { ":zero": 0, ":one": 1, ":max": RATE_LIMIT_MAX },
+        UpdateExpression: "SET #cnt = if_not_exists(#cnt, :zero) + :one, #ttl = :ttl",
+        ExpressionAttributeNames: { "#cnt": "count", "#ttl": "ttl" },
+        ExpressionAttributeValues: { ":zero": 0, ":one": 1, ":max": RATE_LIMIT_MAX, ":ttl": ttlEpoch },
         ConditionExpression: "attribute_not_exists(#cnt) OR #cnt < :max",
         ReturnValues: "UPDATED_NEW",
       })

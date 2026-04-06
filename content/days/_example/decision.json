@@ -7,8 +7,9 @@
     { "name": "usefulness", "weight": 20, "description": "Reward concrete user value" },
     { "name": "feasibility", "weight": 20, "description": "Keep the daily cadence honest" },
     { "name": "artifactClarity", "weight": 15, "description": "Visitors should understand the result" },
-    { "name": "novelty", "weight": 10, "description": "Preserve surprise without letting it dominate" },
-    { "name": "feedbackPull", "weight": 5, "description": "Let the audience influence, not dictate" }
+    { "name": "novelty", "weight": 5, "description": "Preserve surprise without letting it dominate" },
+    { "name": "feedbackPull", "weight": 5, "description": "Let the audience influence, not dictate" },
+    { "name": "shareability", "weight": 5, "description": "Prefer changes that are naturally legible and discussable in public" }
   ],
   "candidates": [
     {
@@ -21,7 +22,8 @@
         "feasibility": 70,
         "artifactClarity": 82,
         "novelty": 65,
-        "feedbackPull": 40
+        "feedbackPull": 40,
+        "shareability": 80
       },
       "totalScore": 76.3,
       "rank": 1,
@@ -37,7 +39,8 @@
         "feasibility": 90,
         "artifactClarity": 75,
         "novelty": 30,
-        "feedbackPull": 60
+        "feedbackPull": 60,
+        "shareability": 50
       },
       "totalScore": 63.0,
       "rank": 2,
@@ -53,7 +56,8 @@
         "feasibility": 95,
         "artifactClarity": 70,
         "novelty": 25,
-        "feedbackPull": 10
+        "feedbackPull": 10,
+        "shareability": 20
       },
       "totalScore": 49.0,
       "rank": 3,
@@ -69,7 +73,8 @@
         "feasibility": 85,
         "artifactClarity": 50,
         "novelty": 20,
-        "feedbackPull": 35
+        "feedbackPull": 35,
+        "shareability": 40
       },
       "totalScore": 58.25,
       "rank": 4,
@@ -85,7 +90,8 @@
         "feasibility": 95,
         "artifactClarity": 60,
         "novelty": 75,
-        "feedbackPull": 15
+        "feedbackPull": 15,
+        "shareability": 60
       },
       "totalScore": 44.75,
       "rank": 5,

@@ -6,7 +6,8 @@
   <meta name="description" content="Command Garden — Archive of all daily pipeline runs and decisions.">
   <meta name="theme-color" content="#1a4d2e">
   <title>Archive — Command Garden</title>
-  <link rel="icon" href="/favicon.ico" type="image/x-icon">
+  <link rel="icon" href="/images/favicon.png" type="image/png">
+  <link rel="apple-touch-icon" href="/images/apple-touch-icon.png">
   <link rel="stylesheet" href="/css/design-system.css">
   <link rel="stylesheet" href="/css/components.css">
 </head>
@@ -16,7 +17,7 @@
   <nav class="nav" role="navigation" aria-label="Main navigation">
     <div class="container nav__inner">
       <a href="/" class="nav__logo">
-        <span class="nav__logo-icon" aria-hidden="true">&#127793;</span>
+        <img src="/images/logo.png" alt="" class="nav__logo-img" width="28" height="28">
         <span>Command Garden</span>
       </a>
       <button class="nav__mobile-toggle" aria-label="Toggle menu" aria-expanded="false">
@@ -49,6 +50,9 @@
             <button class="filter-bar__btn" data-filter="shipped">Shipped</button>
             <button class="filter-bar__btn" data-filter="failed">Failed</button>
           </div>
+          <select class="filter-bar__select" id="theme-filter" aria-label="Filter by theme">
+            <option value="">All Themes</option>
+          </select>
           <input
             type="search"
             class="filter-bar__search"
@@ -57,6 +61,15 @@
             id="search-input"
           >
         </div>
+
+        <!-- Era Comparison -->
+        <details class="era-comparison mb-6" id="era-comparison">
+          <summary class="text-sm font-semibold" style="cursor: pointer; padding: 0.5rem 0;">
+            Era Comparison — see how the garden evolved over time
+          </summary>
+          <div id="era-content" class="mt-4" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 1rem;">
+          </div>
+        </details>
 
         <!-- Archive Content -->
         <div id="archive-content">
@@ -96,6 +109,7 @@
 
     let allDays = [];
     let currentFilter = 'all';
+    let currentTheme = '';
     let currentSearch = '';
 
     async function init() {
@@ -115,6 +129,8 @@
         );
 
         initFilters();
+        populateThemeFilter();
+        populateEraComparison();
         renderArchive();
       } catch (err) {
         console.error('Failed to load archive:', err);
@@ -138,6 +154,13 @@
         });
       });
 
+      // Theme filter dropdown
+      const themeFilter = document.getElementById('theme-filter');
+      themeFilter.addEventListener('change', (e) => {
+        currentTheme = e.target.value;
+        renderArchive();
+      });
+
       // Search input
       const searchInput = document.getElementById('search-input');
       let searchTimeout;
@@ -150,15 +173,102 @@
       });
     }
 
+    function populateThemeFilter() {
+      // Extract unique themes/tags from day entries
+      const themes = new Set();
+      allDays.forEach((day) => {
+        if (day.tags) {
+          (Array.isArray(day.tags) ? day.tags : [day.tags]).forEach((t) => themes.add(t));
+        }
+        if (day.theme) themes.add(day.theme);
+        if (day.featureType) themes.add(day.featureType);
+      });
+
+      const themeFilter = document.getElementById('theme-filter');
+      const sorted = [...themes].sort();
+      sorted.forEach((theme) => {
+        const opt = document.createElement('option');
+        opt.value = theme;
+        opt.textContent = theme;
+        themeFilter.appendChild(opt);
+      });
+
+      // Hide if no themes detected
+      if (sorted.length === 0) {
+        themeFilter.style.display = 'none';
+      }
+    }
+
+    function populateEraComparison() {
+      const container = document.getElementById('era-content');
+      if (!container || allDays.length < 7) {
+        document.getElementById('era-comparison').style.display = 'none';
+        return;
+      }
+
+      // Divide into eras (7-day chunks)
+      const shipped = allDays.filter((d) => d.status === 'shipped');
+      const eraSize = 7;
+      const eras = [];
+      for (let i = 0; i < shipped.length; i += eraSize) {
+        const chunk = shipped.slice(i, i + eraSize);
+        if (chunk.length === 0) break;
+        eras.push(chunk);
+      }
+
+      // Only show last 4 eras
+      const recentEras = eras.slice(0, 4);
+
+      recentEras.forEach((era, idx) => {
+        const startDate = era[era.length - 1].date;
+        const endDate = era[0].date;
+        const label = idx === 0 ? 'This Week' : `Week of ${formatDateShort(startDate)}`;
+
+        const card = el('div', { className: 'card p-4' },
+          el('h4', { className: 'text-sm font-semibold mb-2' }, label),
+          el('p', { className: 'text-xs text-muted mb-3' },
+            `${formatDateShort(startDate)} — ${formatDateShort(endDate)}`
+          ),
+          el('p', { className: 'text-sm' },
+            `${era.length} feature${era.length !== 1 ? 's' : ''} shipped`
+          ),
+          el('ul', { className: 'text-xs text-muted mt-2', style: 'padding-left: 1rem;' },
+            ...era.slice(0, 3).map((d) =>
+              el('li', { className: 'mb-1' },
+                el('a', { href: getDayUrl(d.date), className: 'text-xs' },
+                  d.title || d.date
+                )
+              )
+            ),
+            era.length > 3
+              ? el('li', { className: 'text-xs text-light' }, `+${era.length - 3} more`)
+              : null
+          )
+        );
+        container.appendChild(card);
+      });
+    }
+
     function getFilteredDays() {
       return allDays.filter((day) => {
         // Status filter
         if (currentFilter !== 'all' && day.status !== currentFilter) {
           return false;
         }
+        // Theme/tag filter
+        if (currentTheme) {
+          const dayTags = [
+            ...(Array.isArray(day.tags) ? day.tags : day.tags ? [day.tags] : []),
+            day.theme || '',
+            day.featureType || '',
+          ].map((t) => t.toLowerCase());
+          if (!dayTags.includes(currentTheme.toLowerCase())) {
+            return false;
+          }
+        }
         // Search filter
         if (currentSearch) {
-          const haystack = `${day.title || ''} ${day.summary || ''} ${day.date}`.toLowerCase();
+          const haystack = `${day.title || ''} ${day.summary || ''} ${day.date} ${(day.tags || []).join(' ')}`.toLowerCase();
           return haystack.includes(currentSearch);
         }
         return true;

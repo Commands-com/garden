@@ -2,7 +2,13 @@
 
 const fs = require('fs');
 const path = require('path');
-const { S3Client, PutObjectCommand, GetObjectCommand } = require('@aws-sdk/client-s3');
+const {
+  S3Client,
+  PutObjectCommand,
+  GetObjectCommand,
+  ListObjectsV2Command,
+  DeleteObjectsCommand,
+} = require('@aws-sdk/client-s3');
 const { CloudFrontClient, CreateInvalidationCommand } = require('@aws-sdk/client-cloudfront');
 const { DynamoDBClient } = require('@aws-sdk/client-dynamodb');
 const { DynamoDBDocumentClient, PutCommand, UpdateCommand } = require('@aws-sdk/lib-dynamodb');
@@ -160,14 +166,17 @@ async function publishArtifacts(config, runDate, artifactDir) {
 }
 
 /**
- * Write a tombstone record for a failed run to both S3 and DynamoDB.
+ * Write a tombstone record for a failed run.
+ * Partial artifacts are written to `failed/YYYY-MM-DD/` prefix (not `days/`).
+ * A tombstone is placed at `days/YYYY-MM-DD/tombstone.json` so the archive shows the failure.
  *
  * @param {import('./config')} config
  * @param {string} runDate
  * @param {string} reason - Human-readable failure reason
+ * @param {string} [artifactDir] - Optional path to local artifacts to upload to failed/ prefix
  * @returns {Promise<void>}
  */
-async function publishFailedRun(config, runDate, reason) {
+async function publishFailedRun(config, runDate, reason, artifactDir) {
   const s3 = buildS3Client(config);
   const docClient = buildDocClient(config);
 
@@ -177,20 +186,45 @@ async function publishFailedRun(config, runDate, reason) {
     status: 'failed',
     reason,
     failedAt: new Date().toISOString(),
+    failedArtifactsPath: `failed/${runDate}/`,
   };
 
-  // Write tombstone JSON to S3
-  const s3Key = `days/${runDate}/tombstone.json`;
+  // Upload any partial artifacts to the failed/ prefix (not live days/)
+  if (artifactDir) {
+    const files = walkDir(artifactDir);
+    for (const filePath of files) {
+      const relative = path.relative(artifactDir, filePath);
+      const s3Key = `failed/${runDate}/${relative}`;
+      try {
+        const body = fs.readFileSync(filePath);
+        await s3.send(
+          new PutObjectCommand({
+            Bucket: config.site.bucketName,
+            Key: s3Key,
+            Body: body,
+            ContentType: contentTypeFor(filePath),
+            CacheControl: 'public, max-age=300',
+          })
+        );
+      } catch (err) {
+        console.log(`[artifact-publisher] Warning: could not upload partial artifact ${s3Key}: ${err.message}`);
+      }
+    }
+    console.log(`[artifact-publisher] Uploaded partial artifacts to s3://${config.site.bucketName}/failed/${runDate}/`);
+  }
+
+  // Write a tombstone to the live days/ path so the archive shows the failure
+  const tombstoneKey = `days/${runDate}/tombstone.json`;
   await s3.send(
     new PutObjectCommand({
       Bucket: config.site.bucketName,
-      Key: s3Key,
+      Key: tombstoneKey,
       Body: JSON.stringify(tombstone, null, 2),
       ContentType: 'application/json',
       CacheControl: 'public, max-age=300',
     })
   );
-  console.log(`[artifact-publisher] Wrote tombstone to s3://${config.site.bucketName}/${s3Key}`);
+  console.log(`[artifact-publisher] Wrote tombstone to s3://${config.site.bucketName}/${tombstoneKey}`);
 
   // Write failure record to DynamoDB RunsTable
   await docClient.send(
@@ -327,10 +361,140 @@ async function updateRunMetadata(config, runDate, metadata) {
   console.log(`[artifact-publisher] Updated run metadata for ${runDate} in ${config.dynamo.runsTable}`);
 }
 
+/**
+ * Sync the entire site/ directory to S3 with delete-aware behavior.
+ * This publishes the static site (HTML, CSS, JS) after a successful pipeline
+ * run that may have modified site files.
+ *
+ * After uploading, any S3 objects under the site prefixes that don't correspond
+ * to a local file are deleted. This prevents stale renamed/removed files from
+ * lingering in the bucket.
+ *
+ * Uses content-type aware cache headers matching deploy-site.sh behavior.
+ *
+ * @param {import('./config')} config
+ * @returns {Promise<string[]>} List of S3 keys that were uploaded
+ */
+async function publishSiteAssets(config) {
+  const s3 = buildS3Client(config);
+  const siteDir = path.join(config.site.repoPath, 'site');
+
+  if (!fs.existsSync(siteDir)) {
+    console.warn('[artifact-publisher] site/ directory not found — skipping site publish');
+    return [];
+  }
+
+  const files = walkDir(siteDir);
+  const uploadedKeys = [];
+
+  // Cache-control settings by content type (mirrors deploy-site.sh)
+  const cacheByExt = {
+    '.html': 'public, max-age=300',       // 5 min
+    '.css': 'public, max-age=3600',        // 1 hour
+    '.js': 'public, max-age=3600',         // 1 hour
+    '.json': 'public, max-age=3600',       // 1 hour
+    '.png': 'public, max-age=86400',       // 24 hours
+    '.jpg': 'public, max-age=86400',
+    '.jpeg': 'public, max-age=86400',
+    '.svg': 'public, max-age=86400',
+    '.webp': 'public, max-age=86400',
+    '.ico': 'public, max-age=86400',
+  };
+
+  // Set of local S3 keys we'll upload — used to detect stale remote objects
+  const localKeySet = new Set();
+
+  for (const filePath of files) {
+    // Skip .DS_Store and .map files
+    const basename = path.basename(filePath);
+    if (basename === '.DS_Store' || filePath.endsWith('.map')) continue;
+
+    const relative = path.relative(siteDir, filePath);
+    const s3Key = relative; // site/ files go to the root of the bucket
+
+    // Mirror deploy-site.sh: exclude days/manifest.json to prevent overwriting
+    // the live manifest with the checked-in copy
+    if (s3Key === 'days/manifest.json' || s3Key === path.join('days', 'manifest.json')) continue;
+
+    localKeySet.add(s3Key);
+    const ext = path.extname(filePath).toLowerCase();
+    const body = fs.readFileSync(filePath);
+
+    await s3.send(
+      new PutObjectCommand({
+        Bucket: config.site.bucketName,
+        Key: s3Key,
+        Body: body,
+        ContentType: contentTypeFor(filePath),
+        CacheControl: cacheByExt[ext] || 'public, max-age=3600',
+      })
+    );
+
+    uploadedKeys.push(s3Key);
+  }
+
+  console.log(`[artifact-publisher] Published ${uploadedKeys.length} site asset(s) to S3`);
+
+  // ---- Delete stale S3 objects that no longer have a local counterpart ----
+  // Only delete within known site-asset prefixes to avoid touching runner-managed
+  // artifacts (days/YYYY-MM-DD/*, days/manifest.json), failed/ records, or Lambda code.
+  //
+  // For the days/ prefix we special-case shell-owned keys (days/index.html) while
+  // protecting runner-managed paths that match days/manifest.json or days/YYYY-MM-DD/*.
+  const sitePrefixes = ['index.html', 'css/', 'js/', 'images/', 'archive/', 'judges/', 'feedback/', 'days/'];
+  const staleKeys = [];
+
+  // Pattern to identify runner-managed keys under days/ that must not be deleted:
+  //   days/manifest.json, days/YYYY-MM-DD/*, failed/*
+  const runnerManagedPattern = /^days\/(\d{4}-\d{2}-\d{2}\/|manifest\.json$)/;
+
+  for (const prefix of sitePrefixes) {
+    let continuationToken;
+    do {
+      const listResult = await s3.send(
+        new ListObjectsV2Command({
+          Bucket: config.site.bucketName,
+          Prefix: prefix,
+          ContinuationToken: continuationToken,
+        })
+      );
+      for (const obj of listResult.Contents || []) {
+        // Skip runner-managed keys under days/ (artifacts, manifest)
+        if (prefix === 'days/' && runnerManagedPattern.test(obj.Key)) continue;
+
+        if (!localKeySet.has(obj.Key)) {
+          staleKeys.push(obj.Key);
+        }
+      }
+      continuationToken = listResult.IsTruncated ? listResult.NextContinuationToken : undefined;
+    } while (continuationToken);
+  }
+
+  if (staleKeys.length > 0) {
+    // DeleteObjects accepts up to 1000 keys per request
+    for (let i = 0; i < staleKeys.length; i += 1000) {
+      const batch = staleKeys.slice(i, i + 1000);
+      await s3.send(
+        new DeleteObjectsCommand({
+          Bucket: config.site.bucketName,
+          Delete: {
+            Objects: batch.map((Key) => ({ Key })),
+            Quiet: true,
+          },
+        })
+      );
+    }
+    console.log(`[artifact-publisher] Deleted ${staleKeys.length} stale S3 object(s)`);
+  }
+
+  return uploadedKeys;
+}
+
 module.exports = {
   publishArtifacts,
   publishFailedRun,
   updateManifest,
   invalidateCloudFront,
   updateRunMetadata,
+  publishSiteAssets,
 };

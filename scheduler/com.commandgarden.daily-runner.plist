@@ -7,7 +7,7 @@
 
 	<key>ProgramArguments</key>
 	<array>
-		<string>/usr/local/bin/node</string>
+		<string>{{NODE_PATH}}</string>
 		<string>{{PROJECT_DIR}}/runner/daily-runner.js</string>
 	</array>
 
@@ -31,7 +31,7 @@
 	<key>EnvironmentVariables</key>
 	<dict>
 		<key>PATH</key>
-		<string>/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin</string>
+		<string>/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin</string>
 	</dict>
 
 	<key>RunAtLoad</key>

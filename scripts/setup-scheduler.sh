@@ -94,6 +94,7 @@ do_install() {
   echo "  Copying plist to $PLIST_DEST..."
   cp "$PLIST_SOURCE" "$PLIST_DEST"
   sed -i '' "s|{{PROJECT_DIR}}|${PROJECT_DIR}|g" "$PLIST_DEST"
+  sed -i '' "s|{{NODE_PATH}}|${NODE_PATH}|g" "$PLIST_DEST"
 
   # Unload first if already loaded (ignore errors)
   launchctl unload "$PLIST_DEST" 2>/dev/null || true

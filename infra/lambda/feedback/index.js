@@ -10,6 +10,7 @@ const ddbClient = new DynamoDBClient({});
 const ddb = DynamoDBDocumentClient.from(ddbClient);
 
 const TABLE_NAME = process.env.FEEDBACK_TABLE;
+const MODERATION_TABLE = process.env.MODERATION_TABLE;
 const ALLOWED_ORIGIN = process.env.ALLOWED_ORIGIN || "*";
 const RATE_LIMIT_MAX = 5;
 const RATE_LIMIT_WINDOW_MS = 60 * 60 * 1000; // 1 hour
@@ -138,8 +139,9 @@ exports.handler = async (event) => {
       return response(429, { error: "Too many submissions. Please try again later." });
     }
   } catch (err) {
-    console.log(JSON.stringify({ message: "Rate limit check failed, proceeding", error: err.message }));
-    // If rate limit check fails (e.g., index doesn't exist yet), allow the request
+    console.log(JSON.stringify({ message: "Rate limit check failed", error: err.message }));
+    // Treat broken rate limiter as a hard failure — do not silently allow all requests
+    return response(503, { error: "Service temporarily unavailable. Please try again later." });
   }
 
   const feedbackId = generateUUID();
@@ -167,7 +169,35 @@ exports.handler = async (event) => {
       })
     );
 
-    console.log(JSON.stringify({ message: "Feedback saved", feedbackId, type: body.type }));
+    // Write a moderation record so the feedback-aggregator knows to check
+    // moderation status before including this item. New submissions start as
+    // "pending_review" — an operator (or future auto-moderation Lambda) sets
+    // the status to "approved" or "rejected"/"spam".
+    // Short, benign-looking submissions are auto-approved.
+    const autoApprove = sanitizedContent.length <= 200 && !/https?:\/\//i.test(sanitizedContent);
+    if (MODERATION_TABLE) {
+      try {
+        await ddb.send(
+          new PutCommand({
+            TableName: MODERATION_TABLE,
+            Item: {
+              feedbackId,
+              moderationStatus: autoApprove ? "approved" : "pending_review",
+              submittedAt: now,
+              type: body.type,
+              contentPreview: sanitizedContent.slice(0, 100),
+              sourceIpHash: ipHash,
+            },
+          })
+        );
+      } catch (modErr) {
+        // Non-fatal — moderation is best-effort. The aggregator will still
+        // include unmoderated items (no ModerationTable entry = not rejected).
+        console.log(JSON.stringify({ message: "Moderation record write failed", error: modErr.message }));
+      }
+    }
+
+    console.log(JSON.stringify({ message: "Feedback saved", feedbackId, type: body.type, autoApproved: autoApprove }));
 
     return response(201, {
       feedbackId,

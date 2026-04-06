@@ -62,11 +62,29 @@ async function uploadBlob(accessJwt, imageBuffer, mimeType) {
 }
 
 /**
- * Detect facets (links, mentions) in post text for rich text rendering.
- * @param {string} text
- * @returns {Array} AT Protocol facet objects
+ * Resolve a Bluesky handle to a DID.
+ * @param {string} handle - e.g. "someone.bsky.social"
+ * @returns {Promise<string|null>} DID or null if resolution fails
  */
-function detectFacets(text) {
+async function resolveHandleToDid(handle) {
+  try {
+    const params = new URLSearchParams({ handle });
+    const res = await fetch(`${BSKY_API}/com.atproto.identity.resolveHandle?${params}`);
+    if (!res.ok) return null;
+    const data = await res.json();
+    return data.did || null;
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * Detect facets (links, mentions, hashtags) in post text for rich text rendering.
+ * Mentions are resolved to DIDs as required by the AT Protocol.
+ * @param {string} text
+ * @returns {Promise<Array>} AT Protocol facet objects
+ */
+async function detectFacets(text) {
   const facets = [];
   const encoder = new TextEncoder();
 
@@ -82,15 +100,20 @@ function detectFacets(text) {
     });
   }
 
-  // Detect mentions (@handle.bsky.social)
+  // Detect mentions (@handle.bsky.social) and resolve to DIDs
   const mentionRegex = /@([a-zA-Z0-9.-]+\.[a-zA-Z]+)/g;
   while ((match = mentionRegex.exec(text)) !== null) {
-    const beforeBytes = encoder.encode(text.slice(0, match.index)).length;
-    const matchBytes = encoder.encode(match[0]).length;
-    facets.push({
-      index: { byteStart: beforeBytes, byteEnd: beforeBytes + matchBytes },
-      features: [{ $type: 'app.bsky.richtext.facet#mention', did: match[1] }],
-    });
+    const handle = match[1];
+    const did = await resolveHandleToDid(handle);
+    if (did) {
+      const beforeBytes = encoder.encode(text.slice(0, match.index)).length;
+      const matchBytes = encoder.encode(match[0]).length;
+      facets.push({
+        index: { byteStart: beforeBytes, byteEnd: beforeBytes + matchBytes },
+        features: [{ $type: 'app.bsky.richtext.facet#mention', did }],
+      });
+    }
+    // If DID resolution fails, omit the mention facet (plain text is still visible)
   }
 
   // Detect hashtags
@@ -121,7 +144,7 @@ async function createPost(session, text, embed) {
     $type: 'app.bsky.feed.post',
     text,
     createdAt: new Date().toISOString(),
-    facets: detectFacets(text),
+    facets: await detectFacets(text),
   };
 
   // Add image embed
@@ -405,7 +428,7 @@ async function replyToPost(session, text, parent, root) {
       root: root || parent,
       parent,
     },
-    facets: detectFacets(text),
+    facets: await detectFacets(text),
   };
 
   const res = await fetch(`${BSKY_API}/com.atproto.repo.createRecord`, {
@@ -519,6 +542,26 @@ async function getNotifications(accessJwt, limit = 25) {
 }
 
 /**
+ * Mark all notifications as read (up to the given timestamp).
+ * @param {string} accessJwt
+ * @param {string} [seenAt] - ISO timestamp; defaults to now
+ */
+async function updateNotificationSeen(accessJwt, seenAt) {
+  try {
+    await fetch(`${BSKY_API}/app.bsky.notification.updateSeen`, {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${accessJwt}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ seenAt: seenAt || new Date().toISOString() }),
+    });
+  } catch {
+    // Non-fatal
+  }
+}
+
+/**
  * Execute the daily Bluesky outreach strategy.
  *
  * This is the core audience-growth function. It:
@@ -579,13 +622,37 @@ async function executeOutreach(config, runDate, artifactDir) {
   ];
 
   const maxActions = strategy?.maxDailyActions || 15;
+  const MAX_DAILY_FOLLOWS = 5; // Cap follows separately to avoid aggressive churn
   let actionCount = 0;
+  let followCount = 0;
+
+  // Load previously followed accounts to avoid re-following
+  const followLogPath = path.join(artifactDir, '..', '_follow-log.json');
+  let followLog = {};
+  try {
+    const raw = fs.readFileSync(followLogPath, 'utf8');
+    followLog = JSON.parse(raw);
+  } catch {
+    // No follow log yet
+  }
+
+  // Load previously handled notification URIs to avoid replying twice
+  const handledNotificationsPath = path.join(artifactDir, '..', '_handled-notifications.json');
+  let handledNotifications = {};
+  try {
+    const raw = fs.readFileSync(handledNotificationsPath, 'utf8');
+    handledNotifications = JSON.parse(raw);
+  } catch {
+    // No log yet
+  }
 
   // --- 1. Handle notifications (replies, mentions) ---
   try {
     const notifications = await getNotifications(session.accessJwt, 20);
     const mentions = notifications.filter(
-      (n) => (n.reason === 'mention' || n.reason === 'reply') && !n.isRead
+      (n) => (n.reason === 'mention' || n.reason === 'reply') &&
+             !n.isRead &&
+             !handledNotifications[n.uri] // Skip previously handled
     );
 
     for (const mention of mentions) {
@@ -622,10 +689,17 @@ async function executeOutreach(config, runDate, artifactDir) {
           });
           results.mentionsHandled++;
           actionCount++;
+          // Record this notification as handled
+          handledNotifications[mention.uri] = { date: runDate, reason: mention.reason };
         } catch (err) {
           results.errors.push(`Reply failed: ${err.message}`);
         }
       }
+    }
+
+    // Mark all notifications as read on Bluesky
+    if (mentions.length > 0) {
+      await updateNotificationSeen(session.accessJwt);
     }
   } catch (err) {
     results.errors.push(`Notification handling failed: ${err.message}`);
@@ -669,19 +743,27 @@ async function executeOutreach(config, runDate, artifactDir) {
         }
 
         // Follow accounts that seem genuinely interested in our topics
-        // (only if they have a reasonable follower count — not bots)
+        // Capped separately at MAX_DAILY_FOLLOWS to prevent aggressive churn
+        // Skip accounts we've already followed before
         const followerCount = post.author?.followersCount || 0;
         const followingCount = post.author?.followsCount || 0;
+        const authorDid = post.author?.did;
         if (
+          followCount < MAX_DAILY_FOLLOWS &&
+          authorDid &&
+          !followLog[authorDid] &&
           followerCount >= 10 &&
           followerCount < 100000 &&
           followingCount > 0 &&
           followingCount < 5000
         ) {
           try {
-            await followAccount(session, post.author.did);
+            await followAccount(session, authorDid);
             results.accountsFollowed++;
             actionCount++;
+            followCount++;
+            // Record the follow in the persistent log
+            followLog[authorDid] = { handle: post.author.handle, date: runDate };
           } catch (err) {
             // May already be following — ignore
           }
@@ -690,6 +772,30 @@ async function executeOutreach(config, runDate, artifactDir) {
     } catch (err) {
       results.errors.push(`Search "${query}" failed: ${err.message}`);
     }
+  }
+
+  // Persist follow log to prevent re-following on subsequent runs
+  try {
+    fs.writeFileSync(followLogPath, JSON.stringify(followLog, null, 2), 'utf8');
+  } catch (err) {
+    // Non-fatal — log and continue
+    console.log(`[bluesky-publisher] Warning: could not save follow log: ${err.message}`);
+  }
+
+  // Persist handled notifications log to prevent duplicate replies
+  // Prune entries older than 30 days to keep the file manageable
+  try {
+    const cutoff = new Date();
+    cutoff.setDate(cutoff.getDate() - 30);
+    const cutoffStr = cutoff.toISOString().slice(0, 10);
+    for (const [uri, entry] of Object.entries(handledNotifications)) {
+      if (entry.date && entry.date < cutoffStr) {
+        delete handledNotifications[uri];
+      }
+    }
+    fs.writeFileSync(handledNotificationsPath, JSON.stringify(handledNotifications, null, 2), 'utf8');
+  } catch (err) {
+    console.log(`[bluesky-publisher] Warning: could not save notification log: ${err.message}`);
   }
 
   return results;
@@ -742,4 +848,5 @@ module.exports = {
   getProfile,
   getRecentEngagement,
   getNotifications,
+  updateNotificationSeen,
 };

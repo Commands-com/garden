@@ -116,7 +116,7 @@ echo ""
 # ---------------------------------------------------------------------------
 echo -e "${YELLOW}Syncing site to s3://${BUCKET_NAME}/...${NC}"
 
-SYNC_FLAGS=(--delete --exclude '.DS_Store' --exclude '*.map')
+SYNC_FLAGS=(--delete --exclude '.DS_Store' --exclude '*.map' --exclude 'days/manifest.json')
 
 # HTML files: short cache
 echo "  Syncing HTML files (cache: 5 min)..."
@@ -234,13 +234,12 @@ echo ""
 # ---------------------------------------------------------------------------
 echo -e "${YELLOW}Creating CloudFront invalidation for '/*'...${NC}"
 
-INVALIDATION_OUTPUT=$(aws cloudfront create-invalidation \
+INVALIDATION_ID=$(aws cloudfront create-invalidation \
   --distribution-id "$DISTRIBUTION_ID" \
   --paths '/*' \
   "${AWS_FLAGS[@]}" \
-  --output json)
-
-INVALIDATION_ID=$(echo "$INVALIDATION_OUTPUT" | python3 -c "import sys,json; print(json.load(sys.stdin)['Invalidation']['Id'])")
+  --query 'Invalidation.Id' \
+  --output text)
 
 echo "  Invalidation ID: $INVALIDATION_ID"
 echo -e "${YELLOW}Waiting for invalidation to complete (timeout: 5 min)...${NC}"

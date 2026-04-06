@@ -111,6 +111,7 @@ const config = {
   site: {
     bucketName: env('SITE_BUCKET_NAME', ''),
     distributionId: env('CLOUDFRONT_DISTRIBUTION_ID', ''),
+    customDomain: env('SITE_CUSTOM_DOMAIN', ''),
     repoPath: env('SITE_REPO_PATH', PROJECT_ROOT),
   },
 
@@ -135,6 +136,10 @@ const config = {
     runsTable: env(
       'DYNAMO_RUNS_TABLE',
       `${env('DYNAMO_TABLE_PREFIX', 'command-garden')}-${env('ENVIRONMENT', 'dev')}-runs`
+    ),
+    moderationTable: env(
+      'DYNAMO_MODERATION_TABLE',
+      `${env('DYNAMO_TABLE_PREFIX', 'command-garden')}-${env('ENVIRONMENT', 'dev')}-moderation`
     ),
   },
 

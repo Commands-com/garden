@@ -77,6 +77,8 @@ STACK_NAME="${STACK_NAME:-command-garden}"
 SITE_BUCKET_NAME="${SITE_BUCKET_NAME:-command-garden-site}"
 DYNAMO_TABLE_PREFIX="${DYNAMO_TABLE_PREFIX:-command-garden}"
 AWS_REGION="${AWS_REGION:-us-east-1}"
+LAMBDA_CODE_BUCKET="${LAMBDA_CODE_BUCKET:-}"
+LAMBDA_CODE_VERSION="${LAMBDA_CODE_VERSION:-latest}"
 
 # Build AWS CLI flags
 AWS_FLAGS=()
@@ -111,6 +113,84 @@ echo -e "${GREEN}AWS CLI configured. Identity:${NC}"
 aws sts get-caller-identity "${AWS_FLAGS[@]}" --output table
 
 # ---------------------------------------------------------------------------
+# Package Lambda code to S3
+#
+# The CloudFormation template uses `!If HasLambdaCodeBucket` to switch between
+# S3-based Lambda code (real handlers) and inline ZipFile placeholders.
+# `aws cloudformation package` does NOT work here because the template uses
+# conditional S3Bucket/S3Key references, not CodeUri local paths.
+#
+# Strategy:
+#   - If a staging bucket exists (explicit LAMBDA_CODE_BUCKET, or the site
+#     bucket already exists from a prior deploy), zip + upload Lambda code and
+#     pass LambdaCodeBucket/LambdaCodeVersion as stack parameters.
+#   - On first deploy (no bucket yet), skip Lambda upload — the stack creates
+#     the site bucket with inline placeholders. Re-run the script afterward
+#     to deploy real Lambda code.
+# ---------------------------------------------------------------------------
+LAMBDA_DIR="$PROJECT_DIR/infra/lambda"
+DEPLOY_TEMPLATE="$TEMPLATE_PATH"
+
+# Determine a staging bucket for Lambda uploads.
+STAGING_BUCKET="${LAMBDA_CODE_BUCKET:-}"
+if [[ -z "$STAGING_BUCKET" ]]; then
+  # Check if the site bucket already exists (update path / second run)
+  if aws s3api head-bucket --bucket "$SITE_BUCKET_NAME" ${AWS_FLAGS[@]+"${AWS_FLAGS[@]}"} 2>/dev/null; then
+    STAGING_BUCKET="$SITE_BUCKET_NAME"
+  fi
+fi
+
+LAMBDA_PARAMS_SET=false
+if [[ -d "$LAMBDA_DIR" && -n "$STAGING_BUCKET" ]]; then
+  echo -e "${YELLOW}Packaging Lambda functions to s3://${STAGING_BUCKET}/${LAMBDA_CODE_VERSION}/...${NC}"
+
+  TEMP_DIR=$(mktemp -d)
+  trap 'rm -rf "$TEMP_DIR"' EXIT
+
+  LAMBDA_UPLOAD_OK=true
+  for FUNC_KEY in feedback reactions health; do
+    FUNC_DIR="$LAMBDA_DIR/$FUNC_KEY"
+    if [[ ! -d "$FUNC_DIR" ]]; then
+      echo -e "${YELLOW}  Warning: Lambda directory not found for '${FUNC_KEY}' — skipping${NC}"
+      LAMBDA_UPLOAD_OK=false
+      continue
+    fi
+
+    ZIP_FILE="$TEMP_DIR/${FUNC_KEY}.zip"
+    (cd "$FUNC_DIR" && zip -qr "$ZIP_FILE" .)
+
+    S3_KEY="${LAMBDA_CODE_VERSION}/${FUNC_KEY}.zip"
+    UPLOAD_EXIT=0
+    aws s3 cp "$ZIP_FILE" "s3://${STAGING_BUCKET}/${S3_KEY}" \
+      ${AWS_FLAGS[@]+"${AWS_FLAGS[@]}"} --quiet 2>&1 || UPLOAD_EXIT=$?
+
+    if [[ $UPLOAD_EXIT -ne 0 ]]; then
+      echo -e "${YELLOW}  Warning: Failed to upload ${FUNC_KEY}.zip to S3 — stack will use inline placeholder${NC}"
+      LAMBDA_UPLOAD_OK=false
+    else
+      echo "  Uploaded ${FUNC_KEY}.zip ($(du -h "$ZIP_FILE" | cut -f1))"
+    fi
+  done
+
+  if $LAMBDA_UPLOAD_OK; then
+    LAMBDA_PARAMS_SET=true
+    LAMBDA_CODE_BUCKET="$STAGING_BUCKET"
+    echo -e "${GREEN}Lambda packages uploaded successfully.${NC}"
+  else
+    echo -e "${YELLOW}Some Lambda packages failed to upload — stack will use inline placeholders.${NC}"
+    echo -e "${YELLOW}Run this script again after fixing the issue to deploy real Lambda code.${NC}"
+  fi
+  echo ""
+elif [[ -d "$LAMBDA_DIR" ]]; then
+  echo -e "${YELLOW}No staging bucket available (first deploy?) — stack will use inline Lambda placeholders.${NC}"
+  echo -e "${YELLOW}After the stack creates the site bucket, re-run this script to deploy real Lambda code.${NC}"
+  echo ""
+else
+  echo -e "${YELLOW}No Lambda source directory found — stack will use inline placeholders.${NC}"
+  echo ""
+fi
+
+# ---------------------------------------------------------------------------
 # Determine create vs update
 # ---------------------------------------------------------------------------
 echo ""
@@ -128,6 +208,20 @@ fi
 # ---------------------------------------------------------------------------
 WAIT_ACTION=""
 
+# Build the common parameters array. Lambda params are only added when
+# we successfully uploaded Lambda ZIPs to S3 above.
+PARAMS=(
+  "ParameterKey=Environment,ParameterValue=$ENVIRONMENT"
+  "ParameterKey=SiteBucketName,ParameterValue=$SITE_BUCKET_NAME"
+  "ParameterKey=TablePrefix,ParameterValue=$DYNAMO_TABLE_PREFIX"
+)
+if $LAMBDA_PARAMS_SET; then
+  PARAMS+=(
+    "ParameterKey=LambdaCodeBucket,ParameterValue=$LAMBDA_CODE_BUCKET"
+    "ParameterKey=LambdaCodeVersion,ParameterValue=$LAMBDA_CODE_VERSION"
+  )
+fi
+
 if $STACK_EXISTS; then
   echo "Stack exists. Running update..."
 
@@ -135,13 +229,10 @@ if $STACK_EXISTS; then
   UPDATE_EXIT=0
   UPDATE_OUTPUT=$(aws cloudformation update-stack \
     --stack-name "$STACK_NAME" \
-    --template-body "file://$TEMPLATE_PATH" \
-    --parameters \
-      "ParameterKey=Environment,ParameterValue=$ENVIRONMENT" \
-      "ParameterKey=SiteBucketName,ParameterValue=$SITE_BUCKET_NAME" \
-      "ParameterKey=TablePrefix,ParameterValue=$DYNAMO_TABLE_PREFIX" \
+    --template-body "file://$DEPLOY_TEMPLATE" \
+    --parameters "${PARAMS[@]}" \
     --capabilities CAPABILITY_IAM \
-    "${AWS_FLAGS[@]}" 2>&1) || UPDATE_EXIT=$?
+    ${AWS_FLAGS[@]+"${AWS_FLAGS[@]}"} 2>&1) || UPDATE_EXIT=$?
 
   if [[ $UPDATE_EXIT -ne 0 ]]; then
     if echo "$UPDATE_OUTPUT" | grep -q "No updates are to be performed"; then
@@ -150,7 +241,7 @@ if $STACK_EXISTS; then
       echo -e "${GREEN}Current stack outputs:${NC}"
       aws cloudformation describe-stacks \
         --stack-name "$STACK_NAME" \
-        "${AWS_FLAGS[@]}" \
+        ${AWS_FLAGS[@]+"${AWS_FLAGS[@]}"} \
         --query 'Stacks[0].Outputs' \
         --output table
       exit 0
@@ -167,13 +258,10 @@ else
 
   aws cloudformation create-stack \
     --stack-name "$STACK_NAME" \
-    --template-body "file://$TEMPLATE_PATH" \
-    --parameters \
-      "ParameterKey=Environment,ParameterValue=$ENVIRONMENT" \
-      "ParameterKey=SiteBucketName,ParameterValue=$SITE_BUCKET_NAME" \
-      "ParameterKey=TablePrefix,ParameterValue=$DYNAMO_TABLE_PREFIX" \
+    --template-body "file://$DEPLOY_TEMPLATE" \
+    --parameters "${PARAMS[@]}" \
     --capabilities CAPABILITY_IAM \
-    "${AWS_FLAGS[@]}"
+    ${AWS_FLAGS[@]+"${AWS_FLAGS[@]}"}
 
   WAIT_ACTION="stack-create-complete"
 fi

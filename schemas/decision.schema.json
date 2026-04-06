@@ -40,9 +40,10 @@
               "feasibility": { "type": "number", "minimum": 0, "maximum": 100 },
               "artifactClarity": { "type": "number", "minimum": 0, "maximum": 100 },
               "novelty": { "type": "number", "minimum": 0, "maximum": 100 },
-              "feedbackPull": { "type": "number", "minimum": 0, "maximum": 100 }
+              "feedbackPull": { "type": "number", "minimum": 0, "maximum": 100 },
+              "shareability": { "type": "number", "minimum": 0, "maximum": 100 }
             },
-            "required": ["compoundingValue", "usefulness", "feasibility", "artifactClarity", "novelty", "feedbackPull"]
+            "required": ["compoundingValue", "usefulness", "feasibility", "artifactClarity", "novelty", "feedbackPull", "shareability"]
           },
           "totalScore": { "type": "number" },
           "rank": { "type": "integer", "minimum": 1 },
@@ -62,6 +63,15 @@
       }
     },
     "rationale": { "type": "string" },
+    "featureType": {
+      "type": "string",
+      "description": "High-level category of the daily change (e.g. 'design', 'content', 'interaction', 'infrastructure', 'accessibility')."
+    },
+    "tags": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Free-form tags for this day's change, used for archive filtering and era comparison."
+    },
     "feedbackInfluence": {
       "type": "array",
       "items": {
@@ -70,6 +80,29 @@
           "summary": { "type": "string" },
           "impact": { "type": "string", "enum": ["high", "medium", "low"] }
         }
+      }
+    },
+    "artifacts": {
+      "type": "object",
+      "description": "References to sibling artifact files in the same dated directory.",
+      "properties": {
+        "spec": { "type": "string", "description": "Filename of the spec artifact (e.g. spec.md)" },
+        "buildSummary": { "type": "string", "description": "Filename of the build summary (e.g. build-summary.md)" },
+        "review": { "type": "string", "description": "Filename of the review findings (e.g. review.md)" },
+        "testResults": { "type": "string", "description": "Filename of the test results (e.g. test-results.json)" },
+        "feedbackDigest": { "type": "string", "description": "Filename of the feedback digest (e.g. feedback-digest.json)" }
+      }
+    },
+    "outreachSummary": {
+      "type": "object",
+      "description": "Summary of automated Bluesky outreach actions for transparency.",
+      "properties": {
+        "postUri": { "type": "string", "description": "AT URI of the daily Bluesky post" },
+        "postsLiked": { "type": "integer", "minimum": 0 },
+        "accountsFollowed": { "type": "integer", "minimum": 0 },
+        "mentionsHandled": { "type": "integer", "minimum": 0 },
+        "searchQueries": { "type": "array", "items": { "type": "string" } },
+        "executedAt": { "type": "string", "format": "date-time" }
       }
     },
     "bluesky_post": {

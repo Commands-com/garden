@@ -5,6 +5,8 @@ node_modules/
 !.env.example
 content/days/*/
 !content/days/_example/
+content/days/_follow-log.json
+content/days/_handled-notifications.json
 *.zip
 dist/
 .DS_Store
