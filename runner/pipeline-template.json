@@ -18,7 +18,7 @@
         "objective": "Survey the current state of Command Garden — codebase, recent decisions, community feedback, Bluesky audience metrics, and backlog — then propose 3-5 candidate improvements for today. Each candidate must be achievable in a single pipeline run and produce a user-visible change. Growing the Bluesky audience (@command-garden.bsky.social) is a first-class goal — consider what will attract new followers, not just serve existing ones.\n\nInputs:\n- {{FEEDBACK_DIGEST_PATH}}\n- Recent decision.json files from the last 3 days\n- {{ARTIFACT_DIR}}/recent-context.json (Bluesky metrics: follower count, engagement rates, top posts)\n\nConstraints:\n- Each candidate must be scoped to ship in one day\n- At least one candidate should address community feedback if any exists\n- Avoid repeating improvements from the last 7 days\n- Every candidate must be evaluable on all 7 scoring dimensions: compoundingValue, usefulnessClarity, feasibility, legibility, noveltySurprise, continuity, shareability\n- At least one candidate should be optimized for Bluesky engagement",
         "teamId": "{{EXPLORE_TEAM_ID}}",
         "limits": {
-          "maxCycles": 1,
+          "maxCycles": 2,
           "maxTurns": 10
         },
         "roomConfig": {
@@ -39,8 +39,8 @@
         "objective": "Take the selected candidate from Explore and write a detailed implementation specification. Define exactly what files change, what the user sees before and after, and what the acceptance criteria are.\n\nConstraints:\n- Spec must include explicit file paths for all changes\n- Spec must define at least 3 testable acceptance criteria\n- Spec must estimate token budget for implementation\n- Spec must identify rollback steps if something goes wrong",
         "teamId": "{{SPEC_TEAM_ID}}",
         "limits": {
-          "maxCycles": 2,
-          "maxTurns": 12
+          "maxCycles": 3,
+          "maxTurns": 18
         },
         "roomConfig": {
           "deliverableType": "Technical Spec",
@@ -64,8 +64,8 @@
         "objective": "Implement the specification from the Spec stage. Write all code changes, update any necessary configuration, and produce the artifacts (decision.json, screenshots, updated HTML/CSS/JS) for the day's directory.\n\nConstraints:\n- Follow the spec exactly — no scope creep\n- All changes must be backward-compatible with the existing site\n- Produce a valid decision.json in the day's artifact directory\n- Generate before/after screenshots where applicable\n- Do not modify infrastructure (CloudFormation, Lambda) unless the spec explicitly calls for it",
         "teamId": "{{IMPLEMENTATION_TEAM_ID}}",
         "limits": {
-          "maxCycles": 4,
-          "maxTurns": 40
+          "maxCycles": 8,
+          "maxTurns": 80
         },
         "roomConfig": {
           "isolatedWriteWorktrees": true,
@@ -116,8 +116,8 @@
         "objective": "Final review of today's changes. Verify that the implementation matches the spec, validation passed, and the artifacts are ready to publish. Produce the final summary for the day's public log.\n\nConstraints:\n- If Validation reported any failures, either fix them or reject the run\n- Ensure the decision.json 'summary' field is clear and jargon-free for a public audience\n- Verify all artifact files exist and are well-formed\n- Produce a final one-line headline for the day's change\n- Write a bluesky_post field in decision.json with: headline (max 80 chars), body (max 250 chars optimized for engagement), and alt_text for any screenshot\n- Write a bluesky_strategy field in decision.json with: searchQueries (5-8 terms), replyTemplates (whatIs, howDoesItWork, genericQuestion), hashtagsToUse, and maxDailyActions (10-20)",
         "teamId": "{{REVIEW_TEAM_ID}}",
         "limits": {
-          "maxCycles": 2,
-          "maxTurns": 18
+          "maxCycles": 3,
+          "maxTurns": 24
         },
         "handoff": {
           "outputContract": "review_findings.v1",
