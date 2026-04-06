@@ -223,6 +223,27 @@ async function publishToBluesky(config, runDate, artifactDir, siteUrl) {
     return { posted: false, error: `Could not read decision.json: ${err.message}` };
   }
 
+  // Compute day number from manifest
+  let dayNumber = null;
+  try {
+    const manifestPath = path.join(path.dirname(artifactDir), '..', 'site', 'days', 'manifest.json');
+    const altManifestPath = path.join(artifactDir, '..', '..', 'site', 'days', 'manifest.json');
+    let manifestRaw;
+    try { manifestRaw = fs.readFileSync(manifestPath, 'utf8'); }
+    catch { manifestRaw = fs.readFileSync(altManifestPath, 'utf8'); }
+    const manifest = JSON.parse(manifestRaw);
+    if (manifest.days) {
+      const sorted = [...manifest.days].sort((a, b) => a.date.localeCompare(b.date));
+      const idx = sorted.findIndex((d) => d.date === runDate);
+      dayNumber = idx >= 0 ? idx + 1 : sorted.length + 1;
+    }
+  } catch {
+    // Can't determine day number — omit it
+  }
+
+  const dayLabel = dayNumber ? `Day ${dayNumber}` : runDate;
+  const tags = '#AIAgent #AutonomousAI #BuildInPublic #WebDev';
+
   // Build post text
   let postText;
   const dayUrl = siteUrl ? `${siteUrl}/days/?date=${runDate}` : null;
@@ -233,13 +254,21 @@ async function publishToBluesky(config, runDate, artifactDir, siteUrl) {
     postText = bp.headline
       ? `${bp.headline}\n\n${bp.body || ''}`
       : bp.body || bp.text || '';
+    // Append tags if not already present
+    if (!postText.includes('#')) {
+      postText += `\n\n${tags}`;
+    }
   } else {
     // Fallback: compose from decision data
-    const winner = decision.winner?.title || decision.headline || `Day ${runDate}`;
+    const winner = decision.winner?.title || decision.headline || 'daily improvement';
     const summary = decision.rationale
-      ? decision.rationale.slice(0, 200)
+      ? decision.rationale.slice(0, 100)
       : '';
-    postText = `🌱 Command Garden — Day ${runDate}\n\n${winner}\n\n${summary}`;
+    postText = `🌱 Fully Automated Website ${dayLabel}: ${winner}`;
+    if (summary) {
+      postText += `\n\n${summary}`;
+    }
+    postText += `\n\n${tags}`;
   }
 
   // Add link if we have a site URL
@@ -613,12 +642,14 @@ async function executeOutreach(config, runDate, artifactDir) {
 
   // Default search queries if the pipeline didn't provide a strategy
   const searchQueries = strategy?.searchQueries || [
-    'AI building websites',
-    'autonomous software',
-    'AI shipping code',
-    'self-evolving',
-    'AI agent daily',
+    'AI agent',
+    'build in public',
+    'autonomous AI',
     'AI side project',
+    'AI shipping code',
+    'self-evolving website',
+    'AI web development',
+    'vibe coding',
   ];
 
   const maxActions = strategy?.maxDailyActions || 15;
