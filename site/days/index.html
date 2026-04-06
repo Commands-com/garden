@@ -1,0 +1,417 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Command Garden — Daily decision log and build artifacts.">
+  <meta name="theme-color" content="#1a4d2e">
+  <title>Daily Entry — Command Garden</title>
+  <link rel="icon" href="/favicon.ico" type="image/x-icon">
+  <link rel="stylesheet" href="/css/design-system.css">
+  <link rel="stylesheet" href="/css/components.css">
+</head>
+<body>
+
+  <!-- Navigation -->
+  <nav class="nav" role="navigation" aria-label="Main navigation">
+    <div class="container nav__inner">
+      <a href="/" class="nav__logo">
+        <span class="nav__logo-icon" aria-hidden="true">&#127793;</span>
+        <span>Command Garden</span>
+      </a>
+      <button class="nav__mobile-toggle" aria-label="Toggle menu" aria-expanded="false">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 12h18M3 6h18M3 18h18"/></svg>
+      </button>
+      <div class="nav__links">
+        <a href="/" class="nav__link">Home</a>
+        <a href="/archive/" class="nav__link">Archive</a>
+        <a href="/judges/" class="nav__link">Judges</a>
+        <a href="/feedback/" class="nav__link">Feedback</a>
+        <a href="/days/" class="nav__link nav__link--active nav__link--source">View Source</a>
+      </div>
+    </div>
+  </nav>
+
+  <main>
+    <!-- Day Header -->
+    <section class="section" style="padding-bottom: 0;">
+      <div class="container">
+        <div id="day-header">
+          <div class="skeleton skeleton--badge mb-3"></div>
+          <div class="skeleton skeleton--title" style="width: 50%;"></div>
+          <div class="skeleton skeleton--text" style="width: 30%;"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 1. What the system considered -->
+    <section class="section" id="considered-section">
+      <div class="container">
+        <div class="section__header">
+          <span class="section__label">Step 1</span>
+          <h2 class="section__title">What the system considered</h2>
+          <p class="section__subtitle">All candidate changes proposed for this day.</p>
+        </div>
+        <div id="candidates-list">
+          <div class="skeleton skeleton--card"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 2. How candidates scored -->
+    <section class="section" id="scores-section">
+      <div class="container">
+        <div class="section__header">
+          <span class="section__label">Step 2</span>
+          <h2 class="section__title">How candidates scored</h2>
+          <p class="section__subtitle">Full scoring breakdown across all six dimensions.</p>
+        </div>
+        <div id="score-table-container">
+          <div class="skeleton skeleton--card"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 3. Which one won & why -->
+    <section class="section" id="winner-section">
+      <div class="container">
+        <div class="section__header">
+          <span class="section__label">Step 3</span>
+          <h2 class="section__title">Which one won &amp; why</h2>
+        </div>
+        <div id="winner-container">
+          <div class="card">
+            <div class="skeleton skeleton--badge"></div>
+            <div class="skeleton skeleton--title mt-4"></div>
+            <div class="skeleton skeleton--text"></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 4. Feedback that influenced today -->
+    <section class="section" id="feedback-section">
+      <div class="container">
+        <div class="section__header">
+          <span class="section__label">Step 4</span>
+          <h2 class="section__title">Feedback that influenced today</h2>
+          <p class="section__subtitle">Community input that shaped the decision.</p>
+        </div>
+        <div id="feedback-digest-container">
+          <div class="skeleton skeleton--card"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 5. What changed in the product -->
+    <section class="section" id="build-section">
+      <div class="container">
+        <div class="section__header">
+          <span class="section__label">Step 5</span>
+          <h2 class="section__title">What changed in the product</h2>
+        </div>
+        <div id="build-summary-container" class="card">
+          <div class="skeleton skeleton--title"></div>
+          <div class="skeleton skeleton--text"></div>
+          <div class="skeleton skeleton--text"></div>
+          <div class="skeleton skeleton--text-sm"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 6. Review findings -->
+    <section class="section" id="review-section">
+      <div class="container">
+        <div class="section__header">
+          <span class="section__label">Step 6</span>
+          <h2 class="section__title">Review findings</h2>
+        </div>
+        <div id="review-container" class="card">
+          <div class="skeleton skeleton--title"></div>
+          <div class="skeleton skeleton--text"></div>
+          <div class="skeleton skeleton--text-sm"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 7. Test results -->
+    <section class="section" id="tests-section">
+      <div class="container">
+        <div class="section__header">
+          <span class="section__label">Step 7</span>
+          <h2 class="section__title">Test results</h2>
+        </div>
+        <div id="test-results-container">
+          <div class="skeleton skeleton--card"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 8. Artifacts -->
+    <section class="section" id="artifacts-section">
+      <div class="container">
+        <div class="section__header">
+          <span class="section__label">Raw Data</span>
+          <h2 class="section__title">Artifacts</h2>
+          <p class="section__subtitle">Download the raw artifact files for this day.</p>
+        </div>
+        <div id="artifacts-container"></div>
+      </div>
+    </section>
+
+    <!-- Reactions -->
+    <section class="section" id="reactions-section">
+      <div class="container">
+        <div class="section__header">
+          <h3 class="section__title">React to this day</h3>
+        </div>
+        <div id="reactions-container"></div>
+      </div>
+    </section>
+
+    <!-- Day Navigation -->
+    <div class="container">
+      <div class="day-nav" id="day-nav">
+        <span></span>
+        <span class="day-nav__current" id="day-nav-current"></span>
+        <span></span>
+      </div>
+    </div>
+  </main>
+
+  <!-- Footer -->
+  <footer class="site-footer">
+    <div class="container site-footer__inner">
+      <p class="site-footer__text">
+        Powered by <a href="https://commands.com" class="site-footer__link">Commands.com</a>
+      </p>
+      <span class="site-footer__meta">artifact schema v1</span>
+    </div>
+  </footer>
+
+  <script type="module">
+    import {
+      getManifest,
+      getLatestDay,
+      getDayByDate,
+      getAdjacentDays,
+      loadDay,
+      formatDate,
+      getDayUrl,
+      getDateFromUrl,
+      el,
+      showError,
+      initMobileNav,
+    } from '/js/app.js';
+    import {
+      renderDecision,
+      renderCandidates,
+      renderWinner,
+      renderScoreTable,
+      renderFeedbackDigest,
+      renderMarkdown,
+      renderTestResults,
+      renderReactions,
+      renderArtifactLinks,
+    } from '/js/renderer.js';
+
+    initMobileNav();
+
+    async function init() {
+      try {
+        const manifest = await getManifest();
+
+        // Determine which date to show
+        let dateStr = getDateFromUrl();
+        if (!dateStr) {
+          // Default to latest day
+          const latest = getLatestDay(manifest);
+          if (latest) {
+            dateStr = latest.date;
+          } else {
+            showPageError('No entries available', 'The garden has no daily entries yet.');
+            return;
+          }
+        }
+
+        // Update page title
+        document.title = `${formatDate(dateStr)} — Command Garden`;
+
+        // Load artifacts
+        const artifacts = await loadDay(dateStr);
+        const dayMeta = getDayByDate(manifest, dateStr);
+
+        // Render header
+        renderHeader(dateStr, dayMeta);
+
+        // Render all sections
+        renderSection('candidates-list', () => {
+          if (artifacts.decision && artifacts.decision.candidates) {
+            return renderCandidates(artifacts.decision.candidates);
+          }
+          return emptyNote('No candidate data available.');
+        });
+
+        renderSection('score-table-container', () => {
+          if (artifacts.decision && artifacts.decision.candidates) {
+            return renderScoreTable(artifacts.decision.candidates);
+          }
+          return emptyNote('No scoring data available.');
+        });
+
+        renderSection('winner-container', () => {
+          if (artifacts.decision && artifacts.decision.winner) {
+            return renderWinner(artifacts.decision.winner, artifacts.decision.rationale);
+          }
+          return emptyNote('No winner data available.');
+        });
+
+        renderSection('feedback-digest-container', () => {
+          return renderFeedbackDigest(artifacts.feedbackDigest);
+        });
+
+        renderSection('build-summary-container', () => {
+          if (artifacts.buildSummary) {
+            const wrapper = el('div', { className: 'card' });
+            wrapper.appendChild(renderMarkdown(artifacts.buildSummary));
+            return wrapper;
+          }
+          return emptyNote('No build summary available.');
+        });
+
+        renderSection('review-container', () => {
+          if (artifacts.review) {
+            const wrapper = el('div', { className: 'card' });
+            wrapper.appendChild(renderMarkdown(artifacts.review));
+            return wrapper;
+          }
+          return emptyNote('No review data available.');
+        });
+
+        renderSection('test-results-container', () => {
+          return renderTestResults(artifacts.testResults);
+        });
+
+        // Artifacts links
+        const artifactsContainer = document.getElementById('artifacts-container');
+        artifactsContainer.innerHTML = '';
+        artifactsContainer.appendChild(renderArtifactLinks(dateStr));
+
+        // Reactions
+        const reactionsContainer = document.getElementById('reactions-container');
+        reactionsContainer.innerHTML = '';
+        reactionsContainer.appendChild(renderReactions(dateStr));
+
+        // Day navigation
+        renderDayNav(manifest, dateStr);
+
+      } catch (err) {
+        console.error('Failed to load daily entry:', err);
+        showPageError(
+          'Unable to load this entry',
+          'Something went wrong. The artifacts for this day may not exist yet.'
+        );
+      }
+    }
+
+    function renderHeader(dateStr, dayMeta) {
+      const container = document.getElementById('day-header');
+      container.innerHTML = '';
+
+      const statusBadge = dayMeta && dayMeta.status
+        ? el('span', { className: `badge badge--${dayMeta.status} mb-3` }, dayMeta.status)
+        : null;
+
+      container.appendChild(
+        el('div', {},
+          statusBadge,
+          el('h1', { style: 'margin-bottom: var(--space-2);' }, formatDate(dateStr)),
+          dayMeta && dayMeta.title
+            ? el('p', { className: 'text-xl text-muted' }, dayMeta.title)
+            : null,
+          dayMeta && dayMeta.summary
+            ? el('p', { className: 'text-sm text-muted mt-2 max-w-prose' }, dayMeta.summary)
+            : null
+        )
+      );
+    }
+
+    function renderDayNav(manifest, currentDate) {
+      const navContainer = document.getElementById('day-nav');
+      const { prev, next } = getAdjacentDays(manifest, currentDate);
+
+      navContainer.innerHTML = '';
+
+      // Previous link
+      if (prev) {
+        navContainer.appendChild(
+          el('a', { href: getDayUrl(prev.date), className: 'day-nav__link' },
+            '\u2190 ', prev.date
+          )
+        );
+      } else {
+        navContainer.appendChild(
+          el('span', { className: 'day-nav__link day-nav__link--disabled' }, '\u2190 Previous')
+        );
+      }
+
+      // Current date
+      navContainer.appendChild(
+        el('span', { className: 'day-nav__current' }, currentDate)
+      );
+
+      // Next link
+      if (next) {
+        navContainer.appendChild(
+          el('a', { href: getDayUrl(next.date), className: 'day-nav__link' },
+            next.date, ' \u2192'
+          )
+        );
+      } else {
+        navContainer.appendChild(
+          el('span', { className: 'day-nav__link day-nav__link--disabled' }, 'Next \u2192')
+        );
+      }
+    }
+
+    function renderSection(containerId, renderFn) {
+      const container = document.getElementById(containerId);
+      if (!container) return;
+      container.innerHTML = '';
+      try {
+        const content = renderFn();
+        if (content) {
+          container.appendChild(content);
+        }
+      } catch (err) {
+        console.error(`Error rendering ${containerId}:`, err);
+        container.appendChild(
+          emptyNote('An error occurred rendering this section.')
+        );
+      }
+    }
+
+    function emptyNote(message) {
+      return el('p', { className: 'text-sm text-muted p-4' }, message);
+    }
+
+    function showPageError(title, message) {
+      const main = document.querySelector('main');
+      main.innerHTML = '';
+      main.appendChild(
+        el('div', { className: 'container py-16' },
+          el('div', { className: 'empty-state' },
+            el('div', { className: 'empty-state__icon' }, '\u{1F331}'),
+            el('h2', { className: 'empty-state__title' }, title),
+            el('p', { className: 'empty-state__message' }, message),
+            el('a', { href: '/', className: 'btn btn--primary mt-8' }, 'Back to home')
+          )
+        )
+      );
+    }
+
+    init();
+  </script>
+
+</body>
+</html>

@@ -1,0 +1,62 @@
+{
+  "schemaVersion": 1,
+  "runDate": "2026-04-05",
+  "generatedAt": "2026-04-05T10:15:00.000Z",
+  "summary": {
+    "totalScenarios": 6,
+    "passed": 6,
+    "failed": 0,
+    "passRate": 100
+  },
+  "scenarios": [
+    {
+      "name": "New visitor sees the site map on homepage",
+      "persona": "new visitor",
+      "status": "pass",
+      "description": "A first-time visitor lands on the homepage and sees the 'The Garden So Far' section with visual nodes.",
+      "details": "Site map section rendered with 3 nodes. Canvas layout initialized within 200ms.",
+      "duration": "1.2s"
+    },
+    {
+      "name": "New visitor clicks a site map node",
+      "persona": "new visitor",
+      "status": "pass",
+      "description": "Clicking a node in the site map navigates to the corresponding daily entry page.",
+      "details": "Clicked node for 2026-04-03, successfully navigated to /days/?date=2026-04-03.",
+      "duration": "0.8s"
+    },
+    {
+      "name": "Returning visitor finds site map on mobile",
+      "persona": "returning follower",
+      "status": "pass",
+      "description": "On a mobile viewport, the site map displays as a CSS grid instead of canvas.",
+      "details": "Grid layout with 3 entries rendered at 375px viewport width.",
+      "duration": "0.9s"
+    },
+    {
+      "name": "Site map handles empty manifest",
+      "persona": "new visitor",
+      "status": "pass",
+      "description": "When no shipped entries exist, the site map shows a friendly empty state.",
+      "details": "Empty state message 'The garden is just getting started.' displayed correctly.",
+      "duration": "0.5s"
+    },
+    {
+      "name": "Returning visitor sees updated site map after new day ships",
+      "persona": "returning follower",
+      "status": "pass",
+      "description": "After a new day's entry is published, the site map includes the new node on next page load.",
+      "details": "Manifest re-fetched on page load, new entry node appeared in the layout.",
+      "duration": "1.1s"
+    },
+    {
+      "name": "Daily entry page still renders correctly",
+      "persona": "returning follower",
+      "status": "pass",
+      "description": "The daily entry page for 2026-04-04 renders all sections without errors.",
+      "details": "All 8 sections rendered: candidates, scores, winner, feedback, build summary, review, tests, artifacts.",
+      "duration": "1.4s"
+    }
+  ],
+  "testPersonas": ["new visitor", "returning follower"]
+}

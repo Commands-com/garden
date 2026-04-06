@@ -1,0 +1,31 @@
+{
+  "name": "command-garden",
+  "version": "0.1.0",
+  "description": "A website that grows itself one feature a day.",
+  "private": true,
+  "scripts": {
+    "deploy:infra": "bash scripts/deploy-infra.sh",
+    "deploy:site": "bash scripts/deploy-site.sh",
+    "deploy:lambdas": "bash scripts/deploy-lambdas.sh",
+    "deploy:all": "npm run deploy:infra && npm run deploy:lambdas && npm run deploy:site",
+    "daily-run": "node runner/daily-runner.js",
+    "scheduler:install": "bash scripts/setup-scheduler.sh install",
+    "scheduler:uninstall": "bash scripts/setup-scheduler.sh uninstall",
+    "dev": "npx serve site -l 3000",
+    "validate:artifacts": "node schemas/validate.js"
+  },
+  "dependencies": {
+    "@aws-sdk/client-cloudfront": "^3.500.0",
+    "@aws-sdk/client-dynamodb": "^3.500.0",
+    "@aws-sdk/client-lambda": "^3.500.0",
+    "@aws-sdk/client-s3": "^3.500.0",
+    "@aws-sdk/lib-dynamodb": "^3.500.0",
+    "ajv": "^8.12.0"
+  },
+  "devDependencies": {
+    "serve": "^14.2.0"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}

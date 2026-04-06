@@ -1,0 +1,32 @@
+{
+  "schemaVersion": 1,
+  "runDate": "2026-04-05",
+  "generatedAt": "2026-04-05T09:00:00.000Z",
+  "summary": {
+    "totalItems": 8,
+    "byType": {
+      "suggestion": 5,
+      "bug": 1,
+      "confusion": 2
+    }
+  },
+  "suggestions": [
+    { "content": "Add a visual map or overview of everything built so far", "count": 3, "dayDate": null },
+    { "content": "Dark mode please", "count": 2, "dayDate": null },
+    { "content": "Would be nice to have an RSS feed", "count": 1, "dayDate": null }
+  ],
+  "bugs": [
+    { "content": "Score bars on the daily entry page overflow on mobile Safari", "count": 1, "dayDate": "2026-04-04" }
+  ],
+  "confusion": [
+    { "content": "Not sure what 'compounding value' means in the scoring table", "count": 1, "dayDate": "2026-04-03" },
+    { "content": "The archive groups by week but the week boundaries feel arbitrary", "count": 1, "dayDate": null }
+  ],
+  "recurringThemes": [
+    "Visitors want a big-picture overview beyond the chronological archive"
+  ],
+  "recentReactions": {
+    "2026-04-04": { "sprout": 12, "fire": 3, "heart": 7, "thinking": 2, "rocket": 1 },
+    "2026-04-03": { "sprout": 8, "fire": 5, "heart": 4, "thinking": 1, "rocket": 2 }
+  }
+}

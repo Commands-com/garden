@@ -1,0 +1,135 @@
+{
+  "schemaVersion": 1,
+  "runDate": "2026-04-05",
+  "generatedAt": "2026-04-05T09:42:00.000Z",
+  "scoringDimensions": [
+    { "name": "compoundingValue", "weight": 30, "description": "Prefer moves that create new surfaces future days can build on" },
+    { "name": "usefulness", "weight": 20, "description": "Reward concrete user value" },
+    { "name": "feasibility", "weight": 20, "description": "Keep the daily cadence honest" },
+    { "name": "artifactClarity", "weight": 15, "description": "Visitors should understand the result" },
+    { "name": "novelty", "weight": 10, "description": "Preserve surprise without letting it dominate" },
+    { "name": "feedbackPull", "weight": 5, "description": "Let the audience influence, not dictate" }
+  ],
+  "candidates": [
+    {
+      "id": "candidate-1",
+      "title": "Add interactive site map showing all shipped features",
+      "summary": "A visual map on the homepage showing every feature shipped to date, clustered by theme, with links to each daily entry.",
+      "scores": {
+        "compoundingValue": 85,
+        "usefulness": 78,
+        "feasibility": 70,
+        "artifactClarity": 82,
+        "novelty": 65,
+        "feedbackPull": 40
+      },
+      "totalScore": 76.3,
+      "rank": 1,
+      "feedbackReferences": ["Multiple users asked for a way to see everything built so far"]
+    },
+    {
+      "id": "candidate-2",
+      "title": "Add dark mode toggle",
+      "summary": "Implement a dark color scheme with a toggle in the navigation, persisted via localStorage.",
+      "scores": {
+        "compoundingValue": 45,
+        "usefulness": 82,
+        "feasibility": 90,
+        "artifactClarity": 75,
+        "novelty": 30,
+        "feedbackPull": 60
+      },
+      "totalScore": 63.0,
+      "rank": 2,
+      "feedbackReferences": ["Two users requested dark mode"]
+    },
+    {
+      "id": "candidate-3",
+      "title": "Add reading time estimates to daily entries",
+      "summary": "Calculate and display estimated reading time for each daily entry page based on content length.",
+      "scores": {
+        "compoundingValue": 30,
+        "usefulness": 55,
+        "feasibility": 95,
+        "artifactClarity": 70,
+        "novelty": 25,
+        "feedbackPull": 10
+      },
+      "totalScore": 49.0,
+      "rank": 3,
+      "feedbackReferences": []
+    },
+    {
+      "id": "candidate-4",
+      "title": "Build an RSS feed for daily entries",
+      "summary": "Generate an RSS/Atom feed updated daily so visitors can subscribe via feed readers.",
+      "scores": {
+        "compoundingValue": 60,
+        "usefulness": 70,
+        "feasibility": 85,
+        "artifactClarity": 50,
+        "novelty": 20,
+        "feedbackPull": 35
+      },
+      "totalScore": 58.25,
+      "rank": 4,
+      "feedbackReferences": ["One user asked about RSS support"]
+    },
+    {
+      "id": "candidate-5",
+      "title": "Add a 'random day' button to the archive",
+      "summary": "A button in the archive that takes visitors to a randomly selected past daily entry.",
+      "scores": {
+        "compoundingValue": 20,
+        "usefulness": 40,
+        "feasibility": 95,
+        "artifactClarity": 60,
+        "novelty": 75,
+        "feedbackPull": 15
+      },
+      "totalScore": 44.75,
+      "rank": 5,
+      "feedbackReferences": []
+    }
+  ],
+  "winner": {
+    "candidateId": "candidate-1",
+    "title": "Add interactive site map showing all shipped features"
+  },
+  "rationale": "The site map creates a durable new surface that every future day's entry will automatically appear in. It addresses a real navigation gap — as daily entries accumulate, visitors need a way to see the full picture. It also directly responds to feedback asking for a 'big picture' view. While dark mode scored well on usefulness and feasibility, the site map compounds significantly more value over time.",
+  "feedbackInfluence": [
+    {
+      "summary": "Several visitors asked for a way to see all features at a glance rather than scrolling through the archive chronologically.",
+      "impact": "high"
+    },
+    {
+      "summary": "Two requests for dark mode pushed that candidate into the top 3.",
+      "impact": "medium"
+    }
+  ],
+  "bluesky_post": {
+    "headline": "Our AI just built itself a map of everything it's ever shipped",
+    "body": "Command Garden now has an interactive site map — every feature the autonomous pipeline has shipped, clustered by theme, explorable in one view. The AI chose this over dark mode because it compounds more. Here's why.",
+    "alt_text": "Interactive site map showing clustered nodes for each daily feature shipped by Command Garden, with theme-based color coding and connecting lines."
+  },
+  "bluesky_strategy": {
+    "searchQueries": [
+      "AI building websites",
+      "autonomous software agent",
+      "AI shipping code daily",
+      "self-evolving app",
+      "AI side project",
+      "indie hacker AI",
+      "LLM agent demo",
+      "AI transparency"
+    ],
+    "replyTemplates": {
+      "whatIs": "It's a website that ships one new feature every day, entirely through an AI pipeline. No human writes the code — but the full decision process is published so you can see exactly what it considered and why. Kind of a public lab for autonomous software.",
+      "howDoesItWork": "Every morning, a 5-stage pipeline runs: explore candidates, pick a winner, write a spec, implement it, test it, review it, and ship it. Today it built an interactive map of everything it's ever shipped. All artifacts are public.",
+      "genericQuestion": "Good question — the whole point of Command Garden is radical transparency. Every decision, every candidate, every score is published. Check out today's entry to see the full trail."
+    },
+    "hashtagsToUse": ["CommandGarden", "AIAgent", "AutonomousSoftware", "BuildInPublic"],
+    "maxDailyActions": 15,
+    "growthNotes": "Early days — follower count is low so we should prioritize discoverability. Engaging in AI agent and indie hacker threads is higher leverage than posting into the void. The interactive site map is visually compelling — lead with the screenshot in today's post."
+  }
+}

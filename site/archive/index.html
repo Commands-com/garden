@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Command Garden — Archive of all daily pipeline runs and decisions.">
+  <meta name="theme-color" content="#1a4d2e">
+  <title>Archive — Command Garden</title>
+  <link rel="icon" href="/favicon.ico" type="image/x-icon">
+  <link rel="stylesheet" href="/css/design-system.css">
+  <link rel="stylesheet" href="/css/components.css">
+</head>
+<body>
+
+  <!-- Navigation -->
+  <nav class="nav" role="navigation" aria-label="Main navigation">
+    <div class="container nav__inner">
+      <a href="/" class="nav__logo">
+        <span class="nav__logo-icon" aria-hidden="true">&#127793;</span>
+        <span>Command Garden</span>
+      </a>
+      <button class="nav__mobile-toggle" aria-label="Toggle menu" aria-expanded="false">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 12h18M3 6h18M3 18h18"/></svg>
+      </button>
+      <div class="nav__links">
+        <a href="/" class="nav__link">Home</a>
+        <a href="/archive/" class="nav__link nav__link--active">Archive</a>
+        <a href="/judges/" class="nav__link">Judges</a>
+        <a href="/feedback/" class="nav__link">Feedback</a>
+        <a href="/days/" class="nav__link nav__link--source">View Source</a>
+      </div>
+    </div>
+  </nav>
+
+  <main>
+    <!-- Archive Header -->
+    <section class="section">
+      <div class="container">
+        <div class="section__header">
+          <span class="section__label">History</span>
+          <h1 class="section__title" style="font-size: var(--text-4xl);">Archive</h1>
+          <p class="section__subtitle">Every daily run, every decision, every change. The garden's full growth record.</p>
+        </div>
+
+        <!-- Filters -->
+        <div class="filter-bar" id="filter-bar">
+          <div class="filter-bar__group" role="group" aria-label="Filter by status">
+            <button class="filter-bar__btn filter-bar__btn--active" data-filter="all">All</button>
+            <button class="filter-bar__btn" data-filter="shipped">Shipped</button>
+            <button class="filter-bar__btn" data-filter="failed">Failed</button>
+          </div>
+          <input
+            type="search"
+            class="filter-bar__search"
+            placeholder="Search by title or summary..."
+            aria-label="Search archive entries"
+            id="search-input"
+          >
+        </div>
+
+        <!-- Archive Content -->
+        <div id="archive-content">
+          <div class="skeleton skeleton--card mb-4"></div>
+          <div class="skeleton skeleton--card mb-4"></div>
+          <div class="skeleton skeleton--card mb-4"></div>
+          <div class="skeleton skeleton--card mb-4"></div>
+          <div class="skeleton skeleton--card"></div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Footer -->
+  <footer class="site-footer">
+    <div class="container site-footer__inner">
+      <p class="site-footer__text">
+        Powered by <a href="https://commands.com" class="site-footer__link">Commands.com</a>
+      </p>
+      <span class="site-footer__meta">artifact schema v1</span>
+    </div>
+  </footer>
+
+  <script type="module">
+    import {
+      getManifest,
+      formatDate,
+      formatDateShort,
+      relativeTime,
+      getDayUrl,
+      el,
+      showError,
+      initMobileNav,
+    } from '/js/app.js';
+
+    initMobileNav();
+
+    let allDays = [];
+    let currentFilter = 'all';
+    let currentSearch = '';
+
+    async function init() {
+      try {
+        const manifest = await getManifest();
+        if (!manifest || !manifest.days || manifest.days.length === 0) {
+          showError(
+            document.getElementById('archive-content'),
+            'No entries yet',
+            'The archive will populate as the garden grows each day.'
+          );
+          return;
+        }
+
+        allDays = [...manifest.days].sort(
+          (a, b) => new Date(b.date) - new Date(a.date)
+        );
+
+        initFilters();
+        renderArchive();
+      } catch (err) {
+        console.error('Failed to load archive:', err);
+        showError(
+          document.getElementById('archive-content'),
+          'Unable to load archive',
+          'Something went wrong. Please try refreshing.'
+        );
+      }
+    }
+
+    function initFilters() {
+      // Status filter buttons
+      const filterBtns = document.querySelectorAll('[data-filter]');
+      filterBtns.forEach((btn) => {
+        btn.addEventListener('click', () => {
+          filterBtns.forEach((b) => b.classList.remove('filter-bar__btn--active'));
+          btn.classList.add('filter-bar__btn--active');
+          currentFilter = btn.dataset.filter;
+          renderArchive();
+        });
+      });
+
+      // Search input
+      const searchInput = document.getElementById('search-input');
+      let searchTimeout;
+      searchInput.addEventListener('input', (e) => {
+        clearTimeout(searchTimeout);
+        searchTimeout = setTimeout(() => {
+          currentSearch = e.target.value.toLowerCase().trim();
+          renderArchive();
+        }, 200);
+      });
+    }
+
+    function getFilteredDays() {
+      return allDays.filter((day) => {
+        // Status filter
+        if (currentFilter !== 'all' && day.status !== currentFilter) {
+          return false;
+        }
+        // Search filter
+        if (currentSearch) {
+          const haystack = `${day.title || ''} ${day.summary || ''} ${day.date}`.toLowerCase();
+          return haystack.includes(currentSearch);
+        }
+        return true;
+      });
+    }
+
+    function groupByWeek(days) {
+      const groups = {};
+      days.forEach((day) => {
+        const date = new Date(day.date + 'T12:00:00');
+        // Get Monday of the week
+        const dayOfWeek = date.getDay();
+        const monday = new Date(date);
+        monday.setDate(date.getDate() - ((dayOfWeek + 6) % 7));
+        const weekKey = monday.toISOString().split('T')[0];
+
+        // Format the week label
+        const weekEnd = new Date(monday);
+        weekEnd.setDate(monday.getDate() + 6);
+        const label = `Week of ${formatDateShort(weekKey)}`;
+
+        if (!groups[weekKey]) {
+          groups[weekKey] = { label, days: [] };
+        }
+        groups[weekKey].days.push(day);
+      });
+      return Object.entries(groups)
+        .sort(([a], [b]) => new Date(b) - new Date(a))
+        .map(([, group]) => group);
+    }
+
+    function renderArchive() {
+      const container = document.getElementById('archive-content');
+      container.innerHTML = '';
+
+      const filtered = getFilteredDays();
+
+      if (filtered.length === 0) {
+        container.appendChild(
+          el('div', { className: 'empty-state' },
+            el('div', { className: 'empty-state__icon' }, '\u{1F50D}'),
+            el('h3', { className: 'empty-state__title' },
+              currentSearch ? 'No matching entries' : 'No entries with this status'
+            ),
+            el('p', { className: 'empty-state__message' },
+              currentSearch
+                ? 'Try adjusting your search terms.'
+                : 'Try selecting a different filter.'
+            )
+          )
+        );
+        return;
+      }
+
+      // Group by week
+      const weekGroups = groupByWeek(filtered);
+      const todayStr = new Date().toISOString().split('T')[0];
+
+      weekGroups.forEach((group) => {
+        const weekEl = el('div', { className: 'week-group' });
+        weekEl.appendChild(
+          el('div', { className: 'week-group__label' }, group.label)
+        );
+
+        const timeline = el('div', { className: 'timeline' });
+        group.days.forEach((day) => {
+          const isToday = day.date === todayStr;
+          const dotClass = isToday
+            ? 'timeline-entry__dot--today'
+            : day.status === 'shipped'
+            ? 'timeline-entry__dot--shipped'
+            : day.status === 'failed'
+            ? 'timeline-entry__dot--failed'
+            : '';
+
+          const entry = el('div', { className: 'timeline-entry' },
+            el('div', { className: `timeline-entry__dot ${dotClass}` }),
+            el('div', { className: 'd-flex items-center gap-3 mb-1' },
+              el('span', { className: 'timeline-entry__date' },
+                `${formatDateShort(day.date)}${isToday ? ' \u2014 Today' : ''}`
+              ),
+              day.status
+                ? el('span', { className: `badge badge--${day.status}` }, day.status)
+                : null
+            ),
+            el('div', { className: 'timeline-entry__title' },
+              el('a', { href: getDayUrl(day.date) }, day.title || 'Untitled entry')
+            ),
+            day.summary
+              ? el('p', { className: 'timeline-entry__summary' }, day.summary)
+              : null
+          );
+
+          timeline.appendChild(entry);
+        });
+
+        weekEl.appendChild(timeline);
+        container.appendChild(weekEl);
+      });
+
+      // Result count
+      container.prepend(
+        el('p', { className: 'text-sm text-muted mb-6' },
+          `Showing ${filtered.length} entr${filtered.length === 1 ? 'y' : 'ies'}`
+        )
+      );
+    }
+
+    init();
+  </script>
+
+</body>
+</html>

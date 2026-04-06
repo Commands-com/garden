@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Command Garden — Meet the AI judge panel that evaluates daily changes.">
+  <meta name="theme-color" content="#1a4d2e">
+  <title>Judges — Command Garden</title>
+  <link rel="icon" href="/favicon.ico" type="image/x-icon">
+  <link rel="stylesheet" href="/css/design-system.css">
+  <link rel="stylesheet" href="/css/components.css">
+</head>
+<body>
+
+  <!-- Navigation -->
+  <nav class="nav" role="navigation" aria-label="Main navigation">
+    <div class="container nav__inner">
+      <a href="/" class="nav__logo">
+        <span class="nav__logo-icon" aria-hidden="true">&#127793;</span>
+        <span>Command Garden</span>
+      </a>
+      <button class="nav__mobile-toggle" aria-label="Toggle menu" aria-expanded="false">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 12h18M3 6h18M3 18h18"/></svg>
+      </button>
+      <div class="nav__links">
+        <a href="/" class="nav__link">Home</a>
+        <a href="/archive/" class="nav__link">Archive</a>
+        <a href="/judges/" class="nav__link nav__link--active">Judges</a>
+        <a href="/feedback/" class="nav__link">Feedback</a>
+        <a href="/days/" class="nav__link nav__link--source">View Source</a>
+      </div>
+    </div>
+  </nav>
+
+  <main>
+    <!-- Header -->
+    <section class="section">
+      <div class="container">
+        <div class="section__header text-center" style="max-width: 640px; margin: 0 auto var(--space-12);">
+          <span class="section__label">The Panel</span>
+          <h1 class="section__title" style="font-size: var(--text-4xl);">The Judges</h1>
+          <p class="section__subtitle" style="margin: 0 auto;">
+            A set of AI agents that evaluate candidate changes. Each brings a
+            distinct perspective, ensuring the garden grows in a balanced way.
+          </p>
+        </div>
+
+        <!-- Judge Cards -->
+        <div class="d-grid gap-8" style="grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));">
+
+          <!-- The Gardener -->
+          <article class="judge-card">
+            <div class="judge-card__icon" aria-hidden="true">&#127807;</div>
+            <h2 class="judge-card__name">The Gardener</h2>
+            <p class="judge-card__role">Stewardship &amp; Continuity</p>
+            <p class="judge-card__description">
+              Optimizes for compounding value and continuity. The Gardener asks: "Does this
+              change build on what came before? Will it make tomorrow's changes easier and
+              more valuable? Does it maintain the health of the whole system?"
+            </p>
+          </article>
+
+          <!-- The Visitor -->
+          <article class="judge-card">
+            <div class="judge-card__icon" aria-hidden="true">&#128065;&#65039;</div>
+            <h2 class="judge-card__name">The Visitor</h2>
+            <p class="judge-card__role">Usefulness &amp; Clarity</p>
+            <p class="judge-card__description">
+              Optimizes for usefulness and clarity. The Visitor asks: "Would someone arriving
+              for the first time understand this? Is it immediately useful? Does it reduce
+              confusion rather than add complexity?"
+            </p>
+          </article>
+
+          <!-- The Explorer -->
+          <article class="judge-card">
+            <div class="judge-card__icon" aria-hidden="true">&#129517;</div>
+            <h2 class="judge-card__name">The Explorer</h2>
+            <p class="judge-card__role">Novelty &amp; Surprise</p>
+            <p class="judge-card__description">
+              Optimizes for novelty and surprise. The Explorer asks: "Does this try something
+              we haven't done before? Will it make the garden more interesting? Does it take
+              a creative risk that could pay off?"
+            </p>
+          </article>
+
+        </div>
+      </div>
+    </section>
+
+    <!-- Scoring System -->
+    <section class="section">
+      <div class="container">
+        <div class="section__header">
+          <span class="section__label">Methodology</span>
+          <h2 class="section__title">Scoring Dimensions</h2>
+          <p class="section__subtitle">
+            Each candidate is evaluated across six dimensions, scored 1-10.
+            The final ranking is a weighted sum.
+          </p>
+        </div>
+
+        <div style="overflow-x: auto;">
+          <table class="score-table">
+            <thead>
+              <tr>
+                <th>Dimension</th>
+                <th>Weight</th>
+                <th>What it measures</th>
+                <th>Primary Judge</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td class="score-table__candidate">Impact</td>
+                <td class="score-table__score">2.0x</td>
+                <td>How much meaningful value does this add to the product?</td>
+                <td><span class="tag tag--green">The Gardener</span></td>
+              </tr>
+              <tr>
+                <td class="score-table__candidate">Feasibility</td>
+                <td class="score-table__score">1.5x</td>
+                <td>Can this be built correctly in a single day?</td>
+                <td><span class="tag tag--green">The Gardener</span></td>
+              </tr>
+              <tr>
+                <td class="score-table__candidate">Novelty</td>
+                <td class="score-table__score">1.0x</td>
+                <td>Does this try something new or explore an untested direction?</td>
+                <td><span class="tag tag--gold">The Explorer</span></td>
+              </tr>
+              <tr>
+                <td class="score-table__candidate">Continuity</td>
+                <td class="score-table__score">1.5x</td>
+                <td>Does this build on prior work and strengthen the system's trajectory?</td>
+                <td><span class="tag tag--green">The Gardener</span></td>
+              </tr>
+              <tr>
+                <td class="score-table__candidate">Clarity</td>
+                <td class="score-table__score">1.0x</td>
+                <td>Is it easy to understand and use for a new visitor?</td>
+                <td><span class="tag">The Visitor</span></td>
+              </tr>
+              <tr>
+                <td class="score-table__candidate">Delight</td>
+                <td class="score-table__score">1.0x</td>
+                <td>Does it bring joy, surprise, or aesthetic pleasure?</td>
+                <td><span class="tag tag--gold">The Explorer</span></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Note -->
+        <div class="card mt-8" style="border-left: 3px solid var(--color-sage);">
+          <p class="text-sm" style="line-height: var(--leading-relaxed);">
+            <strong>A note on process:</strong> The final ranking is guided by structured
+            criteria, not mystical AI intuition. Each judge scores independently, scores are
+            combined with the weights above, and the candidate with the highest total wins.
+            All scores and rationale are published in the daily decision log for full transparency.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- How It Works -->
+    <section class="section">
+      <div class="container">
+        <div class="section__header">
+          <span class="section__label">Process</span>
+          <h2 class="section__title">How a day unfolds</h2>
+        </div>
+
+        <div class="timeline">
+          <div class="timeline-entry">
+            <div class="timeline-entry__dot timeline-entry__dot--shipped"></div>
+            <div class="timeline-entry__date">Morning</div>
+            <h4 class="timeline-entry__title">Candidates are generated</h4>
+            <p class="timeline-entry__summary">
+              The pipeline analyzes the current state of the site, recent feedback, and
+              the backlog to propose 3-5 candidate changes.
+            </p>
+          </div>
+          <div class="timeline-entry">
+            <div class="timeline-entry__dot timeline-entry__dot--shipped"></div>
+            <div class="timeline-entry__date">Midday</div>
+            <h4 class="timeline-entry__title">Judges evaluate and score</h4>
+            <p class="timeline-entry__summary">
+              Each judge persona independently scores all candidates across the six
+              dimensions. Scores are combined using the weighted formula.
+            </p>
+          </div>
+          <div class="timeline-entry">
+            <div class="timeline-entry__dot timeline-entry__dot--shipped"></div>
+            <div class="timeline-entry__date">Afternoon</div>
+            <h4 class="timeline-entry__title">Winner is built and tested</h4>
+            <p class="timeline-entry__summary">
+              The top-scoring candidate is implemented, tested automatically, and
+              reviewed for quality and safety.
+            </p>
+          </div>
+          <div class="timeline-entry">
+            <div class="timeline-entry__dot timeline-entry__dot--today"></div>
+            <div class="timeline-entry__date">Evening</div>
+            <h4 class="timeline-entry__title">Changes are shipped</h4>
+            <p class="timeline-entry__summary">
+              If tests pass and the review is clean, the change goes live. All artifacts
+              are published as the daily decision log.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Footer -->
+  <footer class="site-footer">
+    <div class="container site-footer__inner">
+      <p class="site-footer__text">
+        Powered by <a href="https://commands.com" class="site-footer__link">Commands.com</a>
+      </p>
+      <span class="site-footer__meta">artifact schema v1</span>
+    </div>
+  </footer>
+
+  <script type="module">
+    import { initMobileNav } from '/js/app.js';
+    initMobileNav();
+  </script>
+
+</body>
+</html>

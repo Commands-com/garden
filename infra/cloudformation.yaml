@@ -1,0 +1,783 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: >
+  Command Garden - Infrastructure stack.
+  Public website served from S3 behind CloudFront, Lambda APIs for
+  feedback/reactions, and DynamoDB for operational data.
+
+# ---------------------------------------------------------------------------
+# Parameters
+# ---------------------------------------------------------------------------
+Parameters:
+  Environment:
+    Type: String
+    Default: dev
+    AllowedValues:
+      - dev
+      - staging
+      - prod
+    Description: Deployment environment
+
+  SiteBucketName:
+    Type: String
+    Description: Name for the S3 bucket that hosts site content
+
+  CustomDomainName:
+    Type: String
+    Default: ''
+    Description: Optional custom domain name (e.g. commandgarden.com)
+
+  AcmCertificateArn:
+    Type: String
+    Default: ''
+    Description: ACM certificate ARN (required when CustomDomainName is set)
+
+  TablePrefix:
+    Type: String
+    Default: command-garden
+    Description: Prefix for DynamoDB table names
+
+# ---------------------------------------------------------------------------
+# Conditions
+# ---------------------------------------------------------------------------
+Conditions:
+  HasCustomDomain:
+    !Not [!Equals [!Ref CustomDomainName, '']]
+  HasAcmCertificate:
+    !Not [!Equals [!Ref AcmCertificateArn, '']]
+  UseCustomDomain:
+    !And
+      - !Condition HasCustomDomain
+      - !Condition HasAcmCertificate
+
+# ---------------------------------------------------------------------------
+# Resources
+# ---------------------------------------------------------------------------
+Resources:
+
+  # ==========================================================================
+  # S3 - Site Content Bucket
+  # ==========================================================================
+  SiteBucket:
+    Type: AWS::S3::Bucket
+    DeletionPolicy: Retain
+    UpdateReplacePolicy: Retain
+    Properties:
+      BucketName: !Ref SiteBucketName
+      VersioningConfiguration:
+        Status: Enabled
+      CorsConfiguration:
+        CorsRules:
+          - AllowedHeaders:
+              - '*'
+            AllowedMethods:
+              - GET
+              - HEAD
+            AllowedOrigins:
+              - '*'
+            MaxAge: 3600
+      LifecycleConfiguration:
+        Rules:
+          - Id: MoveOldArtifactsToIA
+            Status: Enabled
+            Prefix: days/
+            Transitions:
+              - StorageClass: STANDARD_IA
+                TransitionInDays: 90
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: true
+        BlockPublicPolicy: true
+        IgnorePublicAcls: true
+        RestrictPublicBuckets: true
+
+  SiteBucketPolicy:
+    Type: AWS::S3::BucketPolicy
+    Properties:
+      Bucket: !Ref SiteBucket
+      PolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Sid: AllowCloudFrontOAC
+            Effect: Allow
+            Principal:
+              Service: cloudfront.amazonaws.com
+            Action: s3:GetObject
+            Resource: !Sub '${SiteBucket.Arn}/*'
+            Condition:
+              StringEquals:
+                AWS:SourceArn: !Sub 'arn:aws:cloudfront::${AWS::AccountId}:distribution/${CloudFrontDistribution}'
+
+  # ==========================================================================
+  # CloudFront - OAC + Distribution
+  # ==========================================================================
+  CloudFrontOAC:
+    Type: AWS::CloudFront::OriginAccessControl
+    Properties:
+      OriginAccessControlConfig:
+        Name: !Sub '${AWS::StackName}-oac'
+        Description: OAC for Command Garden S3 origin
+        OriginAccessControlOriginType: s3
+        SigningBehavior: always
+        SigningProtocol: sigv4
+
+  CloudFrontDistribution:
+    Type: AWS::CloudFront::Distribution
+    DependsOn:
+      - FeedbackFunctionUrl
+      - ReactionsFunctionUrl
+      - HealthFunctionUrl
+    Properties:
+      DistributionConfig:
+        Enabled: true
+        Comment: !Sub 'Command Garden (${Environment})'
+        DefaultRootObject: index.html
+        PriceClass: PriceClass_100
+        HttpVersion: http2and3
+
+        Aliases:
+          !If
+            - UseCustomDomain
+            - - !Ref CustomDomainName
+            - !Ref 'AWS::NoValue'
+
+        ViewerCertificate:
+          !If
+            - UseCustomDomain
+            - AcmCertificateArn: !Ref AcmCertificateArn
+              SslSupportMethod: sni-only
+              MinimumProtocolVersion: TLSv1.2_2021
+            - CloudFrontDefaultCertificate: true
+
+        Origins:
+          # S3 origin
+          - Id: S3Origin
+            DomainName: !GetAtt SiteBucket.RegionalDomainName
+            OriginAccessControlId: !GetAtt CloudFrontOAC.Id
+            S3OriginConfig:
+              OriginAccessIdentity: ''
+
+          # Lambda Function URL origin (API)
+          - Id: LambdaApiOrigin
+            DomainName: !Select
+              - 2
+              - !Split ['/', !GetAtt FeedbackFunctionUrl.FunctionUrl]
+            CustomOriginConfig:
+              OriginProtocolPolicy: https-only
+              HTTPSPort: 443
+              OriginSSLProtocols:
+                - TLSv1.2
+
+        # ---- Cache Policies (managed) ----
+        # We reference AWS managed cache policies where useful and create
+        # custom ones for our specific TTL needs.
+
+        DefaultCacheBehavior:
+          TargetOriginId: S3Origin
+          ViewerProtocolPolicy: redirect-to-https
+          Compress: true
+          CachePolicyId: !Ref DefaultCachePolicy
+          AllowedMethods:
+            - GET
+            - HEAD
+          CachedMethods:
+            - GET
+            - HEAD
+
+        CacheBehaviors:
+          # /api/* -> Lambda Function URL (no caching)
+          - PathPattern: '/api/*'
+            TargetOriginId: LambdaApiOrigin
+            ViewerProtocolPolicy: redirect-to-https
+            Compress: true
+            CachePolicyId: !Ref NoCachePolicy
+            OriginRequestPolicyId: !Ref ApiOriginRequestPolicy
+            AllowedMethods:
+              - GET
+              - HEAD
+              - OPTIONS
+              - PUT
+              - POST
+              - PATCH
+              - DELETE
+            CachedMethods:
+              - GET
+              - HEAD
+
+          # /days/*/decision.json -> S3 with 1-hour cache
+          - PathPattern: '/days/*/decision.json'
+            TargetOriginId: S3Origin
+            ViewerProtocolPolicy: redirect-to-https
+            Compress: true
+            CachePolicyId: !Ref OneHourCachePolicy
+            AllowedMethods:
+              - GET
+              - HEAD
+            CachedMethods:
+              - GET
+              - HEAD
+
+          # /days/*/screenshots/* -> S3 with 24-hour cache
+          - PathPattern: '/days/*/screenshots/*'
+            TargetOriginId: S3Origin
+            ViewerProtocolPolicy: redirect-to-https
+            Compress: true
+            CachePolicyId: !Ref TwentyFourHourCachePolicy
+            AllowedMethods:
+              - GET
+              - HEAD
+            CachedMethods:
+              - GET
+              - HEAD
+
+          # *.html -> S3 with 5-minute cache
+          - PathPattern: '*.html'
+            TargetOriginId: S3Origin
+            ViewerProtocolPolicy: redirect-to-https
+            Compress: true
+            CachePolicyId: !Ref FiveMinuteCachePolicy
+            AllowedMethods:
+              - GET
+              - HEAD
+            CachedMethods:
+              - GET
+              - HEAD
+
+        CustomErrorResponses:
+          - ErrorCode: 404
+            ResponseCode: 200
+            ResponsePagePath: /index.html
+            ErrorCachingMinTTL: 60
+          - ErrorCode: 403
+            ResponseCode: 200
+            ResponsePagePath: /index.html
+            ErrorCachingMinTTL: 60
+
+  # ---- CloudFront Cache Policies ----
+
+  NoCachePolicy:
+    Type: AWS::CloudFront::CachePolicy
+    Properties:
+      CachePolicyConfig:
+        Name: !Sub '${AWS::StackName}-no-cache'
+        DefaultTTL: 0
+        MaxTTL: 0
+        MinTTL: 0
+        ParametersInCacheKeyAndForwardedToOrigin:
+          CookiesConfig:
+            CookieBehavior: none
+          HeadersConfig:
+            HeaderBehavior: none
+          QueryStringsConfig:
+            QueryStringBehavior: all
+          EnableAcceptEncodingGzip: true
+          EnableAcceptEncodingBrotli: true
+
+  ApiOriginRequestPolicy:
+    Type: AWS::CloudFront::OriginRequestPolicy
+    Properties:
+      OriginRequestPolicyConfig:
+        Name: !Sub '${AWS::StackName}-api-origin-request'
+        CookiesConfig:
+          CookieBehavior: none
+        HeadersConfig:
+          HeaderBehavior: whitelist
+          Headers:
+            - Content-Type
+            - Origin
+            - Access-Control-Request-Method
+            - Access-Control-Request-Headers
+        QueryStringsConfig:
+          QueryStringBehavior: all
+
+  FiveMinuteCachePolicy:
+    Type: AWS::CloudFront::CachePolicy
+    Properties:
+      CachePolicyConfig:
+        Name: !Sub '${AWS::StackName}-5min-cache'
+        DefaultTTL: 300
+        MaxTTL: 300
+        MinTTL: 0
+        ParametersInCacheKeyAndForwardedToOrigin:
+          CookiesConfig:
+            CookieBehavior: none
+          HeadersConfig:
+            HeaderBehavior: none
+          QueryStringsConfig:
+            QueryStringBehavior: none
+          EnableAcceptEncodingGzip: true
+          EnableAcceptEncodingBrotli: true
+
+  OneHourCachePolicy:
+    Type: AWS::CloudFront::CachePolicy
+    Properties:
+      CachePolicyConfig:
+        Name: !Sub '${AWS::StackName}-1hr-cache'
+        DefaultTTL: 3600
+        MaxTTL: 3600
+        MinTTL: 0
+        ParametersInCacheKeyAndForwardedToOrigin:
+          CookiesConfig:
+            CookieBehavior: none
+          HeadersConfig:
+            HeaderBehavior: none
+          QueryStringsConfig:
+            QueryStringBehavior: none
+          EnableAcceptEncodingGzip: true
+          EnableAcceptEncodingBrotli: true
+
+  TwentyFourHourCachePolicy:
+    Type: AWS::CloudFront::CachePolicy
+    Properties:
+      CachePolicyConfig:
+        Name: !Sub '${AWS::StackName}-24hr-cache'
+        DefaultTTL: 86400
+        MaxTTL: 86400
+        MinTTL: 0
+        ParametersInCacheKeyAndForwardedToOrigin:
+          CookiesConfig:
+            CookieBehavior: none
+          HeadersConfig:
+            HeaderBehavior: none
+          QueryStringsConfig:
+            QueryStringBehavior: none
+          EnableAcceptEncodingGzip: true
+          EnableAcceptEncodingBrotli: true
+
+  DefaultCachePolicy:
+    Type: AWS::CloudFront::CachePolicy
+    Properties:
+      CachePolicyConfig:
+        Name: !Sub '${AWS::StackName}-default-cache'
+        DefaultTTL: 3600
+        MaxTTL: 86400
+        MinTTL: 0
+        ParametersInCacheKeyAndForwardedToOrigin:
+          CookiesConfig:
+            CookieBehavior: none
+          HeadersConfig:
+            HeaderBehavior: none
+          QueryStringsConfig:
+            QueryStringBehavior: none
+          EnableAcceptEncodingGzip: true
+          EnableAcceptEncodingBrotli: true
+
+  # ==========================================================================
+  # DynamoDB Tables
+  # ==========================================================================
+  FeedbackTable:
+    Type: AWS::DynamoDB::Table
+    DeletionPolicy: Retain
+    UpdateReplacePolicy: Retain
+    Properties:
+      TableName: !Sub '${TablePrefix}-${Environment}-feedback'
+      BillingMode: PAY_PER_REQUEST
+      PointInTimeRecoverySpecification:
+        PointInTimeRecoveryEnabled: true
+      AttributeDefinitions:
+        - AttributeName: feedbackId
+          AttributeType: S
+        - AttributeName: createdAt
+          AttributeType: S
+        - AttributeName: type
+          AttributeType: S
+      KeySchema:
+        - AttributeName: feedbackId
+          KeyType: HASH
+        - AttributeName: createdAt
+          KeyType: RANGE
+      GlobalSecondaryIndexes:
+        - IndexName: type-createdAt-index
+          KeySchema:
+            - AttributeName: type
+              KeyType: HASH
+            - AttributeName: createdAt
+              KeyType: RANGE
+          Projection:
+            ProjectionType: ALL
+
+  ReactionsTable:
+    Type: AWS::DynamoDB::Table
+    DeletionPolicy: Retain
+    UpdateReplacePolicy: Retain
+    Properties:
+      TableName: !Sub '${TablePrefix}-${Environment}-reactions'
+      BillingMode: PAY_PER_REQUEST
+      PointInTimeRecoverySpecification:
+        PointInTimeRecoveryEnabled: true
+      AttributeDefinitions:
+        - AttributeName: dayDate
+          AttributeType: S
+        - AttributeName: reaction
+          AttributeType: S
+      KeySchema:
+        - AttributeName: dayDate
+          KeyType: HASH
+        - AttributeName: reaction
+          KeyType: RANGE
+
+  ModerationTable:
+    Type: AWS::DynamoDB::Table
+    DeletionPolicy: Retain
+    UpdateReplacePolicy: Retain
+    Properties:
+      TableName: !Sub '${TablePrefix}-${Environment}-moderation'
+      BillingMode: PAY_PER_REQUEST
+      PointInTimeRecoverySpecification:
+        PointInTimeRecoveryEnabled: true
+      AttributeDefinitions:
+        - AttributeName: feedbackId
+          AttributeType: S
+      KeySchema:
+        - AttributeName: feedbackId
+          KeyType: HASH
+
+  RunsTable:
+    Type: AWS::DynamoDB::Table
+    DeletionPolicy: Retain
+    UpdateReplacePolicy: Retain
+    Properties:
+      TableName: !Sub '${TablePrefix}-${Environment}-runs'
+      BillingMode: PAY_PER_REQUEST
+      PointInTimeRecoverySpecification:
+        PointInTimeRecoveryEnabled: true
+      AttributeDefinitions:
+        - AttributeName: runDate
+          AttributeType: S
+      KeySchema:
+        - AttributeName: runDate
+          KeyType: HASH
+
+  # ==========================================================================
+  # IAM Roles - Lambda Execution
+  # ==========================================================================
+  FeedbackFunctionRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: !Sub '${AWS::StackName}-feedback-lambda-role'
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: lambda.amazonaws.com
+            Action: sts:AssumeRole
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+      Policies:
+        - PolicyName: FeedbackTableAccess
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - dynamodb:PutItem
+                  - dynamodb:GetItem
+                  - dynamodb:Query
+                  - dynamodb:UpdateItem
+                Resource:
+                  - !GetAtt FeedbackTable.Arn
+                  - !Sub '${FeedbackTable.Arn}/index/*'
+
+  ReactionsFunctionRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: !Sub '${AWS::StackName}-reactions-lambda-role'
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: lambda.amazonaws.com
+            Action: sts:AssumeRole
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+      Policies:
+        - PolicyName: ReactionsTableAccess
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - dynamodb:PutItem
+                  - dynamodb:GetItem
+                  - dynamodb:Query
+                  - dynamodb:UpdateItem
+                Resource:
+                  - !GetAtt ReactionsTable.Arn
+
+  HealthFunctionRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: !Sub '${AWS::StackName}-health-lambda-role'
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: lambda.amazonaws.com
+            Action: sts:AssumeRole
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+      Policies:
+        - PolicyName: RunsTableAccess
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - dynamodb:GetItem
+                  - dynamodb:Query
+                  - dynamodb:Scan
+                Resource:
+                  - !GetAtt RunsTable.Arn
+
+  # ==========================================================================
+  # Lambda Functions
+  # ==========================================================================
+  FeedbackFunction:
+    Type: AWS::Lambda::Function
+    Properties:
+      FunctionName: !Sub '${AWS::StackName}-feedback'
+      Runtime: nodejs20.x
+      Handler: index.handler
+      Role: !GetAtt FeedbackFunctionRole.Arn
+      MemorySize: 256
+      Timeout: 10
+      Code:
+        ZipFile: |
+          exports.handler = async (event) => {
+            return { statusCode: 200, body: JSON.stringify({ message: 'Feedback endpoint placeholder' }) };
+          };
+      Environment:
+        Variables:
+          FEEDBACK_TABLE: !Ref FeedbackTable
+          ALLOWED_ORIGIN: !If
+            - UseCustomDomain
+            - !Sub 'https://${CustomDomainName}'
+            - !Sub 'https://${CloudFrontDistribution.DomainName}'
+
+  FeedbackFunctionUrl:
+    Type: AWS::Lambda::Url
+    Properties:
+      AuthType: NONE
+      TargetFunctionArn: !GetAtt FeedbackFunction.Arn
+      Cors:
+        AllowCredentials: false
+        AllowHeaders:
+          - content-type
+          - origin
+        AllowMethods:
+          - POST
+          - OPTIONS
+        AllowOrigins:
+          - '*'
+
+  FeedbackFunctionUrlPermission:
+    Type: AWS::Lambda::Permission
+    Properties:
+      FunctionName: !Ref FeedbackFunction
+      Action: lambda:InvokeFunctionUrl
+      Principal: '*'
+      FunctionUrlAuthType: NONE
+
+  ReactionsFunction:
+    Type: AWS::Lambda::Function
+    Properties:
+      FunctionName: !Sub '${AWS::StackName}-reactions'
+      Runtime: nodejs20.x
+      Handler: index.handler
+      Role: !GetAtt ReactionsFunctionRole.Arn
+      MemorySize: 256
+      Timeout: 10
+      Code:
+        ZipFile: |
+          exports.handler = async (event) => {
+            return { statusCode: 200, body: JSON.stringify({ message: 'Reactions endpoint placeholder' }) };
+          };
+      Environment:
+        Variables:
+          REACTIONS_TABLE: !Ref ReactionsTable
+          ALLOWED_ORIGIN: !If
+            - UseCustomDomain
+            - !Sub 'https://${CustomDomainName}'
+            - !Sub 'https://${CloudFrontDistribution.DomainName}'
+
+  ReactionsFunctionUrl:
+    Type: AWS::Lambda::Url
+    Properties:
+      AuthType: NONE
+      TargetFunctionArn: !GetAtt ReactionsFunction.Arn
+      Cors:
+        AllowCredentials: false
+        AllowHeaders:
+          - content-type
+          - origin
+        AllowMethods:
+          - POST
+          - GET
+          - OPTIONS
+        AllowOrigins:
+          - '*'
+
+  ReactionsFunctionUrlPermission:
+    Type: AWS::Lambda::Permission
+    Properties:
+      FunctionName: !Ref ReactionsFunction
+      Action: lambda:InvokeFunctionUrl
+      Principal: '*'
+      FunctionUrlAuthType: NONE
+
+  HealthFunction:
+    Type: AWS::Lambda::Function
+    Properties:
+      FunctionName: !Sub '${AWS::StackName}-health'
+      Runtime: nodejs20.x
+      Handler: index.handler
+      Role: !GetAtt HealthFunctionRole.Arn
+      MemorySize: 128
+      Timeout: 5
+      Code:
+        ZipFile: |
+          exports.handler = async (event) => {
+            return { statusCode: 200, body: JSON.stringify({ status: 'ok' }) };
+          };
+      Environment:
+        Variables:
+          RUNS_TABLE: !Ref RunsTable
+
+  HealthFunctionUrl:
+    Type: AWS::Lambda::Url
+    Properties:
+      AuthType: NONE
+      TargetFunctionArn: !GetAtt HealthFunction.Arn
+      Cors:
+        AllowCredentials: false
+        AllowHeaders:
+          - content-type
+        AllowMethods:
+          - GET
+          - OPTIONS
+        AllowOrigins:
+          - '*'
+
+  HealthFunctionUrlPermission:
+    Type: AWS::Lambda::Permission
+    Properties:
+      FunctionName: !Ref HealthFunction
+      Action: lambda:InvokeFunctionUrl
+      Principal: '*'
+      FunctionUrlAuthType: NONE
+
+  # ==========================================================================
+  # IAM - Deployment Policy (for CI / deploy scripts)
+  # ==========================================================================
+  DeploymentPolicy:
+    Type: AWS::IAM::ManagedPolicy
+    Properties:
+      ManagedPolicyName: !Sub '${AWS::StackName}-deployment-policy'
+      Description: Policy for CI/CD to deploy site content and invalidate cache
+      PolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Sid: S3Write
+            Effect: Allow
+            Action:
+              - s3:PutObject
+              - s3:GetObject
+              - s3:DeleteObject
+              - s3:ListBucket
+              - s3:GetBucketLocation
+            Resource:
+              - !GetAtt SiteBucket.Arn
+              - !Sub '${SiteBucket.Arn}/*'
+          - Sid: CloudFrontInvalidation
+            Effect: Allow
+            Action:
+              - cloudfront:CreateInvalidation
+              - cloudfront:GetInvalidation
+              - cloudfront:ListInvalidations
+            Resource:
+              - !Sub 'arn:aws:cloudfront::${AWS::AccountId}:distribution/${CloudFrontDistribution}'
+          - Sid: LambdaUpdate
+            Effect: Allow
+            Action:
+              - lambda:UpdateFunctionCode
+            Resource:
+              - !GetAtt FeedbackFunction.Arn
+              - !GetAtt ReactionsFunction.Arn
+              - !GetAtt HealthFunction.Arn
+
+  DeploymentRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: !Sub '${AWS::StackName}-deployment-role'
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              AWS: !Sub 'arn:aws:iam::${AWS::AccountId}:root'
+            Action: sts:AssumeRole
+            Condition:
+              StringEquals:
+                aws:PrincipalTag/department: engineering
+      ManagedPolicyArns:
+        - !Ref DeploymentPolicy
+
+# ---------------------------------------------------------------------------
+# Outputs
+# ---------------------------------------------------------------------------
+Outputs:
+  CloudFrontDomainName:
+    Description: CloudFront distribution domain name
+    Value: !GetAtt CloudFrontDistribution.DomainName
+
+  CloudFrontDistributionId:
+    Description: CloudFront distribution ID
+    Value: !Ref CloudFrontDistribution
+
+  SiteBucketName:
+    Description: S3 bucket name for site content
+    Value: !Ref SiteBucket
+
+  SiteBucketArn:
+    Description: S3 bucket ARN
+    Value: !GetAtt SiteBucket.Arn
+
+  FeedbackFunctionUrl:
+    Description: Feedback Lambda Function URL
+    Value: !GetAtt FeedbackFunctionUrl.FunctionUrl
+
+  ReactionsFunctionUrl:
+    Description: Reactions Lambda Function URL
+    Value: !GetAtt ReactionsFunctionUrl.FunctionUrl
+
+  HealthFunctionUrl:
+    Description: Health Lambda Function URL
+    Value: !GetAtt HealthFunctionUrl.FunctionUrl
+
+  FeedbackTableName:
+    Description: Feedback DynamoDB table name
+    Value: !Ref FeedbackTable
+
+  ReactionsTableName:
+    Description: Reactions DynamoDB table name
+    Value: !Ref ReactionsTable
+
+  ModerationTableName:
+    Description: Moderation DynamoDB table name
+    Value: !Ref ModerationTable
+
+  RunsTableName:
+    Description: Runs DynamoDB table name
+    Value: !Ref RunsTable
+
+  DeploymentPolicyArn:
+    Description: ARN of the deployment IAM policy for CI/CD
+    Value: !Ref DeploymentPolicy
+
+  SiteUrl:
+    Description: The primary URL for the site
+    Value: !If
+      - UseCustomDomain
+      - !Sub 'https://${CustomDomainName}'
+      - !Sub 'https://${CloudFrontDistribution.DomainName}'

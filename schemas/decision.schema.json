@@ -1,0 +1,121 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://commandgarden.com/schemas/decision.v1.json",
+  "title": "Decision",
+  "description": "Daily pipeline decision record — candidates, scores, winner, and rationale.",
+  "type": "object",
+  "required": ["schemaVersion", "runDate", "generatedAt", "candidates", "winner", "rationale", "scoringDimensions"],
+  "properties": {
+    "schemaVersion": { "type": "integer", "const": 1 },
+    "runDate": { "type": "string", "pattern": "^\\d{4}-\\d{2}-\\d{2}$" },
+    "generatedAt": { "type": "string", "format": "date-time" },
+    "scoringDimensions": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["name", "weight"],
+        "properties": {
+          "name": { "type": "string" },
+          "weight": { "type": "number", "minimum": 0, "maximum": 100 },
+          "description": { "type": "string" }
+        }
+      }
+    },
+    "candidates": {
+      "type": "array",
+      "minItems": 3,
+      "maxItems": 7,
+      "items": {
+        "type": "object",
+        "required": ["id", "title", "summary", "scores", "totalScore", "rank"],
+        "properties": {
+          "id": { "type": "string" },
+          "title": { "type": "string" },
+          "summary": { "type": "string" },
+          "scores": {
+            "type": "object",
+            "properties": {
+              "compoundingValue": { "type": "number", "minimum": 0, "maximum": 100 },
+              "usefulness": { "type": "number", "minimum": 0, "maximum": 100 },
+              "feasibility": { "type": "number", "minimum": 0, "maximum": 100 },
+              "artifactClarity": { "type": "number", "minimum": 0, "maximum": 100 },
+              "novelty": { "type": "number", "minimum": 0, "maximum": 100 },
+              "feedbackPull": { "type": "number", "minimum": 0, "maximum": 100 }
+            },
+            "required": ["compoundingValue", "usefulness", "feasibility", "artifactClarity", "novelty", "feedbackPull"]
+          },
+          "totalScore": { "type": "number" },
+          "rank": { "type": "integer", "minimum": 1 },
+          "feedbackReferences": {
+            "type": "array",
+            "items": { "type": "string" }
+          }
+        }
+      }
+    },
+    "winner": {
+      "type": "object",
+      "required": ["candidateId", "title"],
+      "properties": {
+        "candidateId": { "type": "string" },
+        "title": { "type": "string" }
+      }
+    },
+    "rationale": { "type": "string" },
+    "feedbackInfluence": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "summary": { "type": "string" },
+          "impact": { "type": "string", "enum": ["high", "medium", "low"] }
+        }
+      }
+    },
+    "bluesky_post": {
+      "type": "object",
+      "description": "Pre-crafted Bluesky post content, written by the Review stage for automatic publishing.",
+      "required": ["headline", "body"],
+      "properties": {
+        "headline": { "type": "string", "maxLength": 80, "description": "Attention-grabbing one-liner (max 80 chars)" },
+        "body": { "type": "string", "maxLength": 250, "description": "2-3 sentence hook optimized for social engagement" },
+        "alt_text": { "type": "string", "description": "Alt text for the attached screenshot, if any" }
+      }
+    },
+    "bluesky_strategy": {
+      "type": "object",
+      "description": "Daily Bluesky audience growth strategy, written by the Review stage to guide automated outreach.",
+      "properties": {
+        "searchQueries": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "5-8 search terms to find relevant conversations on Bluesky"
+        },
+        "replyTemplates": {
+          "type": "object",
+          "description": "Pre-written replies for common question/comment types",
+          "properties": {
+            "whatIs": { "type": "string" },
+            "howDoesItWork": { "type": "string" },
+            "genericQuestion": { "type": "string" }
+          }
+        },
+        "hashtagsToUse": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Hashtags to include in today's post"
+        },
+        "maxDailyActions": {
+          "type": "integer",
+          "minimum": 5,
+          "maximum": 30,
+          "description": "Maximum outreach actions (likes, follows, replies) for today"
+        },
+        "growthNotes": {
+          "type": "string",
+          "description": "Brief analysis of what's working/not working for audience growth based on recent metrics"
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Command Garden — A website that grows itself one feature a day through an autonomous AI pipeline.">
+  <meta name="theme-color" content="#1a4d2e">
+  <title>Command Garden</title>
+  <link rel="icon" href="/favicon.ico" type="image/x-icon">
+  <link rel="stylesheet" href="/css/design-system.css">
+  <link rel="stylesheet" href="/css/components.css">
+</head>
+<body>
+
+  <!-- Navigation -->
+  <nav class="nav" role="navigation" aria-label="Main navigation">
+    <div class="container nav__inner">
+      <a href="/" class="nav__logo">
+        <span class="nav__logo-icon" aria-hidden="true">&#127793;</span>
+        <span>Command Garden</span>
+      </a>
+      <button class="nav__mobile-toggle" aria-label="Toggle menu" aria-expanded="false">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 12h18M3 6h18M3 18h18"/></svg>
+      </button>
+      <div class="nav__links">
+        <a href="/" class="nav__link nav__link--active">Home</a>
+        <a href="/archive/" class="nav__link">Archive</a>
+        <a href="/judges/" class="nav__link">Judges</a>
+        <a href="/feedback/" class="nav__link">Feedback</a>
+        <a href="/days/" class="nav__link nav__link--source">View Source</a>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Hero -->
+  <section class="hero" role="banner">
+    <div class="container">
+      <span class="hero__badge">
+        <span class="hero__badge-dot" aria-hidden="true"></span>
+        Growing daily
+      </span>
+      <h1 class="hero__title">Command Garden</h1>
+      <p class="hero__tagline">A website that grows itself one feature a day.</p>
+      <p class="hero__description">
+        Every day, an autonomous AI pipeline proposes changes, scores them against
+        structured criteria, ships the winner, and publishes a full decision log.
+        Your feedback shapes what grows next.
+      </p>
+      <div class="hero__actions">
+        <a href="#todays-change" class="btn btn--primary btn--lg">See today's change</a>
+        <a href="/feedback/" class="btn btn--secondary btn--lg">Give feedback</a>
+      </div>
+    </div>
+  </section>
+
+  <main>
+    <!-- Today's Change -->
+    <section class="section" id="todays-change">
+      <div class="container">
+        <div class="section__header">
+          <span class="section__label">Latest</span>
+          <h2 class="section__title">Today's Change</h2>
+          <p class="section__subtitle" id="todays-date"></p>
+        </div>
+        <div id="todays-winner">
+          <div class="card mb-4">
+            <div class="skeleton skeleton--badge"></div>
+            <div class="skeleton skeleton--title mt-4"></div>
+            <div class="skeleton skeleton--text"></div>
+            <div class="skeleton skeleton--text-sm"></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Candidate Ranking Teaser -->
+    <section class="section" id="candidates-section">
+      <div class="container">
+        <div class="section__header">
+          <span class="section__label">Scoring</span>
+          <h2 class="section__title">Top Candidates</h2>
+          <p class="section__subtitle">How the AI judges ranked today's proposals.</p>
+        </div>
+        <div id="candidates-teaser">
+          <div class="d-grid gap-4" style="grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));">
+            <div class="skeleton skeleton--card"></div>
+            <div class="skeleton skeleton--card"></div>
+            <div class="skeleton skeleton--card"></div>
+          </div>
+        </div>
+        <div class="mt-6" id="view-full-decision"></div>
+      </div>
+    </section>
+
+    <!-- Recent Archive -->
+    <section class="section" id="recent-section">
+      <div class="container">
+        <div class="section__header">
+          <span class="section__label">History</span>
+          <h2 class="section__title">Recent Days</h2>
+          <p class="section__subtitle">The garden's growth over the past week.</p>
+        </div>
+        <div id="recent-timeline">
+          <div class="skeleton skeleton--card mb-4"></div>
+          <div class="skeleton skeleton--card mb-4"></div>
+          <div class="skeleton skeleton--card"></div>
+        </div>
+        <div class="mt-6">
+          <a href="/archive/" class="btn btn--ghost">View full archive</a>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Footer -->
+  <footer class="site-footer">
+    <div class="container site-footer__inner">
+      <p class="site-footer__text">
+        Powered by <a href="https://commands.com" class="site-footer__link">Commands.com</a>
+      </p>
+      <span class="site-footer__meta">artifact schema v1</span>
+    </div>
+  </footer>
+
+  <script type="module">
+    import {
+      loadLatestDay,
+      formatDate,
+      getDayUrl,
+      el,
+      showError,
+      initMobileNav,
+    } from '/js/app.js';
+    import {
+      renderWinner,
+      renderCandidates,
+      renderTimeline,
+      renderReactions,
+    } from '/js/renderer.js';
+
+    initMobileNav();
+
+    async function init() {
+      try {
+        const result = await loadLatestDay();
+
+        if (!result || !result.artifacts) {
+          showError(
+            document.getElementById('todays-winner'),
+            'No data yet',
+            'The garden is just getting started. Check back soon for the first daily entry.'
+          );
+          showError(
+            document.getElementById('candidates-teaser'),
+            'Waiting for seeds',
+            'Candidate proposals will appear here after the first pipeline run.'
+          );
+          renderRecentTimeline(result?.manifest);
+          return;
+        }
+
+        const { manifest, day, artifacts } = result;
+
+        // Today's date
+        const dateEl = document.getElementById('todays-date');
+        if (dateEl) {
+          dateEl.textContent = formatDate(day.date);
+        }
+
+        // Winner section
+        const winnerContainer = document.getElementById('todays-winner');
+        winnerContainer.innerHTML = '';
+        if (artifacts.decision && artifacts.decision.winner) {
+          winnerContainer.appendChild(
+            renderWinner(artifacts.decision.winner, artifacts.decision.rationale)
+          );
+
+          // Reactions
+          const reactionsEl = el('div', { className: 'mt-4' });
+          reactionsEl.appendChild(renderReactions(day.date));
+          winnerContainer.appendChild(reactionsEl);
+        } else {
+          showError(winnerContainer, 'Decision pending', 'Today\'s decision has not been finalized yet.');
+        }
+
+        // Candidates teaser
+        const candidatesContainer = document.getElementById('candidates-teaser');
+        candidatesContainer.innerHTML = '';
+        if (artifacts.decision && artifacts.decision.candidates) {
+          candidatesContainer.appendChild(
+            renderCandidates(artifacts.decision.candidates, 3)
+          );
+        } else {
+          showError(candidatesContainer, 'No candidates', 'Candidate data is not available.');
+        }
+
+        // Full decision link
+        const fullDecisionEl = document.getElementById('view-full-decision');
+        fullDecisionEl.innerHTML = '';
+        fullDecisionEl.appendChild(
+          el('a', {
+            href: getDayUrl(day.date),
+            className: 'btn btn--secondary',
+          }, 'View full decision log')
+        );
+
+        // Recent timeline
+        renderRecentTimeline(manifest);
+      } catch (err) {
+        console.error('Failed to load homepage data:', err);
+        showError(
+          document.getElementById('todays-winner'),
+          'Unable to load data',
+          'Something went wrong loading today\'s entry. Please try refreshing.'
+        );
+      }
+    }
+
+    function renderRecentTimeline(manifest) {
+      const timelineContainer = document.getElementById('recent-timeline');
+      timelineContainer.innerHTML = '';
+      if (manifest && manifest.days && manifest.days.length > 0) {
+        timelineContainer.appendChild(renderTimeline(manifest, { limit: 7 }));
+      } else {
+        showError(
+          timelineContainer,
+          'No history yet',
+          'Past daily entries will appear here as the garden grows.'
+        );
+      }
+    }
+
+    init();
+  </script>
+
+</body>
+</html>

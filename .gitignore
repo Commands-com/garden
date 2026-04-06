@@ -1,0 +1,11 @@
+node_modules/
+.env
+.env.*
+!.env.example
+content/days/*/
+!content/days/_example/
+*.zip
+dist/
+.DS_Store
+runner/*.log
+runner/state/

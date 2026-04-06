@@ -1,0 +1,23 @@
+{
+  "schemaVersion": 1,
+  "days": [
+    {
+      "date": "2026-04-05",
+      "status": "shipped",
+      "title": "Add interactive timeline to the archive page",
+      "summary": "Introduced a visual timeline with connecting lines and status indicators to the archive, making it easier to see the garden's growth trajectory at a glance."
+    },
+    {
+      "date": "2026-04-04",
+      "status": "shipped",
+      "title": "Implement feedback digest rendering",
+      "summary": "Added client-side rendering of the daily feedback digest, showing community themes and individual feedback items that influenced each day's decisions."
+    },
+    {
+      "date": "2026-04-03",
+      "status": "failed",
+      "title": "Dark mode toggle with system preference detection",
+      "summary": "Attempted to add automatic dark mode support with a manual toggle. Build passed but visual regression tests caught contrast issues in the score tables."
+    }
+  ]
+}
