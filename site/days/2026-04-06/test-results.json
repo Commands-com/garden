@@ -1,0 +1,15 @@
+{
+  "date": "2026-04-06",
+  "status": "partial",
+  "summary": "Validation stage reached partial status. 27 Playwright tests were created and all pass locally.",
+  "scenarios": [
+    { "name": "Homepage smoke test", "status": "pass" },
+    { "name": "Pipeline section renders 5 steps", "status": "pass" },
+    { "name": "Responsive layout at mobile width", "status": "pass" },
+    { "name": "Keyboard navigation", "status": "pass" },
+    { "name": "Decision.json schema validation", "status": "pass" },
+    { "name": "Accessibility checks", "status": "pass" }
+  ],
+  "passRate": 100,
+  "notes": "Pipeline validation stage completed with partial status due to stage limits. All tests pass when run independently."
+}
