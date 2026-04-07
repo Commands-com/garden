@@ -896,6 +896,104 @@
   color: var(--color-accent-gold);
 }
 
+/* ---------- Garden Stats ---------- */
+.garden-stats {
+  background: var(--surface-secondary);
+  padding: var(--space-10) 0;
+  text-align: center;
+}
+
+.garden-stats h2 {
+  font-size: var(--text-2xl);
+  font-weight: var(--weight-bold);
+  color: var(--color-text-dark);
+  margin-bottom: var(--space-6);
+}
+
+.garden-stats__list {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  gap: var(--space-10);
+  margin: 0;
+  padding: 0;
+}
+
+.garden-stats__item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.garden-stats__item dt {
+  font-size: var(--text-sm);
+  font-weight: var(--weight-medium);
+  color: var(--color-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  order: 1;
+  margin-top: var(--space-2);
+}
+
+.garden-stats__item dd {
+  font-size: var(--text-4xl);
+  font-weight: var(--weight-bold);
+  color: var(--color-deep-green);
+  line-height: var(--leading-tight);
+  order: 0;
+}
+
+/* Skeleton modifier */
+.garden-stats--skeleton .garden-stats__list {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  gap: var(--space-10);
+}
+
+.garden-stats--skeleton .garden-stats__item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.garden-stats--skeleton .garden-stats__item dt,
+.garden-stats--skeleton .garden-stats__item dd {
+  background: linear-gradient(
+    90deg,
+    var(--color-border-light) 25%,
+    var(--color-cream) 50%,
+    var(--color-border-light) 75%
+  );
+  background-size: 200% 100%;
+  animation: skeleton-shimmer 1.5s ease-in-out infinite;
+  border-radius: var(--radius-sm);
+  color: transparent !important;
+}
+
+.garden-stats--skeleton .garden-stats__item dd {
+  width: 3rem;
+  height: 2.25rem;
+}
+
+.garden-stats--skeleton .garden-stats__item dt {
+  width: 6rem;
+  height: 0.875rem;
+}
+
+@media (max-width: 639px) {
+  .garden-stats__list {
+    flex-direction: column;
+    gap: var(--space-6);
+  }
+
+  .garden-stats--skeleton .garden-stats__list {
+    flex-direction: column;
+    gap: var(--space-6);
+  }
+}
+
 /* ---------- Skeleton Loading ---------- */
 .skeleton {
   background: linear-gradient(

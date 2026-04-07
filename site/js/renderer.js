@@ -881,6 +881,41 @@ function renderArtifactLinks(dateStr) {
   return grid;
 }
 
+// ---------- Garden Stats Renderer ----------
+function renderGardenStats(manifest) {
+  if (!manifest || !manifest.days || manifest.days.length === 0) {
+    return null;
+  }
+
+  const dayCount = manifest.days.length;
+  const shippedCount = manifest.days.filter(d => d.status === 'shipped').length;
+  const sorted = [...manifest.days].sort(
+    (a, b) => new Date(a.date) - new Date(b.date)
+  );
+  const startDate = formatDate(sorted[0].date);
+
+  return el('section', {
+    className: 'garden-stats',
+    'aria-labelledby': 'garden-stats-heading',
+  },
+    el('h2', { id: 'garden-stats-heading' }, 'Garden Stats'),
+    el('dl', { className: 'garden-stats__list' },
+      el('div', { className: 'garden-stats__item' },
+        el('dt', {}, 'Pipeline Runs'),
+        el('dd', {}, String(dayCount))
+      ),
+      el('div', { className: 'garden-stats__item' },
+        el('dt', {}, 'Features Shipped'),
+        el('dd', {}, String(shippedCount))
+      ),
+      el('div', { className: 'garden-stats__item' },
+        el('dt', {}, 'Growing Since'),
+        el('dd', {}, startDate)
+      )
+    )
+  );
+}
+
 // ---------- Exports ----------
 export {
   renderMarkdown,
@@ -895,4 +930,5 @@ export {
   renderTimeline,
   renderReactions,
   renderArtifactLinks,
+  renderGardenStats,
 };

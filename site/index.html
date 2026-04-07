@@ -100,6 +100,25 @@
     </div>
   </section>
 
+  <!-- Garden Stats -->
+  <section id="garden-stats" class="garden-stats garden-stats--skeleton" aria-labelledby="garden-stats-heading">
+    <h2 id="garden-stats-heading">Garden Stats</h2>
+    <dl class="garden-stats__list">
+      <div class="garden-stats__item">
+        <dt>&nbsp;</dt>
+        <dd>&nbsp;</dd>
+      </div>
+      <div class="garden-stats__item">
+        <dt>&nbsp;</dt>
+        <dd>&nbsp;</dd>
+      </div>
+      <div class="garden-stats__item">
+        <dt>&nbsp;</dt>
+        <dd>&nbsp;</dd>
+      </div>
+    </dl>
+  </section>
+
   <main>
     <!-- Today's Change -->
     <section class="section" id="todays-change">
@@ -184,6 +203,7 @@
       renderCandidates,
       renderTimeline,
       renderReactions,
+      renderGardenStats,
     } from '/js/renderer.js';
 
     initMobileNav();
@@ -203,11 +223,13 @@
             'Waiting for seeds',
             'Candidate proposals will appear here after the first pipeline run.'
           );
+          hydrateGardenStats(result?.manifest);
           renderRecentTimeline(result?.manifest);
           return;
         }
 
         const { manifest, day, artifacts } = result;
+        hydrateGardenStats(manifest);
         const reactions = await getReactions(day.date);
 
         // Today's date
@@ -262,6 +284,19 @@
           'Unable to load data',
           'Something went wrong loading today\'s entry. Please try refreshing.'
         );
+        hydrateGardenStats(null);
+      }
+    }
+
+    function hydrateGardenStats(manifest) {
+      const gardenStatsEl = document.getElementById('garden-stats');
+      if (!gardenStatsEl) return;
+      const rendered = manifest ? renderGardenStats(manifest) : null;
+      if (rendered) {
+        gardenStatsEl.replaceWith(rendered);
+        rendered.id = 'garden-stats';
+      } else {
+        gardenStatsEl.style.display = 'none';
       }
     }
 
