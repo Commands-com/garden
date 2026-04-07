@@ -1,6 +1,11 @@
 const fs = require("node:fs");
 const path = require("node:path");
 const { test, expect } = require("@playwright/test");
+const {
+  USE_ROUTED_SITE,
+  installLocalSiteRoutes,
+  getAppUrl,
+} = require("./helpers/local-site");
 
 const manifest = JSON.parse(
   fs.readFileSync(
@@ -9,16 +14,17 @@ const manifest = JSON.parse(
   )
 );
 
-const expectedPipelineRuns = String(manifest.days.length);
-const expectedFeaturesShipped = String(
+const expectedDayCount = String(manifest.days.length);
+const expectedShipped = String(
   manifest.days.filter((day) => day.status === "shipped").length
 );
+const sortedDays = [...manifest.days].sort(
+  (a, b) => new Date(a.date) - new Date(b.date)
+);
 const expectedGrowingSince = new Date(
-  `${[...manifest.days].sort((a, b) => new Date(a.date) - new Date(b.date))[0].date}T12:00:00`
+  `${sortedDays[0].date}T12:00:00`
 ).toLocaleDateString("en-US", {
-  weekday: "long",
-  year: "numeric",
-  month: "long",
+  month: "short",
   day: "numeric",
 });
 
@@ -37,7 +43,10 @@ async function getFlexDirection(locator) {
 
 test.describe("Garden Stats section", () => {
   test.beforeEach(async ({ page }) => {
-    await page.goto("/");
+    if (USE_ROUTED_SITE) {
+      await installLocalSiteRoutes(page);
+    }
+    await page.goto(getAppUrl("/"));
   });
 
   test("renders on the homepage with three populated stat items", async ({
@@ -65,21 +74,23 @@ test.describe("Garden Stats section", () => {
     }
   });
 
-  test("computes pipeline runs, shipped count, and start date from the manifest", async ({
+  test("computes day count, shipped count, and start date from the manifest", async ({
     page,
   }) => {
     const section = await waitForRenderedGardenStats(page);
-    const values = await section.locator(".garden-stats__item dd").allTextContents();
+    const values = await section
+      .locator(".garden-stats__item dd")
+      .allTextContents();
 
     expect(values.map((value) => value.trim())).toEqual([
-      expectedPipelineRuns,
-      expectedFeaturesShipped,
+      expectedDayCount,
+      expectedShipped,
       expectedGrowingSince,
     ]);
 
     expect(values[0].trim()).toMatch(/^[1-9]\d*$/);
     expect(values[1].trim()).toMatch(/^\d+$/);
-    expect(values[2].trim()).toMatch(/[A-Z][a-z]+ \d{1,2}, \d{4}/);
+    expect(values[2].trim()).toMatch(/^[A-Z][a-z]+ \d{1,2}$/);
   });
 
   test("uses semantic markup and accessible labeling", async ({ page }) => {
@@ -99,8 +110,8 @@ test.describe("Garden Stats section", () => {
 
     const labels = await list.locator("dt").allTextContents();
     expect(labels.map((label) => label.trim())).toEqual([
-      "Pipeline Runs",
-      "Features Shipped",
+      "Day",
+      "Shipped",
       "Growing Since",
     ]);
   });
@@ -119,14 +130,20 @@ test.describe("Garden Stats section", () => {
     page,
   }) => {
     await page.setViewportSize({ width: 375, height: 667 });
-    await page.goto("/");
+    if (USE_ROUTED_SITE) {
+      await installLocalSiteRoutes(page);
+    }
+    await page.goto(getAppUrl("/"));
 
     const mobileList = page.locator(".garden-stats__list");
     await expect(page.locator(".garden-stats--skeleton")).toHaveCount(0);
     expect(await getFlexDirection(mobileList)).toBe("column");
 
     await page.setViewportSize({ width: 1280, height: 720 });
-    await page.goto("/");
+    if (USE_ROUTED_SITE) {
+      await installLocalSiteRoutes(page);
+    }
+    await page.goto(getAppUrl("/"));
 
     const desktopList = page.locator(".garden-stats__list");
     await expect(page.locator(".garden-stats--skeleton")).toHaveCount(0);
@@ -156,5 +173,32 @@ test.describe("Garden Stats section", () => {
     expect(mainBox.y).toBeGreaterThanOrEqual(
       gardenStatsBox.y + gardenStatsBox.height - 1
     );
+  });
+
+  test("hides the section when manifest has no entries", async ({ page }) => {
+    // Create a fresh page with an empty manifest to test hidden state
+    const newPage = await page.context().newPage();
+    if (USE_ROUTED_SITE) {
+      // Install local-site routes first so they handle all other files
+      await installLocalSiteRoutes(newPage);
+    }
+
+    // Add manifest override AFTER local-site routes so it takes priority
+    // (Playwright checks routes in LIFO order — last registered wins)
+    await newPage.route("**/days/manifest.json", async (route) => {
+      await route.fulfill({
+        status: 200,
+        contentType: "application/json",
+        body: JSON.stringify({ days: [] }),
+      });
+    });
+
+    await newPage.goto(getAppUrl("/"));
+    await newPage.waitForLoadState("networkidle");
+
+    const section = newPage.locator("section#garden-stats");
+    await expect(section).toBeHidden();
+
+    await newPage.close();
   });
 });

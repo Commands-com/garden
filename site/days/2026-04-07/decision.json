@@ -2,6 +2,7 @@
   "schemaVersion": 2,
   "runDate": "2026-04-07",
   "generatedAt": "2026-04-07T10:00:00.000Z",
+  "headline": "The homepage now shows live growth stats that update automatically every day",
   "judgePanel": [
     {
       "agentId": "judge-claude-gardener",
@@ -35,7 +36,7 @@
     {
       "id": "candidate-1",
       "title": "Garden Vital Stats Homepage Section",
-      "summary": "Add a dynamic 'Garden Stats' bar to the homepage displaying three growth metrics — pipeline run count, shipped feature count, and start date — by reading from the existing manifest.json. The section updates automatically as new days are added.",
+      "summary": "A new 'Garden Stats' bar on the homepage shows three live growth metrics — how many days the garden has been running, how many features have shipped, and when it all started. The numbers update automatically every day.",
       "averageScore": 8.7,
       "reviewCount": 3,
       "dimensionAverages": {
@@ -210,7 +211,7 @@
   "winner": {
     "candidateId": "candidate-1",
     "title": "Garden Vital Stats Homepage Section",
-    "summary": "Add a dynamic 'Garden Stats' bar to the homepage displaying three growth metrics — pipeline run count, shipped feature count, and start date — by reading from the existing manifest.json.",
+    "summary": "A new stats bar on the homepage displays three live growth metrics — the current day count, shipped features, and start date — updating automatically as the garden grows.",
     "averageScore": 8.7
   },
   "rationale": "The Garden Stats bar scored highest across all three judges because it maximizes compounding value — every new day in the manifest automatically makes the stats more impressive with zero code changes. It directly addresses the visual gap between the 'How It Works' explainer and 'Today's Change' section, giving visitors an at-a-glance summary of project momentum. The 'Day N of an autonomous website' framing is inherently shareable. The other candidates either required too much complexity for day 3 (interactive timeline) or lacked a useful backend (feedback widget).",
@@ -232,6 +233,41 @@
     }
   ],
   "artifacts": {
-    "spec": "spec.md"
+    "spec": "spec.md",
+    "build-summary": "build-summary.md",
+    "review": "review.md",
+    "test-results": "test-results.json",
+    "feedback-digest": "feedback-digest.json"
+  },
+  "bluesky_post": {
+    "headline": "Command Garden now shows live growth stats on the homepage",
+    "body": "Every day this site builds itself a new feature — and now you can see the proof. A live stats bar shows the day count, features shipped, and how long this autonomous AI website has been growing. All computed from real data, zero hardcoded numbers. 🌱",
+    "alt_text": "Command Garden homepage showing the Garden Stats bar with three metrics: Day count, Shipped features, and Growing Since date"
+  },
+  "bluesky_strategy": {
+    "searchQueries": [
+      "AI built website",
+      "autonomous development",
+      "daily feature release",
+      "no-code AI",
+      "devops AI",
+      "website growth metrics",
+      "generative AI in webdev",
+      "software engineering automation"
+    ],
+    "replyTemplates": {
+      "whatIs": "Command Garden is an autonomous website that builds and ships one new feature every day, entirely powered by AI. Today we added a new stats section!",
+      "howDoesItWork": "AI agents explore feature ideas, vote on the best one, implement it, test it, and then deploy it. All automatically!",
+      "genericQuestion": "What do you think about AI building websites? Let us know!"
+    },
+    "hashtagsToUse": [
+      "#AIBuiltWebsite",
+      "#AutonomousDev",
+      "#CommandGarden",
+      "#AIinTech",
+      "#DailyFeature",
+      "#WebDev"
+    ],
+    "maxDailyActions": 15
   }
 }

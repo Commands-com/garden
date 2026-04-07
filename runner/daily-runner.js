@@ -493,75 +493,78 @@ function generateCanonicalArtifacts(artifactDir, runDate, pipelineReport, gitBas
   }
 
   // ---- decision.json ----
+  // The implementation stage may have written its own decision.json with
+  // stale or placeholder judgePanel/candidates data. We always merge
+  // explore-derived fields (the authoritative source for scoring data)
+  // into whatever exists, or create from scratch if nothing exists.
   const decisionPath = path.join(artifactDir, 'decision.json');
-  if (!fs.existsSync(decisionPath)) {
-    // The concept_bundle.v1 payload from explore_room exposes:
-    //   candidates  — full candidate records (conceptKey, title, aggregateScores, reviewerBreakdown, ...)
-    //   leaderboard — lightweight ranked list (conceptId, averageScore, dimensionAverages, ...)
-    //   selectedConcept — the winning concept (id, title, aggregateScores, reviewerBreakdown, ...)
-    //   judgePanel  — array of judge metadata objects
-    //   decision    — { scoringDimensions: [{id, label}], selectedConceptId, ... }
-    const explorePayload = handoffs.explore || null;
-    if (explorePayload) {
-      const candidateRecords = explorePayload.candidates || [];
-      const leaderboard = explorePayload.leaderboard || [];
-      const selected = explorePayload.selectedConcept || null;
-      const scoringDims = explorePayload.decision?.scoringDimensions || [];
+  const existingDecision = readJsonSafe(decisionPath);
+  const explorePayload = handoffs.explore || null;
 
-      // Build candidates from candidateRecords (full shape), enriched with
-      // leaderboard rankings. Fall back to leaderboard if candidates is empty.
-      const source = candidateRecords.length > 0 ? candidateRecords : leaderboard;
-      const decision = {
-        schemaVersion: 2,
-        runDate,
-        generatedAt: new Date().toISOString(),
-        judgePanel: explorePayload.judgePanel || [],
-        scoringDimensions: scoringDims,
-        candidates: source.map((c, idx) => {
-          // candidateRecords use conceptKey; leaderboard uses conceptId
-          const id = c.conceptKey || c.conceptId || c.id || `candidate-${idx + 1}`;
-          // Scores live under aggregateScores in the full shape
-          const agg = c.aggregateScores || {};
-          return {
-            id,
-            title: c.title || c.conceptTitle || 'Untitled',
-            summary: c.oneLiner || c.summary || '',
-            averageScore: agg.overall ?? c.averageScore ?? 0,
-            reviewCount: agg.reviewCount ?? c.reviewCount ?? 0,
-            dimensionAverages: agg.dimensions || c.dimensionAverages || {},
-            reviewerBreakdown: c.reviewerBreakdown || [],
-            rank: c.rank ?? (idx + 1),
-            keep: c.keep || [],
-            mustChange: c.mustChange || c.improvementTargets || [],
-            risks: c.risks || [],
-          };
-        }),
-        winner: selected ? {
-          candidateId: selected.id || selected.conceptKey || 'candidate-1',
-          title: selected.title || 'Untitled',
-          summary: selected.oneLiner || selected.summary || '',
-          averageScore: selected.aggregateScores?.overall ?? selected.averageScore ?? 0,
-        } : null,
-        rationale: selected
-          ? `Selected as the highest-scoring candidate with an average score of ${(selected.aggregateScores?.overall || 0).toFixed(1)} across ${selected.aggregateScores?.reviewCount || 0} judge(s).`
-          : '',
-      };
-      fs.writeFileSync(decisionPath, JSON.stringify(decision, null, 2), 'utf8');
-    } else {
-      log('Warning: decision.json not found and no handoff payloads available — writing minimal placeholder');
-      const placeholder = {
-        schemaVersion: 2,
-        runDate,
-        generatedAt: new Date().toISOString(),
-        _warning: 'Auto-generated placeholder — pipeline did not produce decision.json',
-        judgePanel: [],
-        scoringDimensions: [],
-        candidates: [],
-        winner: null,
-        rationale: 'Pipeline did not produce a decision artifact.',
-      };
-      fs.writeFileSync(decisionPath, JSON.stringify(placeholder, null, 2), 'utf8');
+  if (explorePayload) {
+    const candidateRecords = explorePayload.candidates || [];
+    const leaderboard = explorePayload.leaderboard || [];
+    const selected = explorePayload.selectedConcept || null;
+    const scoringDims = explorePayload.decision?.scoringDimensions || [];
+
+    const source = candidateRecords.length > 0 ? candidateRecords : leaderboard;
+    const exploreFields = {
+      schemaVersion: 2,
+      runDate,
+      generatedAt: new Date().toISOString(),
+      judgePanel: explorePayload.judgePanel || [],
+      scoringDimensions: scoringDims,
+      candidates: source.map((c, idx) => {
+        const id = c.conceptKey || c.conceptId || c.id || `candidate-${idx + 1}`;
+        const agg = c.aggregateScores || {};
+        return {
+          id,
+          title: c.title || c.conceptTitle || 'Untitled',
+          summary: c.oneLiner || c.summary || '',
+          averageScore: agg.overall ?? c.averageScore ?? 0,
+          reviewCount: agg.reviewCount ?? c.reviewCount ?? 0,
+          dimensionAverages: agg.dimensions || c.dimensionAverages || {},
+          reviewerBreakdown: c.reviewerBreakdown || [],
+          rank: c.rank ?? (idx + 1),
+          keep: c.keep || [],
+          mustChange: c.mustChange || c.improvementTargets || [],
+          risks: c.risks || [],
+        };
+      }),
+      winner: selected ? {
+        candidateId: selected.id || selected.conceptKey || 'candidate-1',
+        title: selected.title || 'Untitled',
+        summary: selected.oneLiner || selected.summary || '',
+        averageScore: selected.aggregateScores?.overall ?? selected.averageScore ?? 0,
+      } : null,
+      rationale: selected
+        ? `Selected as the highest-scoring candidate with an average score of ${(selected.aggregateScores?.overall || 0).toFixed(1)} across ${selected.aggregateScores?.reviewCount || 0} judge(s).`
+        : '',
+    };
+
+    // Merge: explore fields win for scoring/judge data, but preserve
+    // implementation-authored fields like headline, summary, bluesky_post, etc.
+    const merged = existingDecision
+      ? { ...existingDecision, ...exploreFields }
+      : exploreFields;
+    fs.writeFileSync(decisionPath, JSON.stringify(merged, null, 2), 'utf8');
+    if (existingDecision) {
+      log('Merged explore handoff data into existing decision.json');
     }
+  } else if (!existingDecision) {
+    log('Warning: decision.json not found and no explore handoff available — writing minimal placeholder');
+    const placeholder = {
+      schemaVersion: 2,
+      runDate,
+      generatedAt: new Date().toISOString(),
+      _warning: 'Auto-generated placeholder — pipeline did not produce decision.json',
+      judgePanel: [],
+      scoringDimensions: [],
+      candidates: [],
+      winner: null,
+      rationale: 'Pipeline did not produce a decision artifact.',
+    };
+    fs.writeFileSync(decisionPath, JSON.stringify(placeholder, null, 2), 'utf8');
   }
 
   // ---- test-results.json ----

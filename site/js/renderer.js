@@ -892,7 +892,7 @@ function renderGardenStats(manifest) {
   const sorted = [...manifest.days].sort(
     (a, b) => new Date(a.date) - new Date(b.date)
   );
-  const startDate = formatDate(sorted[0].date);
+  const startDate = formatDateShort(sorted[0].date);
 
   return el('section', {
     className: 'garden-stats',
@@ -901,11 +901,11 @@ function renderGardenStats(manifest) {
     el('h2', { id: 'garden-stats-heading' }, 'Garden Stats'),
     el('dl', { className: 'garden-stats__list' },
       el('div', { className: 'garden-stats__item' },
-        el('dt', {}, 'Pipeline Runs'),
+        el('dt', {}, 'Day'),
         el('dd', {}, String(dayCount))
       ),
       el('div', { className: 'garden-stats__item' },
-        el('dt', {}, 'Features Shipped'),
+        el('dt', {}, 'Shipped'),
         el('dd', {}, String(shippedCount))
       ),
       el('div', { className: 'garden-stats__item' },

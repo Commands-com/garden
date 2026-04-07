@@ -1,0 +1,16 @@
+{
+  "date": "2026-04-07",
+  "status": "pass",
+  "summary": "Garden Stats Playwright test suite covers 7 scenarios including rendering, computed values, semantic markup, skeleton replacement, responsive layout, positioning, and empty-manifest hidden state.",
+  "scenarios": [
+    { "name": "Renders on homepage with three populated stat items", "status": "pass" },
+    { "name": "Computes day count, shipped count, and start date from manifest", "status": "pass" },
+    { "name": "Uses semantic markup and accessible labeling", "status": "pass" },
+    { "name": "Fully replaces skeleton node after hydration", "status": "pass" },
+    { "name": "Switches from stacked mobile to row layout on desktop", "status": "pass" },
+    { "name": "Sits between How It Works section and main content", "status": "pass" },
+    { "name": "Hides section when manifest has no entries", "status": "pass" }
+  ],
+  "passRate": 100,
+  "notes": "Tests use routed-site helper (getAppUrl + installLocalSiteRoutes) for portability across both webserver and PLAYWRIGHT_DISABLE_WEBSERVER=1 validation modes. Empty-manifest test uses LIFO route ordering to override the manifest after local-site routes are installed."
+}
