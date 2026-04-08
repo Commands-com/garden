@@ -161,6 +161,10 @@ const config = {
     handle: env('BLUESKY_HANDLE', ''),
     appPassword: env('BLUESKY_APP_PASSWORD', ''),
   },
+
+  devto: {
+    apiKey: env('DEVTO_API_KEY', ''),
+  },
 };
 
 module.exports = config;

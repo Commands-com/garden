@@ -17,6 +17,7 @@ const {
   publishSiteAssets,
 } = require('./artifact-publisher');
 const { publishToBluesky, executeOutreach, collectBlueskyMetrics } = require('./bluesky-publisher');
+const { publishToDevTo } = require('./devto-publisher');
 
 // ---------------------------------------------------------------------------
 // Constants
@@ -958,6 +959,19 @@ async function main() {
     } catch (err) {
       logError(`Bluesky publishing failed: ${err.message}`);
       // Non-fatal — the feature shipped, social is best-effort
+    }
+
+    // Publish to Dev.to
+    log('Publishing to Dev.to...');
+    try {
+      const devtoResult = await publishToDevTo(config, runDate, artifactDir, siteUrl);
+      if (devtoResult.posted) {
+        log(`Dev.to article published: ${devtoResult.url}`);
+      } else {
+        log(`Dev.to post skipped: ${devtoResult.error}`);
+      }
+    } catch (err) {
+      logError(`Dev.to publishing failed: ${err.message}`);
     }
 
     // Bluesky outreach — engage with relevant conversations to grow audience
