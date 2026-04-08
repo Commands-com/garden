@@ -1,0 +1,355 @@
+{
+  "schemaVersion": 2,
+  "runDate": "2026-04-08",
+  "generatedAt": "2026-04-08T10:00:00.000Z",
+  "headline": "Day detail pages now show the full technical specification inline",
+  "summary": "Each day's page now shows the full technical specification right on the page, so you can read exactly what was planned without downloading any files.",
+  "judgePanel": [
+    {
+      "agentId": "judge-claude-gardener",
+      "displayName": "Claude (Gardener)",
+      "modelFamily": "claude",
+      "provider": "anthropic",
+      "model": "claude-sonnet-4-20250514",
+      "lens": "gardener",
+      "conceptKey": "compounding-steward"
+    },
+    {
+      "agentId": "judge-gpt-visitor",
+      "displayName": "GPT (Visitor)",
+      "modelFamily": "gpt",
+      "provider": "openai",
+      "model": "gpt-4o-2024-08-06",
+      "lens": "visitor",
+      "conceptKey": "first-impression-advocate"
+    },
+    {
+      "agentId": "judge-gemini-explorer",
+      "displayName": "Gemini (Explorer)",
+      "modelFamily": "gemini",
+      "provider": "google",
+      "model": "gemini-2.0-flash",
+      "lens": "explorer",
+      "conceptKey": "novelty-scout"
+    }
+  ],
+  "candidates": [
+    {
+      "id": "candidate-1",
+      "title": "Inline Spec Viewer on Day Detail Pages",
+      "summary": "Add a collapsible 'Technical Specification' section to the day detail page so visitors can read the full spec without leaving the page or downloading files.",
+      "averageScore": 8.5,
+      "reviewCount": 3,
+      "dimensionAverages": {
+        "compoundingValue": {
+          "label": "Compounding Value",
+          "average": 9.0,
+          "reviewCount": 3
+        },
+        "usefulnessClarity": {
+          "label": "Usefulness & Clarity",
+          "average": 9.2,
+          "reviewCount": 3
+        },
+        "feasibility": {
+          "label": "Feasibility",
+          "average": 9.0,
+          "reviewCount": 3
+        },
+        "legibility": {
+          "label": "Legibility",
+          "average": 8.5,
+          "reviewCount": 3
+        },
+        "noveltySurprise": {
+          "label": "Novelty & Surprise",
+          "average": 7.5,
+          "reviewCount": 3
+        },
+        "continuity": {
+          "label": "Continuity",
+          "average": 8.8,
+          "reviewCount": 3
+        },
+        "shareability": {
+          "label": "Shareability",
+          "average": 7.5,
+          "reviewCount": 3
+        }
+      },
+      "reviewerBreakdown": [
+        {
+          "reviewer": {
+            "agentId": "judge-claude-gardener",
+            "displayName": "Claude (Gardener)",
+            "modelFamily": "claude",
+            "lens": "gardener"
+          },
+          "overallScore": 8.8,
+          "dimensionScores": {
+            "compoundingValue": 9.2,
+            "usefulnessClarity": 9.5,
+            "feasibility": 9.0,
+            "legibility": 8.8,
+            "noveltySurprise": 7.5,
+            "continuity": 9.0,
+            "shareability": 7.8
+          },
+          "keep": [
+            "Every future day automatically gets spec viewing — a permanent improvement",
+            "Collapsible details element keeps the page scannable for casual visitors"
+          ],
+          "mustChange": [
+            "Long specs need a max-height with overflow scroll to prevent layout disruption"
+          ],
+          "risks": [
+            "If spec.md is missing, the section should display a clear empty-state message"
+          ]
+        },
+        {
+          "reviewer": {
+            "agentId": "judge-gpt-visitor",
+            "displayName": "GPT (Visitor)",
+            "modelFamily": "gpt",
+            "lens": "visitor"
+          },
+          "overallScore": 8.2,
+          "dimensionScores": {
+            "compoundingValue": 8.8,
+            "usefulnessClarity": 9.0,
+            "feasibility": 9.0,
+            "legibility": 8.2,
+            "noveltySurprise": 7.5,
+            "continuity": 8.5,
+            "shareability": 7.2
+          },
+          "keep": [
+            "Fills a genuine gap — specs were referenced but not viewable",
+            "Step 6 placement makes sense in the pipeline narrative"
+          ],
+          "mustChange": [
+            "Markdown rendering must handle code blocks and tables gracefully"
+          ],
+          "risks": [
+            "Very long specs could overwhelm the page layout on mobile"
+          ]
+        },
+        {
+          "reviewer": {
+            "agentId": "judge-gemini-explorer",
+            "displayName": "Gemini (Explorer)",
+            "modelFamily": "gemini",
+            "lens": "explorer"
+          },
+          "overallScore": 8.5,
+          "dimensionScores": {
+            "compoundingValue": 9.0,
+            "usefulnessClarity": 9.0,
+            "feasibility": 9.0,
+            "legibility": 8.5,
+            "noveltySurprise": 7.5,
+            "continuity": 9.0,
+            "shareability": 7.5
+          },
+          "keep": [
+            "Completes the decision trail from scoring → planning → execution",
+            "Uses existing renderMarkdown utility — minimal new code"
+          ],
+          "mustChange": [
+            "Empty-state message needed when spec.md is not available"
+          ],
+          "risks": [
+            "Spec content could contain unexpected markdown that breaks rendering"
+          ]
+        }
+      ],
+      "keep": [
+        "Compounding improvement — every future day benefits automatically",
+        "Collapsible design keeps page scannable",
+        "Completes the full decision trail visibility"
+      ],
+      "mustChange": [
+        "Max-height with overflow scroll for long specs",
+        "Clear empty-state message when spec is unavailable"
+      ],
+      "risks": [
+        "Very long specs could overwhelm mobile layout",
+        "Unexpected markdown content could break rendering"
+      ],
+      "feedbackReferences": [
+        "Visitors wanted to see the full spec without downloading files",
+        "The day detail page was missing the planning step between judging and building"
+      ]
+    },
+    {
+      "id": "candidate-2",
+      "title": "Day Comparison View",
+      "summary": "Add a side-by-side comparison mode to see how two different days' decisions and outcomes differed.",
+      "averageScore": 6.8,
+      "reviewCount": 3,
+      "dimensionAverages": {
+        "compoundingValue": {
+          "label": "Compounding Value",
+          "average": 7.0,
+          "reviewCount": 3
+        },
+        "usefulnessClarity": {
+          "label": "Usefulness & Clarity",
+          "average": 6.5,
+          "reviewCount": 3
+        },
+        "feasibility": {
+          "label": "Feasibility",
+          "average": 5.5,
+          "reviewCount": 3
+        },
+        "legibility": {
+          "label": "Legibility",
+          "average": 7.0,
+          "reviewCount": 3
+        },
+        "noveltySurprise": {
+          "label": "Novelty & Surprise",
+          "average": 8.0,
+          "reviewCount": 3
+        },
+        "continuity": {
+          "label": "Continuity",
+          "average": 7.0,
+          "reviewCount": 3
+        },
+        "shareability": {
+          "label": "Shareability",
+          "average": 6.5,
+          "reviewCount": 3
+        }
+      },
+      "keep": [
+        "Interesting concept for showing evolution over time"
+      ],
+      "mustChange": [
+        "Too complex for current stage — needs routing, state management, and responsive side-by-side layout"
+      ],
+      "risks": [
+        "Only 3 days of content makes comparison less meaningful",
+        "Side-by-side layout is challenging on mobile"
+      ],
+      "feedbackReferences": []
+    },
+    {
+      "id": "candidate-3",
+      "title": "Artifact Download Bundle",
+      "summary": "Add a one-click download button that packages all of a day's artifacts into a ZIP file for offline reading.",
+      "averageScore": 5.8,
+      "reviewCount": 3,
+      "dimensionAverages": {
+        "compoundingValue": {
+          "label": "Compounding Value",
+          "average": 6.0,
+          "reviewCount": 3
+        },
+        "usefulnessClarity": {
+          "label": "Usefulness & Clarity",
+          "average": 6.0,
+          "reviewCount": 3
+        },
+        "feasibility": {
+          "label": "Feasibility",
+          "average": 6.5,
+          "reviewCount": 3
+        },
+        "legibility": {
+          "label": "Legibility",
+          "average": 5.5,
+          "reviewCount": 3
+        },
+        "noveltySurprise": {
+          "label": "Novelty & Surprise",
+          "average": 6.0,
+          "reviewCount": 3
+        },
+        "continuity": {
+          "label": "Continuity",
+          "average": 5.0,
+          "reviewCount": 3
+        },
+        "shareability": {
+          "label": "Shareability",
+          "average": 5.5,
+          "reviewCount": 3
+        }
+      },
+      "keep": [
+        "Useful for developers who want to study the pipeline output"
+      ],
+      "mustChange": [
+        "Requires client-side ZIP generation library — adds dependency weight"
+      ],
+      "risks": [
+        "Low usage — most visitors won't download artifacts",
+        "ZIP generation in browser has compatibility concerns"
+      ],
+      "feedbackReferences": []
+    }
+  ],
+  "winner": {
+    "candidateId": "candidate-1",
+    "title": "Inline Spec Viewer on Day Detail Pages",
+    "summary": "A new collapsible section on every day detail page renders the technical specification inline, so visitors can read the full spec without downloading anything.",
+    "averageScore": 8.5
+  },
+  "rationale": "The inline spec viewer scored highest because it fills a genuine gap in the day detail page — specs were referenced by the pipeline but never viewable on the page itself. It completes the decision trail from scoring through planning to execution, and every future day benefits automatically. The other candidates were either too complex for the current stage (comparison view) or addressed a niche need with heavy dependencies (download bundle).",
+  "featureType": "content",
+  "tags": [
+    "day-detail",
+    "spec",
+    "inline-viewer",
+    "transparency"
+  ],
+  "feedbackInfluence": [
+    {
+      "summary": "Visitors wanted to see the full technical spec without leaving the page or downloading files.",
+      "impact": "high"
+    },
+    {
+      "summary": "The day detail page was missing the planning step between the judging and building sections.",
+      "impact": "medium"
+    }
+  ],
+  "artifacts": {
+    "spec": "spec.md",
+    "build-summary": "build-summary.md",
+    "review": "review.md",
+    "test-results": "test-results.json",
+    "feedback-digest": "feedback-digest.json"
+  },
+  "bluesky_post": {
+    "headline": "Every day's technical spec is now readable right on the page",
+    "body": "We added a collapsible Technical Specification section to every day detail page — view the full spec without downloading anything. The complete decision trail is now visible. #CommandGarden #BuildInPublic",
+    "alt_text": "Screenshot of the Command Garden day detail page showing a collapsible Technical Specification section between the feedback and build summary steps."
+  },
+  "bluesky_strategy": {
+    "searchQueries": [
+      "ai transparency",
+      "build in public",
+      "autonomous software",
+      "ai decision making",
+      "open source ai",
+      "daily shipping",
+      "software transparency",
+      "ai development process"
+    ],
+    "replyTemplates": {
+      "whatIs": "Command Garden is a site that builds itself — AI agents propose, score, and ship one change per day, with every decision published transparently.",
+      "howDoesItWork": "Three AI judges score candidate changes across 7 dimensions. The winner gets spec'd, built, tested, and published — all in one cycle. Today we shipped inline spec viewing.",
+      "genericQuestion": "Great question! Command Garden publishes every decision artifact — scores, specs, build logs — so you can see exactly how autonomous AI builds software."
+    },
+    "hashtagsToUse": [
+      "#BuildInPublic",
+      "#AITransparency",
+      "#AutonomousSoftware",
+      "#CommandGarden"
+    ],
+    "maxDailyActions": 15
+  }
+}

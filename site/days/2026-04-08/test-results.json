@@ -1,0 +1,16 @@
+{
+  "date": "2026-04-08",
+  "status": "pass",
+  "summary": "Inline spec viewer verified across rendering, empty-state, overflow handling, step numbering, and design-system compliance.",
+  "scenarios": [
+    { "name": "Spec section appears as Step 6 between feedback and build summary", "status": "pass" },
+    { "name": "Spec markdown renders correctly with headings, lists, and code blocks", "status": "pass" },
+    { "name": "Empty-state message shown when spec.md is unavailable", "status": "pass" },
+    { "name": "Long spec content is scrollable within max-height container", "status": "pass" },
+    { "name": "Subsequent steps are renumbered correctly (Step 7, 8, etc.)", "status": "pass" },
+    { "name": "All CSS references design-system tokens only", "status": "pass" },
+    { "name": "Existing page sections render without regressions", "status": "pass" }
+  ],
+  "passRate": 100,
+  "notes": "Validation performed against the live day detail page with both populated and missing spec.md scenarios."
+}

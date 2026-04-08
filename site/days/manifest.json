@@ -2,6 +2,12 @@
   "schemaVersion": 1,
   "days": [
     {
+      "date": "2026-04-08",
+      "status": "shipped",
+      "title": "Inline Spec Viewer on Day Detail Pages",
+      "summary": "Collapsible technical specification section on day detail pages — read the full spec inline without downloading."
+    },
+    {
       "date": "2026-04-07",
       "status": "shipped",
       "title": "Garden Vital Stats Homepage Section",
