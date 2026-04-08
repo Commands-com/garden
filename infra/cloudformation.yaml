@@ -198,6 +198,7 @@ Resources:
           ViewerProtocolPolicy: redirect-to-https
           Compress: true
           CachePolicyId: !Ref DefaultCachePolicy
+          ResponseHeadersPolicyId: !Ref SiteCorsResponseHeadersPolicy
           FunctionAssociations:
             - EventType: viewer-request
               FunctionARN: !GetAtt UrlRewriteFunction.FunctionMetadata.FunctionARN
@@ -268,6 +269,7 @@ Resources:
             ViewerProtocolPolicy: redirect-to-https
             Compress: true
             CachePolicyId: !Ref OneHourCachePolicy
+            ResponseHeadersPolicyId: !Ref SiteCorsResponseHeadersPolicy
             AllowedMethods:
               - GET
               - HEAD
@@ -281,6 +283,7 @@ Resources:
             ViewerProtocolPolicy: redirect-to-https
             Compress: true
             CachePolicyId: !Ref TwentyFourHourCachePolicy
+            ResponseHeadersPolicyId: !Ref SiteCorsResponseHeadersPolicy
             AllowedMethods:
               - GET
               - HEAD
@@ -294,6 +297,10 @@ Resources:
             ViewerProtocolPolicy: redirect-to-https
             Compress: true
             CachePolicyId: !Ref FiveMinuteCachePolicy
+            ResponseHeadersPolicyId: !Ref SiteCorsResponseHeadersPolicy
+            FunctionAssociations:
+              - EventType: viewer-request
+                FunctionARN: !GetAtt UrlRewriteFunction.FunctionMetadata.FunctionARN
             AllowedMethods:
               - GET
               - HEAD
@@ -385,6 +392,27 @@ Resources:
             QueryStringBehavior: none
           EnableAcceptEncodingGzip: true
           EnableAcceptEncodingBrotli: true
+
+  SiteCorsResponseHeadersPolicy:
+    Type: AWS::CloudFront::ResponseHeadersPolicy
+    Properties:
+      ResponseHeadersPolicyConfig:
+        Name: !Sub '${AWS::StackName}-cors-headers'
+        CorsConfig:
+          AccessControlAllowOrigins:
+            Items:
+              - 'https://commandgarden.com'
+              - 'https://www.commandgarden.com'
+          AccessControlAllowMethods:
+            Items:
+              - GET
+              - HEAD
+          AccessControlAllowHeaders:
+            Items:
+              - '*'
+          AccessControlAllowCredentials: false
+          AccessControlMaxAgeSec: 86400
+          OriginOverride: true
 
   DefaultCachePolicy:
     Type: AWS::CloudFront::CachePolicy
