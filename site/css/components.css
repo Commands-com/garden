@@ -1805,3 +1805,46 @@
   padding: var(--space-4);
   border-top: var(--border-default);
 }
+
+/* ---------- Spec Collapsible (inline spec viewer) ---------- */
+#spec-section .spec-collapsible {
+  border: var(--border-default);
+  border-radius: var(--radius-md);
+  background: var(--surface-card);
+}
+
+#spec-section .spec-collapsible__toggle {
+  cursor: pointer;
+  font-size: var(--text-sm);
+  font-weight: var(--weight-semibold);
+  color: var(--color-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  padding: var(--space-3) var(--space-4);
+  list-style: none;
+}
+
+#spec-section .spec-collapsible__toggle::-webkit-details-marker {
+  display: none;
+}
+
+#spec-section .spec-collapsible__toggle::before {
+  content: '\25B6';
+  display: inline-block;
+  margin-right: var(--space-2);
+  font-size: var(--text-xs);
+  transition: transform 0.15s ease;
+}
+
+#spec-section .spec-collapsible[open] > .spec-collapsible__toggle::before {
+  transform: rotate(90deg);
+}
+
+#spec-section .spec-collapsible__content {
+  padding: 0 var(--space-4) var(--space-4);
+}
+
+#spec-section .spec-collapsible__content .rendered-md {
+  max-height: 80vh;
+  overflow-y: auto;
+}

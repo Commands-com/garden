@@ -1,0 +1,327 @@
+{
+  "schemaVersion": 2,
+  "runDate": "2026-04-08",
+  "generatedAt": "2026-04-08T10:00:00.000Z",
+  "headline": "Day detail pages now show the full technical specification inline",
+  "judgePanel": [
+    {
+      "agentId": "judge-claude-gardener",
+      "displayName": "Claude (Gardener)",
+      "modelFamily": "claude",
+      "provider": "anthropic",
+      "model": "claude-sonnet-4-20250514",
+      "lens": "gardener",
+      "conceptKey": "compounding-steward"
+    },
+    {
+      "agentId": "judge-gpt-visitor",
+      "displayName": "GPT (Visitor)",
+      "modelFamily": "gpt",
+      "provider": "openai",
+      "model": "gpt-4o-2024-08-06",
+      "lens": "visitor",
+      "conceptKey": "first-impression-advocate"
+    },
+    {
+      "agentId": "judge-gemini-explorer",
+      "displayName": "Gemini (Explorer)",
+      "modelFamily": "gemini",
+      "provider": "google",
+      "model": "gemini-2.0-flash",
+      "lens": "explorer",
+      "conceptKey": "novelty-scout"
+    }
+  ],
+  "candidates": [
+    {
+      "id": "candidate-1",
+      "title": "Inline Spec Viewer on Day Detail Page",
+      "summary": "Add an inline rendering of the technical specification (spec.md) on each day's detail page, positioned between the feedback section and the build summary section. The spec is already loaded by loadDay() — this surfaces it in the UI with a collapsible details/summary element.",
+      "averageScore": 8.9,
+      "reviewCount": 3,
+      "dimensionAverages": {
+        "compoundingValue": {
+          "label": "Compounding Value",
+          "average": 9.5,
+          "reviewCount": 3
+        },
+        "usefulnessClarity": {
+          "label": "Usefulness & Clarity",
+          "average": 9.2,
+          "reviewCount": 3
+        },
+        "feasibility": {
+          "label": "Feasibility",
+          "average": 9.5,
+          "reviewCount": 3
+        },
+        "legibility": {
+          "label": "Legibility",
+          "average": 8.8,
+          "reviewCount": 3
+        },
+        "noveltySurprise": {
+          "label": "Novelty & Surprise",
+          "average": 7.5,
+          "reviewCount": 3
+        },
+        "continuity": {
+          "label": "Continuity",
+          "average": 9.2,
+          "reviewCount": 3
+        },
+        "shareability": {
+          "label": "Shareability",
+          "average": 8.5,
+          "reviewCount": 3
+        }
+      },
+      "reviewerBreakdown": [
+        {
+          "reviewer": {
+            "agentId": "judge-claude-gardener",
+            "displayName": "Claude (Gardener)",
+            "modelFamily": "claude",
+            "lens": "gardener"
+          },
+          "overallScore": 9.2,
+          "dimensionScores": {
+            "compoundingValue": 9.8,
+            "usefulnessClarity": 9.5,
+            "feasibility": 9.5,
+            "legibility": 9.0,
+            "noveltySurprise": 7.5,
+            "continuity": 9.5,
+            "shareability": 8.8
+          },
+          "keep": [
+            "Every future spec renders automatically with zero code changes — pure compounding",
+            "Collapsible details/summary keeps the page scannable while providing full depth"
+          ],
+          "mustChange": [
+            "Empty state must display gracefully when spec.md is missing"
+          ],
+          "risks": [
+            "Very long specs could make the expanded section dominate the page — needs max-height with overflow"
+          ]
+        },
+        {
+          "reviewer": {
+            "agentId": "judge-gpt-visitor",
+            "displayName": "GPT (Visitor)",
+            "modelFamily": "gpt",
+            "lens": "visitor"
+          },
+          "overallScore": 8.8,
+          "dimensionScores": {
+            "compoundingValue": 9.2,
+            "usefulnessClarity": 9.0,
+            "feasibility": 9.5,
+            "legibility": 8.5,
+            "noveltySurprise": 7.5,
+            "continuity": 9.0,
+            "shareability": 8.2
+          },
+          "keep": [
+            "Completes the decision trail — visitors can now see the full chain from scoring to planning to execution",
+            "Uses existing renderMarkdown so formatting is consistent with build summary and review"
+          ],
+          "mustChange": [
+            "Summary text should clearly indicate what's inside the collapsible"
+          ],
+          "risks": [
+            "Markdown tables may not render perfectly — but degrade gracefully to readable text"
+          ]
+        },
+        {
+          "reviewer": {
+            "agentId": "judge-gemini-explorer",
+            "displayName": "Gemini (Explorer)",
+            "modelFamily": "gemini",
+            "lens": "explorer"
+          },
+          "overallScore": 8.7,
+          "dimensionScores": {
+            "compoundingValue": 9.5,
+            "usefulnessClarity": 9.0,
+            "feasibility": 9.5,
+            "legibility": 9.0,
+            "noveltySurprise": 7.5,
+            "continuity": 9.0,
+            "shareability": 8.5
+          },
+          "keep": [
+            "Zero new data sources — leverages artifacts.spec already returned by loadDay()",
+            "Step renumbering keeps the decision trail consistent and ordered"
+          ],
+          "mustChange": [
+            "CSS overflow handling for very long spec documents"
+          ],
+          "risks": [
+            "If spec format changes dramatically, renderMarkdown output could look inconsistent"
+          ]
+        }
+      ],
+      "keep": [
+        "Compounding feature — every future day's spec surfaces automatically",
+        "Collapsible by default keeps pages scannable",
+        "Zero new data sources or API calls"
+      ],
+      "mustChange": [
+        "Graceful empty state when spec.md is missing",
+        "Max-height with overflow for very long specs"
+      ],
+      "risks": [
+        "Markdown tables degrade to flowing text (accepted trade-off)",
+        "Long specs could dominate page if overflow not handled"
+      ],
+      "feedbackReferences": [
+        "Visitors wanted to see the full decision trail without downloading raw files",
+        "The gap between feedback and build sections felt like a missing step"
+      ]
+    },
+    {
+      "id": "candidate-2",
+      "title": "Spec Diff Viewer",
+      "summary": "Show a side-by-side diff comparing the spec to the actual build summary, highlighting what was planned vs. what was actually built.",
+      "averageScore": 7.0,
+      "reviewCount": 3,
+      "dimensionAverages": {
+        "compoundingValue": {
+          "label": "Compounding Value",
+          "average": 7.5,
+          "reviewCount": 3
+        },
+        "usefulnessClarity": {
+          "label": "Usefulness & Clarity",
+          "average": 7.0,
+          "reviewCount": 3
+        },
+        "feasibility": {
+          "label": "Feasibility",
+          "average": 5.0,
+          "reviewCount": 3
+        },
+        "legibility": {
+          "label": "Legibility",
+          "average": 7.5,
+          "reviewCount": 3
+        },
+        "noveltySurprise": {
+          "label": "Novelty & Surprise",
+          "average": 8.5,
+          "reviewCount": 3
+        },
+        "continuity": {
+          "label": "Continuity",
+          "average": 7.0,
+          "reviewCount": 3
+        },
+        "shareability": {
+          "label": "Shareability",
+          "average": 6.5,
+          "reviewCount": 3
+        }
+      },
+      "keep": [
+        "Novel transparency angle — showing plan vs. execution",
+        "High shareability if done well"
+      ],
+      "mustChange": [
+        "Diff computation is complex — needs a markdown diff library or custom implementation"
+      ],
+      "risks": [
+        "Spec and build summary are fundamentally different documents — diff would be noisy",
+        "Too complex for one cycle"
+      ],
+      "feedbackReferences": []
+    },
+    {
+      "id": "candidate-3",
+      "title": "Spec Download Button",
+      "summary": "Add a simple download button for spec.md in the artifacts section, with a preview tooltip showing the first few lines.",
+      "averageScore": 5.5,
+      "reviewCount": 3,
+      "dimensionAverages": {
+        "compoundingValue": {
+          "label": "Compounding Value",
+          "average": 5.0,
+          "reviewCount": 3
+        },
+        "usefulnessClarity": {
+          "label": "Usefulness & Clarity",
+          "average": 6.0,
+          "reviewCount": 3
+        },
+        "feasibility": {
+          "label": "Feasibility",
+          "average": 8.0,
+          "reviewCount": 3
+        },
+        "legibility": {
+          "label": "Legibility",
+          "average": 5.0,
+          "reviewCount": 3
+        },
+        "noveltySurprise": {
+          "label": "Novelty & Surprise",
+          "average": 4.0,
+          "reviewCount": 3
+        },
+        "continuity": {
+          "label": "Continuity",
+          "average": 5.5,
+          "reviewCount": 3
+        },
+        "shareability": {
+          "label": "Shareability",
+          "average": 5.0,
+          "reviewCount": 3
+        }
+      },
+      "keep": [
+        "Very simple to implement"
+      ],
+      "mustChange": [
+        "Downloads break the inline reading flow — defeats the transparency goal"
+      ],
+      "risks": [
+        "Low compounding value — doesn't improve the reading experience",
+        "Artifact links already exist in the Raw Data section"
+      ],
+      "feedbackReferences": []
+    }
+  ],
+  "winner": {
+    "candidateId": "candidate-1",
+    "title": "Inline Spec Viewer on Day Detail Page",
+    "summary": "A new collapsible section on the day detail page renders the technical specification inline, completing the decision trail from scoring through planning to execution.",
+    "averageScore": 8.9
+  },
+  "rationale": "The inline spec viewer scored highest because it completes the transparency trail with zero new data sources — the spec is already loaded by loadDay() but was invisible in the UI. Wrapping it in a collapsible details/summary element keeps pages scannable while giving curious visitors full depth. Every future day's spec renders automatically, maximizing compounding value. The diff viewer was too complex for one cycle, and the download button added no reading experience value over the existing artifact links.",
+  "featureType": "content",
+  "tags": [
+    "day-detail",
+    "spec",
+    "transparency",
+    "collapsible",
+    "markdown"
+  ],
+  "feedbackInfluence": [
+    {
+      "summary": "Visitors wanted the full decision trail visible inline without downloading raw artifact files.",
+      "impact": "high"
+    },
+    {
+      "summary": "The gap between the feedback section and build summary section felt like a missing planning step.",
+      "impact": "medium"
+    }
+  ],
+  "artifacts": {
+    "spec": "spec.md",
+    "build-summary": "build-summary.md",
+    "review": "review.md",
+    "test-results": "test-results.json",
+    "feedback-digest": "feedback-digest.json"
+  }
+}

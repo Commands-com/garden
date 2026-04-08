@@ -120,11 +120,25 @@
       </div>
     </section>
 
-    <!-- 6. What changed in the product -->
-    <section class="section" id="build-section">
+    <!-- 6. Technical Specification -->
+    <section class="section" id="spec-section">
       <div class="container">
         <div class="section__header">
           <span class="section__label">Step 6</span>
+          <h2 class="section__title">Technical Specification</h2>
+          <p class="section__subtitle">The spec that guided today's implementation.</p>
+        </div>
+        <div id="spec-container">
+          <div class="skeleton skeleton--card"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 7. What changed in the product -->
+    <section class="section" id="build-section">
+      <div class="container">
+        <div class="section__header">
+          <span class="section__label">Step 7</span>
           <h2 class="section__title">What changed in the product</h2>
         </div>
         <div id="build-summary-container" class="card">
@@ -136,11 +150,11 @@
       </div>
     </section>
 
-    <!-- 7. Review findings -->
+    <!-- 8. Review findings -->
     <section class="section" id="review-section">
       <div class="container">
         <div class="section__header">
-          <span class="section__label">Step 7</span>
+          <span class="section__label">Step 8</span>
           <h2 class="section__title">Review findings</h2>
         </div>
         <div id="review-container" class="card">
@@ -151,11 +165,11 @@
       </div>
     </section>
 
-    <!-- 8. Test results -->
+    <!-- 9. Test results -->
     <section class="section" id="tests-section">
       <div class="container">
         <div class="section__header">
-          <span class="section__label">Step 8</span>
+          <span class="section__label">Step 9</span>
           <h2 class="section__title">Test results</h2>
         </div>
         <div id="test-results-container">
@@ -164,7 +178,7 @@
       </div>
     </section>
 
-    <!-- 8. Artifacts -->
+    <!-- Artifacts -->
     <section class="section" id="artifacts-section">
       <div class="container">
         <div class="section__header">
@@ -295,6 +309,19 @@
 
         renderSection('feedback-digest-container', () => {
           return renderFeedbackDigest(artifacts.feedbackDigest);
+        });
+
+        renderSection('spec-container', () => {
+          if (artifacts.spec) {
+            const details = el('details', { className: 'spec-collapsible' });
+            const summary = el('summary', { className: 'spec-collapsible__toggle' }, 'View full specification');
+            details.appendChild(summary);
+            const content = el('div', { className: 'spec-collapsible__content' });
+            content.appendChild(renderMarkdown(artifacts.spec));
+            details.appendChild(content);
+            return details;
+          }
+          return emptyNote('No technical specification available for this day.');
         });
 
         renderSection('build-summary-container', () => {
