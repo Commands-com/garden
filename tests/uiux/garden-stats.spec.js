@@ -24,7 +24,9 @@ const sortedDays = [...manifest.days].sort(
 const expectedGrowingSince = new Date(
   `${sortedDays[0].date}T12:00:00`
 ).toLocaleDateString("en-US", {
-  month: "short",
+  weekday: "long",
+  year: "numeric",
+  month: "long",
   day: "numeric",
 });
 
@@ -90,7 +92,7 @@ test.describe("Garden Stats section", () => {
 
     expect(values[0].trim()).toMatch(/^[1-9]\d*$/);
     expect(values[1].trim()).toMatch(/^\d+$/);
-    expect(values[2].trim()).toMatch(/^[A-Z][a-z]+ \d{1,2}$/);
+    expect(values[2].trim()).toMatch(/^[A-Z][a-z]+, [A-Z][a-z]+ \d{1,2}, \d{4}$/);
   });
 
   test("uses semantic markup and accessible labeling", async ({ page }) => {
@@ -110,8 +112,8 @@ test.describe("Garden Stats section", () => {
 
     const labels = await list.locator("dt").allTextContents();
     expect(labels.map((label) => label.trim())).toEqual([
-      "Day",
-      "Shipped",
+      "Pipeline Runs",
+      "Features Shipped",
       "Growing Since",
     ]);
   });

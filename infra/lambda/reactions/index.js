@@ -91,6 +91,10 @@ async function handlePost(event) {
     errors.push(`reaction must be one of: ${VALID_REACTIONS.join(", ")}`);
   }
 
+  if (body.action !== undefined && body.action !== "add" && body.action !== "remove") {
+    errors.push('action must be "add" or "remove"');
+  }
+
   if (errors.length > 0) {
     console.log(JSON.stringify({ message: "Validation failed", errors }));
     return response(400, { error: "Validation failed", details: errors });
@@ -111,16 +115,36 @@ async function handlePost(event) {
 
   try {
     const now = new Date().toISOString();
+    const isRemove = body.action === "remove";
+    const increment = isRemove ? -1 : 1;
 
-    await ddb.send(
-      new UpdateCommand({
-        TableName: TABLE_NAME,
-        Key: { dayDate: body.dayDate, reaction: body.reaction },
-        UpdateExpression: "ADD #cnt :inc SET lastUpdated = :now",
-        ExpressionAttributeNames: { "#cnt": "count" },
-        ExpressionAttributeValues: { ":inc": 1, ":now": now },
-      })
-    );
+    const updateParams = {
+      TableName: TABLE_NAME,
+      Key: { dayDate: body.dayDate, reaction: body.reaction },
+      UpdateExpression: "ADD #cnt :inc SET lastUpdated = :now",
+      ExpressionAttributeNames: { "#cnt": "count" },
+      ExpressionAttributeValues: { ":inc": increment, ":now": now },
+    };
+
+    // When removing, ensure count doesn't go below 0
+    if (isRemove) {
+      updateParams.ConditionExpression = "attribute_exists(#cnt) AND #cnt > :zero";
+      updateParams.ExpressionAttributeValues[":zero"] = 0;
+    }
+
+    try {
+      await ddb.send(new UpdateCommand(updateParams));
+    } catch (err) {
+      if (err.name === "ConditionalCheckFailedException") {
+        // Count is already 0, nothing to remove
+        return response(200, {
+          dayDate: body.dayDate,
+          reaction: body.reaction,
+          message: "Reaction already at zero",
+        });
+      }
+      throw err;
+    }
 
     console.log(JSON.stringify({ message: "Reaction recorded", dayDate: body.dayDate, reaction: body.reaction }));
 

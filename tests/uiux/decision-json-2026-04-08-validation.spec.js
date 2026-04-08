@@ -11,7 +11,7 @@ const {
 
 const DAY_DATE = "2026-04-08";
 const EXPECTED_WINNER_ID = "candidate-1";
-const EXPECTED_WINNER_TITLE = "Inline Spec Viewer on Day Detail Page";
+const EXPECTED_WINNER_TITLE = "Inline Spec Viewer on Day Detail Pages";
 
 const decisionPath = path.join(
   repoRoot,

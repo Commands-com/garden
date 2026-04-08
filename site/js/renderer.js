@@ -663,11 +663,16 @@ function renderTestResults(data) {
 
   const container = el('div');
 
-  // Summary bar — support both nested (data.summary.passed) and flat (data.passed) schemas
-  const summary = data.summary || {};
-  const passed = summary.passed ?? data.passed ?? 0;
-  const failed = summary.failed ?? data.failed ?? 0;
-  const total = summary.totalScenarios ?? data.total ?? (passed + failed);
+  // Summary bar — support nested object (data.summary.passed), flat (data.passed),
+  // or derive from scenarios array
+  const summary = (typeof data.summary === 'object' && data.summary) ? data.summary : {};
+  const scenarios = Array.isArray(data.scenarios) ? data.scenarios : [];
+  const scenarioPassed = scenarios.filter(s => s.status === 'pass' || s.status === 'passed').length;
+  const scenarioTotal = scenarios.length;
+
+  const passed = summary.passed ?? data.passed ?? scenarioPassed;
+  const failed = summary.failed ?? data.failed ?? (scenarioTotal - scenarioPassed);
+  const total = summary.totalScenarios ?? data.total ?? ((passed + failed) || scenarioTotal);
   const passRate = summary.passRate ?? data.passRate ?? null;
 
   const summaryBar = el('div', {
@@ -841,6 +846,7 @@ async function handleReaction(btn, reactionKey, dayDate) {
       body: JSON.stringify({
         dayDate,
         reaction: reactionKey,
+        action: isActive ? 'remove' : 'add',
       }),
     });
   } catch {
@@ -892,7 +898,7 @@ function renderGardenStats(manifest) {
   const sorted = [...manifest.days].sort(
     (a, b) => new Date(a.date) - new Date(b.date)
   );
-  const startDate = formatDateShort(sorted[0].date);
+  const startDate = formatDate(sorted[0].date);
 
   return el('section', {
     className: 'garden-stats',
@@ -901,11 +907,11 @@ function renderGardenStats(manifest) {
     el('h2', { id: 'garden-stats-heading' }, 'Garden Stats'),
     el('dl', { className: 'garden-stats__list' },
       el('div', { className: 'garden-stats__item' },
-        el('dt', {}, 'Day'),
+        el('dt', {}, 'Pipeline Runs'),
         el('dd', {}, String(dayCount))
       ),
       el('div', { className: 'garden-stats__item' },
-        el('dt', {}, 'Shipped'),
+        el('dt', {}, 'Features Shipped'),
         el('dd', {}, String(shippedCount))
       ),
       el('div', { className: 'garden-stats__item' },
