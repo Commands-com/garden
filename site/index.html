@@ -119,6 +119,12 @@
     </dl>
   </section>
 
+  <section id="garden-section" class="garden-viz-section" aria-labelledby="garden-viz-heading">
+    <div class="container">
+      <div class="garden-viz skeleton" aria-busy="true"></div>
+    </div>
+  </section>
+
   <main>
     <!-- Today's Change -->
     <section class="section" id="todays-change">
@@ -204,6 +210,7 @@
       renderTimeline,
       renderReactions,
       renderGardenStats,
+      renderGardenViz,
     } from '/js/renderer.js';
 
     initMobileNav();
@@ -224,12 +231,14 @@
             'Candidate proposals will appear here after the first pipeline run.'
           );
           hydrateGardenStats(result?.manifest);
+          hydrateGardenViz(result?.manifest);
           renderRecentTimeline(result?.manifest);
           return;
         }
 
         const { manifest, day, artifacts } = result;
         hydrateGardenStats(manifest);
+        hydrateGardenViz(manifest);
         const reactions = await getReactions(day.date);
 
         // Today's date
@@ -285,6 +294,7 @@
           'Something went wrong loading today\'s entry. Please try refreshing.'
         );
         hydrateGardenStats(null);
+        hydrateGardenViz(null);
       }
     }
 
@@ -297,6 +307,16 @@
         rendered.id = 'garden-stats';
       } else {
         gardenStatsEl.style.display = 'none';
+      }
+    }
+
+    function hydrateGardenViz(manifest) {
+      const gardenEl = renderGardenViz(manifest);
+      const skeleton = document.getElementById('garden-section');
+      if (gardenEl && skeleton) {
+        skeleton.replaceWith(gardenEl);
+      } else if (!gardenEl && skeleton) {
+        skeleton.remove();
       }
     }
 
