@@ -545,8 +545,19 @@ function generateCanonicalArtifacts(artifactDir, runDate, pipelineReport, gitBas
 
     // Merge: explore fields win for scoring/judge data, but preserve
     // implementation-authored fields like headline, summary, bluesky_post, etc.
+    // Use exploreFields as the base, then layer back implementation-authored
+    // fields that the explore payload doesn't have.
     const merged = existingDecision
-      ? { ...existingDecision, ...exploreFields }
+      ? { ...exploreFields, ...existingDecision, ...{
+          // These fields ALWAYS come from explore (authoritative scoring data)
+          judgePanel: exploreFields.judgePanel,
+          scoringDimensions: exploreFields.scoringDimensions,
+          candidates: exploreFields.candidates,
+          winner: exploreFields.winner,
+          rationale: exploreFields.rationale,
+          schemaVersion: exploreFields.schemaVersion,
+          generatedAt: exploreFields.generatedAt,
+        }}
       : exploreFields;
     fs.writeFileSync(decisionPath, JSON.stringify(merged, null, 2), 'utf8');
     if (existingDecision) {
