@@ -1009,8 +1009,9 @@
   display: flex;
   flex-direction: row;
   align-items: flex-end;
-  gap: var(--space-4);
-  min-height: 180px;
+  gap: var(--space-2);
+  min-height: var(--garden-min-h, 180px);
+  max-height: var(--garden-max-h, 280px);
   overflow-x: auto;
   padding: var(--space-4) var(--space-4) 28px;
   -webkit-overflow-scrolling: touch;
@@ -1040,7 +1041,8 @@
   text-decoration: none;
   transition: transform 0.2s ease;
   z-index: 1;
-  flex-shrink: 0;
+  flex: 1 1 auto;
+  min-width: 20px;
 }
 
 .garden-viz__plant:hover {
@@ -1079,7 +1081,7 @@
 .garden-viz__stem {
   width: 3px;
   height: var(--plant-height, 60px);
-  background: var(--color-deep-green);
+  background: var(--color-sage);
   flex-shrink: 0;
 }
 
@@ -1103,6 +1105,10 @@
     overflow-x: auto;
     -webkit-overflow-scrolling: touch;
     flex-wrap: nowrap;
+  }
+
+  .garden-viz__plant {
+    flex: 0 0 auto;
   }
 
   .garden-viz__label {

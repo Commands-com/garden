@@ -936,13 +936,14 @@ function renderGardenViz(manifest) {
     return null;
   }
 
-  // Seeded height variation from date string
+  // Seeded height variation from date string — 4 tiers per spec
   function plantHeight(dateStr) {
-    let hash = 0;
+    let sum = 0;
     for (let i = 0; i < dateStr.length; i++) {
-      hash = ((hash << 5) - hash + dateStr.charCodeAt(i)) | 0;
+      sum += dateStr.charCodeAt(i);
     }
-    return 50 + Math.abs(hash % 31); // 50–80px
+    const tiers = [60, 80, 100, 120];
+    return tiers[sum % 4];
   }
 
   const container = el('div', { className: 'garden-viz' });
@@ -951,10 +952,12 @@ function renderGardenViz(manifest) {
     const isNewest = index === shippedDays.length - 1;
     const height = plantHeight(day.date);
 
+    const label = (day.title || day.date) + ' — ' + formatDate(day.date);
     const plant = el('a', {
       className: 'garden-viz__plant' + (isNewest ? ' garden-viz__plant--newest' : ''),
       href: getDayUrl(day.date),
       title: day.title || day.date,
+      'aria-label': label,
     },
       el('div', { className: 'garden-viz__crown' }),
       el('div', {
@@ -974,12 +977,14 @@ function renderGardenViz(manifest) {
     className: 'garden-viz-section',
     'aria-labelledby': 'garden-viz-heading',
   },
-    el('div', { className: 'section__header' },
-      el('span', { className: 'section__label' }, 'The Garden'),
-      el('h2', { id: 'garden-viz-heading', className: 'section__title' }, 'Watch It Grow'),
-      el('p', { className: 'section__subtitle' }, 'Each plant represents a shipped feature.')
-    ),
-    container
+    el('div', { className: 'container' },
+      el('div', { className: 'section__header' },
+        el('span', { className: 'section__label' }, 'The Garden'),
+        el('h2', { id: 'garden-viz-heading', className: 'section__title' }, 'Watch It Grow'),
+        el('p', { className: 'section__subtitle' }, 'Each plant represents a shipped feature.')
+      ),
+      container
+    )
   );
 
   return section;

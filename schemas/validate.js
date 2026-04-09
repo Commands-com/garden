@@ -4,7 +4,8 @@
 
 const fs = require('fs');
 const path = require('path');
-const Ajv = require('ajv');
+const Ajv = require('ajv/dist/2020');
+const addFormats = require('ajv-formats');
 
 const SCHEMAS = {
   'decision.json': 'decision.schema.json',
@@ -14,6 +15,7 @@ const SCHEMAS = {
 
 const schemasDir = __dirname;
 const ajv = new Ajv({ allErrors: true });
+addFormats(ajv);
 
 // Load schemas
 const validators = {};
