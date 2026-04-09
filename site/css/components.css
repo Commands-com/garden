@@ -994,6 +994,122 @@
   }
 }
 
+/* ---------- Garden Visualization ---------- */
+.garden-viz-section {
+  padding: var(--space-8) 0;
+}
+
+.garden-viz-section .section__header {
+  text-align: center;
+  margin-bottom: var(--space-8);
+}
+
+.garden-viz {
+  position: relative;
+  display: flex;
+  flex-direction: row;
+  align-items: flex-end;
+  gap: var(--space-4);
+  min-height: 180px;
+  overflow-x: auto;
+  padding: var(--space-4) var(--space-4) 28px;
+  -webkit-overflow-scrolling: touch;
+}
+
+.garden-viz__ground {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 20px;
+  background: linear-gradient(
+    to bottom,
+    var(--color-sage) 0%,
+    var(--color-earth) 60%,
+    var(--color-earth-light) 100%
+  );
+  border-radius: 0 0 var(--radius-sm) var(--radius-sm);
+  z-index: 0;
+}
+
+.garden-viz__plant {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  cursor: pointer;
+  text-decoration: none;
+  transition: transform 0.2s ease;
+  z-index: 1;
+  flex-shrink: 0;
+}
+
+.garden-viz__plant:hover {
+  transform: translateY(-4px);
+}
+
+.garden-viz__crown {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: var(--color-sage);
+  flex-shrink: 0;
+}
+
+.garden-viz__plant:nth-child(3n+2) .garden-viz__crown {
+  width: 32px;
+  height: 32px;
+  background: var(--color-sage-light);
+}
+
+.garden-viz__plant:nth-child(5n+3) .garden-viz__crown {
+  width: 30px;
+  height: 34px;
+  border-radius: 50% 50% 45% 45%;
+  background: var(--color-deep-green);
+}
+
+.garden-viz__plant:nth-child(7n+4) .garden-viz__crown {
+  width: 36px;
+  height: 30px;
+  border-radius: 45% 45% 50% 50%;
+  background: var(--color-sage);
+  opacity: 0.85;
+}
+
+.garden-viz__stem {
+  width: 3px;
+  height: var(--plant-height, 60px);
+  background: var(--color-deep-green);
+  flex-shrink: 0;
+}
+
+.garden-viz__label {
+  font-size: var(--text-xs, 0.75rem);
+  color: var(--color-earth);
+  margin-top: var(--space-1);
+  white-space: nowrap;
+}
+
+.garden-viz__plant--newest {
+  filter: drop-shadow(0 0 6px var(--color-accent-gold));
+}
+
+.garden-viz__plant--newest .garden-viz__crown {
+  background: var(--color-accent-gold);
+}
+
+@media (max-width: 768px) {
+  .garden-viz {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    flex-wrap: nowrap;
+  }
+
+  .garden-viz__label {
+    display: none;
+  }
+}
+
 /* ---------- Skeleton Loading ---------- */
 .skeleton {
   background: linear-gradient(

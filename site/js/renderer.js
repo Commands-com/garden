@@ -922,6 +922,69 @@ function renderGardenStats(manifest) {
   );
 }
 
+// ---------- Garden Visualization Renderer ----------
+function renderGardenViz(manifest) {
+  if (!manifest || !manifest.days || manifest.days.length === 0) {
+    return null;
+  }
+
+  const shippedDays = manifest.days
+    .filter(d => d.status === 'shipped')
+    .sort((a, b) => new Date(a.date) - new Date(b.date));
+
+  if (shippedDays.length === 0) {
+    return null;
+  }
+
+  // Seeded height variation from date string
+  function plantHeight(dateStr) {
+    let hash = 0;
+    for (let i = 0; i < dateStr.length; i++) {
+      hash = ((hash << 5) - hash + dateStr.charCodeAt(i)) | 0;
+    }
+    return 50 + Math.abs(hash % 31); // 50–80px
+  }
+
+  const container = el('div', { className: 'garden-viz' });
+
+  shippedDays.forEach((day, index) => {
+    const isNewest = index === shippedDays.length - 1;
+    const height = plantHeight(day.date);
+
+    const plant = el('a', {
+      className: 'garden-viz__plant' + (isNewest ? ' garden-viz__plant--newest' : ''),
+      href: getDayUrl(day.date),
+      title: day.title || day.date,
+    },
+      el('div', { className: 'garden-viz__crown' }),
+      el('div', {
+        className: 'garden-viz__stem',
+        style: `--plant-height: ${height}px`,
+      }),
+      el('span', { className: 'garden-viz__label' }, formatDateShort(day.date))
+    );
+
+    container.appendChild(plant);
+  });
+
+  container.appendChild(el('div', { className: 'garden-viz__ground' }));
+
+  const section = el('section', {
+    id: 'garden-section',
+    className: 'garden-viz-section',
+    'aria-labelledby': 'garden-viz-heading',
+  },
+    el('div', { className: 'section__header' },
+      el('span', { className: 'section__label' }, 'The Garden'),
+      el('h2', { id: 'garden-viz-heading', className: 'section__title' }, 'Watch It Grow'),
+      el('p', { className: 'section__subtitle' }, 'Each plant represents a shipped feature.')
+    ),
+    container
+  );
+
+  return section;
+}
+
 // ---------- Exports ----------
 export {
   renderMarkdown,
@@ -937,4 +1000,5 @@ export {
   renderReactions,
   renderArtifactLinks,
   renderGardenStats,
+  renderGardenViz,
 };
