@@ -8,6 +8,7 @@ const {
   QueryCommand,
   ScanCommand,
   BatchGetCommand,
+  UpdateCommand,
 } = require('@aws-sdk/lib-dynamodb');
 const { collectBlueskyMetrics } = require('./bluesky-publisher');
 
@@ -381,7 +382,75 @@ async function aggregateFeedback(config, runDate) {
   fs.writeFileSync(digestPath, JSON.stringify(digest, null, 2), 'utf8');
   console.log(`[feedback-aggregator] Wrote ${digestPath}`);
 
-  return digest;
+  // Collect composite keys for every pending item queried (regardless of
+  // moderation status). The caller can mark these as processed after the
+  // pipeline run completes so they do not reappear in tomorrow's digest.
+  // FeedbackTable has a composite primary key: feedbackId (HASH) + createdAt (RANGE).
+  const feedbackKeys = allItems
+    .filter((item) => item.feedbackId && item.createdAt)
+    .map((item) => ({ feedbackId: item.feedbackId, createdAt: item.createdAt }));
+
+  return { digest, feedbackKeys };
 }
 
-module.exports = { aggregateFeedback };
+/**
+ * Mark feedback items as processed in DynamoDB so they are excluded from
+ * subsequent daily digests. Called after a successful pipeline run.
+ *
+ * The FeedbackTable uses a composite primary key (feedbackId HASH + createdAt
+ * RANGE), so callers must pass both parts. Items are updated one-by-one
+ * (DynamoDB does not offer a batch UpdateItem), but requests are fired
+ * concurrently in capped batches. Individual failures are logged and swallowed
+ * so one bad item cannot block the rest.
+ *
+ * @param {import('./config')} config
+ * @param {Array<{feedbackId: string, createdAt: string}>} feedbackKeys
+ * @param {string} runDate - YYYY-MM-DD stamp recorded on each item
+ * @returns {Promise<{updated: number, failed: number}>}
+ */
+async function markFeedbackProcessed(config, feedbackKeys, runDate) {
+  if (!Array.isArray(feedbackKeys) || feedbackKeys.length === 0) {
+    return { updated: 0, failed: 0 };
+  }
+
+  const docClient = buildDocClient(config);
+  const now = new Date().toISOString();
+  const concurrency = 10;
+  let updated = 0;
+  let failed = 0;
+
+  for (let i = 0; i < feedbackKeys.length; i += concurrency) {
+    const chunk = feedbackKeys.slice(i, i + concurrency);
+    const results = await Promise.allSettled(
+      chunk.map((key) =>
+        docClient.send(
+          new UpdateCommand({
+            TableName: config.dynamo.feedbackTable,
+            Key: { feedbackId: key.feedbackId, createdAt: key.createdAt },
+            UpdateExpression: 'SET #s = :processed, processedAt = :now, processedRunDate = :runDate',
+            ExpressionAttributeNames: { '#s': 'status' },
+            ExpressionAttributeValues: {
+              ':processed': 'processed',
+              ':now': now,
+              ':runDate': runDate,
+            },
+          })
+        )
+      )
+    );
+
+    for (const r of results) {
+      if (r.status === 'fulfilled') {
+        updated += 1;
+      } else {
+        failed += 1;
+        console.warn(`[feedback-aggregator] Failed to mark feedback processed: ${r.reason?.message || r.reason}`);
+      }
+    }
+  }
+
+  console.log(`[feedback-aggregator] Marked ${updated}/${feedbackKeys.length} feedback item(s) as processed${failed > 0 ? ` (${failed} failed)` : ''}`);
+  return { updated, failed };
+}
+
+module.exports = { aggregateFeedback, markFeedbackProcessed };

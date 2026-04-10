@@ -7,7 +7,7 @@ const os = require('os');
 const { spawn } = require('child_process');
 
 const config = require('./config');
-const { aggregateFeedback } = require('./feedback-aggregator');
+const { aggregateFeedback, markFeedbackProcessed } = require('./feedback-aggregator');
 const {
   publishArtifacts,
   publishFailedRun,
@@ -787,10 +787,12 @@ async function main() {
   // 2. Aggregate feedback from DynamoDB
   log('Aggregating feedback from cloud backend...');
   let feedbackDigestPath;
+  let aggregatedFeedbackKeys = [];
   try {
-    await aggregateFeedback(config, runDate);
+    const aggregateResult = await aggregateFeedback(config, runDate);
+    aggregatedFeedbackKeys = aggregateResult?.feedbackKeys || [];
     feedbackDigestPath = path.join(artifactDir, 'feedback-digest.json');
-    log(`Feedback digest written to ${feedbackDigestPath}`);
+    log(`Feedback digest written to ${feedbackDigestPath} (${aggregatedFeedbackKeys.length} pending item(s) captured)`);
   } catch (err) {
     logError(`Feedback aggregation failed: ${err.message}`);
     // Non-fatal — continue with an empty digest
@@ -1097,6 +1099,19 @@ async function main() {
       });
     } catch (err) {
       logError(`Run metadata update failed: ${err.message}`);
+    }
+
+    // Mark all feedback items that fed into this run as processed so they
+    // don't reappear in tomorrow's digest. Runs regardless of whether an
+    // individual suggestion was acted on — the user asked us to drain the
+    // queue on every successful run.
+    if (aggregatedFeedbackKeys.length > 0) {
+      log(`Marking ${aggregatedFeedbackKeys.length} feedback item(s) as processed...`);
+      try {
+        await markFeedbackProcessed(config, aggregatedFeedbackKeys, runDate);
+      } catch (err) {
+        logError(`Marking feedback as processed failed: ${err.message}`);
+      }
     }
 
     log('==========================================================');
