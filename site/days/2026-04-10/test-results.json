@@ -1,0 +1,64 @@
+{
+  "schemaVersion": 1,
+  "runDate": "2026-04-10",
+  "generatedAt": "2026-04-10T15:35:00.000Z",
+  "summary": {
+    "totalScenarios": 10,
+    "passed": 10,
+    "failed": 0,
+    "passRate": 100
+  },
+  "scenarios": [
+    {
+      "name": "Terminal section renders on the homepage when the latest decision has a winner",
+      "persona": "visitor",
+      "status": "pass"
+    },
+    {
+      "name": "Terminal section sits between the How It Works section and Garden Stats",
+      "persona": "visitor",
+      "status": "pass"
+    },
+    {
+      "name": "Terminal winner line matches decision.winner.title",
+      "persona": "visitor",
+      "status": "pass"
+    },
+    {
+      "name": "Candidate count in terminal output matches decision.candidates.length",
+      "persona": "visitor",
+      "status": "pass"
+    },
+    {
+      "name": "Feedback count line matches feedback-digest summary.totalItems when feedback exists",
+      "persona": "visitor",
+      "status": "pass"
+    },
+    {
+      "name": "Terminal title bar renders exactly three decorative dots",
+      "persona": "visitor",
+      "status": "pass"
+    },
+    {
+      "name": "Terminal body uses the mono font stack and highlights the winner line",
+      "persona": "screen-reader-user",
+      "status": "pass"
+    },
+    {
+      "name": "Section hides instead of rendering placeholder content when decision data is missing",
+      "persona": "visitor",
+      "status": "pass"
+    },
+    {
+      "name": "Long winner titles wrap on mobile without introducing horizontal page overflow",
+      "persona": "mobile-user",
+      "status": "pass"
+    },
+    {
+      "name": "decision.json validates against schema v2",
+      "persona": "developer",
+      "status": "pass"
+    }
+  ],
+  "testPersonas": ["visitor", "mobile-user", "screen-reader-user", "developer"]
+}

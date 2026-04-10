@@ -1,0 +1,161 @@
+{
+  "schemaVersion": 2,
+  "runDate": "2026-04-10",
+  "generatedAt": "2026-04-10T14:20:00.000Z",
+  "headline": "The homepage now shows the latest pipeline run as a retro terminal",
+  "summary": "Add a retro terminal-styled widget to the homepage that turns the latest published run into a compact explore, score, build, test, and ship narrative using existing artifacts.",
+  "scoringDimensions": [
+    { "id": "compoundingValue", "label": "Compounding Value" },
+    { "id": "usefulnessClarity", "label": "Usefulness & Clarity" },
+    { "id": "feasibility", "label": "Feasibility" },
+    { "id": "legibility", "label": "Legibility" },
+    { "id": "noveltySurprise", "label": "Novelty & Surprise" },
+    { "id": "continuity", "label": "Continuity" },
+    { "id": "shareability", "label": "Shareability" }
+  ],
+  "judgePanel": [
+    {
+      "agentId": "judge-claude-gardener",
+      "displayName": "Claude (Gardener)",
+      "modelFamily": "claude",
+      "provider": "anthropic",
+      "model": "claude-sonnet-4-20250514",
+      "lens": "gardener",
+      "conceptKey": "compounding-steward"
+    },
+    {
+      "agentId": "judge-gpt-visitor",
+      "displayName": "GPT (Visitor)",
+      "modelFamily": "gpt",
+      "provider": "openai",
+      "model": "gpt-4o-2024-08-06",
+      "lens": "visitor",
+      "conceptKey": "first-impression-advocate"
+    },
+    {
+      "agentId": "judge-gemini-explorer",
+      "displayName": "Gemini (Explorer)",
+      "modelFamily": "gemini",
+      "provider": "google",
+      "model": "gemini-2.0-flash",
+      "lens": "explorer",
+      "conceptKey": "novelty-scout"
+    }
+  ],
+  "candidates": [
+    {
+      "id": "candidate-1",
+      "title": "The homepage now shows the latest pipeline run as a retro terminal",
+      "summary": "Add a retro terminal-styled widget to the homepage that renders the latest published run as a curated command-line summary using existing decision, feedback, test, and manifest artifacts.",
+      "averageScore": 8.8,
+      "reviewCount": 3,
+      "dimensionAverages": {
+        "compoundingValue": { "label": "Compounding Value", "average": 8.8, "reviewCount": 3 },
+        "usefulnessClarity": { "label": "Usefulness & Clarity", "average": 9.1, "reviewCount": 3 },
+        "feasibility": { "label": "Feasibility", "average": 8.7, "reviewCount": 3 },
+        "legibility": { "label": "Legibility", "average": 9.2, "reviewCount": 3 },
+        "noveltySurprise": { "label": "Novelty & Surprise", "average": 8.4, "reviewCount": 3 },
+        "continuity": { "label": "Continuity", "average": 9.0, "reviewCount": 3 },
+        "shareability": { "label": "Shareability", "average": 8.6, "reviewCount": 3 }
+      },
+      "reviewerBreakdown": [],
+      "rank": 1,
+      "keep": [
+        "Makes the pipeline feel like something that actually ran, not just a set of static sections",
+        "Pays off the Command Garden name with visible command-line output",
+        "Reuses existing artifacts, so it adds no new backend or data-fetching cost"
+      ],
+      "mustChange": [
+        "Hide the section entirely when decision or winner data is missing",
+        "Normalize mixed historical test-results shapes so the widget works across shipped days"
+      ],
+      "risks": [
+        "A dark terminal treatment could clash with the lighter homepage palette if the styling is too stark"
+      ],
+      "feedbackReferences": [
+        "Visitors asked for an artistic command interface on the home screen",
+        "The homepage needed a clearer picture of what the latest pipeline run actually did"
+      ]
+    },
+    {
+      "id": "candidate-2",
+      "title": "Recent Run Diff Snapshot",
+      "summary": "Show a compact before-and-after diff summarizing what changed between the latest shipped day and the previous one.",
+      "averageScore": 7.2,
+      "reviewCount": 3,
+      "dimensionAverages": {
+        "compoundingValue": { "label": "Compounding Value", "average": 7.4, "reviewCount": 3 },
+        "usefulnessClarity": { "label": "Usefulness & Clarity", "average": 7.6, "reviewCount": 3 },
+        "feasibility": { "label": "Feasibility", "average": 6.8, "reviewCount": 3 },
+        "legibility": { "label": "Legibility", "average": 7.7, "reviewCount": 3 },
+        "noveltySurprise": { "label": "Novelty & Surprise", "average": 7.3, "reviewCount": 3 },
+        "continuity": { "label": "Continuity", "average": 7.5, "reviewCount": 3 },
+        "shareability": { "label": "Shareability", "average": 6.4, "reviewCount": 3 }
+      },
+      "reviewerBreakdown": [],
+      "rank": 2,
+      "keep": [
+        "Makes daily progress easier to compare at a glance"
+      ],
+      "mustChange": [
+        "Needs a clear comparison model for artifacts that do not exist on both days"
+      ],
+      "risks": [
+        "Can read as an internal changelog instead of a user-facing homepage feature"
+      ],
+      "feedbackReferences": []
+    },
+    {
+      "id": "candidate-3",
+      "title": "Archive Filter Chips by Feature Type",
+      "summary": "Add filter chips to the archive so visitors can browse UI, content, and infrastructure days separately.",
+      "averageScore": 6.6,
+      "reviewCount": 3,
+      "dimensionAverages": {
+        "compoundingValue": { "label": "Compounding Value", "average": 6.9, "reviewCount": 3 },
+        "usefulnessClarity": { "label": "Usefulness & Clarity", "average": 7.0, "reviewCount": 3 },
+        "feasibility": { "label": "Feasibility", "average": 6.5, "reviewCount": 3 },
+        "legibility": { "label": "Legibility", "average": 7.2, "reviewCount": 3 },
+        "noveltySurprise": { "label": "Novelty & Surprise", "average": 5.9, "reviewCount": 3 },
+        "continuity": { "label": "Continuity", "average": 6.8, "reviewCount": 3 },
+        "shareability": { "label": "Shareability", "average": 5.8, "reviewCount": 3 }
+      },
+      "reviewerBreakdown": [],
+      "rank": 3,
+      "keep": [
+        "Would improve archive browsing once there are more shipped days"
+      ],
+      "mustChange": [
+        "Needs consistent tags across older manifest entries before it becomes reliable"
+      ],
+      "risks": [
+        "Solves a problem the site does not quite have yet with only a few shipped days"
+      ],
+      "feedbackReferences": []
+    }
+  ],
+  "winner": {
+    "candidateId": "candidate-1",
+    "title": "The homepage now shows the latest pipeline run as a retro terminal",
+    "summary": "Add a retro terminal-styled widget to the homepage that turns the latest published run into a compact explore, score, build, test, and ship narrative using existing artifacts.",
+    "averageScore": 8.8
+  },
+  "rationale": "The terminal widget won because it makes the pipeline feel active without adding any new backend cost. It strengthens the Command Garden brand, turns existing artifacts into a legible narrative, and creates a screenshot-friendly focal point for the homepage while staying safely inside a single implementation cycle.",
+  "featureType": "interaction",
+  "tags": ["homepage", "terminal", "pipeline", "branding", "artifact-driven"],
+  "feedbackInfluence": [
+    {
+      "summary": "Homepage feedback asked for an artistic command interface instead of only cards and prose.",
+      "impact": "high"
+    },
+    {
+      "summary": "Visitors wanted the latest run to feel visible as a process, not just a completed outcome.",
+      "impact": "high"
+    }
+  ],
+  "artifacts": {
+    "spec": "spec.md",
+    "testResults": "test-results.json",
+    "feedbackDigest": "feedback-digest.json"
+  }
+}

@@ -2,6 +2,12 @@
   "schemaVersion": 1,
   "days": [
     {
+      "date": "2026-04-10",
+      "title": "The homepage now shows the latest pipeline run as a retro terminal",
+      "summary": "Add a retro terminal-styled widget to the homepage that turns the latest published run into a compact explore, score, build, test, and ship narrative using existing artifacts.",
+      "status": "shipped"
+    },
+    {
       "date": "2026-04-09",
       "title": "The homepage now grows a visual garden of shipped features",
       "summary": "The homepage now shows a visual garden where each shipped feature appears as a small plant. The garden fills in automatically over time, giving visitors a fun, at-a-glance picture of how much the site has grown.",
