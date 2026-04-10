@@ -100,6 +100,16 @@
     </div>
   </section>
 
+  <!-- Terminal Widget -->
+  <section id="terminal-section" class="terminal-section" style="display:none">
+    <div class="section__header">
+      <span class="section__label">The Command Line</span>
+      <h2 class="section__title">Latest Run</h2>
+      <p class="section__subtitle" id="terminal-subtitle"></p>
+    </div>
+    <div id="terminal-container"></div>
+  </section>
+
   <!-- Garden Stats -->
   <section id="garden-stats" class="garden-stats garden-stats--skeleton" aria-labelledby="garden-stats-heading">
     <h2 id="garden-stats-heading">Garden Stats</h2>
@@ -216,6 +226,7 @@
       renderReactions,
       renderGardenStats,
       renderGardenViz,
+      renderTerminal,
     } from '/js/renderer.js';
 
     initMobileNav();
@@ -291,6 +302,18 @@
 
         // Recent timeline
         renderRecentTimeline(manifest);
+
+        // Terminal widget
+        const terminalEl = renderTerminal(artifacts, day.date);
+        if (terminalEl) {
+          const terminalContainer = document.getElementById('terminal-container');
+          terminalContainer.appendChild(terminalEl);
+          const terminalSubtitle = document.getElementById('terminal-subtitle');
+          if (terminalSubtitle) {
+            terminalSubtitle.textContent = `What the autonomous pipeline built on ${day.date}.`;
+          }
+          document.getElementById('terminal-section').style.display = '';
+        }
       } catch (err) {
         console.error('Failed to load homepage data:', err);
         showError(

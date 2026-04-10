@@ -990,6 +990,73 @@ function renderGardenViz(manifest) {
   return section;
 }
 
+// ---------- Terminal Renderer ----------
+function renderTerminal(artifacts, dayDate) {
+  if (!artifacts.decision || !artifacts.decision.winner) {
+    return null;
+  }
+
+  const winner = artifacts.decision.winner;
+  const candidateCount = artifacts.decision.candidates
+    ? artifacts.decision.candidates.length
+    : 0;
+
+  // Feedback count
+  const feedbackTotal = artifacts.feedbackDigest?.summary?.totalItems;
+  const feedbackText = feedbackTotal != null
+    ? `Scanning feedback… ${feedbackTotal} items`
+    : 'Scanning feedback… no prior feedback';
+
+  // Title bar
+  const titlebar = el('div', { className: 'terminal__titlebar' },
+    el('div', { className: 'terminal__dot' }),
+    el('div', { className: 'terminal__dot' }),
+    el('div', { className: 'terminal__dot' }),
+    el('span', { className: 'terminal__title' }, `command-garden — ${dayDate}`)
+  );
+
+  // Body lines
+  const lines = [
+    // explore
+    el('div', { className: 'terminal__line' },
+      el('span', { className: 'terminal__prompt' }, '$ garden explore'),
+      document.createTextNode('\n'),
+      el('span', { className: 'terminal__output' }, feedbackText)
+    ),
+    // scout
+    el('div', { className: 'terminal__line' },
+      el('span', { className: 'terminal__prompt' }, '$ garden scout'),
+      document.createTextNode('\n'),
+      el('span', { className: 'terminal__output' }, `Found ${candidateCount} candidates`)
+    ),
+    // spec
+    el('div', { className: 'terminal__line' },
+      el('span', { className: 'terminal__prompt' }, '$ garden spec'),
+      document.createTextNode('\n'),
+      el('span', { className: 'terminal__output' }, `Spec written: ${winner.title}`)
+    ),
+    // implement
+    el('div', { className: 'terminal__line' },
+      el('span', { className: 'terminal__prompt' }, '$ garden implement'),
+      document.createTextNode('\n'),
+      el('span', { className: 'terminal__output' }, `Building ${winner.title}…`)
+    ),
+    // review
+    el('div', { className: 'terminal__line' },
+      el('span', { className: 'terminal__prompt' }, '$ garden review'),
+      document.createTextNode('\n'),
+      el('span', { className: 'terminal__highlight' },
+        `✓ Shipped: ${winner.title} (score: ${winner.averageScore})`)
+    ),
+  ];
+
+  const body = el('div', { className: 'terminal__body' });
+  lines.forEach(line => body.appendChild(line));
+
+  const terminal = el('div', { className: 'terminal' }, titlebar, body);
+  return terminal;
+}
+
 // ---------- Exports ----------
 export {
   renderMarkdown,
@@ -1006,4 +1073,5 @@ export {
   renderArtifactLinks,
   renderGardenStats,
   renderGardenViz,
+  renderTerminal,
 };
