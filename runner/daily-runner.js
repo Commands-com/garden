@@ -479,7 +479,19 @@ async function fetchPipelineReport(roomId) {
  * @param {Object|null} pipelineReport - Parsed report data from fetchPipelineReport()
  * @param {string|null} gitBaselineSha - The git SHA captured before the pipeline started
  */
-function generateCanonicalArtifacts(artifactDir, runDate, pipelineReport, gitBaselineSha) {
+async function fetchChildRoomReport(childRoomId) {
+  if (!childRoomId) return null;
+  const cli = config.runner.commandsCliPath;
+  try {
+    const result = await spawnAsync(cli, ['pipeline', 'report', childRoomId, '--json']);
+    if (result.code !== 0) return null;
+    return JSON.parse(result.stdout.trim());
+  } catch {
+    return null;
+  }
+}
+
+async function generateCanonicalArtifacts(artifactDir, runDate, pipelineReport, gitBaselineSha) {
   // Extract per-stage handoff payloads from the pipeline report
   const handoffs = {};
   const reportPayload = pipelineReport?.reportPayload || pipelineReport;
@@ -490,6 +502,37 @@ function generateCanonicalArtifacts(artifactDir, runDate, pipelineReport, gitBas
     const payloadArr = stage.handoffPayloads || [];
     if (payloadArr.length > 0) {
       handoffs[stage.stageId] = payloadArr[0].data || payloadArr[0];
+    }
+  }
+
+  // The control room's relayed handoff for the explore stage often drops
+  // judgePanel/candidates/decision. Fetch the explore room's own report
+  // directly to get the complete data.
+  const exploreStage = stages.find((s) => s.stageId === 'explore');
+  if (exploreStage?.childRoomId && (!handoffs.explore?.judgePanel?.length || !handoffs.explore?.candidates?.length)) {
+    log('Fetching explore room report directly for complete handoff data...');
+    const exploreReport = await fetchChildRoomReport(exploreStage.childRoomId);
+    if (exploreReport) {
+      const erPayload = exploreReport?.reportPayload || exploreReport;
+      const erReport = erPayload?.report || {};
+      // Check both top-level handoffPayloads and pipelineReport.stages path
+      let erHandoffs = erReport.handoffPayloads || [];
+      if (erHandoffs.length === 0) {
+        const erStages = erReport.pipelineReport?.stages || [];
+        for (const s of erStages) {
+          if (s.handoffPayloads?.length > 0) {
+            erHandoffs = s.handoffPayloads;
+            break;
+          }
+        }
+      }
+      if (erHandoffs.length > 0) {
+        const bundle = erHandoffs[0].data || erHandoffs[0];
+        if (bundle.judgePanel?.length > 0 || bundle.candidates?.length > 0) {
+          log(`Explore room report has ${bundle.judgePanel?.length || 0} judges, ${bundle.candidates?.length || 0} candidates`);
+          handoffs.explore = bundle;
+        }
+      }
     }
   }
 
@@ -882,7 +925,7 @@ async function main() {
     }
     log('Generating canonical artifacts...');
     try {
-      generateCanonicalArtifacts(artifactDir, runDate, report, gitBaselineSha);
+      await generateCanonicalArtifacts(artifactDir, runDate, report, gitBaselineSha);
     } catch (err) {
       logError(`Canonical artifact generation failed: ${err.message}`);
     }
