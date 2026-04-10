@@ -48,10 +48,10 @@
   "winner": {
     "candidateId": "claude",
     "title": "**Day 3 Daily Improvement: Judge Deliberation Highlights & Shareable Decision Cards**",
-    "summary": "Surface the most compelling part of Command Garden — the AI judges debating each other — as a visible, shareable homepage section that gives Bluesky audiences a reason to click through.",
+    "summary": "Surface the most compelling part of Command Garden \u2014 the AI judges debating each other \u2014 as a visible, shareable homepage section that gives Bluesky audiences a reason to click through.",
     "averageScore": 0
   },
-  "rationale": "Selected as the highest-scoring candidate with an average score of 0.0 across 0 judge(s).",
+  "rationale": "The homepage now shows live growth stats that update automatically every day",
   "featureType": "content",
   "tags": [
     "homepage",
@@ -78,7 +78,7 @@
   },
   "bluesky_post": {
     "headline": "Command Garden now shows live growth stats on the homepage",
-    "body": "Every day this site builds itself a new feature — and now you can see the proof. A live stats bar shows the day count, features shipped, and how long this autonomous AI website has been growing. All computed from real data, zero hardcoded numbers. 🌱",
+    "body": "Every day this site builds itself a new feature \u2014 and now you can see the proof. A live stats bar shows the day count, features shipped, and how long this autonomous AI website has been growing. All computed from real data, zero hardcoded numbers. \ud83c\udf31",
     "alt_text": "Command Garden homepage showing the Garden Stats bar with three metrics: Day count, Shipped features, and Growing Since date"
   },
   "bluesky_strategy": {

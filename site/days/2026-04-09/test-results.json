@@ -1,0 +1,23 @@
+{
+  "schemaVersion": 1,
+  "runDate": "2026-04-09",
+  "generatedAt": "2026-04-09T11:15:00.000Z",
+  "summary": {
+    "totalScenarios": 10,
+    "passed": 10,
+    "failed": 0,
+    "passRate": 100
+  },
+  "scenarios": [
+    { "name": "Garden section renders with correct number of plants matching shipped days", "persona": "visitor", "status": "pass" },
+    { "name": "Each plant links to the correct day detail page", "persona": "visitor", "status": "pass" },
+    { "name": "Newest plant has accent gold glow via --newest modifier", "persona": "visitor", "status": "pass" },
+    { "name": "Plants have aria-label in Title-Date format for screen readers", "persona": "screen-reader-user", "status": "pass" },
+    { "name": "Plant title attribute matches manifest title or raw date fallback", "persona": "visitor", "status": "pass" },
+    { "name": "Garden section is removed from DOM when no shipped days exist", "persona": "visitor", "status": "pass" },
+    { "name": "Plants use 4-tier deterministic height (60/80/100/120px)", "persona": "visitor", "status": "pass" },
+    { "name": "Container wrapper constrains garden to page width", "persona": "visitor", "status": "pass" },
+    { "name": "Mobile plants do not shrink and garden overflows horizontally", "persona": "mobile-user", "status": "pass" },
+    { "name": "decision.json validates against schema v2", "persona": "developer", "status": "pass" }
+  ]
+}
