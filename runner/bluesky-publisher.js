@@ -776,17 +776,12 @@ async function executeOutreach(config, runDate, artifactDir) {
         // Follow accounts that seem genuinely interested in our topics
         // Capped separately at MAX_DAILY_FOLLOWS to prevent aggressive churn
         // Skip accounts we've already followed before
-        const followerCount = post.author?.followersCount || 0;
-        const followingCount = post.author?.followsCount || 0;
         const authorDid = post.author?.did;
         if (
           followCount < MAX_DAILY_FOLLOWS &&
           authorDid &&
           !followLog[authorDid] &&
-          followerCount >= 10 &&
-          followerCount < 100000 &&
-          followingCount > 0 &&
-          followingCount < 5000
+          postText.length >= 30
         ) {
           try {
             await followAccount(session, authorDid);
