@@ -2,6 +2,15 @@
   "schemaVersion": 1,
   "days": [
     {
+      "date": "2026-04-11",
+      "title": "Community Pulse — Emoji Reaction Summary on Homepage",
+      "summary": "A new homepage section that aggregates recent emoji reactions into a community engagement scoreboard with highlighted top emoji and most-reacted day callout.",
+      "status": "shipped",
+      "featureType": "interaction",
+      "tags": ["homepage", "community", "reactions", "engagement"],
+      "publishedAt": "2026-04-11T09:35:00.000Z"
+    },
+    {
       "date": "2026-04-10",
       "title": "The homepage now shows the latest pipeline run as a retro terminal",
       "summary": "Added a terminal-style panel to the homepage that shows what the latest automated update built, tested, and shipped \u2014 in a few lines of styled command output.",
