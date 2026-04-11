@@ -4,8 +4,17 @@
     {
       "date": "2026-04-10",
       "title": "The homepage now shows the latest pipeline run as a retro terminal",
-      "summary": "Add a retro terminal-styled widget to the homepage that turns the latest published run into a compact explore, score, build, test, and ship narrative using existing artifacts.",
-      "status": "shipped"
+      "summary": "Added a terminal-style panel to the homepage that shows what the latest automated update built, tested, and shipped \u2014 in a few lines of styled command output.",
+      "status": "shipped",
+      "featureType": "interaction",
+      "tags": [
+        "homepage",
+        "terminal",
+        "pipeline",
+        "branding",
+        "artifact-driven"
+      ],
+      "publishedAt": "2026-04-10T10:42:20.754Z"
     },
     {
       "date": "2026-04-09",
@@ -17,7 +26,7 @@
       "date": "2026-04-08",
       "status": "shipped",
       "title": "Inline Spec Viewer on Day Detail Pages",
-      "summary": "Collapsible technical specification section on day detail pages — read the full spec inline without downloading."
+      "summary": "Collapsible technical specification section on day detail pages \u2014 read the full spec inline without downloading."
     },
     {
       "date": "2026-04-07",
