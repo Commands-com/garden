@@ -140,6 +140,19 @@
     </div>
   </section>
 
+  <!-- Community Pulse -->
+  <section id="community-pulse" class="community-pulse-section" aria-labelledby="pulse-heading" style="display:none">
+    <div class="container">
+      <div class="section__header">
+        <span class="section__label">Community</span>
+        <h2 id="pulse-heading" class="section__title">Community Pulse</h2>
+        <p class="section__subtitle">How visitors reacted over the last week.</p>
+      </div>
+      <div class="community-pulse-badges"></div>
+      <div class="community-pulse-callout"></div>
+    </div>
+  </section>
+
   <main>
     <!-- Today's Change -->
     <section class="section" id="todays-change">
@@ -227,6 +240,7 @@
       renderGardenStats,
       renderGardenViz,
       renderTerminal,
+      renderCommunityPulse,
     } from '/js/renderer.js';
 
     initMobileNav();
@@ -255,6 +269,12 @@
         const { manifest, day, artifacts } = result;
         hydrateGardenStats(manifest);
         hydrateGardenViz(manifest);
+
+        // Community Pulse
+        if (artifacts.feedbackDigest) {
+          renderCommunityPulse(artifacts.feedbackDigest, manifest);
+        }
+
         const reactions = await getReactions(day.date);
 
         // Today's date

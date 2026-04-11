@@ -778,15 +778,18 @@ function renderTimeline(manifest, options = {}) {
   return timeline;
 }
 
+// ---------- Shared Reaction Types ----------
+const REACTION_TYPES = [
+  { emoji: '\u{1F331}', label: 'Sprout', key: 'sprout' },
+  { emoji: '\u{1F525}', label: 'Fire', key: 'fire' },
+  { emoji: '\u{1F914}', label: 'Thinking', key: 'thinking' },
+  { emoji: '\u2764\uFE0F', label: 'Heart', key: 'heart' },
+  { emoji: '\u{1F680}', label: 'Rocket', key: 'rocket' },
+];
+
 // ---------- Reactions Renderer ----------
 function renderReactions(dayDate, reactions = {}) {
-  const reactionTypes = [
-    { emoji: '\u{1F331}', label: 'Sprout', key: 'sprout' },
-    { emoji: '\u{1F525}', label: 'Fire', key: 'fire' },
-    { emoji: '\u{1F914}', label: 'Thinking', key: 'thinking' },
-    { emoji: '\u2764\uFE0F', label: 'Heart', key: 'heart' },
-    { emoji: '\u{1F680}', label: 'Rocket', key: 'rocket' },
-  ];
+  const reactionTypes = REACTION_TYPES;
 
   const bar = el('div', { className: 'reaction-bar' });
 
@@ -1108,6 +1111,89 @@ function renderTerminal(result) {
   return terminal;
 }
 
+// ---------- Community Pulse Renderer ----------
+function renderCommunityPulse(feedbackDigest, manifest) {
+  const recentReactions = feedbackDigest?.recentReactions;
+  if (!recentReactions) return null;
+
+  // Aggregate counts per reaction key across all dates
+  const aggregates = {};
+  REACTION_TYPES.forEach(t => { aggregates[t.key] = 0; });
+
+  for (const dateStr of Object.keys(recentReactions)) {
+    const dayReactions = recentReactions[dateStr];
+    for (const t of REACTION_TYPES) {
+      aggregates[t.key] += (dayReactions[t.key] || 0);
+    }
+  }
+
+  // If all zero, return null (AC-1 empty state)
+  const totalAll = REACTION_TYPES.reduce((sum, t) => sum + aggregates[t.key], 0);
+  if (totalAll === 0) return null;
+
+  // Find max aggregate for highlight (AC-3)
+  const maxAggregate = Math.max(...REACTION_TYPES.map(t => aggregates[t.key]));
+
+  // Build badge elements
+  const badgesContainer = document.querySelector('.community-pulse-badges');
+  badgesContainer.innerHTML = '';
+
+  REACTION_TYPES.forEach(t => {
+    const count = aggregates[t.key];
+    const isHighlight = count === maxAggregate && maxAggregate > 0;
+    const badge = el('div', {
+      className: 'community-pulse-badge' + (isHighlight ? ' community-pulse-badge--highlight' : ''),
+    },
+      el('span', { className: 'community-pulse-badge__emoji', 'aria-hidden': 'true' }, t.emoji),
+      el('span', { className: 'community-pulse-badge__count' }, String(count))
+    );
+    badgesContainer.appendChild(badge);
+  });
+
+  // Find most-reacted day (AC-4): highest total, ties → earliest date
+  let bestDate = null;
+  let bestTotal = -1;
+  const sortedDates = Object.keys(recentReactions).sort(); // chronological for tie-breaking
+
+  for (const dateStr of sortedDates) {
+    const dayReactions = recentReactions[dateStr];
+    const dayTotal = REACTION_TYPES.reduce((sum, t) => sum + (dayReactions[t.key] || 0), 0);
+    if (dayTotal > bestTotal) {
+      bestTotal = dayTotal;
+      bestDate = dateStr;
+    }
+  }
+
+  // Build callout
+  if (bestDate && bestTotal > 0) {
+    const calloutContainer = document.querySelector('.community-pulse-callout');
+    calloutContainer.innerHTML = '';
+
+    // Look up title from manifest
+    let dayTitle = bestDate;
+    if (manifest?.days) {
+      const dayEntry = manifest.days.find(d => d.date === bestDate);
+      if (dayEntry?.title) dayTitle = dayEntry.title;
+    }
+
+    const callout = el('p', {},
+      'Most reacted day: ',
+      el('a', {
+        className: 'community-pulse-callout__link',
+        href: getDayUrl(bestDate),
+      }, dayTitle),
+      ` (${bestTotal} reactions)`
+    );
+    calloutContainer.appendChild(callout);
+  }
+
+  // Unhide section
+  const section = document.getElementById('community-pulse');
+  if (section) section.style.display = '';
+
+  return true;
+}
+
 // ---------- Exports ----------
 export {
   renderMarkdown,
@@ -1125,4 +1211,5 @@ export {
   renderGardenStats,
   renderGardenViz,
   renderTerminal,
+  renderCommunityPulse,
 };
