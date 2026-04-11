@@ -457,23 +457,45 @@ function captureGitBaseline() {
 async function commitAndPushResidue(runDate) {
   const opts = { cwd: PROJECT_ROOT };
 
-  // Stage targeted paths. `git add -A` refreshes tracked files AND picks up
-  // new files, but only within the given pathspecs. Paths that don't exist
-  // yet (e.g. content/days/$runDate on its first run) are ignored with -A.
-  const pathspecs = [
+  // Two-step staging strategy that copes with gitignored dirs:
+  //
+  // 1. `git add -u` against tracked-only pathspecs picks up modifications to
+  //    already-tracked files (including content/days/*/decision.json which
+  //    sit inside an otherwise-gitignored directory).
+  // 2. `git add` against non-gitignored dirs picks up new files (Playwright
+  //    specs, day-log artifacts) without complaining about ignored paths.
+  //
+  // Using `-A` against `content/days/$runDate/` would error because the
+  // entire directory is gitignored — `-u` skips ignored files silently.
+  const updatePathspecs = [
     'site/',
     'tests/uiux/',
     `content/days/${runDate}/`,
   ];
+  const newFilePathspecs = [
+    `site/days/${runDate}/`,
+    'tests/uiux/',
+  ];
 
   try {
-    const addResult = await spawnAsync('git', ['add', '-A', '--', ...pathspecs], opts);
-    if (addResult.code !== 0) {
-      log(`git add for residue failed: ${addResult.stderr || addResult.stdout}`);
+    const updateResult = await spawnAsync('git', ['add', '-u', '--', ...updatePathspecs], opts);
+    if (updateResult.code !== 0) {
+      log(`git add -u for residue failed: ${updateResult.stderr || updateResult.stdout}`);
       return;
     }
   } catch (err) {
-    log(`git add for residue threw: ${err.message}`);
+    log(`git add -u for residue threw: ${err.message}`);
+    return;
+  }
+
+  try {
+    const addResult = await spawnAsync('git', ['add', '--', ...newFilePathspecs], opts);
+    if (addResult.code !== 0) {
+      log(`git add for new residue files failed: ${addResult.stderr || addResult.stdout}`);
+      return;
+    }
+  } catch (err) {
+    log(`git add for new residue files threw: ${err.message}`);
     return;
   }
 
