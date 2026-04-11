@@ -108,7 +108,7 @@ do_install() {
   echo ""
   echo "  Label:       $PLIST_LABEL"
   echo "  Plist:       $PLIST_DEST"
-  echo "  Schedule:    Daily at 9:00 AM"
+  echo "  Schedule:    Daily at 6:00 AM"
   echo "  Stdout log:  $PROJECT_DIR/runner/daily-runner.stdout.log"
   echo "  Stderr log:  $PROJECT_DIR/runner/daily-runner.stderr.log"
   echo ""
