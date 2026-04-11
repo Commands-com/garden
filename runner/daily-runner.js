@@ -439,6 +439,89 @@ function captureGitBaseline() {
 }
 
 /**
+ * After a successful run, commit and push any leftover changes in the
+ * working tree that the Implementation stage's worktree-merge flow didn't
+ * capture (Review/Validation edits, new test specs, day-log artifacts,
+ * outreach summary writes). Without this, the repo accumulates stale
+ * modifications every day.
+ *
+ * Scope is deliberately narrow: we only `git add` paths we know the
+ * pipeline writes to (site/, tests/uiux/, content/days/$runDate/). That
+ * keeps unrelated user edits out of the auto-commit.
+ *
+ * Failures are logged but never fail the run — social publishing already
+ * succeeded by this point and should not be invalidated by a git hiccup.
+ *
+ * @param {string} runDate
+ */
+async function commitAndPushResidue(runDate) {
+  const opts = { cwd: PROJECT_ROOT };
+
+  // Stage targeted paths. `git add -A` refreshes tracked files AND picks up
+  // new files, but only within the given pathspecs. Paths that don't exist
+  // yet (e.g. content/days/$runDate on its first run) are ignored with -A.
+  const pathspecs = [
+    'site/',
+    'tests/uiux/',
+    `content/days/${runDate}/`,
+  ];
+
+  try {
+    const addResult = await spawnAsync('git', ['add', '-A', '--', ...pathspecs], opts);
+    if (addResult.code !== 0) {
+      log(`git add for residue failed: ${addResult.stderr || addResult.stdout}`);
+      return;
+    }
+  } catch (err) {
+    log(`git add for residue threw: ${err.message}`);
+    return;
+  }
+
+  // If nothing is staged, bail out quietly. `git diff --cached --quiet` exits
+  // 0 when there are NO staged changes, 1 when there are.
+  try {
+    const diffResult = await spawnAsync('git', ['diff', '--cached', '--quiet'], opts);
+    if (diffResult.code === 0) {
+      log('No post-pipeline residue to commit');
+      return;
+    }
+  } catch (err) {
+    log(`git diff --cached check threw: ${err.message}`);
+    return;
+  }
+
+  const message = `Post-pipeline residue for ${runDate}
+
+Auto-committed trailing edits from the Review/Validation stages and
+post-pipeline artifact writes (day log, outreach summary, new specs).
+
+Co-Authored-By: Commands.com Daily Runner <noreply@commands.com>`;
+
+  try {
+    const commitResult = await spawnAsync('git', ['commit', '-m', message], opts);
+    if (commitResult.code !== 0) {
+      log(`git commit for residue failed: ${commitResult.stderr || commitResult.stdout}`);
+      return;
+    }
+    log('Committed post-pipeline residue');
+  } catch (err) {
+    log(`git commit for residue threw: ${err.message}`);
+    return;
+  }
+
+  try {
+    const pushResult = await spawnAsync('git', ['push'], opts);
+    if (pushResult.code !== 0) {
+      log(`git push for residue failed: ${pushResult.stderr || pushResult.stdout}`);
+      return;
+    }
+    log('Pushed post-pipeline residue');
+  } catch (err) {
+    log(`git push for residue threw: ${err.message}`);
+  }
+}
+
+/**
  * Fetch the finalized pipeline report via the CLI `report` subcommand.
  * This is the canonical way to get per-stage handoff payloads after
  * the pipeline completes — replaces the old extractHandoffPayloads approach.
@@ -1112,6 +1195,18 @@ async function main() {
       } catch (err) {
         logError(`Marking feedback as processed failed: ${err.message}`);
       }
+    }
+
+    // Commit and push whatever the Review/Validation/post-pipeline steps
+    // left behind in the working tree. The Implementation stage already
+    // committed its own work via isolated worktrees, but everything after
+    // that (new Playwright specs, review.md, build-summary.md, outreach
+    // summary writes) stays dirty until we sweep it up here.
+    log('Committing post-pipeline residue...');
+    try {
+      await commitAndPushResidue(runDate);
+    } catch (err) {
+      logError(`Post-pipeline commit/push failed: ${err.message}`);
     }
 
     log('==========================================================');
