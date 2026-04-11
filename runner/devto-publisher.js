@@ -13,6 +13,25 @@ const path = require('path');
 const DEVTO_API = 'https://dev.to/api';
 
 /**
+ * Strip the most common inline markdown markers from a short string so it
+ * can be safely used in a title or other plain-text context. Handles
+ * **bold**, *italic*, __bold__, _italic_, and `code`. Does not try to be a
+ * full markdown parser — just enough to keep titles clean.
+ *
+ * @param {string} text
+ * @returns {string}
+ */
+function stripInlineMarkdown(text) {
+  return (text || '')
+    .replace(/\*\*(.*?)\*\*/g, '$1')
+    .replace(/__(.*?)__/g, '$1')
+    .replace(/(^|[^*])\*(?!\s)([^*]+?)\*(?!\*)/g, '$1$2')
+    .replace(/(^|[^_])_(?!\s)([^_]+?)_(?!_)/g, '$1$2')
+    .replace(/`([^`]+)`/g, '$1')
+    .trim();
+}
+
+/**
  * Publish today's build log as a Dev.to article.
  *
  * Composes a markdown article from the day's artifacts (decision.json,
@@ -40,10 +59,14 @@ async function publishToDevTo(config, runDate, artifactDir, siteUrl) {
     return { posted: false, error: `Could not read decision.json: ${err.message}` };
   }
 
-  // Compute day number from manifest
+  // Compute day number from the canonical manifest at the project root.
+  // artifactDir is <projectRoot>/content/days/<runDate> (3 levels deep), so
+  // resolve the project root from this file's location instead of stacking
+  // brittle "..".
+  const projectRoot = path.resolve(__dirname, '..');
   let dayNumber = null;
   try {
-    const manifestPath = path.join(artifactDir, '..', '..', 'site', 'days', 'manifest.json');
+    const manifestPath = path.join(projectRoot, 'site', 'days', 'manifest.json');
     const raw = fs.readFileSync(manifestPath, 'utf8');
     const manifest = JSON.parse(raw);
     if (manifest.days) {
@@ -52,11 +75,14 @@ async function publishToDevTo(config, runDate, artifactDir, siteUrl) {
       dayNumber = idx >= 0 ? idx + 1 : sorted.length + 1;
     }
   } catch {
-    // Can't determine day number
+    // Can't determine day number — fall back to date label below.
   }
 
   const dayLabel = dayNumber ? `Day ${dayNumber}` : runDate;
-  const headline = decision.headline || decision.winner?.title || 'Daily improvement';
+  const rawHeadline = decision.headline || decision.winner?.title || 'Daily improvement';
+  // Strip light markdown (**bold**, *italic*, _underscore_, `code`) so the
+  // Dev.to title field doesn't show literal asterisks.
+  const headline = stripInlineMarkdown(rawHeadline);
   const summary = decision.summary || decision.rationale || '';
   const dayUrl = siteUrl ? `${siteUrl}/days/?date=${runDate}` : null;
 
