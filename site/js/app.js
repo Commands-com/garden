@@ -101,17 +101,39 @@ function getAdjacentDays(manifest, dateStr) {
 }
 
 // ---------- Day Artifacts ----------
-async function loadDay(dateStr) {
+async function loadDay(dateStr, options = {}) {
   const basePath = `${CONFIG.artifactBasePath}/${dateStr}`;
+  const include = new Set(
+    options.include || [
+      'decision',
+      'feedbackDigest',
+      'spec',
+      'buildSummary',
+      'review',
+      'testResults',
+    ]
+  );
 
   const [decision, feedbackDigest, spec, buildSummary, review, testResults] =
     await Promise.all([
-      fetchOptional(`${basePath}/decision.json`, 'json'),
-      fetchOptional(`${basePath}/feedback-digest.json`, 'json'),
-      fetchOptional(`${basePath}/spec.md`, 'text'),
-      fetchOptional(`${basePath}/build-summary.md`, 'text'),
-      fetchOptional(`${basePath}/review.md`, 'text'),
-      fetchOptional(`${basePath}/test-results.json`, 'json'),
+      include.has('decision')
+        ? fetchOptional(`${basePath}/decision.json`, 'json')
+        : Promise.resolve(null),
+      include.has('feedbackDigest')
+        ? fetchOptional(`${basePath}/feedback-digest.json`, 'json')
+        : Promise.resolve(null),
+      include.has('spec')
+        ? fetchOptional(`${basePath}/spec.md`, 'text')
+        : Promise.resolve(null),
+      include.has('buildSummary')
+        ? fetchOptional(`${basePath}/build-summary.md`, 'text')
+        : Promise.resolve(null),
+      include.has('review')
+        ? fetchOptional(`${basePath}/review.md`, 'text')
+        : Promise.resolve(null),
+      include.has('testResults')
+        ? fetchOptional(`${basePath}/test-results.json`, 'json')
+        : Promise.resolve(null),
     ]);
 
   return {
@@ -129,7 +151,9 @@ async function loadLatestDay() {
   const manifest = await getManifest();
   const latest = getLatestDay(manifest);
   if (!latest) return null;
-  const artifacts = await loadDay(latest.date);
+  const artifacts = await loadDay(latest.date, {
+    include: ['decision', 'feedbackDigest', 'testResults', 'buildSummary'],
+  });
   return { manifest, day: latest, artifacts };
 }
 

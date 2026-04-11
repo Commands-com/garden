@@ -1,148 +1,535 @@
 {
   "schemaVersion": 2,
   "runDate": "2026-04-10",
-  "generatedAt": "2026-04-10T14:20:00.000Z",
+  "generatedAt": "2026-04-10T10:42:15.312Z",
   "headline": "The homepage now shows the latest pipeline run as a retro terminal",
-  "summary": "Add a retro terminal-styled widget to the homepage that turns the latest published run into a compact explore, score, build, test, and ship narrative using existing artifacts.",
+  "summary": "Added a terminal-style panel to the homepage that shows what the latest automated update built, tested, and shipped — in a few lines of styled command output.",
   "scoringDimensions": [
-    { "id": "compoundingValue", "label": "Compounding Value" },
-    { "id": "usefulnessClarity", "label": "Usefulness & Clarity" },
-    { "id": "feasibility", "label": "Feasibility" },
-    { "id": "legibility", "label": "Legibility" },
-    { "id": "noveltySurprise", "label": "Novelty & Surprise" },
-    { "id": "continuity", "label": "Continuity" },
-    { "id": "shareability", "label": "Shareability" }
+    {
+      "id": "compoundingValue",
+      "label": "Compounding Value"
+    },
+    {
+      "id": "usefulnessClarity",
+      "label": "Usefulness & Clarity"
+    },
+    {
+      "id": "noveltySurprise",
+      "label": "Novelty & Surprise"
+    },
+    {
+      "id": "feasibility",
+      "label": "Feasibility"
+    },
+    {
+      "id": "legibility",
+      "label": "Legibility"
+    },
+    {
+      "id": "continuity",
+      "label": "Continuity"
+    },
+    {
+      "id": "shareability",
+      "label": "Shareability"
+    }
   ],
   "judgePanel": [
     {
-      "agentId": "judge-claude-gardener",
-      "displayName": "Claude (Gardener)",
-      "modelFamily": "claude",
-      "provider": "anthropic",
-      "model": "claude-sonnet-4-20250514",
-      "lens": "gardener",
-      "conceptKey": "compounding-steward"
-    },
-    {
-      "agentId": "judge-gpt-visitor",
+      "agentId": "explore_explorer_0",
       "displayName": "GPT (Visitor)",
+      "conceptKey": "openai",
       "modelFamily": "gpt",
-      "provider": "openai",
-      "model": "gpt-4o-2024-08-06",
-      "lens": "visitor",
-      "conceptKey": "first-impression-advocate"
+      "provider": "codex_cli",
+      "model": "gpt-5.4",
+      "lens": "visitor"
     },
     {
-      "agentId": "judge-gemini-explorer",
+      "agentId": "explore_explorer_1",
+      "displayName": "Claude (Gardener)",
+      "conceptKey": "claude",
+      "modelFamily": "claude",
+      "provider": "claude",
+      "model": "opus",
+      "lens": "gardener"
+    },
+    {
+      "agentId": "explore_explorer_2",
       "displayName": "Gemini (Explorer)",
+      "conceptKey": "gemini",
       "modelFamily": "gemini",
-      "provider": "google",
-      "model": "gemini-2.0-flash",
-      "lens": "explorer",
-      "conceptKey": "novelty-scout"
+      "provider": "gemini_cli",
+      "model": "gemini-3.1-pro-preview",
+      "lens": "explorer"
     }
   ],
   "candidates": [
     {
-      "id": "candidate-1",
-      "title": "The homepage now shows the latest pipeline run as a retro terminal",
-      "summary": "Add a retro terminal-styled widget to the homepage that renders the latest published run as a curated command-line summary using existing decision, feedback, test, and manifest artifacts.",
-      "averageScore": 8.8,
-      "reviewCount": 3,
+      "id": "claude",
+      "title": "**Pipeline Terminal Widget — \"The Command Line\" Homepage Section**",
+      "summary": "A retro terminal-styled homepage widget that presents each day's autonomous pipeline run as a sequence of CLI commands and outcomes, making the invisible pipeline visible and inherently screenshot-shareable.",
+      "averageScore": 9,
+      "reviewCount": 2,
       "dimensionAverages": {
-        "compoundingValue": { "label": "Compounding Value", "average": 8.8, "reviewCount": 3 },
-        "usefulnessClarity": { "label": "Usefulness & Clarity", "average": 9.1, "reviewCount": 3 },
-        "feasibility": { "label": "Feasibility", "average": 8.7, "reviewCount": 3 },
-        "legibility": { "label": "Legibility", "average": 9.2, "reviewCount": 3 },
-        "noveltySurprise": { "label": "Novelty & Surprise", "average": 8.4, "reviewCount": 3 },
-        "continuity": { "label": "Continuity", "average": 9.0, "reviewCount": 3 },
-        "shareability": { "label": "Shareability", "average": 8.6, "reviewCount": 3 }
+        "compoundingValue": {
+          "label": "Compounding Value",
+          "average": 8,
+          "reviewCount": 2
+        },
+        "usefulnessClarity": {
+          "label": "Usefulness & Clarity",
+          "average": 9,
+          "reviewCount": 2
+        },
+        "noveltySurprise": {
+          "label": "Novelty & Surprise",
+          "average": 8,
+          "reviewCount": 2
+        },
+        "feasibility": {
+          "label": "Feasibility",
+          "average": 9,
+          "reviewCount": 2
+        },
+        "legibility": {
+          "label": "Legibility",
+          "average": 9.5,
+          "reviewCount": 2
+        },
+        "continuity": {
+          "label": "Continuity",
+          "average": 9.5,
+          "reviewCount": 2
+        },
+        "shareability": {
+          "label": "Shareability",
+          "average": 10,
+          "reviewCount": 2
+        }
       },
-      "reviewerBreakdown": [],
+      "reviewerBreakdown": [
+        {
+          "reviewer": {
+            "agentId": "explore_explorer_0",
+            "displayName": "GPT (Visitor)",
+            "conceptKey": "openai",
+            "modelFamily": "gpt",
+            "provider": "codex_cli",
+            "model": "gpt-5.4",
+            "lens": "visitor"
+          },
+          "overallScore": 9,
+          "dimensionScores": {
+            "compoundingValue": 8,
+            "usefulnessClarity": 9,
+            "noveltySurprise": 8,
+            "feasibility": 9,
+            "legibility": 9,
+            "continuity": 10,
+            "shareability": 10
+          },
+          "keep": [
+            "Strong alignment with the seeded concept: a homepage terminal surface that makes the pipeline feel like a run, not just a result.",
+            "Clear prototype thesis: prove that a static, real-data terminal is visually strong enough to be screenshot-worthy.",
+            "Good decomposition of required flows, real data sources, and explicit out-of-scope boundaries.",
+            "Strong continuity with the current product state: it extends the homepage and builds on the recent pattern that visual changes outperform plain updates on Bluesky."
+          ],
+          "mustChange": [
+            "Tighten the feedback claim. The provided `2026-04-10/feedback-digest.json` has zero aggregated items, so the brief should not overstate “today’s only user feedback” unless it explicitly cites a different source.",
+            "Replace or qualify the hardcoded judge command copy. If the judge panel is absent or changes, the terminal should still stay truthful.",
+            "Pick one mobile behavior. “Scroll horizontally” and “wrap gracefully” are different UX choices; the prototype should prove one."
+          ],
+          "risks": [
+            "The terminal can read as a fake aesthetic layer if the copy feels theatrical rather than data-backed.",
+            "If the widget is too dark or too generic, it may fight the garden brand instead of sharpening it.",
+            "Shareability is plausible, but not guaranteed; the concept still needs to improve comprehension even if social lift is modest."
+          ],
+          "whyItWinsOrLoses": [
+            "This is the strongest brief. It stays on the seed, sharpens the same concept instead of drifting, and identifies what the prototype must actually prove: visual credibility, truthfulness, and screenshot value."
+          ]
+        },
+        {
+          "reviewer": {
+            "agentId": "explore_explorer_2",
+            "displayName": "Gemini (Explorer)",
+            "conceptKey": "gemini",
+            "modelFamily": "gemini",
+            "provider": "gemini_cli",
+            "model": "gemini-3.1-pro-preview",
+            "lens": "explorer"
+          },
+          "overallScore": 9,
+          "dimensionScores": {
+            "compoundingValue": 8,
+            "usefulnessClarity": 9,
+            "noveltySurprise": 8,
+            "feasibility": 9,
+            "legibility": 10,
+            "continuity": 9,
+            "shareability": 10
+          },
+          "keep": [
+            "The direct addressing of user feedback (\"A artistic command interface of home screen in the form of pixel.\") as a core motivation for the feature. This strongly ties into the seed's requirement to address community feedback.",
+            "The highly detailed \"Non-mock functionality\" section, which explicitly maps terminal lines to data sources. This is invaluable for guiding prototype implementation.",
+            "The clear articulation of \"Screenshot-ready\" as a specific prototype focus, emphasizing social shareability.",
+            "The detailed risk analysis with specific mitigation strategies."
+          ],
+          "mustChange": [],
+          "risks": [
+            "The potential for the terminal to look generic, which the brief acknowledges and mitigates by suggesting Command Garden's own color palette.",
+            "The \"doesn't move follower count\" risk is high, which correctly flags that the feature alone isn't a silver bullet but needs complementary social strategy."
+          ],
+          "whyItWinsOrLoses": [
+            "Claude wins because its concept directly addresses a piece of explicit user feedback from the provided context, which was a core constraint of the seed. Its brief is also exceptionally well-detailed for prototyping, especially the mapping of data sources to UI elements, making it highly actionable. The focus on \"screenshot-ready\" aligns perfectly with the social engagement goal."
+          ]
+        }
+      ],
       "rank": 1,
       "keep": [
-        "Makes the pipeline feel like something that actually ran, not just a set of static sections",
-        "Pays off the Command Garden name with visible command-line output",
-        "Reuses existing artifacts, so it adds no new backend or data-fetching cost"
+        "Strong alignment with the seeded concept: a homepage terminal surface that makes the pipeline feel like a run, not just a result.",
+        "Clear prototype thesis: prove that a static, real-data terminal is visually strong enough to be screenshot-worthy.",
+        "Good decomposition of required flows, real data sources, and explicit out-of-scope boundaries.",
+        "Strong continuity with the current product state: it extends the homepage and builds on the recent pattern that visual changes outperform plain updates on Bluesky.",
+        "The direct addressing of user feedback (\"A artistic command interface of home screen in the form of pixel.\") as a core motivation for the feature. This strongly ties into the seed's requirement to address community feedback.",
+        "The highly detailed \"Non-mock functionality\" section, which explicitly maps terminal lines to data sources. This is invaluable for guiding prototype implementation.",
+        "The clear articulation of \"Screenshot-ready\" as a specific prototype focus, emphasizing social shareability.",
+        "The detailed risk analysis with specific mitigation strategies."
       ],
       "mustChange": [
-        "Hide the section entirely when decision or winner data is missing",
-        "Normalize mixed historical test-results shapes so the widget works across shipped days"
+        "Tighten the feedback claim. The provided `2026-04-10/feedback-digest.json` has zero aggregated items, so the brief should not overstate “today’s only user feedback” unless it explicitly cites a different source.",
+        "Replace or qualify the hardcoded judge command copy. If the judge panel is absent or changes, the terminal should still stay truthful.",
+        "Pick one mobile behavior. “Scroll horizontally” and “wrap gracefully” are different UX choices; the prototype should prove one."
       ],
       "risks": [
-        "A dark terminal treatment could clash with the lighter homepage palette if the styling is too stark"
-      ],
-      "feedbackReferences": [
-        "Visitors asked for an artistic command interface on the home screen",
-        "The homepage needed a clearer picture of what the latest pipeline run actually did"
+        "The terminal can read as a fake aesthetic layer if the copy feels theatrical rather than data-backed.",
+        "If the widget is too dark or too generic, it may fight the garden brand instead of sharpening it.",
+        "Shareability is plausible, but not guaranteed; the concept still needs to improve comprehension even if social lift is modest.",
+        "The potential for the terminal to look generic, which the brief acknowledges and mitigates by suggesting Command Garden's own color palette.",
+        "The \"doesn't move follower count\" risk is high, which correctly flags that the feature alone isn't a silver bullet but needs complementary social strategy."
       ]
     },
     {
-      "id": "candidate-2",
-      "title": "Recent Run Diff Snapshot",
-      "summary": "Show a compact before-and-after diff summarizing what changed between the latest shipped day and the previous one.",
-      "averageScore": 7.2,
-      "reviewCount": 3,
+      "id": "openai",
+      "title": "Command Replay Terminal",
+      "summary": "Add a retro, data-backed terminal module to the homepage that turns the latest autonomous run into a fast, screenshot-worthy story.",
+      "averageScore": 8,
+      "reviewCount": 2,
       "dimensionAverages": {
-        "compoundingValue": { "label": "Compounding Value", "average": 7.4, "reviewCount": 3 },
-        "usefulnessClarity": { "label": "Usefulness & Clarity", "average": 7.6, "reviewCount": 3 },
-        "feasibility": { "label": "Feasibility", "average": 6.8, "reviewCount": 3 },
-        "legibility": { "label": "Legibility", "average": 7.7, "reviewCount": 3 },
-        "noveltySurprise": { "label": "Novelty & Surprise", "average": 7.3, "reviewCount": 3 },
-        "continuity": { "label": "Continuity", "average": 7.5, "reviewCount": 3 },
-        "shareability": { "label": "Shareability", "average": 6.4, "reviewCount": 3 }
+        "compoundingValue": {
+          "label": "Compounding Value",
+          "average": 8.5,
+          "reviewCount": 2
+        },
+        "usefulnessClarity": {
+          "label": "Usefulness & Clarity",
+          "average": 8.5,
+          "reviewCount": 2
+        },
+        "noveltySurprise": {
+          "label": "Novelty & Surprise",
+          "average": 7.5,
+          "reviewCount": 2
+        },
+        "feasibility": {
+          "label": "Feasibility",
+          "average": 9,
+          "reviewCount": 2
+        },
+        "legibility": {
+          "label": "Legibility",
+          "average": 8.5,
+          "reviewCount": 2
+        },
+        "continuity": {
+          "label": "Continuity",
+          "average": 9,
+          "reviewCount": 2
+        },
+        "shareability": {
+          "label": "Shareability",
+          "average": 8.5,
+          "reviewCount": 2
+        }
       },
-      "reviewerBreakdown": [],
+      "reviewerBreakdown": [
+        {
+          "reviewer": {
+            "agentId": "explore_explorer_1",
+            "displayName": "Claude (Gardener)",
+            "conceptKey": "claude",
+            "modelFamily": "claude",
+            "provider": "claude",
+            "model": "opus",
+            "lens": "gardener"
+          },
+          "overallScore": 8,
+          "dimensionScores": {
+            "compoundingValue": 9,
+            "usefulnessClarity": 8,
+            "noveltySurprise": 7,
+            "feasibility": 9,
+            "legibility": 8,
+            "continuity": 9,
+            "shareability": 8
+          },
+          "keep": [
+            "**Tight alignment with the seed.** The concept stays on the converged terminal widget idea, addresses user feedback, and is scoped to one pipeline run. This is the right concept for today.",
+            "\"Prove that one new homepage surface can do three jobs at once: explain the system faster, make the site feel alive, and produce a more shareable visual\" — this is the clearest prototype hypothesis across all briefs. It names exactly what the prototype must validate.",
+            "Non-mock functionality is specific and correct: manifest lookup, `decision.json`, `feedback-digest.json`, `test-results.json` — all real data, all already loaded by the homepage. Zero new API calls.",
+            "The risk about \"fake log theater\" is the most important design risk and this is the only brief that names it plainly. The mitigation (truthful status lines, not fake transcript data) is the right guardrail.",
+            "Implementation boundaries are crisp: homepage only, presentational only, no typing animation, no infra changes, existing design tokens. This is prototype-ready.",
+            "Mobile constraint is called out explicitly (\"remains readable without horizontal scrolling\") — the Explorer brief mentions `overflow-x: auto` but OpenAI's constraint is stronger and more user-centered."
+          ],
+          "mustChange": [
+            "**The brief is too thin on visual specification.** It says \"retro terminal module\" but doesn't specify: dark background color token, text color, title bar treatment, prompt character, line structure. The Explorer brief has a full CSS component breakdown (`.terminal`, `.terminal__titlebar`, `.terminal__body`, `.terminal__line`) that this brief lacks. A builder receiving this brief would make too ma",
+            "The data-to-line mapping is described in prose (\"candidate count, winner, feedback count, test outcome\") but not as a concrete table. The Explorer brief's line-by-line mapping table (`> garden explore --date` → `decision.runDate`, etc.) is more implementation-ready. This brief should include that level of detail or risk the builder inventing a different terminal narrative.",
+            "\"Link the module to the corresponding day page\" is mentioned once and never specified. Where does the link go? On the section header? On a specific line? On a \"view full run →\" footer? This is a UX decision that shouldn't be left to the builder.",
+            "The brief doesn't address the section's placement in the DOM with enough precision. \"Between the pipeline explainer and the stats/garden surfaces\" is correct but the Explorer brief specifies it sits outside `<main>` to match the pattern of `#garden-stats` and `#garden-section`. This kind of structural detail matters for a codebase with established conventions.",
+            "No mention of the user feedback that motivated this feature (\"artistic command interface of home screen in the form of pixel\"). Connecting the feature to feedback strengthens the continuity narrative and validates the community-responsive pipeline story."
+          ],
+          "risks": [
+            "The \"gimmicky fake log\" risk is real but the brief's mitigation (\"truthful status lines\") is a principle, not a design spec. Without concrete line templates, the builder might still produce lines that feel performative. The Explorer brief's `> garden judge --candidates 3` format threads this needle better — it reads as a plausible CLI invocation, not a log dump.",
+            "\"A dark terminal surface could fight the garden aesthetic\" — this is a genuine risk but the brief doesn't propose a solution. The Explorer brief suggests using the existing `--surface-dark` / `--color-deep-green` palette, which keeps the terminal on-brand. This brief should specify the same.",
+            "No empty-state strategy beyond \"hide or degrade gracefully.\" What does \"degrade\" look like? Which lines drop? The Explorer brief specifies section-level `display: none` when no decision data exists, plus per-line fallbacks. This brief needs that rigor."
+          ],
+          "whyItWinsOrLoses": [
+            "**Wins on concept clarity and prototype hypothesis.** The \"three jobs at once\" framing is the sharpest articulation of what this feature must prove. Feasibility is high, continuity with the last 5 days is strong, and the implementation boundaries are clean. It loses ground to the Explorer brief on visual specification depth and data-mapping concreteness — a builder would need to cross-reference bo"
+          ]
+        },
+        {
+          "reviewer": {
+            "agentId": "explore_explorer_2",
+            "displayName": "Gemini (Explorer)",
+            "conceptKey": "gemini",
+            "modelFamily": "gemini",
+            "provider": "gemini_cli",
+            "model": "gemini-3.1-pro-preview",
+            "lens": "explorer"
+          },
+          "overallScore": 8,
+          "dimensionScores": {
+            "compoundingValue": 8,
+            "usefulnessClarity": 9,
+            "noveltySurprise": 8,
+            "feasibility": 9,
+            "legibility": 9,
+            "continuity": 9,
+            "shareability": 9
+          },
+          "keep": [
+            "The concise and impactful \"Prototype focus\" statement: \"Prove that one new homepage surface can do three jobs at once: explain the system faster, make the site feel alive, and produce a more shareable visual.\"",
+            "The \"Why this could win\" section that explicitly connects the concept to the \"strongest observed audience pattern\" (visual changes performing well on Bluesky), demonstrating a good analysis of the provided social metrics."
+          ],
+          "mustChange": [
+            "While the \"Non-mock functionality\" lists the data to be pulled, it could benefit from a more explicit mapping to the terminal output lines, similar to Claude's approach, to further enhance clarity for prototyping."
+          ],
+          "risks": [
+            "The risk of the terminal feeling \"gimmicky\" if not executed well, and the potential for it to clash with the existing aesthetic if the color palette isn't carefully considered.",
+            "The acknowledgement that the social upside is \"plausible, not guaranteed,\" which is a realistic assessment."
+          ],
+          "whyItWinsOrLoses": [
+            "OpenAI presents a very strong concept that is almost identical to Claude's. It successfully identifies a critical gap in showing the pipeline's process and proposes a solution that aligns with the social engagement goals. However, it loses slightly to Claude due to being marginally less prescriptive in its \"Non-mock functionality\" details and not directly referencing specific user feedback in its "
+          ]
+        }
+      ],
       "rank": 2,
       "keep": [
-        "Makes daily progress easier to compare at a glance"
+        "**Tight alignment with the seed.** The concept stays on the converged terminal widget idea, addresses user feedback, and is scoped to one pipeline run. This is the right concept for today.",
+        "\"Prove that one new homepage surface can do three jobs at once: explain the system faster, make the site feel alive, and produce a more shareable visual\" — this is the clearest prototype hypothesis across all briefs. It names exactly what the prototype must validate.",
+        "Non-mock functionality is specific and correct: manifest lookup, `decision.json`, `feedback-digest.json`, `test-results.json` — all real data, all already loaded by the homepage. Zero new API calls.",
+        "The risk about \"fake log theater\" is the most important design risk and this is the only brief that names it plainly. The mitigation (truthful status lines, not fake transcript data) is the right guardrail.",
+        "Implementation boundaries are crisp: homepage only, presentational only, no typing animation, no infra changes, existing design tokens. This is prototype-ready.",
+        "Mobile constraint is called out explicitly (\"remains readable without horizontal scrolling\") — the Explorer brief mentions `overflow-x: auto` but OpenAI's constraint is stronger and more user-centered.",
+        "The concise and impactful \"Prototype focus\" statement: \"Prove that one new homepage surface can do three jobs at once: explain the system faster, make the site feel alive, and produce a more shareable visual.\"",
+        "The \"Why this could win\" section that explicitly connects the concept to the \"strongest observed audience pattern\" (visual changes performing well on Bluesky), demonstrating a good analysis of the provided social metrics."
       ],
       "mustChange": [
-        "Needs a clear comparison model for artifacts that do not exist on both days"
+        "**The brief is too thin on visual specification.** It says \"retro terminal module\" but doesn't specify: dark background color token, text color, title bar treatment, prompt character, line structure. The Explorer brief has a full CSS component breakdown (`.terminal`, `.terminal__titlebar`, `.terminal__body`, `.terminal__line`) that this brief lacks. A builder receiving this brief would make too ma",
+        "The data-to-line mapping is described in prose (\"candidate count, winner, feedback count, test outcome\") but not as a concrete table. The Explorer brief's line-by-line mapping table (`> garden explore --date` → `decision.runDate`, etc.) is more implementation-ready. This brief should include that level of detail or risk the builder inventing a different terminal narrative.",
+        "\"Link the module to the corresponding day page\" is mentioned once and never specified. Where does the link go? On the section header? On a specific line? On a \"view full run →\" footer? This is a UX decision that shouldn't be left to the builder.",
+        "The brief doesn't address the section's placement in the DOM with enough precision. \"Between the pipeline explainer and the stats/garden surfaces\" is correct but the Explorer brief specifies it sits outside `<main>` to match the pattern of `#garden-stats` and `#garden-section`. This kind of structural detail matters for a codebase with established conventions.",
+        "No mention of the user feedback that motivated this feature (\"artistic command interface of home screen in the form of pixel\"). Connecting the feature to feedback strengthens the continuity narrative and validates the community-responsive pipeline story.",
+        "While the \"Non-mock functionality\" lists the data to be pulled, it could benefit from a more explicit mapping to the terminal output lines, similar to Claude's approach, to further enhance clarity for prototyping."
       ],
       "risks": [
-        "Can read as an internal changelog instead of a user-facing homepage feature"
-      ],
-      "feedbackReferences": []
+        "The \"gimmicky fake log\" risk is real but the brief's mitigation (\"truthful status lines\") is a principle, not a design spec. Without concrete line templates, the builder might still produce lines that feel performative. The Explorer brief's `> garden judge --candidates 3` format threads this needle better — it reads as a plausible CLI invocation, not a log dump.",
+        "\"A dark terminal surface could fight the garden aesthetic\" — this is a genuine risk but the brief doesn't propose a solution. The Explorer brief suggests using the existing `--surface-dark` / `--color-deep-green` palette, which keeps the terminal on-brand. This brief should specify the same.",
+        "No empty-state strategy beyond \"hide or degrade gracefully.\" What does \"degrade\" look like? Which lines drop? The Explorer brief specifies section-level `display: none` when no decision data exists, plus per-line fallbacks. This brief needs that rigor.",
+        "The risk of the terminal feeling \"gimmicky\" if not executed well, and the potential for it to clash with the existing aesthetic if the color palette isn't carefully considered.",
+        "The acknowledgement that the social upside is \"plausible, not guaranteed,\" which is a realistic assessment."
+      ]
     },
     {
-      "id": "candidate-3",
-      "title": "Archive Filter Chips by Feature Type",
-      "summary": "Add filter chips to the archive so visitors can browse UI, content, and infrastructure days separately.",
-      "averageScore": 6.6,
-      "reviewCount": 3,
+      "id": "gemini",
+      "title": "Enhanced Social Share Cards for Daily Summaries",
+      "summary": "Automatically generate visually engaging, shareable cards for daily Command Garden summaries, optimized for Bluesky and Dev.to, to increase content discoverability and audience growth.",
+      "averageScore": 5,
+      "reviewCount": 2,
       "dimensionAverages": {
-        "compoundingValue": { "label": "Compounding Value", "average": 6.9, "reviewCount": 3 },
-        "usefulnessClarity": { "label": "Usefulness & Clarity", "average": 7.0, "reviewCount": 3 },
-        "feasibility": { "label": "Feasibility", "average": 6.5, "reviewCount": 3 },
-        "legibility": { "label": "Legibility", "average": 7.2, "reviewCount": 3 },
-        "noveltySurprise": { "label": "Novelty & Surprise", "average": 5.9, "reviewCount": 3 },
-        "continuity": { "label": "Continuity", "average": 6.8, "reviewCount": 3 },
-        "shareability": { "label": "Shareability", "average": 5.8, "reviewCount": 3 }
+        "compoundingValue": {
+          "label": "Compounding Value",
+          "average": 5.5,
+          "reviewCount": 2
+        },
+        "usefulnessClarity": {
+          "label": "Usefulness & Clarity",
+          "average": 5.5,
+          "reviewCount": 2
+        },
+        "noveltySurprise": {
+          "label": "Novelty & Surprise",
+          "average": 5.5,
+          "reviewCount": 2
+        },
+        "feasibility": {
+          "label": "Feasibility",
+          "average": 3.5,
+          "reviewCount": 2
+        },
+        "legibility": {
+          "label": "Legibility",
+          "average": 5,
+          "reviewCount": 2
+        },
+        "continuity": {
+          "label": "Continuity",
+          "average": 4.5,
+          "reviewCount": 2
+        },
+        "shareability": {
+          "label": "Shareability",
+          "average": 8,
+          "reviewCount": 2
+        }
       },
-      "reviewerBreakdown": [],
+      "reviewerBreakdown": [
+        {
+          "reviewer": {
+            "agentId": "explore_explorer_0",
+            "displayName": "GPT (Visitor)",
+            "conceptKey": "openai",
+            "modelFamily": "gpt",
+            "provider": "codex_cli",
+            "model": "gpt-5.4",
+            "lens": "visitor"
+          },
+          "overallScore": 5,
+          "dimensionScores": {
+            "compoundingValue": 4,
+            "usefulnessClarity": 6,
+            "noveltySurprise": 5,
+            "feasibility": 4,
+            "legibility": 5,
+            "continuity": 3,
+            "shareability": 8
+          },
+          "keep": [
+            "Strong instinct that audience growth on Bluesky and Dev.to needs a more visual asset.",
+            "Correct emphasis on making the daily output more attractive in feeds."
+          ],
+          "mustChange": [
+            "Return to the seeded concept. This drifts into automated social-card generation instead of refining the selected homepage product idea.",
+            "Make the change user-visible on the site. As written, the value is mostly off-site and partly manual, which conflicts with the daily product constraint.",
+            "Define a prototype proof. The brief talks about asset generation, but not what a visitor-facing prototype must validate in the product itself.",
+            "Reduce technical scope. Image generation introduces dependency and pipeline complexity that is avoidable for a one-day improvement."
+          ],
+          "risks": [
+            "It changes the product thesis from “improve the site experience” to “generate marketing collateral.”",
+            "Manual sharing undercuts the claimed growth loop.",
+            "Dynamic image generation is materially riskier than a frontend-only concept and may not fit a single pipeline run cleanly."
+          ],
+          "whyItWinsOrLoses": [
+            "It loses because it drifts away from the seeded concept and away from the best prototype-room question. The social instinct is good, but this is a weaker seed than the terminal widget because it is less product-native, less legible, and less feasible in one day."
+          ]
+        },
+        {
+          "reviewer": {
+            "agentId": "explore_explorer_1",
+            "displayName": "Claude (Gardener)",
+            "conceptKey": "claude",
+            "modelFamily": "claude",
+            "provider": "claude",
+            "model": "opus",
+            "lens": "gardener"
+          },
+          "overallScore": 5,
+          "dimensionScores": {
+            "compoundingValue": 7,
+            "usefulnessClarity": 5,
+            "noveltySurprise": 6,
+            "feasibility": 3,
+            "legibility": 5,
+            "continuity": 6,
+            "shareability": 8
+          },
+          "keep": [
+            "The core insight is correct: visually rich social cards outperform plain links on Bluesky and Dev.to. This is a real audience-growth lever.",
+            "Identifying that share cards should pull structured data from `decision.json` and `build-summary.md` is the right data model instinct.",
+            "The long-term compounding logic is sound — every future day auto-generates a card."
+          ],
+          "mustChange": [
+            "**Feasibility is the dealbreaker.** Server-side image generation requires a new dependency (Puppeteer, Sharp, or Canvas) that the project explicitly forbids (\"no external CSS/JS libraries\" per AGENTS.md). The brief acknowledges this risk but doesn't solve it. A CSS-rendered card captured via browser screenshot is an alternative, but the brief doesn't propose that path.",
+            "The brief drifts from the seed. The seed converged on a terminal widget addressing specific user feedback (\"artistic command interface\"). This concept proposes a fundamentally different feature (social card image generation) that ignores the feedback signal entirely.",
+            "\"Prototype focus\" is vague — \"designing a template\" and \"implementing logic\" are activities, not things to prove. What's the hypothesis? The brief never states what the prototype must validate.",
+            "The concept doesn't produce a **user-visible change on the site itself**. The constraint says each candidate must produce a user-visible change. A PNG file in `site/images/social-cards/` is invisible to site visitors.",
+            "\"Manual sharing\" as the initial flow means the pipeline doesn't actually automate anything new for the publisher. The daily runner already posts to Bluesky — if the card isn't attached to that post automatically, the value proposition collapses."
+          ],
+          "risks": [
+            "Adding Puppeteer or Sharp to the pipeline introduces a heavy native dependency that could break CI/CD and adds ~200MB to the runner environment.",
+            "Image generation in a Lambda-compatible Node.js environment is notoriously fragile (font rendering, headless Chrome binaries).",
+            "The brief proposes only one card type (Decision of the Day) but doesn't specify dimensions, aspect ratio, or platform-specific requirements (Bluesky's 1200×630 vs. Dev.to's different preview). Missing these details means the prototype will likely produce cards that look wrong on at least one platform.",
+            "No fallback strategy: what happens when `decision.json` has empty/missing fields? The terminal widget brief handles this; this brief doesn't."
+          ],
+          "whyItWinsOrLoses": [
+            "**Loses.** While the audience-growth thesis is valid, this concept drifts from the converged seed (terminal widget), ignores the only user feedback received, has a severe feasibility gap (image generation dependencies), and doesn't produce a user-visible site change. It's a good *future* enhancement to pair with an existing on-site feature, but it's the wrong pick for today's single pipeline run. "
+          ]
+        }
+      ],
       "rank": 3,
       "keep": [
-        "Would improve archive browsing once there are more shipped days"
+        "Strong instinct that audience growth on Bluesky and Dev.to needs a more visual asset.",
+        "Correct emphasis on making the daily output more attractive in feeds.",
+        "The core insight is correct: visually rich social cards outperform plain links on Bluesky and Dev.to. This is a real audience-growth lever.",
+        "Identifying that share cards should pull structured data from `decision.json` and `build-summary.md` is the right data model instinct.",
+        "The long-term compounding logic is sound — every future day auto-generates a card."
       ],
       "mustChange": [
-        "Needs consistent tags across older manifest entries before it becomes reliable"
+        "Return to the seeded concept. This drifts into automated social-card generation instead of refining the selected homepage product idea.",
+        "Make the change user-visible on the site. As written, the value is mostly off-site and partly manual, which conflicts with the daily product constraint.",
+        "Define a prototype proof. The brief talks about asset generation, but not what a visitor-facing prototype must validate in the product itself.",
+        "Reduce technical scope. Image generation introduces dependency and pipeline complexity that is avoidable for a one-day improvement.",
+        "**Feasibility is the dealbreaker.** Server-side image generation requires a new dependency (Puppeteer, Sharp, or Canvas) that the project explicitly forbids (\"no external CSS/JS libraries\" per AGENTS.md). The brief acknowledges this risk but doesn't solve it. A CSS-rendered card captured via browser screenshot is an alternative, but the brief doesn't propose that path.",
+        "The brief drifts from the seed. The seed converged on a terminal widget addressing specific user feedback (\"artistic command interface\"). This concept proposes a fundamentally different feature (social card image generation) that ignores the feedback signal entirely.",
+        "\"Prototype focus\" is vague — \"designing a template\" and \"implementing logic\" are activities, not things to prove. What's the hypothesis? The brief never states what the prototype must validate.",
+        "The concept doesn't produce a **user-visible change on the site itself**. The constraint says each candidate must produce a user-visible change. A PNG file in `site/images/social-cards/` is invisible to site visitors.",
+        "\"Manual sharing\" as the initial flow means the pipeline doesn't actually automate anything new for the publisher. The daily runner already posts to Bluesky — if the card isn't attached to that post automatically, the value proposition collapses."
       ],
       "risks": [
-        "Solves a problem the site does not quite have yet with only a few shipped days"
-      ],
-      "feedbackReferences": []
+        "It changes the product thesis from “improve the site experience” to “generate marketing collateral.”",
+        "Manual sharing undercuts the claimed growth loop.",
+        "Dynamic image generation is materially riskier than a frontend-only concept and may not fit a single pipeline run cleanly.",
+        "Adding Puppeteer or Sharp to the pipeline introduces a heavy native dependency that could break CI/CD and adds ~200MB to the runner environment.",
+        "Image generation in a Lambda-compatible Node.js environment is notoriously fragile (font rendering, headless Chrome binaries).",
+        "The brief proposes only one card type (Decision of the Day) but doesn't specify dimensions, aspect ratio, or platform-specific requirements (Bluesky's 1200×630 vs. Dev.to's different preview). Missing these details means the prototype will likely produce cards that look wrong on at least one platform.",
+        "No fallback strategy: what happens when `decision.json` has empty/missing fields? The terminal widget brief handles this; this brief doesn't."
+      ]
     }
   ],
   "winner": {
-    "candidateId": "candidate-1",
-    "title": "The homepage now shows the latest pipeline run as a retro terminal",
-    "summary": "Add a retro terminal-styled widget to the homepage that turns the latest published run into a compact explore, score, build, test, and ship narrative using existing artifacts.",
-    "averageScore": 8.8
+    "candidateId": "claude",
+    "title": "**Pipeline Terminal Widget — \"The Command Line\" Homepage Section**",
+    "summary": "A retro terminal-styled homepage widget that presents each day's autonomous pipeline run as a sequence of CLI commands and outcomes, making the invisible pipeline visible and inherently screenshot-shareable.",
+    "averageScore": 9
   },
-  "rationale": "The terminal widget won because it makes the pipeline feel active without adding any new backend cost. It strengthens the Command Garden brand, turns existing artifacts into a legible narrative, and creates a screenshot-friendly focal point for the homepage while staying safely inside a single implementation cycle.",
+  "rationale": "Selected as the highest-scoring candidate with an average score of 9.0 across 2 judge(s).",
   "featureType": "interaction",
-  "tags": ["homepage", "terminal", "pipeline", "branding", "artifact-driven"],
+  "tags": [
+    "homepage",
+    "terminal",
+    "pipeline",
+    "branding",
+    "artifact-driven"
+  ],
   "feedbackInfluence": [
     {
       "summary": "Homepage feedback asked for an artistic command interface instead of only cards and prose.",
@@ -156,6 +543,48 @@
   "artifacts": {
     "spec": "spec.md",
     "testResults": "test-results.json",
-    "feedbackDigest": "feedback-digest.json"
+    "feedbackDigest": "feedback-digest.json",
+    "buildSummary": "build-summary.md",
+    "review": "review.md"
+  },
+  "bluesky_post": {
+    "headline": "Command Garden now shows its pipeline running live",
+    "body": "The autonomous pipeline built itself a terminal widget today. Every daily run now appears as styled command-line output on the homepage — explore, score, build, test, ship. All from existing artifacts, zero new backend cost. commandgarden.com",
+    "alt_text": "Homepage showing a dark retro terminal widget with gold command prompts displaying the five pipeline stages and the winning feature title"
+  },
+  "bluesky_strategy": {
+    "searchQueries": [
+      "retro terminal UI",
+      "build in public",
+      "autonomous coding",
+      "AI shipping code",
+      "CLI aesthetic web",
+      "developer tools design",
+      "indie web project"
+    ],
+    "replyTemplates": {
+      "whatIs": "It's a website that ships one new feature every day, entirely built by an AI pipeline. Today it gave itself a retro terminal on the homepage. Every decision is public at commandgarden.com",
+      "howDoesItWork": "A five-stage AI pipeline runs daily: gather feedback, score candidates with three AI judges, write a spec, build it, test it, ship it. Today's feature is a terminal widget that shows the latest run as styled command output.",
+      "genericQuestion": "Great question! Command Garden is radically transparent — every candidate, score, and spec is published. Check today's terminal widget feature at commandgarden.com"
+    },
+    "hashtagsToUse": [
+      "#CommandGarden",
+      "#BuildInPublic",
+      "#AIAgent",
+      "#WebDev",
+      "#CreativeCoding"
+    ],
+    "maxDailyActions": 15
+  },
+  "outreachSummary": {
+    "postUri": "at://did:plc:zq2gcfpg7nfa3xqhpow3m65b/app.bsky.feed.post/3mj556urhvq2o",
+    "postsLiked": 10,
+    "accountsFollowed": 5,
+    "mentionsHandled": 0,
+    "searchQueries": [
+      "retro terminal UI",
+      "build in public"
+    ],
+    "executedAt": "2026-04-10T10:42:23.475Z"
   }
 }

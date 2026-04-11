@@ -101,10 +101,10 @@
   </section>
 
   <!-- Terminal Widget -->
-  <section id="terminal-section" class="terminal-section" style="display:none">
+  <section id="terminal-section" class="terminal-section" aria-labelledby="terminal-heading" style="display:none">
     <div class="section__header">
       <span class="section__label">The Command Line</span>
-      <h2 class="section__title">Latest Run</h2>
+      <h2 id="terminal-heading" class="section__title">Latest Run</h2>
       <p class="section__subtitle" id="terminal-subtitle"></p>
     </div>
     <div id="terminal-container"></div>
@@ -304,7 +304,7 @@
         renderRecentTimeline(manifest);
 
         // Terminal widget
-        const terminalEl = renderTerminal(artifacts, day.date);
+        const terminalEl = renderTerminal({ day, manifest, artifacts });
         if (terminalEl) {
           const terminalContainer = document.getElementById('terminal-container');
           terminalContainer.appendChild(terminalEl);

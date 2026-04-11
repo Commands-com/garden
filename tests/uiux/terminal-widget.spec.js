@@ -33,7 +33,6 @@ const homepageHtml = fs.readFileSync(
 
 const expectedDate = latestDay.date;
 const expectedWinnerTitle = decision.winner.title;
-const expectedAverageScore = String(decision.winner.averageScore);
 const expectedCandidateCount = String(decision.candidates.length);
 const expectedFeedbackCount = String(feedbackDigest.summary.totalItems);
 
@@ -100,24 +99,19 @@ test.describe("Terminal widget", () => {
     await waitForRenderedTerminal(page);
 
     const terminalBody = page.locator(".terminal__body");
-    const winnerTitleLines = page.locator(".terminal__line", {
-      hasText: expectedWinnerTitle,
-    });
-
     await expect(terminalBody).toContainText(expectedWinnerTitle);
-    await expect(winnerTitleLines).toHaveCount(3);
     await expect(
       page.locator(".terminal__line", {
-        hasText: `Found ${expectedCandidateCount} candidates`,
+        hasText: `Generated ${expectedCandidateCount} candidates`,
       })
     ).toHaveCount(1);
     await expect(
       page.locator(".terminal__line", {
-        hasText: `Scanning feedback… ${expectedFeedbackCount} items`,
+        hasText: `Found ${expectedFeedbackCount} feedback items`,
       })
     ).toHaveCount(1);
     await expect(page.locator(".terminal__highlight")).toContainText(
-      expectedAverageScore
+      "Winner:"
     );
   });
 

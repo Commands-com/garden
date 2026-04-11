@@ -1,61 +1,166 @@
 {
   "schemaVersion": 1,
   "runDate": "2026-04-10",
-  "generatedAt": "2026-04-10T15:35:00.000Z",
+  "generatedAt": "2026-04-10T16:10:00.000Z",
   "summary": {
-    "totalScenarios": 10,
-    "passed": 10,
+    "totalScenarios": 31,
+    "passed": 31,
     "failed": 0,
     "passRate": 100
   },
   "scenarios": [
     {
-      "name": "Terminal section renders on the homepage when the latest decision has a winner",
+      "name": "Terminal renders on homepage between How It Works and Garden Stats",
       "persona": "visitor",
       "status": "pass"
     },
     {
-      "name": "Terminal section sits between the How It Works section and Garden Stats",
+      "name": "Terminal reflects latest published run data (winner title, candidate count, feedback count)",
       "persona": "visitor",
       "status": "pass"
     },
     {
-      "name": "Terminal winner line matches decision.winner.title",
+      "name": "Terminal renders expected DOM structure (dots, title, 5 lines, 5 prompts, 1 highlight)",
       "persona": "visitor",
       "status": "pass"
     },
     {
-      "name": "Candidate count in terminal output matches decision.candidates.length",
+      "name": "Terminal section is hidden by default in raw HTML",
+      "persona": "developer",
+      "status": "pass"
+    },
+    {
+      "name": "Terminal section header shows correct copy (The Command Line / Latest Run)",
       "persona": "visitor",
       "status": "pass"
     },
     {
-      "name": "Feedback count line matches feedback-digest summary.totalItems when feedback exists",
+      "name": "AC-1: #terminal-section appears between How It Works and #garden-stats as a direct sibling",
       "persona": "visitor",
       "status": "pass"
     },
     {
-      "name": "Terminal title bar renders exactly three decorative dots",
+      "name": "AC-2: terminal body contains the winner title from decision.json",
       "persona": "visitor",
       "status": "pass"
     },
     {
-      "name": "Terminal body uses the mono font stack and highlights the winner line",
+      "name": "AC-2: terminal body shows candidate count from decision.candidates.length",
+      "persona": "visitor",
+      "status": "pass"
+    },
+    {
+      "name": "AC-2: terminal body shows feedback totalItems from feedback-digest.json",
+      "persona": "visitor",
+      "status": "pass"
+    },
+    {
+      "name": "AC-2: terminal highlight contains winner title and averageScore",
+      "persona": "visitor",
+      "status": "pass"
+    },
+    {
+      "name": "AC-3: titlebar contains exactly 3 terminal dot elements",
+      "persona": "visitor",
+      "status": "pass"
+    },
+    {
+      "name": "AC-3: terminal title contains the date 2026-04-10",
+      "persona": "visitor",
+      "status": "pass"
+    },
+    {
+      "name": "AC-3: terminal body has 5 lines with 5 prompts",
+      "persona": "visitor",
+      "status": "pass"
+    },
+    {
+      "name": "AC-3: the 5 pipeline stages are explore, score, build, test, ship",
+      "persona": "visitor",
+      "status": "pass"
+    },
+    {
+      "name": "Judge panel includes claude, gpt, and gemini model families",
+      "persona": "developer",
+      "status": "pass"
+    },
+    {
+      "name": "Score line contains a single highlight with winner title and score",
+      "persona": "visitor",
+      "status": "pass"
+    },
+    {
+      "name": "Accessibility: aria-labelledby points to Latest Run heading",
       "persona": "screen-reader-user",
       "status": "pass"
     },
     {
-      "name": "Section hides instead of rendering placeholder content when decision data is missing",
-      "persona": "visitor",
+      "name": "Accessibility: terminal dots are aria-hidden and not focusable",
+      "persona": "screen-reader-user",
       "status": "pass"
     },
     {
-      "name": "Long winner titles wrap on mobile without introducing horizontal page overflow",
+      "name": "Accessibility: design-token colors match expected values",
+      "persona": "screen-reader-user",
+      "status": "pass"
+    },
+    {
+      "name": "Accessibility: keyboard focus is not trapped in terminal",
+      "persona": "screen-reader-user",
+      "status": "pass"
+    },
+    {
+      "name": "Mobile: terminal fills available width with no large margins",
       "persona": "mobile-user",
       "status": "pass"
     },
     {
-      "name": "decision.json validates against schema v2",
+      "name": "Mobile: no horizontal scrollbar at 375px viewport",
+      "persona": "mobile-user",
+      "status": "pass"
+    },
+    {
+      "name": "Mobile: font-size matches --text-xs at <640px",
+      "persona": "mobile-user",
+      "status": "pass"
+    },
+    {
+      "name": "Mobile: terminal dot width is 10px at <640px",
+      "persona": "mobile-user",
+      "status": "pass"
+    },
+    {
+      "name": "Mobile: long text wraps via overflow-wrap without overflow",
+      "persona": "mobile-user",
+      "status": "pass"
+    },
+    {
+      "name": "Desktop: terminal container has max-width 720px and is centered",
+      "persona": "visitor",
+      "status": "pass"
+    },
+    {
+      "name": "Desktop: no horizontal scrollbar at 1024px viewport",
+      "persona": "visitor",
+      "status": "pass"
+    },
+    {
+      "name": "Desktop: font-size is --text-sm at >=640px",
+      "persona": "visitor",
+      "status": "pass"
+    },
+    {
+      "name": "Desktop: terminal dot width is 12px at >=640px",
+      "persona": "visitor",
+      "status": "pass"
+    },
+    {
+      "name": "Design system: spec requires design-system tokens and no new terminal tokens added",
+      "persona": "developer",
+      "status": "pass"
+    },
+    {
+      "name": "Design system: terminal CSS rules use no hardcoded hex or rgba color values",
       "persona": "developer",
       "status": "pass"
     }

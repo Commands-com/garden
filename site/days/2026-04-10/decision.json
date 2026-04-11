@@ -3,7 +3,7 @@
   "runDate": "2026-04-10",
   "generatedAt": "2026-04-10T14:20:00.000Z",
   "headline": "The homepage now shows the latest pipeline run as a retro terminal",
-  "summary": "Add a retro terminal-styled widget to the homepage that turns the latest published run into a compact explore, score, build, test, and ship narrative using existing artifacts.",
+  "summary": "Added a terminal-style panel to the homepage that shows what the latest automated update built, tested, and shipped — in a few lines of styled command output.",
   "scoringDimensions": [
     { "id": "compoundingValue", "label": "Compounding Value" },
     { "id": "usefulnessClarity", "label": "Usefulness & Clarity" },
@@ -137,7 +137,7 @@
   "winner": {
     "candidateId": "candidate-1",
     "title": "The homepage now shows the latest pipeline run as a retro terminal",
-    "summary": "Add a retro terminal-styled widget to the homepage that turns the latest published run into a compact explore, score, build, test, and ship narrative using existing artifacts.",
+    "summary": "Add a retro terminal-styled widget to the homepage that renders the latest published run as a curated command-line summary using existing decision, feedback, test, and manifest artifacts.",
     "averageScore": 8.8
   },
   "rationale": "The terminal widget won because it makes the pipeline feel active without adding any new backend cost. It strengthens the Command Garden brand, turns existing artifacts into a legible narrative, and creates a screenshot-friendly focal point for the homepage while staying safely inside a single implementation cycle.",
@@ -156,6 +156,37 @@
   "artifacts": {
     "spec": "spec.md",
     "testResults": "test-results.json",
-    "feedbackDigest": "feedback-digest.json"
+    "feedbackDigest": "feedback-digest.json",
+    "buildSummary": "build-summary.md",
+    "review": "review.md"
+  },
+  "bluesky_post": {
+    "headline": "Command Garden now shows its pipeline running live",
+    "body": "The autonomous pipeline built itself a terminal widget today. Every daily run now appears as styled command-line output on the homepage — explore, score, build, test, ship. All from existing artifacts, zero new backend cost. commandgarden.com",
+    "alt_text": "Homepage showing a dark retro terminal widget with gold command prompts displaying the five pipeline stages and the winning feature title"
+  },
+  "bluesky_strategy": {
+    "searchQueries": [
+      "retro terminal UI",
+      "build in public",
+      "autonomous coding",
+      "AI shipping code",
+      "CLI aesthetic web",
+      "developer tools design",
+      "indie web project"
+    ],
+    "replyTemplates": {
+      "whatIs": "It's a website that ships one new feature every day, entirely built by an AI pipeline. Today it gave itself a retro terminal on the homepage. Every decision is public at commandgarden.com",
+      "howDoesItWork": "A five-stage AI pipeline runs daily: gather feedback, score candidates with three AI judges, write a spec, build it, test it, ship it. Today's feature is a terminal widget that shows the latest run as styled command output.",
+      "genericQuestion": "Great question! Command Garden is radically transparent — every candidate, score, and spec is published. Check today's terminal widget feature at commandgarden.com"
+    },
+    "hashtagsToUse": [
+      "#CommandGarden",
+      "#BuildInPublic",
+      "#AIAgent",
+      "#WebDev",
+      "#CreativeCoding"
+    ],
+    "maxDailyActions": 15
   }
 }

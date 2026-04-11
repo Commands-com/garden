@@ -991,64 +991,115 @@ function renderGardenViz(manifest) {
 }
 
 // ---------- Terminal Renderer ----------
-function renderTerminal(artifacts, dayDate) {
-  if (!artifacts.decision || !artifacts.decision.winner) {
+function renderTerminal(result) {
+  const artifacts = result?.artifacts;
+  const dayDate = result?.day?.date;
+  if (!artifacts?.decision || !artifacts.decision.winner) {
     return null;
   }
 
-  const winner = artifacts.decision.winner;
-  const candidateCount = artifacts.decision.candidates
-    ? artifacts.decision.candidates.length
+  const decision = artifacts.decision;
+  const winner = decision.winner;
+  const candidateCount = decision.candidates
+    ? decision.candidates.length
     : 0;
 
   // Feedback count
   const feedbackTotal = artifacts.feedbackDigest?.summary?.totalItems;
   const feedbackText = feedbackTotal != null
-    ? `Scanning feedback… ${feedbackTotal} items`
-    : 'Scanning feedback… no prior feedback';
+    ? `Found ${feedbackTotal} feedback items`
+    : null;
+
+  // Judge line
+  const judgePanel = decision.judgePanel;
+  const hasJudges = Array.isArray(judgePanel) && judgePanel.length > 0;
+  const scorePrompt = hasJudges
+    ? `$ garden score --judges ${judgePanel.map(j => j.modelFamily).join(',')}`
+    : '$ garden score';
+
+  // Score output
+  const scoreText = winner.averageScore != null
+    ? `Winner: "${winner.title}" (${winner.averageScore}/10)`
+    : `Winner: "${winner.title}"`;
+
+  // Build status
+  const buildText = artifacts.buildSummary
+    ? 'Implementation complete'
+    : 'Build status unknown';
+
+  // Test result normalization
+  let testText = 'Tests pending';
+  const tr = artifacts.testResults;
+  if (tr) {
+    if (tr.summary) {
+      // Schema v1
+      testText = tr.summary.failed > 0
+        ? 'Some checks failed'
+        : `All checks passed (${tr.summary.passed} scenarios)`;
+    } else if (tr.passRate != null) {
+      // Legacy shape
+      testText = tr.passRate < 100
+        ? 'Some checks failed'
+        : 'All checks passed';
+    }
+  }
 
   // Title bar
   const titlebar = el('div', { className: 'terminal__titlebar' },
-    el('div', { className: 'terminal__dot' }),
-    el('div', { className: 'terminal__dot' }),
-    el('div', { className: 'terminal__dot' }),
+    el('div', { className: 'terminal__dot', 'aria-hidden': 'true' }),
+    el('div', { className: 'terminal__dot', 'aria-hidden': 'true' }),
+    el('div', { className: 'terminal__dot', 'aria-hidden': 'true' }),
     el('span', { className: 'terminal__title' }, `command-garden — ${dayDate}`)
   );
 
   // Body lines
-  const lines = [
-    // explore
-    el('div', { className: 'terminal__line' },
-      el('span', { className: 'terminal__prompt' }, '$ garden explore'),
-      document.createTextNode('\n'),
-      el('span', { className: 'terminal__output' }, feedbackText)
-    ),
-    // scout
-    el('div', { className: 'terminal__line' },
-      el('span', { className: 'terminal__prompt' }, '$ garden scout'),
-      document.createTextNode('\n'),
-      el('span', { className: 'terminal__output' }, `Found ${candidateCount} candidates`)
-    ),
-    // spec
-    el('div', { className: 'terminal__line' },
-      el('span', { className: 'terminal__prompt' }, '$ garden spec'),
-      document.createTextNode('\n'),
-      el('span', { className: 'terminal__output' }, `Spec written: ${winner.title}`)
-    ),
-    // implement
-    el('div', { className: 'terminal__line' },
-      el('span', { className: 'terminal__prompt' }, '$ garden implement'),
-      document.createTextNode('\n'),
-      el('span', { className: 'terminal__output' }, `Building ${winner.title}…`)
-    ),
-    // review
-    el('div', { className: 'terminal__line' },
-      el('span', { className: 'terminal__prompt' }, '$ garden review'),
-      document.createTextNode('\n'),
-      el('span', { className: 'terminal__highlight' },
-        `✓ Shipped: ${winner.title} (score: ${winner.averageScore})`)
-    ),
-  ];
+  const lines = [];
+
+  // explore
+  const exploreLine = el('div', { className: 'terminal__line' },
+    el('span', { className: 'terminal__prompt' }, `$ garden explore --date ${dayDate}`)
+  );
+  if (feedbackText) {
+    exploreLine.appendChild(document.createTextNode('\n'));
+    exploreLine.appendChild(el('span', { className: 'terminal__output' }, feedbackText));
+  }
+  exploreLine.appendChild(document.createTextNode('\n'));
+  exploreLine.appendChild(el('span', { className: 'terminal__output' }, `Generated ${candidateCount} candidates`));
+  lines.push(exploreLine);
+
+  // score
+  lines.push(el('div', { className: 'terminal__line' },
+    el('span', { className: 'terminal__prompt' }, scorePrompt),
+    document.createTextNode('\n'),
+    el('span', { className: 'terminal__output' }, 'Evaluated across 7 dimensions'),
+    document.createTextNode('\n'),
+    el('span', { className: 'terminal__highlight' }, scoreText)
+  ));
+
+  // build
+  lines.push(el('div', { className: 'terminal__line' },
+    el('span', { className: 'terminal__prompt' }, '$ garden build --spec approved'),
+    document.createTextNode('\n'),
+    el('span', { className: 'terminal__output' }, buildText)
+  ));
+
+  // test
+  lines.push(el('div', { className: 'terminal__line' },
+    el('span', { className: 'terminal__prompt' }, '$ garden test'),
+    document.createTextNode('\n'),
+    el('span', { className: 'terminal__output' }, testText)
+  ));
+
+  // ship
+  lines.push(el('div', { className: 'terminal__line' },
+    el('span', { className: 'terminal__prompt' }, '$ garden ship'),
+    document.createTextNode('\n'),
+    el('span', { className: 'terminal__output' },
+      `✓ Deployed to commandgarden.com`),
+    document.createTextNode('\n'),
+    el('span', { className: 'terminal__output' },
+      `Published decision log for ${dayDate}`)
+  ));
 
   const body = el('div', { className: 'terminal__body' });
   lines.forEach(line => body.appendChild(line));
