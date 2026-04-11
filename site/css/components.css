@@ -2119,7 +2119,8 @@
   flex-wrap: wrap;
   justify-content: center;
   gap: var(--space-4);
-  margin-bottom: var(--space-8);
+  margin: 0 0 var(--space-8);
+  padding: 0;
 }
 
 .community-pulse-badge {
@@ -2142,9 +2143,11 @@
 }
 
 .community-pulse-badge__count {
+  font-family: var(--font-mono);
   font-size: var(--text-lg);
   font-weight: var(--weight-bold);
   color: var(--color-text-dark);
+  margin: 0;
 }
 
 .community-pulse-badge--highlight {
@@ -2168,6 +2171,29 @@
 
 .community-pulse-callout__link:hover {
   color: var(--color-accent-gold);
+}
+
+.community-pulse-cta {
+  text-align: center;
+  margin-top: var(--space-6);
+}
+
+.community-pulse-cta__link {
+  display: inline-block;
+  color: var(--color-deep-green);
+  font-weight: var(--weight-semibold);
+  font-size: var(--text-base);
+  text-decoration: none;
+  padding: var(--space-2) var(--space-4);
+  border: 1px solid var(--color-deep-green);
+  border-radius: var(--radius-md);
+  transition: background var(--duration-fast) var(--ease-default),
+    color var(--duration-fast) var(--ease-default);
+}
+
+.community-pulse-cta__link:hover {
+  background: var(--color-deep-green);
+  color: var(--color-cream);
 }
 
 @media (max-width: 639px) {

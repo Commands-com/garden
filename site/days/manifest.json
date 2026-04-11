@@ -4,7 +4,7 @@
     {
       "date": "2026-04-11",
       "title": "Community Pulse — Emoji Reaction Summary on Homepage",
-      "summary": "A new homepage section that aggregates recent emoji reactions into a community engagement scoreboard with highlighted top emoji and most-reacted day callout.",
+      "summary": "A new 'Community Pulse' section on the homepage showing which features got the most love from the community over the last week.",
       "status": "shipped",
       "featureType": "interaction",
       "tags": ["homepage", "community", "reactions", "engagement"],

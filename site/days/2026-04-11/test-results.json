@@ -1,0 +1,149 @@
+{
+  "schemaVersion": 1,
+  "runDate": "2026-04-11",
+  "generatedAt": "2026-04-11T16:00:00.000Z",
+  "summary": {
+    "totalScenarios": 27,
+    "passed": 27,
+    "failed": 0,
+    "passRate": 100
+  },
+  "scenarios": [
+    {
+      "name": "Community Pulse becomes visible after page load",
+      "persona": "visitor",
+      "status": "pass"
+    },
+    {
+      "name": "Community Pulse sits between garden viz and main content",
+      "persona": "visitor",
+      "status": "pass"
+    },
+    {
+      "name": "Section exposes the expected heading (Community Pulse)",
+      "persona": "visitor",
+      "status": "pass"
+    },
+    {
+      "name": "Section has aria-labelledby pointing to pulse-heading",
+      "persona": "screen-reader-user",
+      "status": "pass"
+    },
+    {
+      "name": "Section stays hidden when recentReactions is empty",
+      "persona": "visitor",
+      "status": "pass"
+    },
+    {
+      "name": "Renders five emoji badges in shipped order",
+      "persona": "visitor",
+      "status": "pass"
+    },
+    {
+      "name": "Sprout badge shows aggregated count of 24",
+      "persona": "visitor",
+      "status": "pass"
+    },
+    {
+      "name": "Fire badge shows aggregated count of 13",
+      "persona": "visitor",
+      "status": "pass"
+    },
+    {
+      "name": "Thinking badge shows aggregated count of 13",
+      "persona": "visitor",
+      "status": "pass"
+    },
+    {
+      "name": "Heart badge shows aggregated count of 16",
+      "persona": "visitor",
+      "status": "pass"
+    },
+    {
+      "name": "Rocket badge shows aggregated count of 18",
+      "persona": "visitor",
+      "status": "pass"
+    },
+    {
+      "name": "Only Sprout badge (highest at 24) has gold highlight",
+      "persona": "visitor",
+      "status": "pass"
+    },
+    {
+      "name": "Highlight border uses --color-accent-gold token",
+      "persona": "developer",
+      "status": "pass"
+    },
+    {
+      "name": "Most-reacted day callout shows correct title from manifest",
+      "persona": "visitor",
+      "status": "pass"
+    },
+    {
+      "name": "Most-reacted day shows 55 reactions",
+      "persona": "visitor",
+      "status": "pass"
+    },
+    {
+      "name": "Most-reacted day link points to correct day URL",
+      "persona": "visitor",
+      "status": "pass"
+    },
+    {
+      "name": "Each badge has aria-label with reaction name and count",
+      "persona": "screen-reader-user",
+      "status": "pass"
+    },
+    {
+      "name": "Sprout badge has aria-label: Sprout reactions: 24",
+      "persona": "screen-reader-user",
+      "status": "pass"
+    },
+    {
+      "name": "Fire badge has aria-label: Fire reactions: 13",
+      "persona": "screen-reader-user",
+      "status": "pass"
+    },
+    {
+      "name": "Thinking badge has aria-label: Thinking reactions: 13",
+      "persona": "screen-reader-user",
+      "status": "pass"
+    },
+    {
+      "name": "Heart badge has aria-label: Heart reactions: 16",
+      "persona": "screen-reader-user",
+      "status": "pass"
+    },
+    {
+      "name": "Rocket badge has aria-label: Rocket reactions: 18",
+      "persona": "screen-reader-user",
+      "status": "pass"
+    },
+    {
+      "name": "CTA link is visible and points to #todays-change",
+      "persona": "visitor",
+      "status": "pass"
+    },
+    {
+      "name": "CTA link contains text about reacting to today's feature",
+      "persona": "visitor",
+      "status": "pass"
+    },
+    {
+      "name": "Mobile: badges wrap and resize at 639px breakpoint",
+      "persona": "mobile-user",
+      "status": "pass"
+    },
+    {
+      "name": "Mobile: no horizontal scrollbar at 375px viewport",
+      "persona": "mobile-user",
+      "status": "pass"
+    },
+    {
+      "name": "Design system: all CSS uses design-system tokens with no hardcoded colors",
+      "persona": "developer",
+      "status": "pass"
+    }
+  ],
+  "testPersonas": ["visitor", "mobile-user", "screen-reader-user", "developer"]
+}

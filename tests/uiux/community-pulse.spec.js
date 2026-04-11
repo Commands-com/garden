@@ -7,8 +7,8 @@ const {
   getAppUrl,
 } = require("./helpers/local-site");
 
-const LATEST_DAY_DATE = "2026-04-10";
-const MOST_REACTED_DAY_DATE = "2026-04-09";
+const LATEST_DAY_DATE = "2026-04-11";
+const MOST_REACTED_DAY_DATE = "2026-04-08";
 
 const feedbackDigest = JSON.parse(
   fs.readFileSync(
@@ -24,11 +24,11 @@ const manifest = JSON.parse(
 );
 
 const expectedBadges = [
-  { emoji: "🌱", count: "16" },
-  { emoji: "🔥", count: "6" },
-  { emoji: "🤔", count: "7" },
-  { emoji: "❤️", count: "9" },
-  { emoji: "🚀", count: "13" },
+  { emoji: "🌱", count: "24" },
+  { emoji: "🔥", count: "13" },
+  { emoji: "🤔", count: "13" },
+  { emoji: "❤️", count: "16" },
+  { emoji: "🚀", count: "18" },
 ];
 
 const mostReactedTitle =
@@ -150,7 +150,7 @@ test.describe("Community Pulse section", () => {
     const badges = section.locator(".community-pulse-badge");
 
     const highlightBadge = badges.filter({
-      has: page.locator(".community-pulse-badge__count", { hasText: "16" }),
+      has: page.locator(".community-pulse-badge__count", { hasText: "24" }),
     });
     await expect(highlightBadge).toHaveCount(1);
     await expect(highlightBadge).toHaveClass(
@@ -167,12 +167,18 @@ test.describe("Community Pulse section", () => {
     );
     expect(highlightBorderColor).toContain("196, 163, 90");
 
-    for (const count of ["6", "7", "9", "13"]) {
+    for (const badgeInfo of expectedBadges) {
       const badge = badges.filter({
-        has: page.locator(".community-pulse-badge__count", { hasText: count }),
+        has: page.locator(".community-pulse-badge__emoji", {
+          hasText: badgeInfo.emoji,
+        }),
       });
       await expect(badge).toHaveCount(1);
-      await expect(badge).not.toHaveClass(/community-pulse-badge--highlight/);
+      if (badgeInfo.count === "24") {
+        await expect(badge).toHaveClass(/community-pulse-badge--highlight/);
+      } else {
+        await expect(badge).not.toHaveClass(/community-pulse-badge--highlight/);
+      }
     }
   });
 
@@ -184,11 +190,41 @@ test.describe("Community Pulse section", () => {
     const link = callout.locator("a.community-pulse-callout__link");
 
     await expect(callout).toContainText("Most reacted day:");
-    await expect(callout).toContainText("(48 reactions)");
+    await expect(callout).toContainText("(55 reactions)");
     await expect(link).toHaveAttribute(
       "href",
       `/days/?date=${MOST_REACTED_DAY_DATE}`
     );
     await expect(link).toHaveText(mostReactedTitle);
+  });
+
+  test("each badge has an accessible aria-label with the reaction name and count", async ({
+    page,
+  }) => {
+    const section = await waitForCommunityPulse(page);
+    const badges = section.locator(".community-pulse-badge");
+
+    const expectedLabels = [
+      "Sprout reactions: 24",
+      "Fire reactions: 13",
+      "Thinking reactions: 13",
+      "Heart reactions: 16",
+      "Rocket reactions: 18",
+    ];
+
+    for (const [index, label] of expectedLabels.entries()) {
+      await expect(badges.nth(index)).toHaveAttribute("aria-label", label);
+    }
+  });
+
+  test("shows a CTA link to the reaction widget anchored at #todays-change", async ({
+    page,
+  }) => {
+    const section = await waitForCommunityPulse(page);
+    const cta = section.locator(".community-pulse-cta__link");
+
+    await expect(cta).toBeVisible();
+    await expect(cta).toHaveAttribute("href", "#todays-change");
+    await expect(cta).toContainText("React to today");
   });
 });

@@ -1134,7 +1134,7 @@ function renderCommunityPulse(feedbackDigest, manifest) {
   // Find max aggregate for highlight (AC-3)
   const maxAggregate = Math.max(...REACTION_TYPES.map(t => aggregates[t.key]));
 
-  // Build badge elements
+  // Build badge elements as semantic <dl> with <dt>/<dd> pairs (AC-8)
   const badgesContainer = document.querySelector('.community-pulse-badges');
   badgesContainer.innerHTML = '';
 
@@ -1143,9 +1143,10 @@ function renderCommunityPulse(feedbackDigest, manifest) {
     const isHighlight = count === maxAggregate && maxAggregate > 0;
     const badge = el('div', {
       className: 'community-pulse-badge' + (isHighlight ? ' community-pulse-badge--highlight' : ''),
+      'aria-label': `${t.label} reactions: ${count}`,
     },
-      el('span', { className: 'community-pulse-badge__emoji', 'aria-hidden': 'true' }, t.emoji),
-      el('span', { className: 'community-pulse-badge__count' }, String(count))
+      el('dt', { className: 'community-pulse-badge__emoji', 'aria-hidden': 'true' }, t.emoji),
+      el('dd', { className: 'community-pulse-badge__count' }, String(count))
     );
     badgesContainer.appendChild(badge);
   });
@@ -1185,6 +1186,17 @@ function renderCommunityPulse(feedbackDigest, manifest) {
       ` (${bestTotal} reactions)`
     );
     calloutContainer.appendChild(callout);
+  }
+
+  // Build CTA link back to today's reaction widget (AC-5)
+  const ctaContainer = document.querySelector('.community-pulse-cta');
+  if (ctaContainer) {
+    ctaContainer.innerHTML = '';
+    const cta = el('a', {
+      className: 'community-pulse-cta__link',
+      href: '#todays-change',
+    }, 'React to today\u2019s feature \u2192');
+    ctaContainer.appendChild(cta);
   }
 
   // Unhide section

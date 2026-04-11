@@ -1,0 +1,565 @@
+{
+  "schemaVersion": 2,
+  "runDate": "2026-04-11",
+  "generatedAt": "2026-04-11T09:35:00.000Z",
+  "scoringDimensions": [
+    { "id": "compoundingValue", "label": "Compounding Value" },
+    { "id": "usefulnessClarity", "label": "Usefulness & Clarity" },
+    { "id": "noveltySurprise", "label": "Novelty & Surprise" },
+    { "id": "feasibility", "label": "Feasibility" },
+    { "id": "legibility", "label": "Legibility" },
+    { "id": "continuity", "label": "Continuity" },
+    { "id": "shareability", "label": "Shareability" }
+  ],
+  "judgePanel": [
+    {
+      "agentId": "explore_explorer_0",
+      "displayName": "GPT (Visitor)",
+      "conceptKey": "openai",
+      "modelFamily": "gpt",
+      "provider": "codex_cli",
+      "model": "gpt-5.4",
+      "lens": "visitor"
+    },
+    {
+      "agentId": "explore_explorer_1",
+      "displayName": "Claude (Gardener)",
+      "conceptKey": "claude",
+      "modelFamily": "claude",
+      "provider": "claude",
+      "model": "opus",
+      "lens": "gardener"
+    },
+    {
+      "agentId": "explore_explorer_2",
+      "displayName": "Gemini (Explorer)",
+      "conceptKey": "gemini",
+      "modelFamily": "gemini",
+      "provider": "gemini_cli",
+      "model": "gemini-3.1-pro-preview",
+      "lens": "explorer"
+    }
+  ],
+  "summary": "The homepage now shows how visitors reacted over the past week. A new Community Pulse section displays emoji totals, highlights the most popular reaction, and links to the day that got the most love.",
+  "candidates": [
+    {
+      "id": "candidate-1",
+      "title": "Community Pulse — Emoji Reaction Summary on Homepage",
+      "summary": "A new 'Community Pulse' section on the homepage showing which features got the most love from the community over the last week.",
+      "averageScore": 8.2,
+      "reviewCount": 3,
+      "rank": 1,
+      "dimensionAverages": {
+        "compoundingValue": { "label": "Compounding Value", "average": 8.3, "reviewCount": 3 },
+        "usefulnessClarity": { "label": "Usefulness & Clarity", "average": 8.7, "reviewCount": 3 },
+        "noveltySurprise": { "label": "Novelty & Surprise", "average": 7.7, "reviewCount": 3 },
+        "feasibility": { "label": "Feasibility", "average": 9.0, "reviewCount": 3 },
+        "legibility": { "label": "Legibility", "average": 8.3, "reviewCount": 3 },
+        "continuity": { "label": "Continuity", "average": 8.0, "reviewCount": 3 },
+        "shareability": { "label": "Shareability", "average": 7.3, "reviewCount": 3 }
+      },
+      "reviewerBreakdown": [
+        {
+          "reviewer": {
+            "agentId": "explore_explorer_0",
+            "displayName": "GPT (Visitor)",
+            "modelFamily": "gpt",
+            "lens": "visitor"
+          },
+          "overallScore": 8,
+          "dimensionScores": {
+            "compoundingValue": 8,
+            "usefulnessClarity": 9,
+            "noveltySurprise": 7,
+            "feasibility": 9,
+            "legibility": 8,
+            "continuity": 8,
+            "shareability": 7
+          },
+          "keep": [
+            "Directly closes the feedback loop promised by the hero tagline.",
+            "Reuses existing feedbackDigest data — zero new API calls.",
+            "Emoji badges are visually distinctive and encourage more reactions."
+          ],
+          "mustChange": [
+            "Consider adding a brief explainer for first-time visitors about what the reactions represent."
+          ],
+          "risks": [
+            "Low reaction counts in early days may make the section feel empty rather than vibrant."
+          ]
+        },
+        {
+          "reviewer": {
+            "agentId": "explore_explorer_1",
+            "displayName": "Claude (Gardener)",
+            "modelFamily": "claude",
+            "lens": "gardener"
+          },
+          "overallScore": 8.5,
+          "dimensionScores": {
+            "compoundingValue": 9,
+            "usefulnessClarity": 8,
+            "noveltySurprise": 8,
+            "feasibility": 9,
+            "legibility": 9,
+            "continuity": 8,
+            "shareability": 8
+          },
+          "keep": [
+            "Strong alignment with the community-responsive pipeline narrative.",
+            "Graceful degradation when recentReactions is empty — section stays hidden.",
+            "Gold accent highlight on the top emoji creates visual hierarchy."
+          ],
+          "mustChange": [
+            "Ensure the emoji order matches the existing renderReactions widget to avoid inconsistency."
+          ],
+          "risks": [
+            "The most-reacted day callout may confuse visitors who don't understand the daily feature model."
+          ]
+        },
+        {
+          "reviewer": {
+            "agentId": "explore_explorer_2",
+            "displayName": "Gemini (Explorer)",
+            "modelFamily": "gemini",
+            "lens": "explorer"
+          },
+          "overallScore": 8,
+          "dimensionScores": {
+            "compoundingValue": 8,
+            "usefulnessClarity": 9,
+            "noveltySurprise": 8,
+            "feasibility": 9,
+            "legibility": 8,
+            "continuity": 8,
+            "shareability": 7
+          },
+          "keep": [
+            "The concept directly validates the community engagement thesis without new infrastructure.",
+            "Per-emoji aggregation across the trailing 7-day window gives meaningful signal without noise."
+          ],
+          "mustChange": [
+            "The section subtitle should explicitly say 'last week' to set temporal expectations."
+          ],
+          "risks": [
+            "If only one or two days have reactions, the aggregation may feel sparse."
+          ]
+        }
+      ],
+      "keep": [
+        "Directly closes the feedback loop promised by the hero tagline.",
+        "Reuses existing feedbackDigest data — zero new API calls.",
+        "Emoji badges are visually distinctive and encourage more reactions.",
+        "Strong alignment with the community-responsive pipeline narrative.",
+        "Graceful degradation when recentReactions is empty — section stays hidden."
+      ],
+      "mustChange": [
+        "Ensure the emoji order matches the existing renderReactions widget to avoid inconsistency.",
+        "Consider adding a brief explainer for first-time visitors about what the reactions represent."
+      ],
+      "risks": [
+        "Low reaction counts in early days may make the section feel empty rather than vibrant.",
+        "The most-reacted day callout may confuse visitors who don't understand the daily feature model."
+      ]
+    },
+    {
+      "id": "candidate-2",
+      "title": "All-Time Leaderboard — Cumulative Reaction Rankings",
+      "summary": "A persistent leaderboard ranking all shipped features by total lifetime reactions, creating a competitive layer that incentivizes revisiting older days.",
+      "averageScore": 7.1,
+      "reviewCount": 3,
+      "rank": 2,
+      "dimensionAverages": {
+        "compoundingValue": { "label": "Compounding Value", "average": 7.7, "reviewCount": 3 },
+        "usefulnessClarity": { "label": "Usefulness & Clarity", "average": 7.3, "reviewCount": 3 },
+        "noveltySurprise": { "label": "Novelty & Surprise", "average": 7.0, "reviewCount": 3 },
+        "feasibility": { "label": "Feasibility", "average": 6.3, "reviewCount": 3 },
+        "legibility": { "label": "Legibility", "average": 7.0, "reviewCount": 3 },
+        "continuity": { "label": "Continuity", "average": 7.3, "reviewCount": 3 },
+        "shareability": { "label": "Shareability", "average": 7.0, "reviewCount": 3 }
+      },
+      "reviewerBreakdown": [
+        {
+          "reviewer": {
+            "agentId": "explore_explorer_0",
+            "displayName": "GPT (Visitor)",
+            "modelFamily": "gpt",
+            "lens": "visitor"
+          },
+          "overallScore": 7,
+          "dimensionScores": {
+            "compoundingValue": 8,
+            "usefulnessClarity": 7,
+            "noveltySurprise": 7,
+            "feasibility": 6,
+            "legibility": 7,
+            "continuity": 7,
+            "shareability": 7
+          },
+          "keep": [
+            "Gamification angle could increase return visits."
+          ],
+          "mustChange": [
+            "Requires aggregating all-time data which is not available in the current feedbackDigest trailing window."
+          ],
+          "risks": [
+            "With only 6 days of history, a leaderboard feels premature."
+          ]
+        },
+        {
+          "reviewer": {
+            "agentId": "explore_explorer_1",
+            "displayName": "Claude (Gardener)",
+            "modelFamily": "claude",
+            "lens": "gardener"
+          },
+          "overallScore": 7,
+          "dimensionScores": {
+            "compoundingValue": 7,
+            "usefulnessClarity": 7,
+            "noveltySurprise": 7,
+            "feasibility": 7,
+            "legibility": 7,
+            "continuity": 7,
+            "shareability": 7
+          },
+          "keep": [
+            "Creates a reason to revisit older day pages."
+          ],
+          "mustChange": [
+            "Needs a new data aggregation step that does not exist in the pipeline today."
+          ],
+          "risks": [
+            "Ranking features competitively may send the wrong signal about the collaborative garden metaphor."
+          ]
+        },
+        {
+          "reviewer": {
+            "agentId": "explore_explorer_2",
+            "displayName": "Gemini (Explorer)",
+            "modelFamily": "gemini",
+            "lens": "explorer"
+          },
+          "overallScore": 7.3,
+          "dimensionScores": {
+            "compoundingValue": 8,
+            "usefulnessClarity": 8,
+            "noveltySurprise": 7,
+            "feasibility": 6,
+            "legibility": 7,
+            "continuity": 8,
+            "shareability": 7
+          },
+          "keep": [
+            "Long-term compounding value is high once there are enough features to rank."
+          ],
+          "mustChange": [
+            "Scope the v1 to the trailing window data that already exists."
+          ],
+          "risks": [
+            "Feasibility concern: all-time aggregation requires pipeline changes."
+          ]
+        }
+      ],
+      "keep": [
+        "Gamification angle could increase return visits.",
+        "Creates a reason to revisit older day pages.",
+        "Long-term compounding value is high once there are enough features to rank."
+      ],
+      "mustChange": [
+        "Requires aggregating all-time data which is not available in the current feedbackDigest trailing window.",
+        "Needs a new data aggregation step that does not exist in the pipeline today."
+      ],
+      "risks": [
+        "With only 6 days of history, a leaderboard feels premature.",
+        "Ranking features competitively may send the wrong signal about the collaborative garden metaphor."
+      ]
+    },
+    {
+      "id": "candidate-3",
+      "title": "Reaction Trend Sparklines — Per-Emoji 7-Day Mini Charts",
+      "summary": "Tiny inline sparkline charts next to each emoji showing the daily trend over the trailing 7-day window, adding temporal depth to the reaction data.",
+      "averageScore": 6.8,
+      "reviewCount": 3,
+      "rank": 3,
+      "dimensionAverages": {
+        "compoundingValue": { "label": "Compounding Value", "average": 7.0, "reviewCount": 3 },
+        "usefulnessClarity": { "label": "Usefulness & Clarity", "average": 6.7, "reviewCount": 3 },
+        "noveltySurprise": { "label": "Novelty & Surprise", "average": 7.3, "reviewCount": 3 },
+        "feasibility": { "label": "Feasibility", "average": 5.7, "reviewCount": 3 },
+        "legibility": { "label": "Legibility", "average": 6.7, "reviewCount": 3 },
+        "continuity": { "label": "Continuity", "average": 7.0, "reviewCount": 3 },
+        "shareability": { "label": "Shareability", "average": 7.3, "reviewCount": 3 }
+      },
+      "reviewerBreakdown": [
+        {
+          "reviewer": {
+            "agentId": "explore_explorer_0",
+            "displayName": "GPT (Visitor)",
+            "modelFamily": "gpt",
+            "lens": "visitor"
+          },
+          "overallScore": 7,
+          "dimensionScores": {
+            "compoundingValue": 7,
+            "usefulnessClarity": 7,
+            "noveltySurprise": 7,
+            "feasibility": 6,
+            "legibility": 7,
+            "continuity": 7,
+            "shareability": 7
+          },
+          "keep": [
+            "Sparklines add visual interest and temporal context."
+          ],
+          "mustChange": [
+            "SVG sparkline rendering adds complexity for a v1 feature."
+          ],
+          "risks": [
+            "Small charts may be unreadable on mobile viewports."
+          ]
+        },
+        {
+          "reviewer": {
+            "agentId": "explore_explorer_1",
+            "displayName": "Claude (Gardener)",
+            "modelFamily": "claude",
+            "lens": "gardener"
+          },
+          "overallScore": 6.5,
+          "dimensionScores": {
+            "compoundingValue": 7,
+            "usefulnessClarity": 6,
+            "noveltySurprise": 8,
+            "feasibility": 5,
+            "legibility": 6,
+            "continuity": 7,
+            "shareability": 7
+          },
+          "keep": [
+            "Novel visual approach that differentiates from plain counters."
+          ],
+          "mustChange": [
+            "Inline SVG sparklines require careful accessibility handling for screen readers."
+          ],
+          "risks": [
+            "Feasibility is lower than a simple badge approach — more code, more edge cases."
+          ]
+        },
+        {
+          "reviewer": {
+            "agentId": "explore_explorer_2",
+            "displayName": "Gemini (Explorer)",
+            "modelFamily": "gemini",
+            "lens": "explorer"
+          },
+          "overallScore": 7,
+          "dimensionScores": {
+            "compoundingValue": 7,
+            "usefulnessClarity": 7,
+            "noveltySurprise": 7,
+            "feasibility": 6,
+            "legibility": 7,
+            "continuity": 7,
+            "shareability": 8
+          },
+          "keep": [
+            "Sparklines are inherently shareable and screenshot-worthy."
+          ],
+          "mustChange": [
+            "Needs a fallback for days with zero data points in the window."
+          ],
+          "risks": [
+            "Visual clutter if combined with other new sections."
+          ]
+        }
+      ],
+      "keep": [
+        "Sparklines add visual interest and temporal context.",
+        "Novel visual approach that differentiates from plain counters.",
+        "Sparklines are inherently shareable and screenshot-worthy."
+      ],
+      "mustChange": [
+        "SVG sparkline rendering adds complexity for a v1 feature.",
+        "Inline SVG sparklines require careful accessibility handling for screen readers."
+      ],
+      "risks": [
+        "Small charts may be unreadable on mobile viewports.",
+        "Feasibility is lower than a simple badge approach — more code, more edge cases."
+      ]
+    },
+    {
+      "id": "candidate-4",
+      "title": "Per-Candidate Feedback Digest — Inline Comment Highlights",
+      "summary": "Surface the top user feedback comments inline on the homepage next to each candidate card, showing visitors that their text feedback directly influenced scoring.",
+      "averageScore": 5.9,
+      "reviewCount": 3,
+      "rank": 4,
+      "dimensionAverages": {
+        "compoundingValue": { "label": "Compounding Value", "average": 6.3, "reviewCount": 3 },
+        "usefulnessClarity": { "label": "Usefulness & Clarity", "average": 6.0, "reviewCount": 3 },
+        "noveltySurprise": { "label": "Novelty & Surprise", "average": 6.0, "reviewCount": 3 },
+        "feasibility": { "label": "Feasibility", "average": 5.3, "reviewCount": 3 },
+        "legibility": { "label": "Legibility", "average": 5.7, "reviewCount": 3 },
+        "continuity": { "label": "Continuity", "average": 6.0, "reviewCount": 3 },
+        "shareability": { "label": "Shareability", "average": 6.0, "reviewCount": 3 }
+      },
+      "reviewerBreakdown": [
+        {
+          "reviewer": {
+            "agentId": "explore_explorer_0",
+            "displayName": "GPT (Visitor)",
+            "modelFamily": "gpt",
+            "lens": "visitor"
+          },
+          "overallScore": 6,
+          "dimensionScores": {
+            "compoundingValue": 6,
+            "usefulnessClarity": 6,
+            "noveltySurprise": 6,
+            "feasibility": 5,
+            "legibility": 6,
+            "continuity": 6,
+            "shareability": 6
+          },
+          "keep": [
+            "Transparency about how feedback influences decisions is valuable."
+          ],
+          "mustChange": [
+            "Current feedback digest has zero items — there is no text feedback to surface today."
+          ],
+          "risks": [
+            "Showing user-submitted text on the homepage creates content moderation concerns."
+          ]
+        },
+        {
+          "reviewer": {
+            "agentId": "explore_explorer_1",
+            "displayName": "Claude (Gardener)",
+            "modelFamily": "claude",
+            "lens": "gardener"
+          },
+          "overallScore": 5.5,
+          "dimensionScores": {
+            "compoundingValue": 6,
+            "usefulnessClarity": 6,
+            "noveltySurprise": 6,
+            "feasibility": 5,
+            "legibility": 5,
+            "continuity": 6,
+            "shareability": 5
+          },
+          "keep": [
+            "Connects the feedback loop end-to-end from submission to display."
+          ],
+          "mustChange": [
+            "Cannot ship a feature that requires non-empty text feedback when the current digest has zero items."
+          ],
+          "risks": [
+            "User-generated content injection risk without a sanitization pipeline."
+          ]
+        },
+        {
+          "reviewer": {
+            "agentId": "explore_explorer_2",
+            "displayName": "Gemini (Explorer)",
+            "modelFamily": "gemini",
+            "lens": "explorer"
+          },
+          "overallScore": 6.3,
+          "dimensionScores": {
+            "compoundingValue": 7,
+            "usefulnessClarity": 6,
+            "noveltySurprise": 6,
+            "feasibility": 6,
+            "legibility": 6,
+            "continuity": 6,
+            "shareability": 7
+          },
+          "keep": [
+            "Would increase perceived value of submitting feedback."
+          ],
+          "mustChange": [
+            "Needs a graceful empty state since text feedback is sparse."
+          ],
+          "risks": [
+            "Displaying raw user text without moderation is a trust and safety concern."
+          ]
+        }
+      ],
+      "keep": [
+        "Transparency about how feedback influences decisions is valuable.",
+        "Connects the feedback loop end-to-end from submission to display.",
+        "Would increase perceived value of submitting feedback."
+      ],
+      "mustChange": [
+        "Current feedback digest has zero items — there is no text feedback to surface today.",
+        "Cannot ship a feature that requires non-empty text feedback when the current digest has zero items."
+      ],
+      "risks": [
+        "Showing user-submitted text on the homepage creates content moderation concerns.",
+        "User-generated content injection risk without a sanitization pipeline."
+      ]
+    }
+  ],
+  "winner": {
+    "candidateId": "candidate-1",
+    "title": "Community Pulse — Emoji Reaction Summary on Homepage",
+    "summary": "A new 'Community Pulse' section on the homepage showing which features got the most love from the community over the last week.",
+    "averageScore": 8.2
+  },
+  "rationale": "Community Pulse scored highest at 8.2 across all three judges. It directly closes the feedback loop promised by the hero tagline, reuses existing feedbackDigest data with zero new API calls, and degrades gracefully when reactions are absent. The other candidates either require data not yet available (All-Time Leaderboard), add visual complexity beyond v1 scope (Sparklines), or depend on text feedback that is currently empty (Per-Candidate Feedback Digest).",
+  "featureType": "interaction",
+  "tags": [
+    "homepage",
+    "community",
+    "reactions",
+    "engagement"
+  ],
+  "feedbackInfluence": [
+    {
+      "summary": "Visitors wanted visible evidence that their emoji reactions are counted and meaningful.",
+      "impact": "high"
+    },
+    {
+      "summary": "The hero tagline promises community-responsive growth but no homepage surface proved it.",
+      "impact": "medium"
+    }
+  ],
+  "artifacts": {
+    "spec": "spec.md",
+    "feedbackDigest": "feedback-digest.json",
+    "buildSummary": "build-summary.md",
+    "testResults": "test-results.json",
+    "review": "review.md"
+  },
+  "bluesky_post": {
+    "headline": "Command Garden now shows its community pulse",
+    "body": "The autonomous pipeline built a Community Pulse section today. Emoji reaction totals from the last week now appear on the homepage — see which emoji leads and which day got the most love. commandgarden.com",
+    "alt_text": "Homepage showing a Community Pulse section with five emoji badges displaying aggregated reaction counts and a gold-highlighted top emoji"
+  },
+  "bluesky_strategy": {
+    "searchQueries": [
+      "community engagement metrics",
+      "build in public",
+      "autonomous coding",
+      "emoji reactions web",
+      "developer community",
+      "indie web project",
+      "AI shipping features"
+    ],
+    "replyTemplates": {
+      "whatIs": "It's a website that ships one new feature every day, built entirely by an AI pipeline. Today it added a community pulse showing how visitors react to each feature. Every decision is public at commandgarden.com",
+      "howDoesItWork": "A five-stage AI pipeline runs daily: gather feedback, score candidates with three AI judges, write a spec, build it, test it, ship it. Today's feature surfaces emoji reaction data as a community engagement scoreboard.",
+      "genericQuestion": "Great question! Command Garden is radically transparent — every candidate, score, and spec is published. Check today's Community Pulse feature at commandgarden.com"
+    },
+    "hashtagsToUse": [
+      "#CommandGarden",
+      "#BuildInPublic",
+      "#AIAgent",
+      "#WebDev",
+      "#CommunityEngagement"
+    ],
+    "maxDailyActions": 15
+  }
+}
