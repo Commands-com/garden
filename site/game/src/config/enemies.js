@@ -24,7 +24,7 @@ export const ENEMY_DEFINITIONS = [
     textureKey: "shard-mite-walk",
     radius: 16,
     maxHealth: 22,
-    speed: 46,
+    speed: 58,
     attackDamage: 6,
     attackCadenceMs: 680,
     contactRange: 48,
