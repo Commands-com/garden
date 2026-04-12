@@ -139,6 +139,8 @@ Rules:
 - Keep tutorial and challenge aligned. If the daily challenge adds a new plant, enemy, economy rule, or board rule, update the tutorial so it teaches that exact thing.
 - Treat the daily challenge as a real board with a win state. Endless mode is the post-clear score chase, not the primary session structure.
 - If you retune a daily board for difficulty, run `npm run validate:scenario-difficulty -- --date YYYY-MM-DD` and use its result when deciding whether the board is unwinnable, too forgiving, or acceptably knife-edge.
+- Do not assume a good challenge must clear with full wall health. A valid board may be "hard but winnable" even if the canonical winning line survives on the last wall segment after one intentional late breach.
+- Do not treat "no winning plan found" as automatic proof that the board must be softened. First ask whether the validator search is missing the real line because its beam width, seed plans, or pressure assumptions are too weak.
 - If you touch a core system file, add or update tests that protect existing behavior.
 - Generated binaries belong under `site/game/assets/generated/` and should stay out of git.
 - Keep `?testMode=1` and `window.__gameTestHooks` working.

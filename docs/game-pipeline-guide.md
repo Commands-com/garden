@@ -77,6 +77,10 @@ If you modify a core system, include regression coverage for the behavior you ar
 - Treat validator output as a gate:
   - no winning plan found means the board is likely unwinnable
   - too many perturbed plans still win means the board is still too forgiving
+- Interpret that gate with judgment:
+  - a canonical win does not need to preserve every wall segment; surviving with one wall segment left can still be the intended "hard but fair" line
+  - if the validator reports no winning plan but human playtesting finds one, improve the search before retuning the board downward
+  - common fixes are wider beam search, pressure-aware seed plans, and explicit exploration of early lane-stack openings for enemies like Glass Rams
 - The goal is not arbitrary cruelty. The goal is: **winnable with strong play, but not casually survivable through sloppy placement**.
 
 ## Asset Backends
