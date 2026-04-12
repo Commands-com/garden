@@ -178,7 +178,7 @@ test.describe("Homepage a11y — landmark & keyboard validation", () => {
     page,
   }) => {
     const focused = [];
-    const maxTabs = 30;
+    const maxTabs = 60;
 
     for (let i = 0; i < maxTabs; i++) {
       const info = await tabAndDescribe(page);

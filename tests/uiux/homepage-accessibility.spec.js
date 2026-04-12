@@ -1,9 +1,27 @@
 // Tests: Accessibility audit of How It Works section and homepage landmarks
 const { test, expect } = require("@playwright/test");
+const {
+  USE_ROUTED_SITE,
+  installLocalSiteRoutes,
+  getAppUrl,
+} = require("./helpers/local-site");
 
 test.describe("Homepage accessibility", () => {
   test.beforeEach(async ({ page }) => {
-    await page.goto("/");
+    if (USE_ROUTED_SITE) {
+      await installLocalSiteRoutes(page);
+    }
+
+    // Intercept /api/reactions to prevent 404 on static/dev servers
+    await page.route("**/api/reactions*", async (route) => {
+      await route.fulfill({
+        status: 200,
+        contentType: "application/json; charset=utf-8",
+        body: JSON.stringify({ reactions: {} }),
+      });
+    });
+
+    await page.goto(getAppUrl("/"));
   });
 
   test("page has correct landmark structure (navigation with aria-label, main)", async ({
@@ -65,17 +83,20 @@ test.describe("Homepage accessibility", () => {
   test("keyboard tab order flows logically through nav, hero CTAs, and footer without focus traps", async ({
     page,
   }) => {
+    // Wait for dynamic content to finish loading so the focusable elements
+    // are stable before we start tabbing
+    await page.waitForLoadState("networkidle");
+
     // Expected focusable elements in DOM order on initial page load:
     // 1. Nav logo link
-    // 2. Mobile toggle button (may be hidden on desktop but still focusable
-    //    depending on CSS — we'll track what actually gets focus)
+    // 2. Mobile toggle button (hidden on desktop via display:none)
     // 3-7. Nav links (Home, Archive, Judges, Feedback, View Source)
     // 8. Hero CTA: "See today's change"
     // 9. Hero CTA: "Give feedback"
-    // ... then content links, footer link
+    // ... then content links, reaction buttons, footer link
 
     const focusedElements = [];
-    const maxTabs = 25; // enough to traverse the static elements
+    const maxTabs = 40; // enough to traverse all elements including dynamic content
 
     for (let i = 0; i < maxTabs; i++) {
       await page.keyboard.press("Tab");
@@ -129,15 +150,19 @@ test.describe("Homepage accessibility", () => {
     const heroIdx = focusedElements.indexOf(heroPrimary);
     expect(logoIdx).toBeLessThan(heroIdx);
 
-    // No focus trap: after maxTabs we should not be stuck on the same element
-    const lastThree = focusedElements.slice(-3);
-    const allSame = lastThree.every(
-      (el) =>
-        el.tag === lastThree[0].tag &&
-        el.text === lastThree[0].text &&
-        el.href === lastThree[0].href
-    );
-    expect(allSame).toBe(false);
+    // No focus trap: check that the last 5 consecutive focused elements are
+    // not all identical. A true trap keeps returning to the same element;
+    // wrapping around the page naturally produces different elements.
+    const lastFive = focusedElements.slice(-5);
+    if (lastFive.length >= 5) {
+      const allSame = lastFive.every(
+        (el) =>
+          el.tag === lastFive[0].tag &&
+          el.text === lastFive[0].text &&
+          el.href === lastFive[0].href
+      );
+      expect(allSame).toBe(false);
+    }
   });
 
   test("mobile nav toggle has aria-label and aria-expanded attributes", async ({

@@ -442,11 +442,10 @@
 
 /* ---------- Scoreboard ---------- */
 .scoreboard {
-  --scoreboard-gpt: #10a37f;
-  --scoreboard-claude: #d97706;
-  --scoreboard-gemini: #4285f4;
+  --scoreboard-claude: var(--color-sage);
+  --scoreboard-gpt: var(--color-accent-gold);
+  --scoreboard-gemini: var(--color-info);
 
-  display: none;
   padding: var(--space-10) 0;
   background: var(--surface-secondary);
   border-top: var(--border-default);
@@ -544,6 +543,38 @@
   min-width: 0;
 }
 
+.scoreboard__overall-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+  min-width: 0;
+}
+
+.scoreboard__overall-item {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-3);
+  background: var(--surface-secondary);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-full);
+  color: var(--color-text-dark);
+  font-size: var(--text-sm);
+  font-weight: var(--weight-medium);
+}
+
+.scoreboard__overall-swatch {
+  width: 12px;
+  min-width: 12px;
+  height: 12px;
+  border-radius: var(--radius-full);
+}
+
+.scoreboard__overall-score {
+  font-family: var(--font-mono);
+  font-weight: var(--weight-semibold);
+}
+
 .scoreboard__bar {
   display: block;
   width: 0;
@@ -552,6 +583,23 @@
   height: 14px;
   border-radius: var(--radius-full);
   transition: width var(--duration-slow) var(--ease-default);
+}
+
+.scoreboard__bar-placeholder {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  max-width: 100%;
+  min-width: 2px;
+  height: 14px;
+  border: 1px dashed var(--color-border);
+  border-radius: var(--radius-full);
+  color: var(--color-text-muted);
+  background: transparent;
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  line-height: 1;
 }
 
 .scoreboard__bar--gpt {
@@ -564,6 +612,10 @@
 
 .scoreboard__bar--gemini {
   background: var(--scoreboard-gemini);
+}
+
+.scoreboard__bar--other {
+  background: var(--color-text-muted);
 }
 
 .scoreboard__divergence-badge {
@@ -2338,7 +2390,7 @@
   color: var(--color-cream);
 }
 
-@media (max-width: 600px) {
+@media (max-width: 767px) {
   .scoreboard {
     padding: var(--space-8) 0;
   }
@@ -2360,6 +2412,14 @@
     padding: var(--space-4);
   }
 
+  .scoreboard__overall-list {
+    gap: var(--space-2);
+  }
+
+  .scoreboard__overall-item {
+    font-size: var(--text-xs);
+  }
+
   .scoreboard__row-header {
     justify-content: space-between;
     align-items: flex-start;
@@ -2370,6 +2430,10 @@
   }
 
   .scoreboard__bar {
+    height: 12px;
+  }
+
+  .scoreboard__bar-placeholder {
     height: 12px;
   }
 }

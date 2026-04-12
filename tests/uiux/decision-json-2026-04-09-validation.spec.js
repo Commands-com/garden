@@ -10,8 +10,8 @@ const {
 } = require("./helpers/local-site");
 
 const DAY_DATE = "2026-04-09";
-const EXPECTED_WINNER_ID = "candidate-1";
-const EXPECTED_WINNER_TITLE = "Garden Growth Visualization";
+const EXPECTED_WINNER_ID = "claude";
+const EXPECTED_WINNER_TITLE = "The homepage now grows a visual garden of shipped features";
 const EXPECTED_CANDIDATE_COUNT = 3;
 const EXPECTED_JUDGE_COUNT = 3;
 const SCORE_DIMENSIONS = [

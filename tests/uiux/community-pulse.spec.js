@@ -19,9 +19,15 @@ const feedbackDigest = JSON.parse(
     "utf8"
   )
 );
-const manifest = JSON.parse(
+const fullManifest = JSON.parse(
   fs.readFileSync(path.join(__dirname, "../../site/days/manifest.json"), "utf8")
 );
+// Pin manifest so this test always sees LATEST_DAY_DATE as the newest day,
+// regardless of which days have been shipped since.
+const manifest = {
+  ...fullManifest,
+  days: fullManifest.days.filter((d) => d.date <= LATEST_DAY_DATE),
+};
 
 const expectedBadges = [
   { emoji: "🌱", count: "24" },
@@ -47,6 +53,15 @@ test.describe("Community Pulse section", () => {
     if (USE_ROUTED_SITE) {
       await installLocalSiteRoutes(page);
     }
+    // Pin the manifest so the homepage loads LATEST_DAY_DATE data regardless of
+    // which days have been shipped since this test was written.
+    await page.route("**/days/manifest.json", async (route) => {
+      await route.fulfill({
+        status: 200,
+        contentType: "application/json; charset=utf-8",
+        body: JSON.stringify(manifest),
+      });
+    });
     await page.goto(getAppUrl("/"));
   });
 
@@ -95,6 +110,24 @@ test.describe("Community Pulse section", () => {
     if (USE_ROUTED_SITE) {
       await installLocalSiteRoutes(newPage);
     }
+
+    // Pin manifest so the homepage treats LATEST_DAY_DATE as the newest day
+    await newPage.route("**/days/manifest.json", async (route) => {
+      await route.fulfill({
+        status: 200,
+        contentType: "application/json; charset=utf-8",
+        body: JSON.stringify(manifest),
+      });
+    });
+
+    // Intercept /api/reactions to prevent 404 on static/dev servers
+    await newPage.route("**/api/reactions*", async (route) => {
+      await route.fulfill({
+        status: 200,
+        contentType: "application/json; charset=utf-8",
+        body: JSON.stringify({ reactions: {} }),
+      });
+    });
 
     await newPage.route(
       `**/days/${LATEST_DAY_DATE}/feedback-digest.json`,

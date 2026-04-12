@@ -74,9 +74,10 @@ test.describe("Homepage links — post-hydration validation", () => {
   test("hero primary CTA (#todays-change) targets an existing element", async ({
     page,
   }) => {
+    // Hero CTA + Community Pulse CTA both link to #todays-change
     const cta = page.locator('a[href="#todays-change"]');
-    await expect(cta).toHaveCount(1);
-    await expect(cta).toBeVisible();
+    await expect(cta).toHaveCount(2);
+    await expect(cta.first()).toBeVisible();
 
     const targetExists = await page.locator("#todays-change").count();
     expect(targetExists).toBe(1);

@@ -1122,7 +1122,15 @@ function renderScoreboard(decision) {
   const winnerId = decision?.winner?.candidateId;
   const winner = decision?.candidates?.find((candidate) => candidate.id === winnerId);
   const reviewerBreakdown = winner?.reviewerBreakdown;
-  const scoringDimensions = decision?.scoringDimensions;
+
+  // scoringDimensions is optional — fall back to winner.dimensionAverages keys
+  let scoringDimensions = decision?.scoringDimensions;
+  if ((!Array.isArray(scoringDimensions) || scoringDimensions.length === 0) && winner?.dimensionAverages) {
+    scoringDimensions = Object.keys(winner.dimensionAverages).map((id) => ({
+      id,
+      label: winner.dimensionAverages[id]?.label || id,
+    }));
+  }
 
   if (
     !winner ||
@@ -1134,6 +1142,25 @@ function renderScoreboard(decision) {
     return null;
   }
 
+  // Build ordered reviewer list from judgePanel (spec: render in judgePanel order).
+  // Fall back to reviewerBreakdown order when judgePanel is absent.
+  const judgePanel = decision?.judgePanel;
+  let orderedReviewers;
+  if (Array.isArray(judgePanel) && judgePanel.length > 0) {
+    const breakdownByAgentId = {};
+    reviewerBreakdown.forEach((entry) => {
+      const agentId = entry.reviewer?.agentId;
+      if (agentId) breakdownByAgentId[agentId] = entry;
+    });
+    orderedReviewers = judgePanel
+      .filter((judge) => breakdownByAgentId[judge.agentId])
+      .map((judge) => breakdownByAgentId[judge.agentId]);
+  } else {
+    orderedReviewers = reviewerBreakdown;
+  }
+
+  if (orderedReviewers.length === 0) return null;
+
   const reviewerClassMap = {
     gpt: 'scoreboard__bar--gpt',
     claude: 'scoreboard__bar--claude',
@@ -1142,7 +1169,7 @@ function renderScoreboard(decision) {
 
   const header = el('div', { className: 'section__header' },
     el('span', { className: 'section__label' }, 'Judging'),
-    el('h2', { className: 'scoreboard__title' }, 'The Scoreboard'),
+    el('h2', { id: 'scoreboard-heading', className: 'scoreboard__title' }, 'The Scoreboard'),
     el(
       'p',
       { className: 'section__subtitle' },
@@ -1156,11 +1183,12 @@ function renderScoreboard(decision) {
     'aria-label': 'Judge legend',
   });
 
-  reviewerBreakdown.forEach((entry) => {
+  orderedReviewers.forEach((entry) => {
     const reviewer = entry.reviewer || {};
     const modelFamily = reviewer.modelFamily || 'judge';
     const lens = reviewer.lens || 'unknown';
-    const modifierClass = reviewerClassMap[modelFamily] || reviewerClassMap.gpt;
+    const modifierClass = reviewerClassMap[modelFamily] || 'scoreboard__bar--other';
+    const displayName = modelFamily.charAt(0).toUpperCase() + modelFamily.slice(1);
 
     legend.appendChild(
       el('div', { className: 'scoreboard__legend-item', role: 'listitem' },
@@ -1168,7 +1196,7 @@ function renderScoreboard(decision) {
           className: `scoreboard__bar ${modifierClass}`,
           'aria-hidden': 'true',
         }),
-        el('span', {}, `${modelFamily} · ${lens}`)
+        el('span', {}, `${displayName} (${lens})`)
       )
     );
   });
@@ -1176,45 +1204,54 @@ function renderScoreboard(decision) {
   const grid = el('div', { className: 'scoreboard__grid' });
 
   scoringDimensions.forEach((dimension) => {
-    const bars = [];
-
-    reviewerBreakdown.forEach((entry) => {
+    const slots = orderedReviewers.map((entry) => {
       const reviewer = entry.reviewer || {};
       const rawScore = entry.dimensionScores?.[dimension.id];
       const score = typeof rawScore === 'object' && rawScore !== null
         ? rawScore.score
         : rawScore;
-
-      if (typeof score !== 'number') return;
-
       const modelFamily = reviewer.modelFamily || 'judge';
       const lens = reviewer.lens || 'unknown';
-      const modifierClass = reviewerClassMap[modelFamily] || reviewerClassMap.gpt;
+      const modifierClass = reviewerClassMap[modelFamily] || 'scoreboard__bar--other';
 
-      bars.push({
+      return {
         score,
         modelFamily,
         lens,
         modifierClass,
-        width: Math.max(0, Math.min(100, (score / 10) * 100)),
-      });
+        width: typeof score === 'number'
+          ? Math.max(0, Math.min(100, (score / 10) * 100))
+          : 0,
+      };
     });
 
-    if (bars.length === 0) return;
+    const scoredSlots = slots.filter((slot) => typeof slot.score === 'number');
+    if (scoredSlots.length === 0) return;
 
-    const spread = Math.max(...bars.map((bar) => bar.score)) -
-      Math.min(...bars.map((bar) => bar.score));
+    const spread = Math.max(...scoredSlots.map((slot) => slot.score)) -
+      Math.min(...scoredSlots.map((slot) => slot.score));
     const isDivergent = spread >= 3;
     const barsContainer = el('div', { className: 'scoreboard__bars' });
 
-    bars.forEach((bar) => {
+    slots.forEach((slot) => {
+      if (typeof slot.score === 'number') {
+        barsContainer.appendChild(
+          el('span', {
+            className: `scoreboard__bar ${slot.modifierClass}`,
+            style: `width: ${slot.width}%;`,
+            role: 'img',
+            'aria-label': `${slot.modelFamily} ${slot.lens}: ${slot.score} out of 10`,
+          })
+        );
+        return;
+      }
+
       barsContainer.appendChild(
         el('span', {
-          className: `scoreboard__bar ${bar.modifierClass}`,
-          style: `width: ${bar.width}%;`,
+          className: 'scoreboard__bar-placeholder',
           role: 'img',
-          'aria-label': `${bar.modelFamily} ${bar.lens}: ${bar.score} out of 10`,
-        })
+          'aria-label': `${slot.modelFamily} ${slot.lens}: no score`,
+        }, '–')
       );
     });
 
@@ -1242,12 +1279,44 @@ function renderScoreboard(decision) {
     );
   });
 
+  const overallItems = orderedReviewers
+    .map((entry) => {
+      const reviewer = entry.reviewer || {};
+      const modelFamily = reviewer.modelFamily || 'judge';
+      const displayName = modelFamily.charAt(0).toUpperCase() + modelFamily.slice(1);
+      const modifierClass = reviewerClassMap[modelFamily] || 'scoreboard__bar--other';
+      const overallScore = entry.overallScore;
+
+      if (typeof overallScore !== 'number') return null;
+
+      return el('div', { className: 'scoreboard__overall-item' },
+        el('span', {
+          className: `scoreboard__overall-swatch ${modifierClass}`,
+          'aria-hidden': 'true',
+        }),
+        el('span', { className: 'scoreboard__overall-model' }, displayName),
+        el('span', { className: 'scoreboard__overall-score' }, String(overallScore))
+      );
+    })
+    .filter(Boolean);
+
+  if (overallItems.length > 0) {
+    grid.appendChild(
+      el('div', { className: 'scoreboard__row scoreboard__overall' },
+        el('div', { className: 'scoreboard__row-header' },
+          el('div', { className: 'scoreboard__dim-label' }, 'Overall Score')
+        ),
+        el('div', { className: 'scoreboard__overall-list' }, ...overallItems)
+      )
+    );
+  }
+
   if (!grid.childNodes.length) return null;
 
   section.replaceChildren(
     el('div', { className: 'container' }, header, legend, grid)
   );
-  section.style.display = '';
+  section.style.display = 'block';
 
   return section;
 }

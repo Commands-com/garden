@@ -31,6 +31,16 @@ const EXPECTED_JUDGE_FAMILIES = decision.judgePanel
   .map((j) => j.modelFamily)
   .sort();
 
+// Build a manifest snapshot where DAY_DATE is the latest day, so the homepage
+// renders the expected data even when newer days have been shipped since.
+const fullManifest = JSON.parse(
+  fs.readFileSync(path.join(repoRoot, "site/days/manifest.json"), "utf8")
+);
+const pinnedManifest = {
+  ...fullManifest,
+  days: fullManifest.days.filter((d) => d.date <= DAY_DATE),
+};
+
 async function waitForRenderedTerminal(page) {
   const section = page.locator("#terminal-section");
   await expect(section).toBeVisible();
@@ -43,6 +53,15 @@ test.describe(`Terminal widget live data validation for ${DAY_DATE}`, () => {
     if (USE_ROUTED_SITE) {
       await installLocalSiteRoutes(page);
     }
+    // Pin the manifest so the homepage loads 2026-04-10 data regardless of
+    // which days have been shipped since this test was written.
+    await page.route("**/days/manifest.json", async (route) => {
+      await route.fulfill({
+        status: 200,
+        contentType: "application/json; charset=utf-8",
+        body: JSON.stringify(pinnedManifest),
+      });
+    });
     await page.goto(getAppUrl("/"));
   });
 

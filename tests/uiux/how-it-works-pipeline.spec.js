@@ -110,9 +110,11 @@ test.describe("How It Works pipeline section", () => {
   });
 
   test("section has descriptive subtitle", async ({ page }) => {
-    const subtitle = page.locator(".section__subtitle", {
-      hasText: "autonomous pipeline",
+    const howItWorksSection = page.locator("section.section", {
+      has: page.locator("h2", { hasText: "How It Works" }),
     });
+    const subtitle = howItWorksSection.locator(".section__subtitle");
     await expect(subtitle).toBeVisible();
+    await expect(subtitle).toContainText("autonomous pipeline");
   });
 });

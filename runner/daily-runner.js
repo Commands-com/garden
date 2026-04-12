@@ -56,6 +56,15 @@ function logError(msg) {
 }
 
 /**
+ * Sleep for the given number of milliseconds.
+ * @param {number} ms
+ * @returns {Promise<void>}
+ */
+function sleep(ms) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+/**
  * Parse CLI arguments for --date=YYYY-MM-DD.
  * @returns {string} Run date in YYYY-MM-DD format
  */
@@ -305,7 +314,7 @@ async function pollPipelineStatus(roomId, maxMinutes) {
     : ['pipeline', 'status', '--json'];
 
   while (Date.now() < deadline) {
-    await new Promise((resolve) => setTimeout(resolve, POLL_INTERVAL_MS));
+    await sleep(POLL_INTERVAL_MS);
 
     const result = await spawnAsync(cli, statusArgs);
     const output = result.stdout.trim();
@@ -384,7 +393,131 @@ async function pollPipelineStatus(roomId, maxMinutes) {
     }
   }
 
+  // One final boundary check catches runs that complete just as the wall-clock
+  // deadline is reached.
+  if (roomId) {
+    const result = await spawnAsync(cli, statusArgs);
+    const output = result.stdout.trim();
+    try {
+      const statusObj = JSON.parse(output);
+      const state = statusObj.state;
+      const stopReason = statusObj.stopReason;
+      const totalTokens =
+        statusObj.metrics?.aggregateMetrics?.totalTokens ??
+        statusObj.metrics?.aggregateTokens?.value ??
+        null;
+      if (totalTokens != null) {
+        cumulativeTokens = totalTokens;
+      }
+
+      if (state === 'stopped') {
+        if (stopReason === 'pipeline_complete') {
+          return { status: 'success', output, roomId, tokenUsage: cumulativeTokens || null };
+        }
+        const failedStage = detectFailedStage(statusObj) || stopReason || 'unknown';
+        return {
+          status: 'failed',
+          output,
+          roomId,
+          failedStage,
+          tokenUsage: cumulativeTokens || null,
+        };
+      }
+    } catch {
+      if (/completed|success/i.test(output)) {
+        return { status: 'success', output, roomId, tokenUsage: cumulativeTokens || null };
+      }
+      if (/failed|error/i.test(output)) {
+        return { status: 'failed', output, roomId, failedStage: 'unknown', tokenUsage: cumulativeTokens || null };
+      }
+    }
+  }
+
   return { status: 'timeout', output: 'Wall-clock timeout exceeded', roomId, tokenUsage: cumulativeTokens || null };
+}
+
+/**
+ * After the main wall-clock deadline, keep polling for a short grace window
+ * before declaring the run timed out. This prevents false public failures
+ * when the remote pipeline finishes moments after the local runner's cap.
+ *
+ * @param {string|null} roomId
+ * @param {number} graceMinutes
+ * @param {number|null} tokenUsage
+ * @returns {Promise<{status: string, output: string, roomId: string|null, failedStage?: string, tokenUsage?: number|null}>}
+ */
+async function reconcileTimedOutPipeline(roomId, graceMinutes, tokenUsage = null) {
+  if (!roomId || graceMinutes <= 0) {
+    return {
+      status: 'timeout',
+      output: 'Wall-clock timeout exceeded',
+      roomId,
+      tokenUsage,
+    };
+  }
+
+  const cli = config.runner.commandsCliPath;
+  const deadline = Date.now() + graceMinutes * 60_000;
+  const statusArgs = ['pipeline', 'status', roomId, '--json'];
+  let cumulativeTokens = tokenUsage || 0;
+
+  log(
+    `Wall-clock limit reached — entering a ${graceMinutes} minute grace window before marking the run timed out...`
+  );
+
+  while (Date.now() < deadline) {
+    const result = await spawnAsync(cli, statusArgs);
+    const output = result.stdout.trim();
+
+    try {
+      const statusObj = JSON.parse(output);
+      const state = statusObj.state;
+      const stopReason = statusObj.stopReason;
+      const totalTokens =
+        statusObj.metrics?.aggregateMetrics?.totalTokens ??
+        statusObj.metrics?.aggregateTokens?.value ??
+        null;
+      if (totalTokens != null) {
+        cumulativeTokens = totalTokens;
+      }
+
+      if (state === 'stopped') {
+        if (stopReason === 'pipeline_complete') {
+          return { status: 'success', output, roomId, tokenUsage: cumulativeTokens || null };
+        }
+        const failedStage = detectFailedStage(statusObj) || stopReason || 'unknown';
+        return {
+          status: 'failed',
+          output,
+          roomId,
+          failedStage,
+          tokenUsage: cumulativeTokens || null,
+        };
+      }
+
+      const stage = statusObj.metrics?.currentStageLabel?.value || 'unknown';
+      log(
+        `Pipeline still running after wall-clock timeout — stage: ${stage}${cumulativeTokens ? ` (tokens: ${cumulativeTokens})` : ''}`
+      );
+    } catch {
+      if (/completed|success/i.test(output)) {
+        return { status: 'success', output, roomId, tokenUsage: cumulativeTokens || null };
+      }
+      if (/failed|error/i.test(output)) {
+        return { status: 'failed', output, roomId, failedStage: 'unknown', tokenUsage: cumulativeTokens || null };
+      }
+      log(`Pipeline still running after wall-clock timeout — raw status: ${output.slice(0, 120)}`);
+    }
+
+    await sleep(POLL_INTERVAL_MS);
+  }
+
+  return {
+    status: 'timeout',
+    output: `Wall-clock timeout exceeded and ${graceMinutes} minute grace window expired`,
+    roomId,
+    tokenUsage: cumulativeTokens || null,
+  };
 }
 
 /**
@@ -995,6 +1128,14 @@ async function main() {
   log(`Polling pipeline status every ${POLL_INTERVAL_MS / 1000}s (timeout: ${config.runner.maxWallClockMinutes}min)...`);
   let pipelineResult = await pollPipelineStatus(currentRoomId, config.runner.maxWallClockMinutes);
 
+  if (pipelineResult.status === 'timeout') {
+    pipelineResult = await reconcileTimedOutPipeline(
+      currentRoomId,
+      config.runner.timeoutGraceMinutes,
+      pipelineResult.tokenUsage || null
+    );
+  }
+
   // 7. Handle retry for Stage 1-2 failures
   if (pipelineResult.status === 'failed') {
     const sn = stageNumber(pipelineResult.failedStage || '');
@@ -1238,12 +1379,37 @@ async function main() {
 
     cleanupTempFiles();
     process.exit(0);
+  } else if (pipelineResult.status === 'timeout') {
+    const reason = `Wall-clock timeout after ${durationMin} minutes`;
+
+    logError(reason);
+
+    log('Skipping failed manifest/tombstone publish for timeout because the remote pipeline may still complete after the local runner exits.');
+
+    try {
+      await updateRunMetadata(config, runDate, {
+        status: 'timeout',
+        reason,
+        durationMs,
+        durationMinutes: parseFloat(durationMin),
+        timedOutAt: new Date().toISOString(),
+        startedAt: new Date(startTime).toISOString(),
+      });
+    } catch (err) {
+      logError(`Run metadata update failed: ${err.message}`);
+    }
+
+    await sendAlert(`Command Garden daily run TIMED OUT (${runDate}): ${reason}`);
+
+    log('==========================================================');
+    log(`Daily run TIMED OUT — ${runDate} — ${durationMin} min`);
+    log('==========================================================');
+
+    cleanupTempFiles();
+    process.exit(1);
   } else {
-    // Failed or timed out
-    const reason =
-      pipelineResult.status === 'timeout'
-        ? `Wall-clock timeout after ${durationMin} minutes`
-        : `Pipeline failed at stage "${pipelineResult.failedStage || 'unknown'}": ${pipelineResult.output.slice(0, 500)}`;
+    // Confirmed failure
+    const reason = `Pipeline failed at stage "${pipelineResult.failedStage || 'unknown'}": ${pipelineResult.output.slice(0, 500)}`;
 
     logError(reason);
 

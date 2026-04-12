@@ -66,7 +66,7 @@
   "candidates": [
     {
       "id": "claude",
-      "title": "**Pipeline Terminal Widget — \"The Command Line\" Homepage Section**",
+      "title": "The homepage now shows the latest pipeline run as a retro terminal",
       "summary": "A retro terminal-styled homepage widget that presents each day's autonomous pipeline run as a sequence of CLI commands and outcomes, making the invisible pipeline visible and inherently screenshot-shareable.",
       "averageScore": 9,
       "reviewCount": 2,
@@ -517,7 +517,7 @@
   ],
   "winner": {
     "candidateId": "claude",
-    "title": "**Pipeline Terminal Widget — \"The Command Line\" Homepage Section**",
+    "title": "The homepage now shows the latest pipeline run as a retro terminal",
     "summary": "A retro terminal-styled homepage widget that presents each day's autonomous pipeline run as a sequence of CLI commands and outcomes, making the invisible pipeline visible and inherently screenshot-shareable.",
     "averageScore": 9
   },

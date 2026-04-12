@@ -10,6 +10,16 @@ async function loadHomepage(page) {
     await installLocalSiteRoutes(page);
   }
 
+  // Intercept /api/reactions to prevent 404 on static/dev servers
+  // (the API endpoint only exists in production)
+  await page.route("**/api/reactions*", async (route) => {
+    await route.fulfill({
+      status: 200,
+      contentType: "application/json; charset=utf-8",
+      body: JSON.stringify({ reactions: {} }),
+    });
+  });
+
   await page.goto(getAppUrl("/"));
   await expect(page.locator("#terminal-section")).toBeVisible();
 }
@@ -124,7 +134,10 @@ test.describe("Homepage internal links and no-regression smoke", () => {
         );
       }
 
-      await expect(page.locator("body")).not.toContainText(/404|Not found/i);
+      // Check the page title/heading area rather than the full body,
+      // because rendered artifact content (e.g. test-results.json) may
+      // legitimately contain the string "404".
+      await expect(page.locator("h1").first()).not.toContainText(/404|Not found/i);
       await routeCheck.assertLoaded();
 
       await page.goto(getAppUrl("/"));

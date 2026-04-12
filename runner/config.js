@@ -73,6 +73,11 @@ function env(name, defaultValue) {
   return undefined;
 }
 
+function envNumber(name, defaultValue) {
+  const raw = Number(env(name, String(defaultValue)));
+  return Number.isFinite(raw) ? raw : defaultValue;
+}
+
 // ---------------------------------------------------------------------------
 // Exported configuration object
 // ---------------------------------------------------------------------------
@@ -96,6 +101,7 @@ function env(name, defaultValue) {
  * @property {string} runner.reviewTeamId
  * @property {number} runner.maxTokenBudget
  * @property {number} runner.maxWallClockMinutes
+ * @property {number} runner.timeoutGraceMinutes
  * @property {string} runner.artifactBaseDir
  * @property {Object} dynamo
  * @property {string} dynamo.tablePrefix
@@ -128,8 +134,11 @@ const config = {
     implementationTeamId: env('IMPLEMENTATION_TEAM_ID', ''),
     validationTeamId: env('VALIDATION_TEAM_ID', ''),
     reviewTeamId: env('REVIEW_TEAM_ID', ''),
-    maxTokenBudget: Number(env('MAX_TOKEN_BUDGET', '500000')),
-    maxWallClockMinutes: Number(env('MAX_WALL_CLOCK_MINUTES', '120')),
+    maxTokenBudget: envNumber('MAX_TOKEN_BUDGET', 500000),
+    // Enforce a 4-hour minimum so stale local/prod env values don't cut off
+    // long-running validation or review stages prematurely.
+    maxWallClockMinutes: Math.max(envNumber('MAX_WALL_CLOCK_MINUTES', 240), 240),
+    timeoutGraceMinutes: envNumber('TIMEOUT_GRACE_MINUTES', 15),
     artifactBaseDir: env('ARTIFACT_BASE_DIR', 'content/days'),
   },
 

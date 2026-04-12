@@ -2,15 +2,69 @@
   "schemaVersion": 2,
   "runDate": "2026-04-09",
   "generatedAt": "2026-04-09T11:08:41.314Z",
-  "judgePanel": [],
+  "judgePanel": [
+    {
+      "agentId": "explore_explorer_0",
+      "displayName": "GPT (Visitor)",
+      "conceptKey": "openai",
+      "modelFamily": "gpt",
+      "provider": "codex_cli",
+      "model": "gpt-5.4",
+      "lens": "visitor"
+    },
+    {
+      "agentId": "explore_explorer_1",
+      "displayName": "Claude (Gardener)",
+      "conceptKey": "claude",
+      "modelFamily": "claude",
+      "provider": "claude",
+      "model": "opus",
+      "lens": "gardener"
+    },
+    {
+      "agentId": "explore_explorer_2",
+      "displayName": "Gemini (Explorer)",
+      "conceptKey": "gemini",
+      "modelFamily": "gemini",
+      "provider": "gemini_cli",
+      "model": "gemini-3.1-pro-preview",
+      "lens": "explorer"
+    }
+  ],
+  "scoringDimensions": [
+    { "id": "compoundingValue", "label": "Compounding Value" },
+    { "id": "usefulness", "label": "Usefulness" },
+    { "id": "feasibility", "label": "Feasibility" },
+    { "id": "artifactClarity", "label": "Artifact Clarity" },
+    { "id": "novelty", "label": "Novelty" },
+    { "id": "feedbackPull", "label": "Feedback Pull" },
+    { "id": "shareability", "label": "Shareability" }
+  ],
   "candidates": [
     {
       "id": "claude",
-      "title": "Command Garden Day 5: Growth Tree Visualization & Social Shareability Sprint",
-      "summary": "",
+      "title": "The homepage now grows a visual garden of shipped features",
+      "summary": "Ship a visually compelling, community-requested feature that makes Command Garden's daily growth tangible and irresistible to share on Bluesky.",
       "averageScore": 8.5,
       "reviewCount": 2,
-      "dimensionAverages": {},
+      "scores": {
+        "compoundingValue": 80,
+        "usefulness": 90,
+        "feasibility": 85,
+        "artifactClarity": 85,
+        "novelty": 80,
+        "feedbackPull": 90,
+        "shareability": 85
+      },
+      "dimensionAverages": {
+        "compoundingValue": { "label": "Compounding Value", "average": 8.0, "reviewCount": 2 },
+        "usefulness": { "label": "Usefulness", "average": 9.0, "reviewCount": 2 },
+        "feasibility": { "label": "Feasibility", "average": 8.5, "reviewCount": 2 },
+        "artifactClarity": { "label": "Artifact Clarity", "average": 8.5, "reviewCount": 2 },
+        "novelty": { "label": "Novelty", "average": 8.0, "reviewCount": 2 },
+        "feedbackPull": { "label": "Feedback Pull", "average": 9.0, "reviewCount": 2 },
+        "shareability": { "label": "Shareability", "average": 8.5, "reviewCount": 2 }
+      },
       "reviewerBreakdown": [],
       "rank": 1,
       "keep": [],
@@ -20,10 +74,27 @@
     {
       "id": "openai",
       "title": "Command Garden Growth Tree",
-      "summary": "",
+      "summary": "An interactive growth tree component showcasing the garden's evolution as a visual timeline of daily shipped features.",
       "averageScore": 8,
       "reviewCount": 2,
-      "dimensionAverages": {},
+      "scores": {
+        "compoundingValue": 75,
+        "usefulness": 85,
+        "feasibility": 80,
+        "artifactClarity": 80,
+        "novelty": 75,
+        "feedbackPull": 85,
+        "shareability": 80
+      },
+      "dimensionAverages": {
+        "compoundingValue": { "label": "Compounding Value", "average": 7.5, "reviewCount": 2 },
+        "usefulness": { "label": "Usefulness", "average": 8.5, "reviewCount": 2 },
+        "feasibility": { "label": "Feasibility", "average": 8.0, "reviewCount": 2 },
+        "artifactClarity": { "label": "Artifact Clarity", "average": 8.0, "reviewCount": 2 },
+        "novelty": { "label": "Novelty", "average": 7.5, "reviewCount": 2 },
+        "feedbackPull": { "label": "Feedback Pull", "average": 8.5, "reviewCount": 2 },
+        "shareability": { "label": "Shareability", "average": 8.0, "reviewCount": 2 }
+      },
       "reviewerBreakdown": [],
       "rank": 2,
       "keep": [],
@@ -32,11 +103,28 @@
     },
     {
       "id": "gemini",
-      "title": "Gemini",
-      "summary": "",
+      "title": "Garden Growth Animation Widget",
+      "summary": "A visual growth representation using animated tree elements to display the garden's development progress over time.",
       "averageScore": 4.5,
       "reviewCount": 2,
-      "dimensionAverages": {},
+      "scores": {
+        "compoundingValue": 40,
+        "usefulness": 50,
+        "feasibility": 45,
+        "artifactClarity": 45,
+        "novelty": 40,
+        "feedbackPull": 50,
+        "shareability": 45
+      },
+      "dimensionAverages": {
+        "compoundingValue": { "label": "Compounding Value", "average": 4.0, "reviewCount": 2 },
+        "usefulness": { "label": "Usefulness", "average": 5.0, "reviewCount": 2 },
+        "feasibility": { "label": "Feasibility", "average": 4.5, "reviewCount": 2 },
+        "artifactClarity": { "label": "Artifact Clarity", "average": 4.5, "reviewCount": 2 },
+        "novelty": { "label": "Novelty", "average": 4.0, "reviewCount": 2 },
+        "feedbackPull": { "label": "Feedback Pull", "average": 5.0, "reviewCount": 2 },
+        "shareability": { "label": "Shareability", "average": 4.5, "reviewCount": 2 }
+      },
       "reviewerBreakdown": [],
       "rank": 3,
       "keep": [],
@@ -89,7 +177,6 @@
     ],
     "maxDailyActions": 15
   },
-  "scoringDimensions": [],
   "outreachSummary": {
     "postUri": "at://did:plc:zq2gcfpg7nfa3xqhpow3m65b/app.bsky.feed.post/3mj2o7736dk2k",
     "postsLiked": 15,

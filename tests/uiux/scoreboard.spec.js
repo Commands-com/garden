@@ -108,17 +108,17 @@ test.describe("Scoreboard section", () => {
     const legendItems = section.locator(".scoreboard__legend-item");
     await expect(legendItems).toHaveCount(3);
 
-    // Verify legend labels use the format: modelFamily · lens
-    const expectedLabels = ["gpt \u00b7 visitor", "claude \u00b7 gardener", "gemini \u00b7 explorer"];
+    // Verify legend labels use the format: ModelFamily (lens)
+    const expectedLabels = ["Gpt (visitor)", "Claude (gardener)", "Gemini (explorer)"];
     for (const [index, label] of expectedLabels.entries()) {
       await expect(legendItems.nth(index)).toContainText(label);
     }
 
-    // Verify color swatches map to expected colors
+    // Verify color swatches map to expected design-system colors
     const expectedColors = {
-      0: "rgb(16, 163, 127)", // #10a37f (gpt)
-      1: "rgb(217, 119, 6)", // #d97706 (claude)
-      2: "rgb(66, 133, 244)", // #4285f4 (gemini)
+      0: "rgb(196, 163, 90)", // #c4a35a --color-accent-gold (gpt)
+      1: "rgb(92, 138, 110)", // #5c8a6e --color-sage (claude)
+      2: "rgb(58, 122, 180)", // #3a7ab4 --color-info (gemini)
     };
 
     for (const [index, expectedRgb] of Object.entries(expectedColors)) {
@@ -136,7 +136,7 @@ test.describe("Scoreboard section", () => {
   }) => {
     const section = await waitForScoreboard(page);
 
-    const rows = section.locator(".scoreboard__row");
+    const rows = section.locator(".scoreboard__row:not(.scoreboard__overall)");
     await expect(rows).toHaveCount(7);
 
     // Each row has a dimension label

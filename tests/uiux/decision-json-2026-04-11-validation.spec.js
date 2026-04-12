@@ -10,15 +10,14 @@ const {
 } = require("./helpers/local-site");
 
 const DAY_DATE = "2026-04-11";
-const EXPECTED_CANDIDATE_COUNT = 4;
+const EXPECTED_CANDIDATE_COUNT = 3;
 const EXPECTED_WINNER_TITLE =
-  "Community Pulse — Emoji Reaction Summary on Homepage";
-const EXPECTED_WINNER_AVG_SCORE_APPROX = 8.2;
+  "The Scoreboard — Visual Judge Score Comparison on the Homepage";
+const EXPECTED_WINNER_AVG_SCORE_APPROX = 8;
 const EXPECTED_CANDIDATE_TITLES = [
-  "Community Pulse",
-  "All-Time Leaderboard",
-  "Reaction Trend Sparklines",
-  "Per-Candidate Feedback Digest",
+  "Scoreboard",
+  "Judge Deliberation Spotlight",
+  "Interactive Feature Seeds",
 ];
 const EXPECTED_DIMENSION_COUNT = 7;
 const SCORING_DIMENSION_IDS = [
@@ -131,17 +130,17 @@ test.describe(`${DAY_DATE} decision.json schema v2 validation and data correctne
     expect(candidateIds).toContain(decision.winner.candidateId);
   });
 
-  test("winner title references Community Pulse and averageScore is approximately 8.2", () => {
+  test("winner title references Scoreboard and averageScore is approximately 8", () => {
     const winningCandidate = decision.candidates.find(
       (c) => c.id === decision.winner.candidateId
     );
     expect(winningCandidate).toBeTruthy();
     expect(decision.winner.title).toBe(winningCandidate.title);
-    expect(decision.winner.title.toLowerCase()).toContain("community pulse");
+    expect(decision.winner.title.toLowerCase()).toContain("scoreboard");
     expect(decision.winner.summary).toBe(winningCandidate.summary);
     expect(decision.winner.averageScore).toBe(winningCandidate.averageScore);
 
-    // Average score should be approximately 8.2 (within ±0.5 tolerance)
+    // Average score should be approximately 8 (within ±0.5 tolerance)
     expect(decision.winner.averageScore).toBeGreaterThanOrEqual(
       EXPECTED_WINNER_AVG_SCORE_APPROX - 0.5
     );
@@ -221,7 +220,7 @@ test.describe(`${DAY_DATE} decision.json schema v2 validation and data correctne
     expect(new Set(ranks).size).toBe(EXPECTED_CANDIDATE_COUNT);
   });
 
-  test("candidates include all four expected feature proposals", () => {
+  test("candidates include all three expected feature proposals", () => {
     const titles = decision.candidates.map((c) => c.title.toLowerCase());
 
     for (const expectedTitle of EXPECTED_CANDIDATE_TITLES) {
@@ -384,6 +383,15 @@ test.describe(`${DAY_DATE} decision.json schema v2 validation and data correctne
     if (USE_ROUTED_SITE) {
       await installLocalSiteRoutes(page);
     }
+
+    // Intercept /api/reactions to prevent 404 on static/dev servers
+    await page.route("**/api/reactions*", async (route) => {
+      await route.fulfill({
+        status: 200,
+        contentType: "application/json; charset=utf-8",
+        body: JSON.stringify({ reactions: {} }),
+      });
+    });
 
     await page.route(`**/days/${DAY_DATE}/decision.json`, async (route) => {
       await route.fulfill({

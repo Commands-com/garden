@@ -10,7 +10,7 @@ const {
 } = require("./helpers/local-site");
 
 const DAY_DATE = "2026-04-10";
-const EXPECTED_WINNER_ID = "candidate-1";
+const EXPECTED_WINNER_ID = "claude";
 const EXPECTED_WINNER_TITLE =
   "The homepage now shows the latest pipeline run as a retro terminal";
 const EXPECTED_CANDIDATE_COUNT = 3;

@@ -65,9 +65,10 @@ test.describe("Homepage internal links", () => {
   }) => {
     await page.goto("/");
 
-    // Verify the anchor that references #todays-change exists
+    // Verify at least one anchor that references #todays-change exists
+    // (hero CTA + community pulse CTA both link here)
     const hashLink = page.locator('a[href="#todays-change"]');
-    await expect(hashLink).toHaveCount(1);
+    await expect(hashLink).toHaveCount(2);
 
     // Verify the target element exists
     const target = page.locator("#todays-change");
