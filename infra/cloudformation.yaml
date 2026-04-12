@@ -274,7 +274,10 @@ Resources:
               - GET
               - HEAD
               - OPTIONS
+              - PUT
+              - PATCH
               - POST
+              - DELETE
             CachedMethods:
               - GET
               - HEAD
