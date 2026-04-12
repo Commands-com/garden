@@ -1,0 +1,358 @@
+# Game Expansion — Design Document
+
+Proposal to extend Command Garden with a daily-evolving browser game. The existing pipeline already picks one site feature per day; this doc describes how it will also be able to pick game features — generating sprites via Replicate, sound via ElevenLabs, gameplay code via Claude, and persisting high scores in DynamoDB.
+
+## Goal
+
+Give the pipeline a second surface where it can ship compounding value. Each day the pipeline chooses between a site improvement and a game improvement (or both, in rare cases). Over time the game grows from a single-screen prototype into something with real depth — new enemies, weapons, art, sound, mechanics — all decided and built autonomously.
+
+## Non-goals
+
+- Building a AAA game. Everything is deliberately small-scoped and charming.
+- Replacing the existing site pipeline. The game is an additional surface, not a pivot.
+- Multiplayer. Single-player only, at least for the first 30 days.
+- A custom game engine. Phaser handles everything we need out of the box.
+- Adding Supabase or any second database. DynamoDB already covers leaderboards.
+
+## Starter game concept
+
+**Single-screen top-down arena survival.** The player controls a character in a fixed-size arena. Enemies spawn from the edges in waves. The goal is to survive as long as possible while collecting pickups. The run ends when the player takes enough damage. High scores are posted to the leaderboard.
+
+Why this genre:
+
+- **Fixed camera** — no scrolling, tile streaming, or level design complexity.
+- **Modular content** — enemies, weapons, powerups, and hazards are all independent pieces the pipeline can add one at a time.
+- **Natural difficulty ramp** — waves get harder over time, which is a gameplay loop the pipeline can extend endlessly.
+- **Short sessions** — 2-5 minutes per run drives repeat visits, which is exactly the engagement model a daily-shipping project needs.
+- **Well-suited to Phaser** — arcade physics, simple collision, sprite-based rendering.
+
+Good analogues: *Vampire Survivors*, *20 Minutes Till Dawn*, *Brotato*, the arena levels of *Nuclear Throne*.
+
+Alternatives considered:
+- **Endless runner** — too physics-reliant; hard for the pipeline to iterate on without breaking feel.
+- **Platformer** — jump feel is notoriously hard to get right via daily iteration.
+- **Puzzle game** — content is harder to modularize; each daily add tends to need full level design.
+
+## Architecture
+
+```
+Browser (Phaser 3)  ←→  API Gateway  ←→  Lambda  ←→  DynamoDB (scores)
+       ↑
+       │ (static assets)
+       │
+   S3 + CloudFront
+       ↑
+       │ (Replicate-generated sprites, ElevenLabs-generated audio)
+       │
+   runner/asset-generator.js  ──→  Replicate API
+                               └→  ElevenLabs API
+```
+
+- **Game client**: Phaser 3, loaded from CDN (or bundled), vanilla JS. No build step.
+- **Assets**: Generated ahead of time by `runner/asset-generator.js`, committed to `site/game/assets/`, served as static files from S3.
+- **Leaderboard**: A new Lambda behind API Gateway, backed by a new `command-garden-prod-scores` DynamoDB table.
+- **Player identity**: Anonymous UUID stored in localStorage. No auth, no accounts.
+
+## Core loop protection
+
+The biggest regression risk is the pipeline rewriting foundational systems (movement, collision, spawning, scene flow) every time it ships a game feature. Once the core loop works, most daily changes should be **data-driven additions** — new entries in config/content files — not rewrites of the engine.
+
+### What's "core" (locked down after Day 1)
+
+These systems get built once and rarely touched:
+
+- **Player movement and input** (`systems/input.js`) — WASD/arrow handling, speed, acceleration.
+- **Collision and damage** — hitbox sizes, damage application, invincibility frames.
+- **Scene flow** — Boot → Title → Play → GameOver transitions.
+- **Wave spawning engine** (`systems/spawning.js`) — reads wave definitions from config, spawns enemies according to the schedule. The engine is generic; new content is added by editing the wave config, not the spawner.
+- **Scoring and leaderboard submission** (`systems/scoring.js`) — score calculation, POST to API, rank display.
+- **Audio playback** (`systems/audio.js`) — play/stop/loop. New sounds are added as asset files referenced by config, not by editing the audio system.
+
+### What's "content" (pipeline iterates on daily)
+
+These are the safe surfaces for daily changes:
+
+- **`config/enemies.js`** — enemy definitions: sprite key, HP, speed, damage, behavior type, spawn weight. Adding a new enemy = adding one object to this file.
+- **`config/weapons.js`** — weapon definitions: sprite, damage, fire rate, projectile speed, sound key.
+- **`config/waves.js`** — wave schedule: which enemies spawn, how many, at what interval, scaling per wave.
+- **`config/powerups.js`** — powerup definitions: effect type, duration, sprite, rarity.
+- **`config/balance.js`** — tunable numbers: player HP, base speed, score multipliers, wave timing.
+- **`assets/sprites/`** and **`assets/audio/`** — new art and sound files referenced by the config entries above.
+
+The pipeline template's controller prompt should include a rule: **"For game features, prefer config/content changes over system code changes. Only modify core systems when the spec explicitly justifies it and the acceptance criteria include regression tests for existing behavior."**
+
+### Enforcing it
+
+- AGENTS.md gets a new "Game Systems" section listing which files are core (modify with caution) vs content (iterate freely).
+- The Spec stage must flag any proposed change to a core system file and include regression criteria.
+- The Validation stage runs the full existing game test suite on every game-day, not just the new feature's tests.
+
+## Pipeline integration
+
+The existing 5-stage pipeline (Explore → Spec → Implementation → Validation → Review) does not fundamentally change. The changes are:
+
+### Explore stage
+
+- Adds a new candidate family: `featureType: "game"`.
+- Each day's candidate pool contains a mix of site and game candidates.
+- Judges score them on the existing 7 dimensions — no new dimensions needed. "Shareability" already favors game features because they produce GIFs.
+- An explicit soft target: over any 7-day rolling window, aim for at least 2 game days. The controller prompt enforces this.
+
+### Spec stage
+
+- For game candidates, the spec must include:
+  - Exact gameplay change (new enemy, new weapon, new mechanic, tuning change)
+  - Art and sound direction (what assets the feature likely needs — the Implementation workers decide the exact prompts and generation calls)
+  - Which Phaser scene / system gets touched
+  - Acceptance criteria testable from Playwright (game loads, canvas paints, no console errors)
+  - Rollback plan if the feature breaks gameplay
+
+### Implementation stage
+
+- Workers have access to `runner/asset-generator.js` as a CLI tool. When implementing a game feature that needs a new sprite or sound, the worker calls the tool with a prompt and output path — same way it already calls `git`, `npx`, or any other shell command.
+- The tool handles API keys (reads from `.env`), style guardrails (baked into prompt templates), and budget enforcement (checks remaining spend before each call, refuses if the cap is hit).
+- Generated assets are written to `site/game/assets/sprites/` and `site/game/assets/audio/`. The worker decides what to generate, when, and where to put it.
+- The pipeline — not the runner — decides what assets are needed. The runner just provides the tool.
+
+### Validation stage
+
+Games are inherently nondeterministic (random spawns, timing-dependent physics). Reliable Playwright tests require determinism hooks built into the game from Day 1:
+
+**Test mode** (`/game/?testMode=1`):
+- Fixed RNG seed — every run produces identical spawn patterns, pickup placements, and enemy behavior. Implemented via a seedable PRNG (e.g., `mulberry32`) that replaces `Math.random()` in test mode.
+- Fixed delta time — physics updates use a constant dt instead of real frame deltas. Eliminates timing variance across machines.
+- Forced scene transitions — `window.__gameTestHooks.goToScene('play')` skips the title screen and starts gameplay immediately.
+- Kill player on demand — `window.__gameTestHooks.killPlayer()` triggers death and the Game Over flow. Lets tests verify the full lifecycle without waiting for organic damage.
+- Expose game state — `window.__gameTestHooks.getState()` returns `{ scene, playerHP, score, wave, enemyCount }` so Playwright can assert on game internals, not just pixels.
+
+**What Playwright tests cover:**
+- Canvas element exists and has correct dimensions
+- No console errors for 10 seconds of idle game state
+- `goToScene('play')` → game begins, player sprite is present
+- Simulated WASD input → `getState().playerHP` unchanged, position delta > 0
+- After N frames with fixed seed → `getState().enemyCount > 0` (spawning works)
+- `killPlayer()` → scene transitions to GameOver, score submission fires
+- Visual regression screenshots of title screen and gameplay (with fixed seed, these are pixel-deterministic)
+
+**What Playwright does NOT cover:**
+- Whether the game is fun
+- Whether difficulty is tuned well
+- Whether art and sound hang together aesthetically
+
+These are caught by human review (the Review stage) and community feedback via Bluesky / Dev.to.
+
+### Review stage
+
+- Writes a public summary explaining what gameplay changed, what got easier/harder, what new art/sound landed.
+- The Bluesky and Dev.to posts include a GIF of the new feature (generated by Playwright headed mode or recorded manually for the first N days).
+
+## Asset generation
+
+### Replicate (sprites, backgrounds)
+
+- **Models used**:
+  - Pixel art sprite generation: `fofr/sdxl-emoji` or `lucataco/sdxl-lightning-4step` with a pixel-art LoRA
+  - Backgrounds: same base model, different prompt template
+- **Style guardrails baked into every prompt**:
+  - Resolution: 512×512 source, downscaled to 32×32 or 64×64 pixel art
+  - Palette: limited (8-16 colors), high contrast
+  - Negative prompts: `realistic, photo, 3d, watermark, text, blurry, low contrast`
+  - Style anchor: "retro 16-bit pixel art, transparent background, centered character, facing camera"
+- **Prompt template** (filled in by the spec):
+  ```
+  A 16-bit pixel art sprite of {subject}, {pose}, transparent background,
+  centered, limited palette, high contrast, game asset, retro arcade style.
+  ```
+- **Budget cap**: `MAX_REPLICATE_SPEND_PER_RUN` in `.env` (default: $0.50). Runner tracks spend via Replicate's billing metadata and aborts generation if the cap is hit. Remaining sprites fall back to existing assets or placeholder pixels.
+- **Caching**: Generated assets are served from S3, not committed to git. The `site/game/assets/` directory is gitignored — assets are uploaded directly to the S3 bucket by the asset-generator tool after generation. This avoids bloating the repo with binary files that accumulate daily. An `assets-manifest.json` file in the repo tracks what exists (filename, prompt used, date generated) so the pipeline knows what's available without downloading them.
+
+### ElevenLabs (SFX, music)
+
+- **API**: The Sound Effects endpoint (`/v1/sound-generation`) — not TTS. Inputs are text descriptions of sounds.
+- **Voice API**: Only used if a game feature explicitly calls for narration or character voice lines.
+- **Clip length limits**:
+  - SFX: max 2 seconds
+  - Music loops: max 30 seconds (game loops them client-side)
+- **Style guardrails**:
+  - SFX prompts always include: `retro video game, 8-bit, chiptune, short, punchy`
+  - Music prompts always include: `chiptune, retro game, loopable, 8-bit`
+- **Output format**: MP3 (smaller than WAV, good enough for game audio)
+- **Caching**: Same as Replicate — uploaded to S3, tracked in `assets-manifest.json`, not committed to git.
+- No per-run cap initially (tons of credits available), but log total characters / generations per run for monitoring.
+
+### `runner/asset-generator.js` — tool available to implementation workers
+
+A CLI that implementation workers call directly when they need to generate assets. The pipeline decides what to generate — the tool just wraps the APIs with style guardrails and budget enforcement.
+
+```bash
+# Generate a sprite
+node runner/asset-generator.js sprite \
+  --prompt "slime monster, menacing, green" \
+  --size 32 \
+  --output site/game/assets/sprites/slime.png
+
+# Generate a sound effect
+node runner/asset-generator.js sfx \
+  --prompt "player jump, short rising tone" \
+  --duration 0.5 \
+  --output site/game/assets/audio/jump.mp3
+
+# Generate a music loop
+node runner/asset-generator.js music \
+  --prompt "upbeat chiptune arena battle theme, loopable" \
+  --duration 30 \
+  --output site/game/assets/audio/battle-loop.mp3
+```
+
+The tool reads API keys from `.env`, injects style constraints into every prompt (pixel art anchors, negative prompts, palette limits), and tracks per-run spend against `MAX_REPLICATE_SPEND_PER_RUN`. If the budget is hit, the call returns an error and the worker falls back to existing assets or placeholder sprites.
+
+## DynamoDB schema
+
+**New table: `command-garden-prod-game-scores`**
+
+The leaderboard resets every day. The game changes daily — new enemies, weapons, mechanics — so yesterday's scores were earned under different rules. A daily reset creates a reason to come back ("can I top today's board?") and ties directly into the daily-ship narrative.
+
+| Attribute | Type | Role |
+|---|---|---|
+| `dayDate` | String | Partition key. Format `YYYY-MM-DD`. Each day gets its own leaderboard. |
+| `scoreId` | String | Sort key. Format `{score_padded}#{timestamp}#{playerId}` — zero-padded descending score allows sorted scans without a GSI. Higher scores sort first. |
+| `playerId` | String | Anonymous UUID (generated client-side, stored in localStorage). |
+| `playerName` | String | Optional display name (max 20 chars, sanitized). |
+| `score` | Number | The actual score value. |
+| `level` | Number | Wave / stage reached. |
+| `durationSeconds` | Number | How long the run lasted. |
+| `createdAt` | String | ISO timestamp. |
+| `sourceIpHash` | String | SHA-256 of IP + salt (for rate limiting, never exposed). |
+| `ttl` | Number | Unix timestamp, 30 days out. Old leaderboards age off automatically. |
+
+Querying today's top 10 is a single partition query on today's `dayDate` with `Limit: 10, ScanIndexForward: false`.
+
+Previous days' leaderboards are still queryable — the game's archive page can show "Day 8's top scores" alongside the changelog for that day. After 30 days, TTL cleans them up.
+
+## API endpoints (new)
+
+- `POST /api/game/score` — submit a run's final score for today. Rate-limited by IP hash (same pattern as feedback). Returns `{ submitted: true, score }`. Does NOT return exact rank — computing rank in DynamoDB requires scanning all items in the partition, which gets expensive as scores accumulate. The client fetches the leaderboard separately via GET and can determine approximate position client-side.
+- `GET /api/game/leaderboard?date=2026-04-12&limit=10` — top scores for a given day. Defaults to today. Public, cached 30 seconds at CloudFront. Past days' boards are still queryable for the archive.
+
+Both handled by a new `infra/lambda/game-scores/` Lambda. Added to `infra/cloudformation.yaml` alongside the existing feedback and reactions Lambdas.
+
+## File layout
+
+```
+site/
+  game/
+    index.html              # Loads Phaser, mounts canvas, sets up client API calls
+    src/
+      main.js               # Phaser game config and scene registration
+      scenes/
+        boot.js             # Preload assets, show loading bar
+        title.js            # Title screen, leaderboard, "Start" button
+        play.js             # Main gameplay loop
+        gameover.js         # Final score, score submission, restart
+      systems/              # Core loop — locked down after Day 1 (see "Core loop protection")
+        input.js            # Keyboard + touch input
+        spawning.js         # Wave and enemy spawning — reads from config, generic engine
+        scoring.js          # Score calculation and DynamoDB submission
+        audio.js            # Music and SFX playback
+        test-hooks.js       # ?testMode=1: fixed RNG, forced transitions, kill hook, state exposure
+      config/               # Content layer — safe for daily iteration
+        enemies.js          # Enemy definitions (sprite, HP, speed, damage, behavior, spawn weight)
+        weapons.js          # Weapon definitions (sprite, damage, fire rate, projectile, sound)
+        waves.js            # Wave schedule (which enemies, how many, timing, scaling)
+        powerups.js         # Powerup definitions (effect, duration, sprite, rarity)
+        balance.js          # Tunable numbers (player HP, base speed, score multipliers)
+    assets/                 # gitignored — binaries live on S3, not in the repo
+      sprites/              # Replicate-generated PNGs (uploaded to S3 by asset-generator)
+      audio/                # ElevenLabs-generated MP3s (uploaded to S3 by asset-generator)
+    assets-manifest.json    # Tracked in git — maps asset keys to filenames, prompts, dates
+
+runner/
+  asset-generator.js        # Replicate + ElevenLabs CLI (called by implementation workers)
+
+infra/
+  lambda/game-scores/
+    index.js                # POST /score, GET /leaderboard handlers
+    package.json
+  cloudformation.yaml       # +GameScoresTable, +GameScoresLambda, +API routes
+
+tests/uiux/
+  game-smoke.spec.js        # Canvas exists, no console errors, scene transitions
+  game-visual.spec.js       # Title screen screenshot regression
+```
+
+## Day 1 scope
+
+The first game-day should ship a deliberately small vertical slice:
+
+- `/game/` route loads Phaser
+- Boot scene loads one sprite (player character, Replicate-generated)
+- Title scene with a "Start" button
+- Play scene with:
+  - The player sprite, movable with WASD / arrow keys
+  - A fixed arena with simple walls
+  - One enemy type that chases the player (generated sprite)
+  - Collision damage
+  - A health bar
+  - Death → Game Over scene
+- Game Over scene:
+  - Final score (just duration survived for Day 1)
+  - Score POSTed to DynamoDB
+  - Leaderboard showing top 5
+  - Restart button
+- One 30-second chiptune music loop
+- SFX for: hit taken, enemy defeated, game over
+
+- `?testMode=1` support from the start:
+  - Seedable PRNG replacing `Math.random()`
+  - Fixed delta time for physics
+  - `window.__gameTestHooks` exposing `goToScene()`, `killPlayer()`, `getState()`
+- Config-driven content from the start:
+  - The one enemy type is defined in `config/enemies.js`, not hardcoded in the scene
+  - Wave timing is defined in `config/waves.js`
+  - Balance numbers in `config/balance.js`
+
+Everything else (weapons, multiple enemy types, powerups, waves, biomes, effects, polish) comes on subsequent game-days as config/content additions. The Day 1 scope is intentionally playable but sparse — the pipeline needs room to grow, and the core loop + test hooks + config layer are the foundation it grows on.
+
+## Validation strategy
+
+See the [Validation stage](#validation-stage) section above for the full plan including `?testMode=1`, fixed RNG seeds, `__gameTestHooks`, and what Playwright can and cannot cover. The key principle: **determinism is not optional** — it ships on Day 1 alongside the game itself, not as a future improvement.
+
+## Budget and cost model
+
+| Service | Per-run cost (est.) | Cap |
+|---|---|---|
+| Replicate (sprites) | $0.10 – $0.50 | `MAX_REPLICATE_SPEND_PER_RUN=0.50` |
+| ElevenLabs (SFX + music) | Covered by existing credits | Log only, no cap |
+| DynamoDB (scores table) | < $0.01 | Within free tier for 6-figure daily scores |
+| Lambda (score handler) | < $0.01 | Within free tier |
+| CloudFront (serving assets) | < $0.10 | Existing distribution |
+
+Expected daily ceiling: under $1 even on a heavy asset-generation day. Weekly ceiling: under $5.
+
+## Risks and open questions
+
+1. **Concept dilution.** "A website that builds itself" is a tight narrative. "A website and a game that build themselves" is noisier. Mitigation: frame the game as a feature *of* the site, not a separate product. "The AI now gets to build anything, and today it added a new enemy to the game."
+
+2. **Game quality ceiling.** AI-generated sprites and code for games can feel cheap. Mitigation: strict style guardrails, consistent art direction, Review-stage gatekeeping. First few days may be rough — lean into the story of iteration.
+
+3. **Feature-feel can regress.** Gameplay tuning is fragile. A change that makes one system better can break balance elsewhere. Mitigation: every game-day spec must include a rollback plan, and the Validation stage runs the existing Playwright suite (catches crashes but not balance).
+
+4. **Pipeline drift toward the game.** Once the game is up, it may start winning every day because game candidates score higher on shareability. Mitigation: the controller prompt enforces a minimum of 3 site days per rolling 7-day window.
+
+5. **Accessibility.** Platformers and arena games are hard for keyboard-only or screen-reader users. Mitigation: ship a "spectator mode" early — the leaderboard, art gallery, and audio player should be navigable without ever playing.
+
+## What I'm *not* deciding in this doc
+
+- The exact starter game's art direction (beyond "pixel art"). The first Explore stage can propose candidates.
+- Whether enemies, waves, and scoring are "deep" enough to last 30 days — the pipeline will find out.
+- Whether to add mobile touch controls on Day 1 or defer. Defer unless the spec explicitly demands them.
+- Whether game scores feed back into the main site (e.g., a "high score of the day" widget on the homepage). Probably yes, but as a future site-day feature.
+
+## Next steps
+
+1. Watch tomorrow's fully-autonomous run complete end to end without intervention.
+2. If that works: implement the `game-expansion.md` plan, one phase at a time:
+   - Phase A: `/game/` route + Phaser boot + `runner/asset-generator.js` CLI tool + Day 1 vertical slice. Implementation workers generate the starter assets via the tool during the run.
+   - Phase B: Add `game-scores` Lambda + DynamoDB table + leaderboard wiring.
+   - Phase C: Add the `featureType: "game"` candidate path to the Explore stage and let the pipeline start proposing game features on its own.
+3. Once Phase C is live, the project is fully expanded. Daily runs will sometimes ship site features, sometimes ship game features.
