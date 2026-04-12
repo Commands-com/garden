@@ -1111,6 +1111,147 @@ function renderTerminal(result) {
   return terminal;
 }
 
+// ---------- Scoreboard Renderer ----------
+function renderScoreboard(decision) {
+  const section = document.getElementById('scoreboard-section');
+  if (!section) return null;
+
+  section.replaceChildren();
+  section.style.display = 'none';
+
+  const winnerId = decision?.winner?.candidateId;
+  const winner = decision?.candidates?.find((candidate) => candidate.id === winnerId);
+  const reviewerBreakdown = winner?.reviewerBreakdown;
+  const scoringDimensions = decision?.scoringDimensions;
+
+  if (
+    !winner ||
+    !Array.isArray(reviewerBreakdown) ||
+    reviewerBreakdown.length === 0 ||
+    !Array.isArray(scoringDimensions) ||
+    scoringDimensions.length === 0
+  ) {
+    return null;
+  }
+
+  const reviewerClassMap = {
+    gpt: 'scoreboard__bar--gpt',
+    claude: 'scoreboard__bar--claude',
+    gemini: 'scoreboard__bar--gemini',
+  };
+
+  const header = el('div', { className: 'section__header' },
+    el('span', { className: 'section__label' }, 'Judging'),
+    el('h2', { className: 'scoreboard__title' }, 'The Scoreboard'),
+    el(
+      'p',
+      { className: 'section__subtitle' },
+      'How GPT, Claude, and Gemini scored today\'s winning candidate across the seven judging dimensions.'
+    )
+  );
+
+  const legend = el('div', {
+    className: 'scoreboard__legend',
+    role: 'list',
+    'aria-label': 'Judge legend',
+  });
+
+  reviewerBreakdown.forEach((entry) => {
+    const reviewer = entry.reviewer || {};
+    const modelFamily = reviewer.modelFamily || 'judge';
+    const lens = reviewer.lens || 'unknown';
+    const modifierClass = reviewerClassMap[modelFamily] || reviewerClassMap.gpt;
+
+    legend.appendChild(
+      el('div', { className: 'scoreboard__legend-item', role: 'listitem' },
+        el('span', {
+          className: `scoreboard__bar ${modifierClass}`,
+          'aria-hidden': 'true',
+        }),
+        el('span', {}, `${modelFamily} · ${lens}`)
+      )
+    );
+  });
+
+  const grid = el('div', { className: 'scoreboard__grid' });
+
+  scoringDimensions.forEach((dimension) => {
+    const bars = [];
+
+    reviewerBreakdown.forEach((entry) => {
+      const reviewer = entry.reviewer || {};
+      const rawScore = entry.dimensionScores?.[dimension.id];
+      const score = typeof rawScore === 'object' && rawScore !== null
+        ? rawScore.score
+        : rawScore;
+
+      if (typeof score !== 'number') return;
+
+      const modelFamily = reviewer.modelFamily || 'judge';
+      const lens = reviewer.lens || 'unknown';
+      const modifierClass = reviewerClassMap[modelFamily] || reviewerClassMap.gpt;
+
+      bars.push({
+        score,
+        modelFamily,
+        lens,
+        modifierClass,
+        width: Math.max(0, Math.min(100, (score / 10) * 100)),
+      });
+    });
+
+    if (bars.length === 0) return;
+
+    const spread = Math.max(...bars.map((bar) => bar.score)) -
+      Math.min(...bars.map((bar) => bar.score));
+    const isDivergent = spread >= 3;
+    const barsContainer = el('div', { className: 'scoreboard__bars' });
+
+    bars.forEach((bar) => {
+      barsContainer.appendChild(
+        el('span', {
+          className: `scoreboard__bar ${bar.modifierClass}`,
+          style: `width: ${bar.width}%;`,
+          role: 'img',
+          'aria-label': `${bar.modelFamily} ${bar.lens}: ${bar.score} out of 10`,
+        })
+      );
+    });
+
+    grid.appendChild(
+      el(
+        'div',
+        {
+          className: `scoreboard__row${isDivergent ? ' scoreboard__row--divergent' : ''}`,
+        },
+        el('div', { className: 'scoreboard__row-header' },
+          el('div', { className: 'scoreboard__dim-label' }, dimension.label || dimension.id),
+          isDivergent
+            ? el(
+                'span',
+                {
+                  className: 'scoreboard__divergence-badge',
+                  'aria-label': `Score spread ${spread}`,
+                },
+                `spread ${spread}`
+              )
+            : null
+        ),
+        barsContainer
+      )
+    );
+  });
+
+  if (!grid.childNodes.length) return null;
+
+  section.replaceChildren(
+    el('div', { className: 'container' }, header, legend, grid)
+  );
+  section.style.display = '';
+
+  return section;
+}
+
 // ---------- Community Pulse Renderer ----------
 function renderCommunityPulse(feedbackDigest, manifest) {
   const recentReactions = feedbackDigest?.recentReactions;
@@ -1223,5 +1364,6 @@ export {
   renderGardenStats,
   renderGardenViz,
   renderTerminal,
+  renderScoreboard,
   renderCommunityPulse,
 };

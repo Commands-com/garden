@@ -174,6 +174,8 @@
       </div>
     </section>
 
+    <section id="scoreboard-section" class="scoreboard" style="display:none"></section>
+
     <!-- Candidate Ranking Teaser -->
     <section class="section" id="candidates-section">
       <div class="container">
@@ -241,6 +243,7 @@
       renderGardenStats,
       renderGardenViz,
       renderTerminal,
+      renderScoreboard,
       renderCommunityPulse,
     } from '/js/renderer.js';
 
@@ -291,6 +294,7 @@
           winnerContainer.appendChild(
             renderWinner(artifacts.decision.winner, artifacts.decision.rationale)
           );
+          renderScoreboard(artifacts.decision);
 
           // Reactions
           const reactionsEl = el('div', { className: 'mt-4' });

@@ -440,6 +440,148 @@
   font-variant-numeric: tabular-nums;
 }
 
+/* ---------- Scoreboard ---------- */
+.scoreboard {
+  --scoreboard-gpt: #10a37f;
+  --scoreboard-claude: #d97706;
+  --scoreboard-gemini: #4285f4;
+
+  display: none;
+  padding: var(--space-10) 0;
+  background: var(--surface-secondary);
+  border-top: var(--border-default);
+  border-bottom: var(--border-default);
+}
+
+.scoreboard .section__header {
+  text-align: center;
+  margin-bottom: var(--space-8);
+}
+
+.scoreboard__title {
+  font-size: var(--text-2xl);
+  color: var(--color-text-dark);
+  margin-bottom: var(--space-2);
+}
+
+.scoreboard__legend,
+.scoreboard__grid {
+  max-width: var(--container-lg);
+  margin: 0 auto;
+}
+
+.scoreboard__legend {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: var(--space-3);
+  margin-bottom: var(--space-8);
+}
+
+.scoreboard__legend-item {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-2) var(--space-4);
+  background: var(--surface-card);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-full);
+  color: var(--color-text-muted);
+  font-size: var(--text-sm);
+  font-weight: var(--weight-medium);
+  line-height: 1;
+  white-space: nowrap;
+}
+
+.scoreboard__legend-item .scoreboard__bar {
+  width: 16px;
+  min-width: 16px;
+  height: 16px;
+}
+
+.scoreboard__grid {
+  display: grid;
+  gap: var(--space-4);
+}
+
+.scoreboard__row {
+  display: grid;
+  grid-template-columns: minmax(0, 210px) minmax(0, 1fr);
+  gap: var(--space-4);
+  align-items: start;
+  min-width: 0;
+  padding: var(--space-4) var(--space-5);
+  background: var(--surface-card);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-xs);
+}
+
+.scoreboard__row--divergent {
+  border-left: 4px solid var(--color-warning);
+}
+
+.scoreboard__row-header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--space-2);
+  min-width: 0;
+}
+
+.scoreboard__dim-label {
+  font-size: var(--text-sm);
+  font-weight: var(--weight-semibold);
+  color: var(--color-text-dark);
+  line-height: 1.35;
+  overflow-wrap: anywhere;
+}
+
+.scoreboard__bars {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  min-width: 0;
+}
+
+.scoreboard__bar {
+  display: block;
+  width: 0;
+  max-width: 100%;
+  min-width: 2px;
+  height: 14px;
+  border-radius: var(--radius-full);
+  transition: width var(--duration-slow) var(--ease-default);
+}
+
+.scoreboard__bar--gpt {
+  background: var(--scoreboard-gpt);
+}
+
+.scoreboard__bar--claude {
+  background: var(--scoreboard-claude);
+}
+
+.scoreboard__bar--gemini {
+  background: var(--scoreboard-gemini);
+}
+
+.scoreboard__divergence-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-1) var(--space-2);
+  border: 1px solid var(--color-warning);
+  border-radius: var(--radius-full);
+  color: var(--color-warning);
+  background: var(--color-cream);
+  font-family: var(--font-mono);
+  font-size: var(--text-xs);
+  font-weight: var(--weight-semibold);
+  line-height: 1;
+  white-space: nowrap;
+}
+
 /* ---------- Score Table ---------- */
 .score-table {
   width: 100%;
@@ -2194,6 +2336,42 @@
 .community-pulse-cta__link:hover {
   background: var(--color-deep-green);
   color: var(--color-cream);
+}
+
+@media (max-width: 600px) {
+  .scoreboard {
+    padding: var(--space-8) 0;
+  }
+
+  .scoreboard__legend {
+    justify-content: flex-start;
+    gap: var(--space-2);
+    margin-bottom: var(--space-6);
+  }
+
+  .scoreboard__legend-item {
+    padding: var(--space-2) var(--space-3);
+    font-size: var(--text-xs);
+  }
+
+  .scoreboard__row {
+    grid-template-columns: 1fr;
+    gap: var(--space-3);
+    padding: var(--space-4);
+  }
+
+  .scoreboard__row-header {
+    justify-content: space-between;
+    align-items: flex-start;
+  }
+
+  .scoreboard__dim-label {
+    font-size: var(--text-xs);
+  }
+
+  .scoreboard__bar {
+    height: 12px;
+  }
 }
 
 @media (max-width: 639px) {
