@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "updatedAt": "2026-04-12T16:41:44.720Z",
+  "updatedAt": "2026-04-12T19:35:09.615Z",
   "assets": [
     {
       "id": "briar-beetle",
@@ -43,6 +43,20 @@
       }
     },
     {
+      "id": "challenge-clear",
+      "type": "audio",
+      "kind": "sfx",
+      "provider": "elevenlabs",
+      "path": "/game/assets/generated/audio/sfx/challenge-clear.mp3",
+      "prompt": "rising three-note victory fanfare, da da daa, bright major-key bells, unmistakable level-clear melody. Direction: clean interface confirm sound with premium product-like clarity. Style: stylized action-game sound effect, crisp transient, polished mix, organic-meets-synthetic texture, modern indie game audio, short and readable, no retro chiptune. Keep it short, punchy, and gameplay-readable.",
+      "generatedAt": "2026-04-12T19:35:09.608Z",
+      "metadata": {
+        "duration": 1.5,
+        "kind": "sfx",
+        "category": "ui"
+      }
+    },
+    {
       "id": "garden-wall",
       "type": "sprite",
       "kind": "sprite",
@@ -57,6 +71,29 @@
         "style": "environment",
         "width": 384,
         "height": 384
+      }
+    },
+    {
+      "id": "glass-ram-walk",
+      "type": "sprite",
+      "kind": "animation",
+      "provider": "replicate",
+      "path": "/game/assets/generated/animations/enemies/glass-ram-walk.png",
+      "prompt": "Create an animated enemy sprite of armored glasshouse ram with translucent crystalline horns, heavy root-plated shoulders, charging garden siege beast, scuffing earth as it marches leftward. hostile lane-pushing creature for a top-down lane-defense game, readable attack silhouette, visually distinct body shape, premium indie-game finish. Render a cohesive low-framerate gameplay animation with consistent character volume, palette, and positioning across frames. Use the rd-animation style walking_and_idle. Each frame must keep the same subject identity, palette, and camera angle while showing one coherent gameplay action. Target frame size 48x48. No text, labels, borders, UI panels, or background scene dressing. modern polished pixel art, crisp readable silhouettes, consistent shading, and strong gameplay clarity. avoid muddy low-contrast frames, avoid random pose drift, avoid noisy background detail, avoid deliberately primitive 8-bit nostalgia.",
+      "generatedAt": "2026-04-12T19:27:48.292Z",
+      "metadata": {
+        "predictionId": "cdprjepwwdrmw0cxgcmtywppmw",
+        "modelVersion": "2e4eabbc836578423e151ba27352a1d8a566c6f1186c0da3ddf66c54deacf28b",
+        "model": "rd-animation",
+        "category": "enemy",
+        "style": "walking_and_idle",
+        "width": 48,
+        "height": 48,
+        "returnSpritesheet": true,
+        "phaser": {
+          "frameWidth": 48,
+          "frameHeight": 48
+        }
       }
     },
     {

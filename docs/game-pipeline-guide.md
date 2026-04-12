@@ -13,6 +13,11 @@ Use this document when you are deciding, specifying, implementing, or validating
 - The game is **Rootline Defense**, a **Phaser 4** lane-defense game in the style of *Plants vs. Zombies*.
 - The target is a polished contemporary browser game, not a nostalgic arena-survival prototype.
 - The main compounding surface is the board: defenders, enemies, encounters, economy, tiles, wall pressure, onboarding, and leaderboard flow.
+- The intended session arc is: **tutorial -> today's challenge -> endless**.
+- The tutorial is not generic onboarding. It should teach the exact plants, enemies, rules, and lane-reading skills required for the current daily challenge.
+- Clearing tutorial should roll directly into the current day's challenge without sending the player back to a menu.
+- The daily challenge should be difficult but genuinely winnable with strong play. Endless mode is the post-win score-chasing layer, not the primary way a run ends.
+- Daily scenarios should be stored by date so archived boards remain replayable later.
 - Homepage or archive work should support discovery, onboarding, retention, leaderboard usefulness, or transparency. Do not invent decorative homepage filler.
 
 ## First Principles
@@ -39,7 +44,7 @@ Preferred mutation surfaces:
 - `site/game/src/config/balance.js`
 - `site/game/src/config/plants.js`
 - `site/game/src/config/enemies.js`
-- `site/game/src/config/encounters.js`
+- `site/game/src/config/scenarios.js`
 - `site/game/assets-manifest.json`
 
 Core systems to touch cautiously:
@@ -53,6 +58,26 @@ Core systems to touch cautiously:
 - `site/game/src/scenes/boot.js`
 
 If you modify a core system, include regression coverage for the behavior you are disturbing.
+
+## Scenario Rules
+
+- Store dated boards in `site/game/src/config/scenarios.js`.
+- Each scenario should define both a `tutorial` mode and a `challenge` mode.
+- The tutorial should only teach what the player needs for that day's challenge. Do not let it drift into a disconnected sandbox.
+- The tutorial should introduce the day's available plants, enemy types, lane pressures, or economy rules in a softer sequence than the challenge.
+- The challenge should have a real scripted win state. It should be hard, but the spec and review should treat "winnable with good play" as a requirement.
+- After the scripted challenge is cleared, the run should continue into endless mode for leaderboard chasing.
+- Tutorial runs should stay local and should not clutter the public leaderboard.
+- When adding a new date, keep old dates playable. Archive scenarios are part of the product.
+
+### Difficulty Validation
+
+- When tuning a daily board, run `npm run validate:scenario-difficulty -- --date YYYY-MM-DD`.
+- The validator uses a deterministic simulation plus beam search to find a winning scripted plan, then perturbs that plan with small timing, row, column, and omission mistakes.
+- Treat validator output as a gate:
+  - no winning plan found means the board is likely unwinnable
+  - too many perturbed plans still win means the board is still too forgiving
+- The goal is not arbitrary cruelty. The goal is: **winnable with strong play, but not casually survivable through sloppy placement**.
 
 ## Asset Backends
 

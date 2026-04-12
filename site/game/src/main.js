@@ -26,13 +26,15 @@ import {
 } from "./systems/scoring.js";
 import { GardenAudio } from "./systems/audio.js";
 import { installGameTestHooks } from "./systems/test-hooks.js";
+import { PLANT_DEFINITIONS } from "./config/plants.js";
+import { getScenarioForDate } from "./config/scenarios.js";
 
 const params = new URLSearchParams(window.location.search);
 const testMode = params.get("testMode") === "1";
 const requestedSeed = params.get("seed");
 
 const todayDate = new Date().toISOString().slice(0, 10);
-const seed = requestedSeed || `${DEFAULT_SEED}:${todayDate}`;
+let seed = requestedSeed || `${DEFAULT_SEED}:${todayDate}`;
 
 const dom = {
   latestRun: document.getElementById("game-latest-run"),
@@ -40,6 +42,7 @@ const dom = {
   seedValue: document.getElementById("game-seed-value"),
   assetsCount: document.getElementById("game-assets-count"),
   apiStatus: document.getElementById("game-api-status"),
+  sapHeader: document.getElementById("game-sap-header"),
   scoreValue: document.getElementById("game-score-value"),
   waveValue: document.getElementById("game-wave-value"),
   sapValue: document.getElementById("game-sap-value"),
@@ -51,6 +54,7 @@ const dom = {
   leaderboardList: document.getElementById("game-leaderboard-list"),
   leaderboardNote: document.getElementById("game-leaderboard-note"),
   assetsList: document.getElementById("game-assets-list"),
+  inventory: document.getElementById("game-inventory"),
   root: document.getElementById("game-root"),
   audioToggle: document.getElementById("game-audio-toggle"),
   volumeSlider: document.getElementById("game-volume-slider"),
@@ -58,6 +62,48 @@ const dom = {
 
 let game = null;
 let gameDate = todayDate;
+
+function renderInventory(dayDate) {
+  if (!dom.inventory) {
+    return;
+  }
+
+  const scenario = getScenarioForDate(dayDate);
+  const plantIds = scenario.availablePlants || [];
+  dom.inventory.innerHTML = "";
+
+  if (!plantIds.length) {
+    dom.inventory.appendChild(
+      el("p", { className: "game-panel__note" }, "No plants unlocked for this scenario yet.")
+    );
+    return;
+  }
+
+  plantIds.forEach((plantId) => {
+    const plant = PLANT_DEFINITIONS[plantId];
+    if (!plant) {
+      return;
+    }
+
+    dom.inventory.appendChild(
+      el(
+        "div",
+        { className: "game-inventory__item" },
+        el(
+          "div",
+          { className: "game-inventory__header" },
+          el("span", { className: "game-inventory__name" }, plant.label),
+          el("span", { className: "game-inventory__cost" }, `${plant.cost} sap`)
+        ),
+        el(
+          "p",
+          { className: "game-inventory__desc" },
+          plant.description || "Configured in the daily scenario roster."
+        )
+      )
+    );
+  });
+}
 
 function normalizeAssetCatalog(payload) {
   if (!payload || !Array.isArray(payload.assets)) {
@@ -175,6 +221,7 @@ function updateRuntimeReadout(state) {
   dom.scoreValue.textContent = String(Math.round(state.score || 0));
   dom.waveValue.textContent = String(state.wave || 1);
   if (dom.sapValue) dom.sapValue.textContent = String(Math.round(state.resources ?? 0));
+  if (dom.sapHeader) dom.sapHeader.textContent = String(Math.round(state.resources ?? 0));
   if (dom.wallValue) dom.wallValue.textContent = `${state.gardenHP ?? 0} / ${state.maxGardenHealth ?? 0}`;
   if (dom.defendersValue) dom.defendersValue.textContent = String(state.defenderCount ?? 0);
   if (dom.enemyValue) dom.enemyValue.textContent = String(state.enemyCount ?? 0);
@@ -182,13 +229,29 @@ function updateRuntimeReadout(state) {
   if (!dom.runNote) return;
 
   if (state.scene === "play") {
+    if (state.mode === "tutorial") {
+      dom.runNote.textContent = state.resources >= 50
+        ? "Tutorial active. Thorn Vine is ready; place it in the lane that is under pressure."
+        : "Tutorial active. Sap is rebuilding so you can prepare for the next teaching wave.";
+      return;
+    }
+
+    if (state.scenarioPhase === "endless" || state.challengeCleared) {
+      dom.runNote.textContent =
+        "Today's garden is cleared. Endless mode is live now for leaderboard chasing.";
+      return;
+    }
+
     dom.runNote.textContent = state.resources >= 50
-      ? "Thorn Vine ready. Click an empty bed."
-      : "Sap regenerating. Hold the wall.";
+      ? "Today's challenge is live. Thorn Vine is ready; plant where the current lane pressure is coming."
+      : "Today's garden is hard but winnable. Sap is regenerating for the next placement.";
   } else if (state.scene === "gameover") {
-    dom.runNote.textContent = "Run complete. Score submitted if the API is reachable.";
+    dom.runNote.textContent = state.mode === "tutorial"
+      ? "Tutorial attempt complete. Clear it to roll straight into today's challenge."
+      : "Run complete. Challenge and endless scores submit if the API is reachable.";
   } else {
-    dom.runNote.textContent = "Click an empty bed to plant. Sap regenerates every 4s.";
+    dom.runNote.textContent =
+      "Choose Tutorial First to learn today's roster, or jump straight into Today's Challenge.";
   }
 }
 
@@ -221,6 +284,9 @@ async function init() {
     ? [...siteManifest.days].sort((a, b) => new Date(b.date) - new Date(a.date))[0]
     : null;
   gameDate = params.get("date") || latestDay?.date || todayDate;
+  seed = requestedSeed || `${DEFAULT_SEED}:${gameDate}`;
+  dom.seedValue.textContent = seed;
+  renderInventory(gameDate);
   setLatestRunCopy(latestDay);
 
   const audioController = new GardenAudio({ testMode });
@@ -228,6 +294,7 @@ async function init() {
   const bootstrap = {
     testMode,
     seed,
+    todayDate,
     dayDate: gameDate,
     assetCatalog,
     audio: audioController,
@@ -334,9 +401,6 @@ async function init() {
   await refreshLeaderboard(gameDate);
 
   if (testMode) {
-    if (dom.modeLabel) {
-      dom.modeLabel.textContent = "Test mode active";
-    }
     dom.runNote.textContent =
       "Deterministic hooks are exposed on window.__gameTestHooks for Playwright.";
   }

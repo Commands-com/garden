@@ -73,6 +73,35 @@ test.describe("Rootline Defense", () => {
     );
   });
 
+  test("can clear tutorial into today's challenge and then unlock endless mode", async ({
+    page,
+  }) => {
+    await prepareGamePage(page);
+
+    await page.evaluate(() => window.__gameTestHooks.startMode("tutorial"));
+    await page.waitForFunction(
+      () =>
+        window.__gameTestHooks.getState()?.scene === "play" &&
+        window.__gameTestHooks.getState()?.mode === "tutorial"
+    );
+
+    await page.evaluate(() => window.__gameTestHooks.finishScenario());
+    await page.waitForFunction(
+      () =>
+        window.__gameTestHooks.getState()?.scene === "play" &&
+        window.__gameTestHooks.getState()?.mode === "challenge",
+      undefined,
+      { timeout: 5000 }
+    );
+
+    await page.evaluate(() => window.__gameTestHooks.finishScenario());
+    await page.waitForFunction(
+      () => window.__gameTestHooks.getState()?.scenarioPhase === "endless",
+      undefined,
+      { timeout: 4000 }
+    );
+  });
+
   test("can kill the player on demand and submit a score to the stub leaderboard", async ({
     page,
   }) => {

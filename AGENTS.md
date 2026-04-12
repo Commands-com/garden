@@ -104,6 +104,7 @@ container.innerHTML = `<h3>${title}</h3>`;
 
 The browser game lives under `site/game/` and is designed so most daily work happens in safe, data-driven places instead of repeatedly rewriting the loop.
 Current direction: the runtime is on Phaser 4, and the game should migrate the temporary arena-survival prototype toward a Plants vs. Zombies-style lane-defense game instead of deepening the old arena loop.
+The intended run flow is tutorial -> today's challenge -> endless. The tutorial should teach exactly what the player needs for the current daily board, then roll directly into that challenge on clear.
 Before changing game code, read `docs/game-pipeline-guide.md`.
 Before changing Phaser runtime code specifically, also read `docs/phaser-4-runtime.md`.
 
@@ -117,11 +118,10 @@ Before changing Phaser runtime code specifically, also read `docs/phaser-4-runti
 - `site/game/src/systems/test-hooks.js`
 
 **Preferred daily mutation surfaces**
-Until the lane-defense migration lands, the current prototype still uses `weapons.js`, `waves.js`, and `powerups.js`; treat those as transitional files, not the long-term design target.
 - `site/game/src/config/enemies.js`
-- `site/game/src/config/weapons.js`
-- `site/game/src/config/waves.js`
-- `site/game/src/config/powerups.js`
+- `site/game/src/config/plants.js`
+- `site/game/src/config/scenarios.js`
+- `site/game/src/config/board.js`
 - `site/game/src/config/balance.js`
 - `site/game/assets-manifest.json`
 
@@ -136,6 +136,9 @@ Until the lane-defense migration lands, the current prototype still uses `weapon
 
 Rules:
 - Prefer config/content additions over rewriting the core loop.
+- Keep tutorial and challenge aligned. If the daily challenge adds a new plant, enemy, economy rule, or board rule, update the tutorial so it teaches that exact thing.
+- Treat the daily challenge as a real board with a win state. Endless mode is the post-clear score chase, not the primary session structure.
+- If you retune a daily board for difficulty, run `npm run validate:scenario-difficulty -- --date YYYY-MM-DD` and use its result when deciding whether the board is unwinnable, too forgiving, or acceptably knife-edge.
 - If you touch a core system file, add or update tests that protect existing behavior.
 - Generated binaries belong under `site/game/assets/generated/` and should stay out of git.
 - Keep `?testMode=1` and `window.__gameTestHooks` working.

@@ -18,7 +18,7 @@ Give the pipeline a second surface where it can ship compounding value. Each day
 
 ## Starter game concept
 
-**Single-screen lane-defense garden.** The player places plant-like defenders on a fixed lawn grid while enemies march from right to left across a handful of lanes. The goal is to survive the day's encounter schedule by building an economy, choosing the right placements, and preventing any enemy from breaching the house. High scores are posted to the leaderboard.
+**Single-screen lane-defense garden.** The player places plant-like defenders on a fixed lawn grid while enemies march from right to left across a handful of lanes. Each day should offer a short tutorial that teaches the exact roster and rule changes needed for that day's board, then roll directly into a hard but winnable scripted challenge. Clearing that challenge unlocks endless mode for leaderboard chasing.
 
 Why this genre:
 
@@ -28,6 +28,7 @@ Why this genre:
 - **Natural compounding** — new defenders and enemy abilities layer on top of the same board without rewriting the engine.
 - **Short sessions** — 3-7 minute runs support repeat attempts and daily leaderboard chasing.
 - **Well-suited to Phaser 4** — grid placement, timers, simple projectiles, collision, and HUD work all fit well.
+- **Real wins** — the main daily board can actually be completed, which creates payoff and then cleanly hands replayability to endless mode.
 
 Good analogues: *Plants vs. Zombies* and other board-first lane-defense games where each new unit or enemy is immediately legible.
 
@@ -61,6 +62,13 @@ Browser (Phaser 4)  ←→  API Gateway  ←→  Lambda  ←→  DynamoDB (score
 
 The biggest regression risk is the pipeline rewriting foundational systems (movement, collision, spawning, scene flow) every time it ships a game feature. Once the core loop works, most daily changes should be **data-driven additions** — new entries in config/content files — not rewrites of the engine.
 
+The desired session structure is:
+
+1. **Tutorial** teaches the exact mechanics, plants, enemies, or economy rules needed for the current day.
+2. **Today's challenge** is a scripted board that is very hard but still beatable with strong play.
+3. **Endless mode** unlocks only after the player clears the scripted challenge and exists primarily for leaderboard score chasing.
+4. **Archive scenarios** remain playable by date so a new visitor can go back and complete earlier daily boards.
+
 ### What's "core" (locked down after Day 1)
 
 These systems get built once and rarely touched:
@@ -68,7 +76,7 @@ These systems get built once and rarely touched:
 - **Placement and input** (`systems/placement.js`) — tile targeting, occupancy rules, resource checks, cooldown handling.
 - **Lane marching and combat resolution** — defender targeting, enemy advance, hit resolution, breach conditions.
 - **Scene flow** — Boot → Title → Play → GameOver transitions.
-- **Encounter engine** (`systems/encounters.js`) — reads encounter definitions from config and sends enemy groups down lanes according to the schedule.
+- **Encounter engine** (`systems/encounters.js`) — reads dated scenario definitions from config, runs tutorial/challenge scripts, and then hands off to endless pacing when appropriate.
 - **Scoring and leaderboard submission** (`systems/scoring.js`) — score calculation, POST to API, rank display.
 - **Audio playback** (`systems/audio.js`) — play/stop/loop. New sounds are added as asset files referenced by config, not by editing the audio system.
 
@@ -78,7 +86,7 @@ These are the safe surfaces for daily changes:
 
 - **`config/plants.js`** — defender definitions: cost, cooldown, attack cadence, projectile or aura behavior, sprite, sound key.
 - **`config/enemies.js`** — enemy definitions: HP, speed, damage, armor or shield traits, lane behavior, sprite, sound key.
-- **`config/encounters.js`** — encounter schedule: which enemies appear, in which lanes, with what cadence and difficulty ramp.
+- **`config/scenarios.js`** — dated tutorial and challenge definitions, wave schedules, scenario summaries, and endless unlock pacing.
 - **`config/board.js`** — lane count, grid dimensions, blocked tiles, special slots, breach rules.
 - **`config/balance.js`** — tunable numbers: starting resources, passive income, score multipliers, encounter pacing.
 - **`assets/sprites/`** and **`assets/audio/`** — new art and sound files referenced by the config entries above.
@@ -101,6 +109,8 @@ The pipeline template's controller prompt should include a rule: **"For game fea
 - AGENTS.md gets a new "Game Systems" section listing which files are core (modify with caution) vs content (iterate freely).
 - The Spec stage must flag any proposed change to a core system file and include regression criteria.
 - The Validation stage runs the full existing game test suite on every game-day, not just the new feature's tests.
+- The Spec and Review stages should treat "today's challenge is hard but winnable" as a real requirement, not flavor text.
+- The tutorial should be reviewed as part of the daily content, because it must stay aligned with whatever the challenge requires that day.
 
 ## Pipeline integration
 
@@ -358,7 +368,7 @@ The first real lane-defense day should ship a deliberately small vertical slice:
   - `window.__gameTestHooks` exposing `goToScene()`, `grantResources()`, `spawnEnemy()`, `forceBreach()`, `getState()`
 - Config-driven content from the start:
   - The first defender is defined in `config/plants.js`, not hardcoded in the scene
-  - Encounter timing is defined in `config/encounters.js`
+  - Dated tutorial/challenge boards are defined in `config/scenarios.js`
   - Board layout lives in `config/board.js`
   - Balance numbers live in `config/balance.js`
 

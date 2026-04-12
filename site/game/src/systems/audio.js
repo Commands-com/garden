@@ -6,6 +6,7 @@ const TONE_MAP = {
   "thorn-hit": { frequency: 280, durationMs: 80 },
   hurt: { frequency: 172, durationMs: 120 },
   pickup: { frequency: 784, durationMs: 110 },
+  "challenge-clear": { frequency: 988, durationMs: 260 },
   gameover: { frequency: 138, durationMs: 240 },
 };
 
@@ -13,6 +14,7 @@ const TONE_MAP = {
 // The generated audio comes in hot; 0.06 keeps it audible without fatiguing
 // during rapid-fire gameplay. Only deviate with a specific reason.
 const VOLUME_MAP = {
+  "challenge-clear": 0.16,
   "thorn-fire": 0.05,
   "thorn-hit": 0.06,
 };
@@ -162,7 +164,10 @@ export class GardenAudio {
       const gain = context.createGain();
       const now = context.currentTime;
 
-      oscillator.type = effectKey === "pickup" ? "triangle" : "square";
+      oscillator.type =
+        effectKey === "pickup" || effectKey === "challenge-clear"
+          ? "triangle"
+          : "square";
       oscillator.frequency.setValueAtTime(tone.frequency, now);
       gain.gain.setValueAtTime(0.0001, now);
       gain.gain.exponentialRampToValueAtTime(peakGain, now + 0.01);

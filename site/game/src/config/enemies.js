@@ -37,6 +37,27 @@ export const ENEMY_DEFINITIONS = [
     animationFrames: [12, 13, 14, 15],
     animationFrameDurationMs: 100,
   },
+  {
+    id: "glassRam",
+    label: "Glass Ram",
+    textureKey: "glass-ram-walk",
+    radius: 24,
+    maxHealth: 160,
+    speed: 50,
+    attackDamage: 14,
+    attackCadenceMs: 840,
+    contactRange: 56,
+    breachDamage: 1,
+    requiredDefendersInLane: 3,
+    underDefendedDamageMultiplier: 0.34,
+    score: 32,
+    spawnWeight: 2,
+    tint: null,
+    displayWidth: 78,
+    displayHeight: 78,
+    animationFrames: [12, 13, 14, 15],
+    animationFrameDurationMs: 118,
+  },
 ];
 
 export const ENEMY_BY_ID = Object.fromEntries(

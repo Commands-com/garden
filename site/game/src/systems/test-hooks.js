@@ -4,12 +4,17 @@ export function installGameTestHooks(game, bootstrap) {
   }
 
   const hooks = {
+    startMode(mode = "challenge") {
+      const resolvedMode = mode === "tutorial" ? "tutorial" : "challenge";
+      game.scene.stop("title");
+      game.scene.stop("gameover");
+      game.scene.start("play", { reason: "test-hook", mode: resolvedMode });
+      return true;
+    },
+
     goToScene(sceneKey) {
       if (sceneKey === "play") {
-        game.scene.stop("title");
-        game.scene.stop("gameover");
-        game.scene.start("play", { reason: "test-hook" });
-        return true;
+        return hooks.startMode("challenge");
       }
 
       if (sceneKey === "title") {
@@ -56,6 +61,15 @@ export function installGameTestHooks(game, bootstrap) {
       }
 
       return playScene.placeDefender(row, col, plantId);
+    },
+
+    finishScenario() {
+      const playScene = game.scene.getScene("play");
+      if (!playScene?.scene?.isActive() || typeof playScene.forceScenarioClear !== "function") {
+        return false;
+      }
+
+      return playScene.forceScenarioClear();
     },
 
     spawnEnemy(lane = 0, enemyId = "briarBeetle") {

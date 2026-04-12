@@ -11,10 +11,7 @@ import {
 } from "../config/balance.js";
 import {
   BOARD_CENTER_X,
-  BOARD_CENTER_Y,
-  BOARD_COLS,
   BOARD_HEIGHT,
-  BOARD_LEFT,
   BOARD_ROWS,
   BOARD_TOP,
   BOARD_WIDTH,
@@ -29,7 +26,7 @@ import {
 } from "../config/board.js";
 import { ENEMY_BY_ID } from "../config/enemies.js";
 import { PLANT_DEFINITIONS, STARTING_PLANT_ID } from "../config/plants.js";
-import { getEncounterWave } from "../config/encounters.js";
+import { getScenarioModeDefinition } from "../config/scenarios.js";
 import { EncounterSystem } from "../systems/encounters.js";
 import { createSeededRandom } from "../systems/rng.js";
 
@@ -49,6 +46,7 @@ export class PlayScene extends Phaser.Scene {
 
   init(data) {
     this.startReason = data?.reason || "restart";
+    this.mode = data?.mode === "tutorial" ? "tutorial" : "challenge";
   }
 
   create() {
@@ -64,15 +62,19 @@ export class PlayScene extends Phaser.Scene {
     this.audioController = this.bootstrap.audio;
     this.audioController.attach(this);
 
-    this.score = 0;
-    this.resources = STARTING_RESOURCES;
-    this.gardenHP = GARDEN_MAX_HEALTH;
-    this.survivedMs = 0;
-    this.elapsedMs = 0;
-    this.nextPassiveScoreMs = 1000;
-    this.nextIncomeAtMs = RESOURCE_TICK_MS;
+    this.modeDefinition = getScenarioModeDefinition(this.bootstrap.dayDate, this.mode);
+    this.challengeCleared = false;
+    this.endlessActive = false;
+    this.transitioningToChallenge = false;
     this.gameEnding = false;
     this.lastPublishedAtMs = 0;
+    this.elapsedMs = 0;
+    this.survivedMs = 0;
+    this.nextPassiveScoreMs = 1000;
+    this.nextIncomeAtMs = this.getResourceTickMs();
+    this.score = 0;
+    this.resources = this.getStartingResources();
+    this.gardenHP = this.getStartingGardenHealth();
 
     this.defenders = [];
     this.enemies = [];
@@ -86,16 +88,37 @@ export class PlayScene extends Phaser.Scene {
     this.encounterSystem = new EncounterSystem({
       random: this.random,
       spawnEnemy: (enemyId, lane) => this.spawnEnemy(enemyId, lane),
+      modeDefinition: this.modeDefinition,
     });
 
     this.audioController.playEffect("start");
-    this.bootstrap.publishState(this.getSnapshot("play"));
+    this.publishIfNeeded(true);
+  }
+
+  getStartingResources() {
+    return this.modeDefinition.startingResources ?? STARTING_RESOURCES;
+  }
+
+  getResourcePerTick() {
+    return this.modeDefinition.resourcePerTick ?? RESOURCE_PER_TICK;
+  }
+
+  getResourceTickMs() {
+    return this.modeDefinition.resourceTickMs ?? RESOURCE_TICK_MS;
+  }
+
+  getPassiveScorePerSecond() {
+    return this.modeDefinition.passiveScorePerSecond ?? PASSIVE_SCORE_PER_SECOND;
+  }
+
+  getStartingGardenHealth() {
+    return this.modeDefinition.gardenHealth ?? GARDEN_MAX_HEALTH;
   }
 
   drawBoard() {
     this.add.rectangle(
       BOARD_CENTER_X,
-      BOARD_CENTER_Y,
+      BOARD_TOP + BOARD_HEIGHT / 2,
       BOARD_WIDTH + 24,
       BOARD_HEIGHT + 24,
       0x08110d,
@@ -118,7 +141,7 @@ export class PlayScene extends Phaser.Scene {
         color: "#bdd0c2",
       }).setOrigin(0.5).setAlpha(0.68);
 
-      for (let col = 0; col < BOARD_COLS; col += 1) {
+      for (let col = 0; col < 7; col += 1) {
         const center = getCellCenter(row, col);
         const tile = this.add.image(center.x, center.y, "board-cell");
         tile.setDisplaySize(CELL_WIDTH - 6, CELL_HEIGHT - 6);
@@ -135,7 +158,7 @@ export class PlayScene extends Phaser.Scene {
 
     this.add.rectangle(
       BREACH_X - 16,
-      BOARD_CENTER_Y,
+      BOARD_TOP + BOARD_HEIGHT / 2,
       16,
       BOARD_HEIGHT + 8,
       0x0b1813,
@@ -146,28 +169,47 @@ export class PlayScene extends Phaser.Scene {
     this.hoverTile.setStrokeStyle(2, 0x9fdd6b, 0.95);
     this.hoverTile.setDepth(3);
     this.hoverTile.setVisible(false);
+
+    this.transitionBanner = this.add.text(ARENA_WIDTH / 2, ARENA_HEIGHT / 2, "", {
+      fontFamily: "DM Sans",
+      fontSize: "26px",
+      fontStyle: "700",
+      color: "#f5f0e8",
+      align: "center",
+      lineSpacing: 8,
+    });
+    this.transitionBanner.setOrigin(0.5);
+    this.transitionBanner.setDepth(40);
+    this.transitionBanner.setVisible(false);
   }
 
   createHud() {
-    // Top banner — wave name and threats
     const bannerY = BOARD_TOP / 2;
 
-    this.add.rectangle(ARENA_WIDTH / 2, bannerY, ARENA_WIDTH - 32, 52, 0x08110d, 0.6)
+    this.add.rectangle(ARENA_WIDTH / 2, bannerY, ARENA_WIDTH - 32, 60, 0x08110d, 0.6)
       .setStrokeStyle(1, 0xdbe8d4, 0.08)
       .setDepth(20);
 
-    this.waveLabel = this.add.text(28, bannerY - 6, "Wave 1", {
+    this.waveLabel = this.add.text(28, bannerY - 8, "Challenge 1", {
       fontFamily: "DM Sans",
       fontSize: "18px",
       fontStyle: "700",
       color: "#f5f0e8",
     }).setOrigin(0, 0.5).setDepth(21);
 
-    this.waveSubLabel = this.add.text(28, bannerY + 14, "First Probe", {
+    this.waveSubLabel = this.add.text(28, bannerY + 14, this.modeDefinition.label, {
       fontFamily: "DM Sans",
       fontSize: "13px",
       color: "#c4a35a",
     }).setOrigin(0, 0.5).setDepth(21);
+
+    this.objectiveLabel = this.add.text(ARENA_WIDTH / 2, bannerY, "", {
+      fontFamily: "DM Sans",
+      fontSize: "13px",
+      color: "#d8e5db",
+      align: "center",
+      wordWrap: { width: 360 },
+    }).setOrigin(0.5).setDepth(21);
 
     this.threatsLabel = this.add.text(ARENA_WIDTH - 28, bannerY, "", {
       fontFamily: "DM Sans",
@@ -176,31 +218,35 @@ export class PlayScene extends Phaser.Scene {
       align: "right",
     }).setOrigin(1, 0.5).setDepth(21);
 
-    // Bottom bar — sap and wall
     const barY = ARENA_HEIGHT - 32;
 
     this.add.rectangle(ARENA_WIDTH / 2, barY, ARENA_WIDTH - 32, 36, 0x08110d, 0.7)
       .setStrokeStyle(1, 0xdbe8d4, 0.1)
       .setDepth(20);
 
-    this.resourceText = this.add.text(28, barY, `Sap ${STARTING_RESOURCES}`, {
+    this.resourceText = this.add.text(28, barY, `Sap ${this.resources}`, {
       fontFamily: "DM Sans",
       fontSize: "15px",
       fontStyle: "600",
       color: "#9fdd6b",
     }).setOrigin(0, 0.5).setDepth(21);
 
-    this.healthText = this.add.text(ARENA_WIDTH - 28, barY, `Wall ${GARDEN_MAX_HEALTH} / ${GARDEN_MAX_HEALTH}`, {
-      fontFamily: "DM Sans",
-      fontSize: "15px",
-      fontStyle: "600",
-      color: "#f5f0e8",
-    }).setOrigin(1, 0.5).setDepth(21);
+    this.healthText = this.add.text(
+      ARENA_WIDTH - 28,
+      barY,
+      `Wall ${this.gardenHP} / ${this.getStartingGardenHealth()}`,
+      {
+        fontFamily: "DM Sans",
+        fontSize: "15px",
+        fontStyle: "600",
+        color: "#f5f0e8",
+      }
+    ).setOrigin(1, 0.5).setDepth(21);
   }
 
   installInput() {
     this.input.on("pointermove", (pointer) => {
-      if (this.gameEnding) {
+      if (this.gameEnding || this.transitioningToChallenge) {
         this.hoverTile.setVisible(false);
         return;
       }
@@ -224,6 +270,10 @@ export class PlayScene extends Phaser.Scene {
     });
 
     this.input.on("pointerdown", (pointer) => {
+      if (this.transitioningToChallenge) {
+        return;
+      }
+
       const tile = getTileAtPoint(pointer.worldX, pointer.worldY);
       if (!tile) {
         return;
@@ -247,26 +297,27 @@ export class PlayScene extends Phaser.Scene {
 
     this.awardPassiveScore();
     this.awardResources();
-    this.encounterSystem.update(stepDelta);
+    this.encounterSystem.update(stepDelta, this.getActiveEnemyCount());
     this.updateDefenders(stepDelta);
     this.updateProjectiles(stepDelta);
     this.updateEnemies(stepDelta);
     this.cleanupEntities();
+    this.checkModeTransitions();
     this.updateHud();
     this.publishIfNeeded();
   }
 
   awardPassiveScore() {
     while (this.survivedMs >= this.nextPassiveScoreMs) {
-      this.score += PASSIVE_SCORE_PER_SECOND;
+      this.score += this.getPassiveScorePerSecond();
       this.nextPassiveScoreMs += 1000;
     }
   }
 
   awardResources() {
     while (this.elapsedMs >= this.nextIncomeAtMs) {
-      this.resources += RESOURCE_PER_TICK;
-      this.nextIncomeAtMs += RESOURCE_TICK_MS;
+      this.resources += this.getResourcePerTick();
+      this.nextIncomeAtMs += this.getResourceTickMs();
       this.pulseText(this.resourceText);
     }
   }
@@ -345,23 +396,94 @@ export class PlayScene extends Phaser.Scene {
     }
   }
 
+  checkModeTransitions() {
+    if (
+      this.mode === "tutorial" &&
+      this.encounterSystem.completed &&
+      !this.transitioningToChallenge &&
+      this.getActiveEnemyCount() === 0
+    ) {
+      this.beginChallengeFromTutorial();
+      return;
+    }
+
+    if (
+      this.mode === "challenge" &&
+      this.encounterSystem.phase === "endless" &&
+      !this.challengeCleared
+    ) {
+      this.enterEndlessMode();
+    }
+  }
+
+  beginChallengeFromTutorial() {
+    this.transitioningToChallenge = true;
+    this.audioController.playEffect("pickup");
+    this.transitionBanner.setText("Tutorial Clear\nLoading Today's Garden…");
+    this.transitionBanner.setVisible(true);
+
+    this.publishIfNeeded(true);
+
+    this.time.delayedCall(1400, () => {
+      this.scene.start("play", {
+        reason: "tutorial-complete",
+        mode: "challenge",
+      });
+    });
+  }
+
+  enterEndlessMode() {
+    this.challengeCleared = true;
+    this.endlessActive = true;
+    this.resources += this.modeDefinition.endlessRewardResources || 0;
+    this.score += this.modeDefinition.endlessRewardScore || 0;
+    this.audioController.playEffect("challenge-clear");
+    this.transitionBanner.setText("Today's Garden Cleared\nEndless Mode Unlocked");
+    this.transitionBanner.setVisible(true);
+    this.time.delayedCall(1400, () => {
+      if (this.transitionBanner?.active) {
+        this.transitionBanner.setVisible(false);
+      }
+    });
+    this.publishIfNeeded(true);
+  }
+
   updateHud() {
-    this.resourceText.setText(`Sap ${this.resources}`);
-    this.healthText.setText(`Wall ${this.gardenHP} / ${GARDEN_MAX_HEALTH}`);
-
-    const currentWave = this.encounterSystem?.wave || 1;
-    const waveDef = getEncounterWave(this.elapsedMs);
-    this.waveLabel.setText(`Wave ${currentWave}`);
-    this.waveSubLabel.setText(currentWave > 3 ? "Endless" : (waveDef.label || ""));
-
-    const threats = (waveDef.unlocks || [])
+    const currentWave = this.encounterSystem.getCurrentWave();
+    const threats = (currentWave.unlocks || [])
       .map((id) => ENEMY_BY_ID[id]?.label || id)
       .join("  ·  ");
+
+    this.resourceText.setText(`Sap ${this.resources}`);
+    this.healthText.setText(
+      `Wall ${this.gardenHP} / ${this.getStartingGardenHealth()}`
+    );
+
+    if (this.mode === "tutorial") {
+      this.waveLabel.setText(`Tutorial ${currentWave.wave}`);
+      this.waveSubLabel.setText(currentWave.label || "Garden Drill");
+      this.objectiveLabel.setText(
+        "Learn the current board, then roll straight into today's challenge."
+      );
+    } else if (this.endlessActive) {
+      this.waveLabel.setText(`Endless ${currentWave.wave}`);
+      this.waveSubLabel.setText("Score chase");
+      this.objectiveLabel.setText(
+        "You cleared today's garden. Endless pressure is now live for leaderboard chasing."
+      );
+    } else {
+      this.waveLabel.setText(`Challenge ${currentWave.wave}`);
+      this.waveSubLabel.setText(currentWave.label || this.modeDefinition.label);
+      this.objectiveLabel.setText(
+        "Today's garden is hard but winnable. Clear every scripted wave to unlock endless."
+      );
+    }
+
     this.threatsLabel.setText(threats);
   }
 
   placeDefender(row, col, plantId = STARTING_PLANT_ID) {
-    if (this.gameEnding) {
+    if (this.gameEnding || this.transitioningToChallenge) {
       return false;
     }
 
@@ -388,7 +510,7 @@ export class PlayScene extends Phaser.Scene {
       baseScaleX,
       baseScaleY,
       definition,
-      cooldownMs: Math.max(180, definition.cadenceMs * 0.45),
+      cooldownMs: definition.initialCooldownMs ?? Math.max(180, definition.cadenceMs * 0.45),
       sprite,
       destroyed: false,
     };
@@ -463,10 +585,9 @@ export class PlayScene extends Phaser.Scene {
       sprite.setTint(definition.tint);
     }
 
-    // Scale enemy HP and speed in endless mode (wave 4+)
-    const currentWave = this.encounterSystem?.wave || 1;
-    const scaleFactor = currentWave > 3 ? 1 + (currentWave - 3) * 0.30 : 1;
-    const speedScale = currentWave > 3 ? 1 + (currentWave - 3) * 0.12 : 1;
+    const endlessWave = this.endlessActive ? Math.max(0, this.encounterSystem.wave - 3) : 0;
+    const scaleFactor = 1 + endlessWave * 0.18;
+    const speedScale = 1 + endlessWave * 0.08;
 
     const enemy = {
       id: enemyId,
@@ -583,8 +704,34 @@ export class PlayScene extends Phaser.Scene {
     return match;
   }
 
+  getDefenderCountInLane(row) {
+    let count = 0;
+    for (const defender of this.defenders) {
+      if (!defender.destroyed && defender.row === row) {
+        count += 1;
+      }
+    }
+    return count;
+  }
+
+  getEffectiveProjectileDamage(enemy, damage) {
+    const requiredDefenders = enemy.definition.requiredDefendersInLane || 0;
+    if (requiredDefenders <= 1) {
+      return damage;
+    }
+
+    const defenderCount = this.getDefenderCountInLane(enemy.lane);
+    if (defenderCount >= requiredDefenders) {
+      return damage;
+    }
+
+    const multiplier = enemy.definition.underDefendedDamageMultiplier ?? 1;
+    return Math.max(1, Math.round(damage * multiplier));
+  }
+
   damageEnemy(enemy, damage) {
-    enemy.hp -= damage;
+    const effectiveDamage = this.getEffectiveProjectileDamage(enemy, damage);
+    enemy.hp -= effectiveDamage;
     enemy.sprite.setTint(0xffffff).setTintMode(Phaser.TintModes.FILL);
     this.time.delayedCall(70, () => {
       if (!enemy.destroyed && enemy.sprite?.active) {
@@ -645,7 +792,11 @@ export class PlayScene extends Phaser.Scene {
 
   resolveBreach(enemy) {
     this.destroyEnemy(enemy, { awardScore: false });
-    this.gardenHP = clamp(this.gardenHP - (enemy.definition.breachDamage || 1), 0, GARDEN_MAX_HEALTH);
+    this.gardenHP = clamp(
+      this.gardenHP - (enemy.definition.breachDamage || 1),
+      0,
+      this.getStartingGardenHealth()
+    );
     this.pulseText(this.healthText);
     this.audioController.playEffect("hurt");
 
@@ -660,6 +811,13 @@ export class PlayScene extends Phaser.Scene {
     this.projectiles = this.projectiles.filter((projectile) => !projectile.destroyed);
     this.enemies = this.enemies.filter((enemy) => !enemy.destroyed);
     this.defenders = this.defenders.filter((defender) => !defender.destroyed);
+  }
+
+  getActiveEnemyCount() {
+    return this.enemies.reduce(
+      (count, enemy) => count + (enemy.destroyed ? 0 : 1),
+      0
+    );
   }
 
   pulseText(textObject) {
@@ -693,13 +851,25 @@ export class PlayScene extends Phaser.Scene {
       wave: this.encounterSystem?.wave || 1,
       resources: this.resources,
       gardenHP: this.gardenHP,
-      maxGardenHealth: GARDEN_MAX_HEALTH,
-      enemyCount: this.enemies.length,
+      maxGardenHealth: this.getStartingGardenHealth(),
+      enemyCount: this.getActiveEnemyCount(),
       defenderCount: this.defenders.length,
       seed: this.bootstrap.seed,
       dayDate: this.bootstrap.dayDate,
       survivedMs: Math.round(this.survivedMs),
-      status: this.gameEnding ? "resolving" : "running",
+      mode: this.mode,
+      scenarioTitle: this.modeDefinition.scenarioTitle,
+      scenarioPhase: this.endlessActive
+        ? "endless"
+        : this.transitioningToChallenge
+          ? "transition"
+          : this.mode,
+      challengeCleared: this.challengeCleared,
+      status: this.gameEnding
+        ? "resolving"
+        : this.transitioningToChallenge
+          ? "transitioning"
+          : "running",
     };
   }
 
@@ -714,7 +884,11 @@ export class PlayScene extends Phaser.Scene {
       return false;
     }
 
-    this.gardenHP = clamp(this.gardenHP - Math.max(1, Math.round(Number(amount) || 1)), 0, GARDEN_MAX_HEALTH);
+    this.gardenHP = clamp(
+      this.gardenHP - Math.max(1, Math.round(Number(amount) || 1)),
+      0,
+      this.getStartingGardenHealth()
+    );
     if (this.gardenHP <= 0) {
       await this.forceGameOver();
       return true;
@@ -722,6 +896,30 @@ export class PlayScene extends Phaser.Scene {
 
     this.publishIfNeeded(true);
     return true;
+  }
+
+  forceScenarioClear() {
+    for (const enemy of this.enemies) {
+      if (!enemy.destroyed) {
+        enemy.destroyed = true;
+        enemy.sprite.destroy();
+      }
+    }
+    this.cleanupEntities();
+
+    if (this.mode === "tutorial") {
+      this.encounterSystem.completed = true;
+      this.beginChallengeFromTutorial();
+      return true;
+    }
+
+    if (!this.challengeCleared) {
+      this.encounterSystem.phase = "endless";
+      this.enterEndlessMode();
+      return true;
+    }
+
+    return false;
   }
 
   async forceGameOver() {
@@ -736,7 +934,17 @@ export class PlayScene extends Phaser.Scene {
     const finalState = this.getSnapshot("gameover");
     this.bootstrap.publishState(finalState);
 
-    const submission = await this.bootstrap.submitScore(finalState);
-    this.scene.start("gameover", { finalState, submission });
+    const submission = this.mode === "tutorial"
+      ? {
+          ok: false,
+          skipped: true,
+          reason: "tutorial-run",
+        }
+      : await this.bootstrap.submitScore(finalState);
+    this.scene.start("gameover", {
+      finalState,
+      submission,
+      restartMode: this.mode === "tutorial" ? "tutorial" : "challenge",
+    });
   }
 }
