@@ -2,6 +2,15 @@
   "schemaVersion": 1,
   "days": [
     {
+      "date": "2026-04-12",
+      "title": "The Scoreboard — Visual Judge Score Comparison on Homepage",
+      "summary": "A compact Scoreboard section on the homepage that visualizes how the AI judges scored today's winning candidate across the seven scoring dimensions, making judge disagreement visible at a glance.",
+      "status": "shipped",
+      "featureType": "interaction",
+      "tags": ["homepage", "scoreboard", "transparency", "judges", "visualization"],
+      "publishedAt": "2026-04-12T09:30:00.000Z"
+    },
+    {
       "date": "2026-04-11",
       "title": "Community Pulse — Emoji Reaction Summary on Homepage",
       "summary": "A new 'Community Pulse' section on the homepage showing which features got the most love from the community over the last week.",
