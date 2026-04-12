@@ -349,9 +349,10 @@ export class PlayScene extends Phaser.Scene {
     this.resourceText.setText(`Sap ${this.resources}`);
     this.healthText.setText(`Wall ${this.gardenHP} / ${GARDEN_MAX_HEALTH}`);
 
+    const currentWave = this.encounterSystem?.wave || 1;
     const waveDef = getEncounterWave(this.elapsedMs);
-    this.waveLabel.setText(`Wave ${waveDef.wave}`);
-    this.waveSubLabel.setText(waveDef.label || "");
+    this.waveLabel.setText(`Wave ${currentWave}`);
+    this.waveSubLabel.setText(currentWave > 3 ? "Endless" : (waveDef.label || ""));
 
     const threats = (waveDef.unlocks || [])
       .map((id) => ENEMY_BY_ID[id]?.label || id)
@@ -462,13 +463,21 @@ export class PlayScene extends Phaser.Scene {
       sprite.setTint(definition.tint);
     }
 
+    // Scale enemy HP and speed in endless mode (wave 4+)
+    const currentWave = this.encounterSystem?.wave || 1;
+    const scaleFactor = currentWave > 3 ? 1 + (currentWave - 3) * 0.15 : 1;
+    const speedScale = currentWave > 3 ? 1 + (currentWave - 3) * 0.06 : 1;
+
     const enemy = {
       id: enemyId,
       lane: resolvedLane,
       x: ENEMY_SPAWN_X,
       y: getLaneY(resolvedLane),
-      hp: definition.maxHealth,
-      definition,
+      hp: Math.round(definition.maxHealth * scaleFactor),
+      definition: {
+        ...definition,
+        speed: definition.speed * speedScale,
+      },
       sprite,
       attackCooldownMs: definition.attackCadenceMs,
       animationFrameIndex: 0,

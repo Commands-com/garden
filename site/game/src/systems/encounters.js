@@ -31,7 +31,13 @@ export class EncounterSystem {
 
     if (this.eventIndex >= this.events.length) {
       this.endlessBudgetMs += deltaMs;
-      const cadenceMs = Math.max(850, 1800 - (this.wave - 1) * 120);
+
+      // Endless wave counter keeps climbing based on time since endless started
+      const endlessStartMs = this.events[this.events.length - 1]?.atMs || 0;
+      const endlessElapsed = this.elapsedMs - endlessStartMs;
+      this.wave = 3 + Math.floor(endlessElapsed / 12000);
+
+      const cadenceMs = Math.max(400, 1800 - (this.wave - 1) * 100);
 
       while (this.endlessBudgetMs >= cadenceMs) {
         this.endlessBudgetMs -= cadenceMs;

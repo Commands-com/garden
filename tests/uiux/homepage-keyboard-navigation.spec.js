@@ -62,11 +62,16 @@ test("desktop keyboard navigation reaches nav links and hero CTAs with visible f
   }
 
   const primaryCta = page.getByRole("link", { name: "See today's change" });
+  const gameCta = page.getByRole("link", { name: "Play the game" });
   const feedbackCta = page.getByRole("link", { name: "Give feedback" });
 
   await page.keyboard.press("Tab");
   await expect(primaryCta).toBeFocused();
   await expect(primaryCta).toHaveAccessibleName("See today's change");
+
+  await page.keyboard.press("Tab");
+  await expect(gameCta).toBeFocused();
+  await expect(gameCta).toHaveAccessibleName("Play the game");
 
   await page.keyboard.press("Tab");
   await expect(feedbackCta).toBeFocused();

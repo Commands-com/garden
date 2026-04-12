@@ -33,8 +33,8 @@ test.describe("Rootline Defense", () => {
 
     await expect(page.locator("h1.game-shell__title")).toHaveText("Rootline Defense");
     await expect.poll(
-      async () => page.locator("#game-assets-list li").count(),
-      { message: "tracked assets rail should render at least one list item" }
+      async () => page.locator("#game-assets-list details, #game-assets-list li").count(),
+      { message: "tracked assets rail should render at least one item" }
     ).toBeGreaterThan(0);
     await expect(page.locator("#game-assets-list")).toContainText(
       /briar-beetle|No generated assets tracked yet/
