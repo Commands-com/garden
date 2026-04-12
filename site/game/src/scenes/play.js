@@ -465,8 +465,8 @@ export class PlayScene extends Phaser.Scene {
 
     // Scale enemy HP and speed in endless mode (wave 4+)
     const currentWave = this.encounterSystem?.wave || 1;
-    const scaleFactor = currentWave > 3 ? 1 + (currentWave - 3) * 0.15 : 1;
-    const speedScale = currentWave > 3 ? 1 + (currentWave - 3) * 0.06 : 1;
+    const scaleFactor = currentWave > 3 ? 1 + (currentWave - 3) * 0.25 : 1;
+    const speedScale = currentWave > 3 ? 1 + (currentWave - 3) * 0.10 : 1;
 
     const enemy = {
       id: enemyId,
