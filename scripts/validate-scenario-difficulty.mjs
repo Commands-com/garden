@@ -17,7 +17,7 @@ const DEFAULT_OPTIONS = {
   mode: "challenge",
   stepMs: 50,
   decisionIntervalMs: 200,
-  beamWidth: 48,
+  beamWidth: 96,
   perturbationDelayMs: 800,
   perturbationWinRateThreshold: 0.22,
   maxNaiveStrategyWins: 0,
@@ -629,7 +629,9 @@ function evaluateSimulator(simulator) {
     return -1_000_000_000 + simulator.elapsedMs;
   }
 
-  let score = simulator.gardenHP * 200_000;
+  let score = simulator.gardenHP > 0 ? 170_000 : 0;
+  score += Math.max(0, simulator.gardenHP - 1) * 20_000;
+  score -= simulator.breachCount * 9_000;
   score += simulator.resources * 120;
   score += simulator.defenders.length * 4_000;
   score += simulator.eventIndex * 2_500;
@@ -660,101 +662,11 @@ function evaluateSimulator(simulator) {
 
   if (simulator.won) {
     score += 1_000_000_000;
-    score += simulator.gardenHP * 50_000;
+    score += simulator.gardenHP * 12_500;
     score -= simulator.clearTimeMs ?? simulator.elapsedMs;
   }
 
   return score;
-}
-
-function searchWinningPlan(modeDefinition, options) {
-  const decisionIntervalMs = options.decisionIntervalMs;
-  const maxTicks = Math.ceil(
-    ((buildScenarioEvents(modeDefinition).at(-1)?.atMs || 0) + 35_000) /
-      decisionIntervalMs
-  );
-  let beam = [
-    {
-      simulator: new ScenarioSimulator(modeDefinition, options),
-      heuristic: 0,
-    },
-  ];
-  let bestWinning = null;
-
-  for (let tick = 0; tick <= maxTicks; tick += 1) {
-    const nextTimeMs = (tick + 1) * decisionIntervalMs;
-    const nextBeam = [];
-    const seen = new Map();
-
-    for (const entry of beam) {
-      const baseSimulator = entry.simulator;
-      if (baseSimulator.won) {
-        if (!bestWinning || entry.heuristic > bestWinning.heuristic) {
-          bestWinning = entry;
-        }
-        continue;
-      }
-
-      if (baseSimulator.lost) {
-        continue;
-      }
-
-      const actions = [{ type: "wait" }];
-      for (const action of baseSimulator.getCandidateActions()) {
-        actions.push(action);
-      }
-
-      for (const action of actions) {
-        const simulator = baseSimulator.clone();
-        let placed = false;
-
-        if (action.type === "place") {
-          placed = simulator.placeDefender(action.row, action.col, simulator.elapsedMs);
-          if (!placed) {
-            continue;
-          }
-        } else if (action.type === "stack") {
-          placed = true;
-          for (const placement of action.placements || []) {
-            const didPlace = simulator.placeDefender(
-              placement.row,
-              placement.col,
-              simulator.elapsedMs
-            );
-            if (!didPlace) {
-              placed = false;
-              break;
-            }
-          }
-          if (!placed) {
-            continue;
-          }
-        }
-
-        simulator.advanceTo(nextTimeMs);
-
-        const placementCount = action.type === "stack" ? action.placements.length : placed ? 1 : 0;
-        const heuristic = evaluateSimulator(simulator) + placementCount * 80;
-        const signature = buildStateSignature(simulator);
-        if ((seen.get(signature) ?? Number.NEGATIVE_INFINITY) >= heuristic) {
-          continue;
-        }
-
-        seen.set(signature, heuristic);
-        nextBeam.push({ simulator, heuristic });
-      }
-    }
-
-    nextBeam.sort((left, right) => right.heuristic - left.heuristic);
-    beam = nextBeam.slice(0, options.beamWidth);
-
-    const winningBeamEntry = beam.find((entry) => entry.simulator.won);
-    if (winningBeamEntry && (!bestWinning || winningBeamEntry.heuristic > bestWinning.heuristic)) {
-      bestWinning = winningBeamEntry;
-    }
-  }
-
-  return bestWinning?.simulator ?? null;
 }
 
 function simulatePlan(modeDefinition, plan, options) {
@@ -1055,6 +967,260 @@ function analyzePlanComplexity(plan) {
     simpleLaneCoverageWin:
       rowsSeen.size === BOARD_ROWS && placementsUntilFullCoverage <= BOARD_ROWS + 1,
   };
+}
+
+function getPressureOrderedRows(modeDefinition) {
+  const events = buildScenarioEvents(modeDefinition);
+  const horizonMs = Math.min(18_000, events[7]?.atMs ?? 18_000);
+  const statsByRow = new Map();
+
+  for (const event of events) {
+    if (event.atMs > horizonMs) {
+      break;
+    }
+
+    const definition = ENEMY_BY_ID[event.enemyId];
+    const required = definition?.requiredDefendersInLane || 1;
+    const current = statsByRow.get(event.lane) || {
+      row: event.lane,
+      count: 0,
+      firstAtMs: event.atMs,
+      maxRequired: 1,
+      pressure: 0,
+    };
+
+    current.count += 1;
+    current.firstAtMs = Math.min(current.firstAtMs, event.atMs);
+    current.maxRequired = Math.max(current.maxRequired, required);
+    current.pressure += required * 100;
+    current.pressure += Math.max(0, horizonMs - event.atMs) / 80;
+    if (event.enemyId === "glassRam") {
+      current.pressure += 180;
+    }
+
+    statsByRow.set(event.lane, current);
+  }
+
+  return [...statsByRow.values()].sort(
+    (left, right) =>
+      right.maxRequired - left.maxRequired ||
+      right.pressure - left.pressure ||
+      left.firstAtMs - right.firstAtMs ||
+      left.row - right.row
+  );
+}
+
+function buildContiguousColumnWindows(length) {
+  const clampedLength = clamp(length, 1, BOARD_COLS);
+  const centerStart = (BOARD_COLS - clampedLength) / 2;
+  const windows = [];
+
+  for (let start = 0; start <= BOARD_COLS - clampedLength; start += 1) {
+    windows.push(
+      Array.from({ length: clampedLength }, (_, index) => start + index)
+    );
+  }
+
+  windows.sort(
+    (left, right) =>
+      Math.abs(left[0] - centerStart) - Math.abs(right[0] - centerStart) ||
+      left[0] - right[0]
+  );
+
+  return windows;
+}
+
+function buildSearchSeedPlans(modeDefinition, options) {
+  const pressureRows = getPressureOrderedRows(modeDefinition).slice(0, 2);
+  const firstSeenRows = getFirstSeenLaneOrder(modeDefinition);
+  const seen = new Set();
+  const seeds = [];
+
+  for (const pressureRow of pressureRows) {
+    const stackSize = clamp(pressureRow.maxRequired || 1, 2, 3);
+    const coverRows = firstSeenRows.filter((row) => row !== pressureRow.row);
+
+    for (const window of buildContiguousColumnWindows(stackSize)) {
+      const placements = [
+        ...window.map((col) => ({ row: pressureRow.row, col })),
+        ...coverRows.slice(0, 2).map((row) => ({ row, col: window[0] })),
+      ];
+      const plan = schedulePlacementsByBudget(modeDefinition, placements, options);
+      const signature = buildPlanSignature(plan);
+      if (seen.has(signature)) {
+        continue;
+      }
+      seen.add(signature);
+      seeds.push({
+        label: `pressure-row-${pressureRow.row}-start-${window[0]}`,
+        plan,
+      });
+    }
+  }
+
+  return seeds;
+}
+
+function seedSimulatorWithPlan(modeDefinition, plan, options) {
+  const simulator = new ScenarioSimulator(modeDefinition, options);
+  const sortedPlan = clonePlan(plan).sort((left, right) => left.timeMs - right.timeMs);
+
+  for (const action of sortedPlan) {
+    if (simulator.isTerminal()) {
+      break;
+    }
+
+    simulator.advanceTo(action.timeMs);
+    const placed = simulator.placeDefender(action.row, action.col, action.timeMs);
+    if (!placed) {
+      return null;
+    }
+  }
+
+  return simulator;
+}
+
+function buildInitialSearchBeam(modeDefinition, options) {
+  const entries = [];
+  const seen = new Set();
+
+  function pushSimulator(simulator) {
+    if (!simulator) {
+      return;
+    }
+
+    const signature = buildStateSignature(simulator);
+    if (seen.has(signature)) {
+      return;
+    }
+
+    seen.add(signature);
+    entries.push({
+      simulator,
+      heuristic: evaluateSimulator(simulator),
+    });
+  }
+
+  pushSimulator(new ScenarioSimulator(modeDefinition, options));
+
+  for (const seed of buildSearchSeedPlans(modeDefinition, options)) {
+    pushSimulator(seedSimulatorWithPlan(modeDefinition, seed.plan, options));
+  }
+
+  entries.sort((left, right) => right.heuristic - left.heuristic);
+  return entries.slice(0, options.beamWidth);
+}
+
+function runBeamSearch(modeDefinition, options, initialBeam) {
+  const seedSimulator = new ScenarioSimulator(modeDefinition, options);
+  const decisionIntervalMs = options.decisionIntervalMs;
+  const maxIterations = Math.ceil(seedSimulator.maxSimulationMs / decisionIntervalMs) + 2;
+  let beam = initialBeam;
+  let bestWinning = null;
+
+  for (let iteration = 0; iteration < maxIterations && beam.length > 0; iteration += 1) {
+    const nextBeam = [];
+    const seen = new Map();
+
+    for (const entry of beam) {
+      const baseSimulator = entry.simulator;
+      if (baseSimulator.won) {
+        if (!bestWinning || entry.heuristic > bestWinning.heuristic) {
+          bestWinning = entry;
+        }
+        continue;
+      }
+
+      if (baseSimulator.lost || baseSimulator.elapsedMs >= baseSimulator.maxSimulationMs) {
+        continue;
+      }
+
+      const actions = [{ type: "wait" }, ...baseSimulator.getCandidateActions()];
+
+      for (const action of actions) {
+        const simulator = baseSimulator.clone();
+        let placed = false;
+
+        if (action.type === "place") {
+          placed = simulator.placeDefender(action.row, action.col, simulator.elapsedMs);
+          if (!placed) {
+            continue;
+          }
+        } else if (action.type === "stack") {
+          placed = true;
+          for (const placement of action.placements || []) {
+            const didPlace = simulator.placeDefender(
+              placement.row,
+              placement.col,
+              simulator.elapsedMs
+            );
+            if (!didPlace) {
+              placed = false;
+              break;
+            }
+          }
+          if (!placed) {
+            continue;
+          }
+        }
+
+        const nextTimeMs = Math.min(
+          simulator.maxSimulationMs,
+          simulator.elapsedMs + decisionIntervalMs
+        );
+        simulator.advanceTo(nextTimeMs);
+
+        const placementCount =
+          action.type === "stack" ? action.placements.length : placed ? 1 : 0;
+        const heuristic = evaluateSimulator(simulator) + placementCount * 80;
+        const signature = buildStateSignature(simulator);
+        if ((seen.get(signature) ?? Number.NEGATIVE_INFINITY) >= heuristic) {
+          continue;
+        }
+
+        seen.set(signature, heuristic);
+        nextBeam.push({ simulator, heuristic });
+      }
+    }
+
+    nextBeam.sort((left, right) => right.heuristic - left.heuristic);
+    beam = nextBeam.slice(0, options.beamWidth);
+
+    const winningBeamEntry = beam.find((entry) => entry.simulator.won);
+    if (winningBeamEntry && (!bestWinning || winningBeamEntry.heuristic > bestWinning.heuristic)) {
+      bestWinning = winningBeamEntry;
+    }
+  }
+
+  return bestWinning?.simulator ?? null;
+}
+
+function searchWinningPlan(modeDefinition, options) {
+  const initialBeam = buildInitialSearchBeam(modeDefinition, options);
+  const broadSearchWin = runBeamSearch(modeDefinition, options, initialBeam);
+  if (broadSearchWin) {
+    return broadSearchWin;
+  }
+
+  for (const seed of buildSearchSeedPlans(modeDefinition, options)) {
+    const seededSimulator = seedSimulatorWithPlan(modeDefinition, seed.plan, options);
+    if (!seededSimulator) {
+      continue;
+    }
+
+    const seededWin = runBeamSearch(modeDefinition, options, [
+      {
+        simulator: seededSimulator,
+        heuristic: evaluateSimulator(seededSimulator),
+      },
+    ]);
+
+    if (seededWin) {
+      return seededWin;
+    }
+  }
+
+  return null;
 }
 
 function findWinningFallbackPlan(modeDefinition, options) {
