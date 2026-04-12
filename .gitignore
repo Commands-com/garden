@@ -13,3 +13,4 @@ dist/
 runner/*.log
 runner/state/
 test-results/
+site/game/assets/generated/

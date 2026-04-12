@@ -310,6 +310,7 @@ function detectPage() {
 
   if (path === '/' || path === '/index.html') return 'home';
   if (path.startsWith('/days')) return 'day';
+  if (path.startsWith('/game')) return 'game';
   if (path.startsWith('/archive')) return 'archive';
   if (path.startsWith('/judges')) return 'judges';
   if (path.startsWith('/feedback')) return 'feedback';

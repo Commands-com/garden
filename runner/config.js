@@ -78,6 +78,27 @@ function envNumber(name, defaultValue) {
   return Number.isFinite(raw) ? raw : defaultValue;
 }
 
+function envBoolean(name, defaultValue) {
+  const value = env(name);
+  if (value === undefined) return defaultValue;
+
+  const normalized = String(value).trim().toLowerCase();
+  if (['1', 'true', 'yes', 'on'].includes(normalized)) return true;
+  if (['0', 'false', 'no', 'off'].includes(normalized)) return false;
+  return defaultValue;
+}
+
+function envPath(name, defaultRelativePath) {
+  const value = env(name);
+  if (!value) {
+    return path.resolve(PROJECT_ROOT, defaultRelativePath);
+  }
+
+  return path.isAbsolute(value)
+    ? value
+    : path.resolve(PROJECT_ROOT, value);
+}
+
 // ---------------------------------------------------------------------------
 // Exported configuration object
 // ---------------------------------------------------------------------------
@@ -173,6 +194,58 @@ const config = {
 
   devto: {
     apiKey: env('DEVTO_API_KEY', ''),
+  },
+
+  assets: {
+    manifestPath: envPath('GAME_ASSET_MANIFEST', 'site/game/assets-manifest.json'),
+    outputDir: envPath('GAME_ASSET_OUTPUT_DIR', 'site/game/assets/generated'),
+    replicateApiToken: env('REPLICATE_API_TOKEN', ''),
+    replicateApiBaseUrl: env('REPLICATE_API_BASE_URL', 'https://api.replicate.com/v1'),
+    replicateSpriteVersion: env('REPLICATE_SPRITE_VERSION', ''),
+    replicateAnimationVersion: env('REPLICATE_ANIMATION_VERSION', ''),
+    replicateTileVersion: env('REPLICATE_TILE_VERSION', ''),
+    replicateSpriteStyle: env('REPLICATE_SPRITE_STYLE', 'topdown_asset'),
+    replicateTileStyle: env('REPLICATE_TILE_STYLE', 'single_tile'),
+    replicateTilesetStyle: env('REPLICATE_TILESET_STYLE', 'tileset'),
+    replicateTileWidth: envNumber('REPLICATE_TILE_WIDTH', 32),
+    replicateTileHeight: envNumber('REPLICATE_TILE_HEIGHT', 32),
+    replicateSpritesheetStyle: env('REPLICATE_SPRITESHEET_STYLE', 'character_turnaround'),
+    replicateSpritesheetFrames: envNumber('REPLICATE_SPRITESHEET_FRAMES', 4),
+    replicateSpritesheetColumns: envNumber('REPLICATE_SPRITESHEET_COLUMNS', 4),
+    replicateSpritesheetRows: envNumber('REPLICATE_SPRITESHEET_ROWS', 1),
+    replicateSpritesheetAnimation: env('REPLICATE_SPRITESHEET_ANIMATION', 'idle'),
+    replicateAnimationStyle: env('REPLICATE_ANIMATION_STYLE', 'walking_and_idle'),
+    replicateAnimationWidth: envNumber('REPLICATE_ANIMATION_WIDTH', 48),
+    replicateAnimationHeight: envNumber('REPLICATE_ANIMATION_HEIGHT', 48),
+    replicateAnimationReturnSpritesheet: envBoolean(
+      'REPLICATE_ANIMATION_RETURN_SPRITESHEET',
+      true
+    ),
+    replicateSpriteWidth: envNumber('REPLICATE_SPRITE_WIDTH', 384),
+    replicateSpriteHeight: envNumber('REPLICATE_SPRITE_HEIGHT', 384),
+    replicateRemoveBg: envBoolean('REPLICATE_REMOVE_BG', true),
+    replicateBypassPromptExpansion: envBoolean(
+      'REPLICATE_BYPASS_PROMPT_EXPANSION',
+      true
+    ),
+    replicateNegativePrompt: env(
+      'REPLICATE_NEGATIVE_PROMPT',
+      'realistic, photo, 3d, watermark, text, blurry, low contrast'
+    ),
+    maxReplicateSpendPerRun: envNumber('MAX_REPLICATE_SPEND_PER_RUN', 0.5),
+    estimatedReplicateSpriteCost: envNumber('ESTIMATED_REPLICATE_SPRITE_COST', 0.05),
+    estimatedReplicateAnimationCost: envNumber('ESTIMATED_REPLICATE_ANIMATION_COST', 0.08),
+    estimatedReplicateTileCost: envNumber('ESTIMATED_REPLICATE_TILE_COST', 0.06),
+    elevenLabsApiKey: env('ELEVENLABS_API_KEY', ''),
+    elevenLabsApiBaseUrl: env('ELEVENLABS_API_BASE_URL', 'https://api.elevenlabs.io'),
+    elevenLabsSfxStyle: env(
+      'ELEVENLABS_SFX_STYLE',
+      'stylized action-game sound effect, crisp transient, polished mix, organic-meets-synthetic texture, modern indie game audio, short and readable, no retro chiptune'
+    ),
+    elevenLabsMusicStyle: env(
+      'ELEVENLABS_MUSIC_STYLE',
+      'modern indie action soundtrack, atmospheric electronic-organic texture, loopable, propulsive, polished browser-game mix, no retro chiptune'
+    ),
   },
 };
 

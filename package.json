@@ -9,6 +9,8 @@
     "deploy:lambdas": "bash scripts/deploy-lambdas.sh",
     "deploy:all": "npm run deploy:infra && npm run deploy:lambdas && npm run deploy:site",
     "daily-run": "node runner/daily-runner.js",
+    "asset:generate": "node runner/asset-generator.js",
+    "vendor:phaser": "node scripts/sync-phaser-vendor.js",
     "scheduler:install": "bash scripts/setup-scheduler.sh install",
     "scheduler:uninstall": "bash scripts/setup-scheduler.sh uninstall",
     "dev": "npx serve site -l tcp://127.0.0.1:3000",
@@ -27,6 +29,7 @@
   },
   "devDependencies": {
     "@playwright/test": "^1.59.1",
+    "phaser": "^4.0.0",
     "serve": "^14.2.0"
   },
   "engines": {

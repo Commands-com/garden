@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Rootline Defense — the daily-evolving Command Garden browser game.">
+  <meta name="theme-color" content="#1a4d2e">
+  <title>Rootline Defense — Command Garden</title>
+  <link rel="icon" href="/images/favicon.png" type="image/png">
+  <link rel="apple-touch-icon" href="/images/apple-touch-icon.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/design-system.css">
+  <link rel="stylesheet" href="/css/components.css">
+</head>
+<body class="game-page-body">
+
+  <nav class="nav" role="navigation" aria-label="Main navigation">
+    <div class="container nav__inner">
+      <a href="/" class="nav__logo">
+        <img src="/images/logo.png" alt="Command Garden" class="nav__logo-img" height="36">
+      </a>
+      <button class="nav__mobile-toggle" aria-label="Toggle menu" aria-expanded="false">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 12h18M3 6h18M3 18h18"/></svg>
+      </button>
+      <div class="nav__links">
+        <a href="/" class="nav__link">Home</a>
+        <a href="/game/" class="nav__link nav__link--active">Game</a>
+        <a href="/archive/" class="nav__link">Archive</a>
+        <a href="/judges/" class="nav__link">Judges</a>
+        <a href="/feedback/" class="nav__link">Feedback</a>
+        <a href="/days/" class="nav__link nav__link--source">View Source</a>
+      </div>
+    </div>
+  </nav>
+
+  <main class="game-page">
+    <section class="game-shell" id="game-stage">
+      <div class="container">
+        <div class="game-shell__topbar">
+          <h1 class="game-shell__title">Rootline Defense</h1>
+          <div class="game-shell__controls">
+            <button class="game-audio-toggle" id="game-audio-toggle" type="button" aria-label="Toggle sound" title="Toggle sound">
+              <svg class="game-audio-toggle__icon game-audio-toggle__icon--on" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/></svg>
+              <svg class="game-audio-toggle__icon game-audio-toggle__icon--off" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:none"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><line x1="23" y1="9" x2="17" y2="15"/><line x1="17" y1="9" x2="23" y2="15"/></svg>
+            </button>
+            <input class="game-volume-slider" id="game-volume-slider" type="range" min="0" max="100" value="80" aria-label="Volume">
+          </div>
+          <dl class="game-shell__chips">
+            <div class="game-shell__chip">
+              <dt>Seed</dt>
+              <dd id="game-seed-value">—</dd>
+            </div>
+            <div class="game-shell__chip">
+              <dt>Assets</dt>
+              <dd id="game-assets-count">0 tracked</dd>
+            </div>
+            <div class="game-shell__chip">
+              <dt>Board</dt>
+              <dd id="game-api-status">Checking…</dd>
+            </div>
+          </dl>
+        </div>
+
+        <section class="game-stage" aria-label="Rootline Defense game canvas">
+          <div class="game-stage__viewport" id="game-root">
+            <div class="game-stage__loading">
+              <p class="game-stage__loading-title">Booting Rootline Defense</p>
+              <p class="game-stage__loading-copy">Loading lanes, encounter hooks, and tracked assets…</p>
+            </div>
+          </div>
+        </section>
+
+        <div class="game-cards">
+          <section class="game-panel">
+            <h3 class="game-panel__title">Inventory</h3>
+            <div class="game-inventory" id="game-inventory">
+              <div class="game-inventory__item">
+                <div class="game-inventory__header">
+                  <span class="game-inventory__name">Thorn Vine</span>
+                  <span class="game-inventory__cost">50 sap</span>
+                </div>
+                <p class="game-inventory__desc">Fires thorns down the lane at approaching pests.</p>
+              </div>
+            </div>
+            <dl class="game-readout">
+              <div class="game-readout__item">
+                <dt>Sap</dt>
+                <dd id="game-sap-value">100</dd>
+              </div>
+              <div class="game-readout__item">
+                <dt>Planted</dt>
+                <dd id="game-defenders-value">0</dd>
+              </div>
+            </dl>
+            <p class="game-panel__note" id="game-run-note">Click an empty bed to plant. Sap regenerates every 4s.</p>
+          </section>
+
+          <section class="game-panel">
+            <h3 class="game-panel__title">Daily Board</h3>
+            <ol class="game-leaderboard" id="game-leaderboard-list">
+              <li class="game-leaderboard__empty">Loading…</li>
+            </ol>
+            <label class="game-field" for="game-alias-input">
+              <span class="game-field__label">Your alias</span>
+              <input class="game-field__input" id="game-alias-input" type="text" maxlength="24" placeholder="Garden guest" autocomplete="nickname">
+            </label>
+            <p class="game-panel__note" id="game-leaderboard-note">Scores submit on game over.</p>
+          </section>
+
+          <section class="game-panel">
+            <h3 class="game-panel__title">Run</h3>
+            <dl class="game-readout">
+              <div class="game-readout__item">
+                <dt>Score</dt>
+                <dd id="game-score-value">0</dd>
+              </div>
+              <div class="game-readout__item">
+                <dt>Wave</dt>
+                <dd id="game-wave-value">1</dd>
+              </div>
+              <div class="game-readout__item">
+                <dt>Wall</dt>
+                <dd id="game-wall-value">3 / 3</dd>
+              </div>
+              <div class="game-readout__item">
+                <dt>Pests</dt>
+                <dd id="game-enemy-value">0</dd>
+              </div>
+            </dl>
+          </section>
+        </div>
+
+        <section class="game-panel game-feedback">
+          <h3 class="game-panel__title">Shape the game</h3>
+          <p class="game-panel__note">What should the AI build next? New plants, enemies, mechanics, art — your feedback goes directly into tomorrow's pipeline.</p>
+          <form class="game-feedback__form" id="game-feedback-form">
+            <textarea class="game-field__input game-feedback__input" id="game-feedback-text" placeholder="I'd love to see…" maxlength="1000" rows="2"></textarea>
+            <div class="game-feedback__footer">
+              <span class="game-feedback__status" id="game-feedback-status"></span>
+              <button type="submit" class="btn btn--primary btn--sm">Send feedback</button>
+            </div>
+          </form>
+        </section>
+
+        <div class="game-shell__latest">
+          <p class="game-shell__latest-run" id="game-latest-run">Loading latest day…</p>
+          <p class="game-shell__latest-summary" id="game-latest-summary">Placeholder art until assets are generated.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="container">
+        <div class="game-assets">
+          <div class="section__header game-assets__header">
+            <span class="section__label">Tracked Assets</span>
+            <h2 class="section__title">What the generator has available</h2>
+            <p class="section__subtitle">
+              Generated sprites and audio are tracked in a manifest so the pipeline can reuse and build on them.
+            </p>
+          </div>
+          <ul class="game-assets__list" id="game-assets-list">
+            <li class="game-assets__empty">No generated assets tracked yet. Placeholder visuals are active.</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container site-footer__inner">
+      <p class="site-footer__text">
+        Powered by <a href="https://commands.com" class="site-footer__link">Commands.com</a>
+      </p>
+      <span class="site-footer__meta">lane defense prototype</span>
+    </div>
+  </footer>
+
+  <script src="/game/vendor/phaser.min.js"></script>
+  <script type="module" src="/game/src/main.js"></script>
+  <script>
+    (function () {
+      const form = document.getElementById("game-feedback-form");
+      const text = document.getElementById("game-feedback-text");
+      const status = document.getElementById("game-feedback-status");
+      if (!form || !text) return;
+
+      form.addEventListener("submit", async function (e) {
+        e.preventDefault();
+        const value = text.value.trim();
+        if (!value) return;
+
+        status.textContent = "Sending…";
+        try {
+          const res = await fetch("/api/feedback", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ type: "suggestion", message: value, source: "game-page" }),
+          });
+          if (res.ok) {
+            status.textContent = "Sent — thanks!";
+            text.value = "";
+          } else {
+            status.textContent = "Failed to send. Try again.";
+          }
+        } catch {
+          status.textContent = "Network error. Try again.";
+        }
+      });
+    })();
+  </script>
+</body>
+</html>

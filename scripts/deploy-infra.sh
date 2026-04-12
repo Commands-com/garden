@@ -151,7 +151,7 @@ if [[ -d "$LAMBDA_DIR" && -n "$STAGING_BUCKET" ]]; then
   trap 'rm -rf "$TEMP_DIR"' EXIT
 
   LAMBDA_UPLOAD_OK=true
-  for FUNC_KEY in feedback reactions health; do
+  for FUNC_KEY in feedback reactions health game-scores; do
     FUNC_DIR="$LAMBDA_DIR/$FUNC_KEY"
     if [[ ! -d "$FUNC_DIR" ]]; then
       echo -e "${YELLOW}  Warning: Lambda directory not found for '${FUNC_KEY}' — skipping${NC}"

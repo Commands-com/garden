@@ -12,6 +12,7 @@ A public website at **commandgarden.com** that ships one user-visible feature pe
 site/                   # Static website (HTML, CSS, JS) — deployed to S3/CloudFront
   css/                  # design-system.css (variables) + components.css (BEM components)
   js/                   # app.js (data loading), renderer.js (DOM rendering), feedback.js
+  game/                 # Phaser game shell, scenes, systems, config, and asset manifest
   days/                 # Daily artifacts served to users (decision.json, spec.md, etc.)
   images/               # Logo, favicon, OG image
   index.html            # Homepage
@@ -23,6 +24,7 @@ site/                   # Static website (HTML, CSS, JS) — deployed to S3/Clou
 runner/                 # Daily pipeline automation (Node.js)
   daily-runner.js       # Main orchestrator — runs the 5-stage pipeline
   artifact-publisher.js # Uploads artifacts + site to S3, invalidates CloudFront
+  asset-generator.js    # Replicate + ElevenLabs wrapper for game assets
   bluesky-publisher.js  # Posts to Bluesky, runs outreach
   feedback-aggregator.js# Aggregates user feedback from DynamoDB
   config.js             # Environment config parser
@@ -33,6 +35,7 @@ infra/                  # AWS infrastructure
   lambda/feedback/      # Feedback submission handler
   lambda/reactions/     # Emoji reaction handler
   lambda/health/        # Health check handler
+  lambda/game-scores/   # Game leaderboard submission + lookup handler
 
 scripts/                # Deployment scripts (bash)
   deploy-infra.sh       # CloudFormation stack deploy (also packages Lambda zips)
@@ -97,6 +100,46 @@ el('div', { className: 'card' },
 container.innerHTML = `<h3>${title}</h3>`;
 ```
 
+## Game Systems
+
+The browser game lives under `site/game/` and is designed so most daily work happens in safe, data-driven places instead of repeatedly rewriting the loop.
+Current direction: the runtime is on Phaser 4, and the game should migrate the temporary arena-survival prototype toward a Plants vs. Zombies-style lane-defense game instead of deepening the old arena loop.
+Before changing game code, read `docs/game-pipeline-guide.md`.
+Before changing Phaser runtime code specifically, also read `docs/phaser-4-runtime.md`.
+
+**Core systems — modify with caution**
+- `site/game/src/scenes/play.js`
+- `site/game/src/scenes/title.js`
+- `site/game/src/scenes/gameover.js`
+- `site/game/src/systems/input.js`
+- `site/game/src/systems/spawning.js`
+- `site/game/src/systems/scoring.js`
+- `site/game/src/systems/test-hooks.js`
+
+**Preferred daily mutation surfaces**
+Until the lane-defense migration lands, the current prototype still uses `weapons.js`, `waves.js`, and `powerups.js`; treat those as transitional files, not the long-term design target.
+- `site/game/src/config/enemies.js`
+- `site/game/src/config/weapons.js`
+- `site/game/src/config/waves.js`
+- `site/game/src/config/powerups.js`
+- `site/game/src/config/balance.js`
+- `site/game/assets-manifest.json`
+
+**Animation and asset guidance**
+- Use `node runner/asset-generator.js sprite ...` with `rd-plus` for high-detail static unit art, environment art, UI, and items.
+- Use `node runner/asset-generator.js animation ...` with `rd-animation` for true gameplay loops such as walking, idle, attack, hurt, spawn, or compact VFX sheets.
+- Keep `rd-animation` outputs gameplay-sized. Its styles have hard size constraints; for example, `walking_and_idle` and `four_angle_walking` are 48x48, `small_sprites` is 32x32, and `vfx` is 24-96.
+- Prefer runtime motion for anything that does not need hand-drawn frame changes. Defenders that mostly sit in place should usually stay static and use tweens, recoil, bob, tint, or scale rather than a full generated spritesheet.
+- If a generated sheet contains multiple facing directions, never cycle all rows blindly. Explicitly choose the row that matches gameplay direction in config, such as `animationFrames: [12, 13, 14, 15]` for a right-to-left enemy that should always face the wall.
+- Record animation choices in config files (`site/game/src/config/enemies.js`, later `plants.js` if needed), not as ad hoc magic numbers buried in scene code.
+- Generated sheets should carry `metadata.phaser.frameWidth` and `metadata.phaser.frameHeight` in `site/game/assets-manifest.json` so Boot can preload them as spritesheets.
+
+Rules:
+- Prefer config/content additions over rewriting the core loop.
+- If you touch a core system file, add or update tests that protect existing behavior.
+- Generated binaries belong under `site/game/assets/generated/` and should stay out of git.
+- Keep `?testMode=1` and `window.__gameTestHooks` working.
+
 ## API Endpoints
 
 All routes go through CloudFront → API Gateway → Lambda.
@@ -107,6 +150,8 @@ All routes go through CloudFront → API Gateway → Lambda.
 | GET | `/api/reactions?dayDate=YYYY-MM-DD` | reactions | Get emoji reaction counts |
 | POST | `/api/reactions` | reactions | Submit a reaction |
 | GET | `/api/health` | health | Health check + last run status |
+| GET | `/api/game/leaderboard?dayDate=YYYY-MM-DD` | game-scores | Fetch the daily game leaderboard |
+| POST | `/api/game/score` | game-scores | Submit a finished run to the daily board |
 
 **Adding a new endpoint:**
 1. Create handler in `infra/lambda/{name}/index.js`
@@ -216,8 +261,8 @@ const spec = await fetchOptional('/days/2026-04-06/spec.md', 'text'); // returns
 - **S3** — `command-garden-site` bucket, serves all static content
 - **CloudFront** — CDN with OAC, custom domain `commandgarden.com` + `www` redirect
 - **API Gateway** — HTTP API routing `/api/*` to Lambda
-- **Lambda** — Three functions (feedback, reactions, health), Node.js 20.x
-- **DynamoDB** — Four tables: feedback, reactions, runs, moderation (prefix: `command-garden-prod-`)
+- **Lambda** — Four functions (feedback, reactions, health, game-scores), Node.js 20.x
+- **DynamoDB** — Five tables: feedback, reactions, runs, moderation, game-scores (prefix: `command-garden-prod-`)
 - **ACM** — TLS cert for `*.commandgarden.com`
 
 ## Bluesky

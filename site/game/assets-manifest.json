@@ -1,0 +1,162 @@
+{
+  "schemaVersion": 1,
+  "updatedAt": "2026-04-12T16:41:44.720Z",
+  "assets": [
+    {
+      "id": "briar-beetle",
+      "type": "sprite",
+      "kind": "sprite",
+      "provider": "replicate",
+      "path": "/game/assets/generated/sprites/test/briar-beetle.png",
+      "prompt": "Create a enemy sprite of briar-backed beetle predator with glowing amber core. hostile creature sprite for a top-down arena game, readable attack silhouette, visually distinct body shape, premium indie-game finish. modern high-detail pixel art, nuanced shading, crisp edges, visually rich but gameplay-readable, designed for a contemporary indie game. Style mode: topdown_asset. Output should hold up at 384x384 source resolution and still read clearly when scaled down in gameplay. Transparent or removable background. avoid chunky 8-bit nostalgia, avoid intentionally primitive low-detail treatment, avoid exaggerated CRT or old-console aesthetics.",
+      "generatedAt": "2026-04-12T14:51:33.900Z",
+      "metadata": {
+        "predictionId": "94sv5dvf45rmt0cxg8pamyewn8",
+        "modelVersion": "8fa3491557e024ac62c4f3c0918774c54b948c25f6388c5741862dd4b523e311",
+        "category": "enemy",
+        "style": "topdown_asset",
+        "width": 384,
+        "height": 384
+      }
+    },
+    {
+      "id": "briar-beetle-walk",
+      "type": "sprite",
+      "kind": "animation",
+      "provider": "replicate",
+      "path": "/game/assets/generated/animations/test/briar-beetle-walk.png",
+      "prompt": "Create an animated enemy sprite of briar beetle lane-pusher with amber shell plates and thorn legs. hostile lane-pushing creature for a top-down lane-defense game, readable attack silhouette, visually distinct body shape, premium indie-game finish. Render a cohesive low-framerate gameplay animation with consistent character volume, palette, and positioning across frames. Use the rd-animation style walking_and_idle. Each frame must keep the same subject identity, palette, and camera angle while showing one coherent gameplay action. Target frame size 48x48. No text, labels, borders, UI panels, or background scene dressing. modern polished pixel art, crisp readable silhouettes, consistent shading, and strong gameplay clarity. avoid muddy low-contrast frames, avoid random pose drift, avoid noisy background detail, avoid deliberately primitive 8-bit nostalgia.",
+      "generatedAt": "2026-04-12T16:25:11.811Z",
+      "metadata": {
+        "predictionId": "n23mq8cb1srmt0cxga1awqjrm4",
+        "modelVersion": "2e4eabbc836578423e151ba27352a1d8a566c6f1186c0da3ddf66c54deacf28b",
+        "model": "rd-animation",
+        "category": "enemy",
+        "style": "walking_and_idle",
+        "width": 48,
+        "height": 48,
+        "returnSpritesheet": true,
+        "phaser": {
+          "frameWidth": 48,
+          "frameHeight": 48
+        }
+      }
+    },
+    {
+      "id": "garden-wall",
+      "type": "sprite",
+      "kind": "sprite",
+      "provider": "replicate",
+      "path": "/game/assets/generated/sprites/environment/garden-wall.png",
+      "prompt": "Create a environment sprite of sturdy garden stone wall segment with moss and lichen, weathered but strong, warm earthy tones, viewed from above at slight angle, defensive barrier for a garden game. playable environment asset with modern game-art finish, readable forms, polished detail. modern high-detail pixel art, nuanced shading, crisp edges, visually rich but gameplay-readable, designed for a contemporary indie game. Style mode: environment. Output should hold up at 384x384 source resolution and still read clearly when scaled down in gameplay. Transparent or removable background. avoid chunky 8-bit nostalgia, avoid intentionally primitive low-detail treatment, avoid exaggerated CRT or old-console aesthetics.",
+      "generatedAt": "2026-04-12T16:03:43.497Z",
+      "metadata": {
+        "predictionId": "gxs0bhm5fnrmw0cxg9q94k86jc",
+        "modelVersion": "8fa3491557e024ac62c4f3c0918774c54b948c25f6388c5741862dd4b523e311",
+        "category": "environment",
+        "style": "environment",
+        "width": 384,
+        "height": 384
+      }
+    },
+    {
+      "id": "shard-mite-walk",
+      "type": "sprite",
+      "kind": "animation",
+      "provider": "replicate",
+      "path": "/game/assets/generated/sprites/enemies/shard-mite-walk.png",
+      "prompt": "Create an animated enemy sprite of small crystalline insect pest with translucent ice-blue carapace and sharp angular legs, scurrying aggressively leftward. hostile lane-pushing creature for a top-down lane-defense game, readable attack silhouette, visually distinct body shape, premium indie-game finish. Render a cohesive low-framerate gameplay animation with consistent character volume, palette, and positioning across frames. Use the rd-animation style walking_and_idle. Each frame must keep the same subject identity, palette, and camera angle while showing one coherent gameplay action. Target frame size 48x48. No text, labels, borders, UI panels, or background scene dressing. modern polished pixel art, crisp readable silhouettes, consistent shading, and strong gameplay clarity. avoid muddy low-contrast frames, avoid random pose drift, avoid noisy background detail, avoid deliberately primitive 8-bit nostalgia.",
+      "generatedAt": "2026-04-12T16:41:44.695Z",
+      "metadata": {
+        "predictionId": "vb4zfa5hhdrmw0cxga8rs24jbw",
+        "modelVersion": "2e4eabbc836578423e151ba27352a1d8a566c6f1186c0da3ddf66c54deacf28b",
+        "model": "rd-animation",
+        "category": "enemy",
+        "style": "walking_and_idle",
+        "width": 48,
+        "height": 48,
+        "returnSpritesheet": true,
+        "phaser": {
+          "frameWidth": 48,
+          "frameHeight": 48
+        }
+      }
+    },
+    {
+      "id": "thorn-fire",
+      "type": "audio",
+      "kind": "sfx",
+      "provider": "elevenlabs",
+      "path": "/game/assets/generated/audio/sfx/thorn-fire.mp3",
+      "prompt": "sharp thorn launching from a vine, woody snap with a fast airy whistle, short and punchy. Direction: short attack or projectile release with crisp forward motion. Style: stylized action-game sound effect, crisp transient, polished mix, organic-meets-synthetic texture, modern indie game audio, short and readable, no retro chiptune. Keep it short, punchy, and gameplay-readable.",
+      "generatedAt": "2026-04-12T16:07:26.677Z",
+      "metadata": {
+        "duration": 0.5,
+        "kind": "sfx",
+        "category": "projectile"
+      }
+    },
+    {
+      "id": "thorn-hit",
+      "type": "audio",
+      "kind": "sfx",
+      "provider": "elevenlabs",
+      "path": "/game/assets/generated/audio/sfx/thorn-hit.mp3",
+      "prompt": "thorn piercing into a creature, fleshy puncture with a brittle crack, quick and satisfying impact. Direction: sharp gameplay impact with a clean transient and satisfying weight. Style: stylized action-game sound effect, crisp transient, polished mix, organic-meets-synthetic texture, modern indie game audio, short and readable, no retro chiptune. Keep it short, punchy, and gameplay-readable.",
+      "generatedAt": "2026-04-12T16:10:01.608Z",
+      "metadata": {
+        "duration": 0.5,
+        "kind": "sfx",
+        "category": "impact"
+      }
+    },
+    {
+      "id": "thorn-lance-impact-v2",
+      "type": "audio",
+      "kind": "sfx",
+      "provider": "elevenlabs",
+      "path": "/game/assets/generated/audio/test/thorn-lance-impact-v2.mp3",
+      "prompt": "thorn-lance impact with glassy sap crack and tight low-end body. Direction: sharp gameplay impact with a clean transient and satisfying weight. Style: stylized action-game sound effect, crisp transient, polished mix, organic-meets-synthetic texture, modern indie game audio, short and readable, no retro chiptune. Keep it short, punchy, and gameplay-readable.",
+      "generatedAt": "2026-04-12T14:57:06.797Z",
+      "metadata": {
+        "duration": 0.9,
+        "kind": "sfx",
+        "category": "impact"
+      }
+    },
+    {
+      "id": "thorn-projectile",
+      "type": "sprite",
+      "kind": "sprite",
+      "provider": "replicate",
+      "path": "/game/assets/generated/sprites/projectiles/thorn-projectile.png",
+      "prompt": "Create a projectile sprite of single sharp thorn projectile spinning through the air, golden-green barbed spike with a slight motion trail, small and compact, top-down perspective. small readable projectile or magic seed icon, clean silhouette, premium game-item finish. modern high-detail pixel art, nuanced shading, crisp edges, visually rich but gameplay-readable, designed for a contemporary indie game. Style mode: topdown_asset. Output should hold up at 128x128 source resolution and still read clearly when scaled down in gameplay. Transparent or removable background. avoid chunky 8-bit nostalgia, avoid intentionally primitive low-detail treatment, avoid exaggerated CRT or old-console aesthetics.",
+      "generatedAt": "2026-04-12T16:07:28.446Z",
+      "metadata": {
+        "predictionId": "yw0h8w0ccsrmy0cxg9s9ccbwbw",
+        "modelVersion": "8fa3491557e024ac62c4f3c0918774c54b948c25f6388c5741862dd4b523e311",
+        "category": "projectile",
+        "style": "topdown_asset",
+        "width": 128,
+        "height": 128
+      }
+    },
+    {
+      "id": "thorn-vine",
+      "type": "sprite",
+      "kind": "sprite",
+      "provider": "replicate",
+      "path": "/game/assets/generated/sprites/plants/thorn-vine.png",
+      "prompt": "Create a player sprite of thorny defensive vine plant growing from a garden bed, sharp barbed leaves radiating outward, glowing golden thorn tips ready to fire, rooted firmly in dark soil, top-down game defender unit. hero unit for a polished browser action game, confident stance, readable movement silhouette, premium indie-game finish. modern high-detail pixel art, nuanced shading, crisp edges, visually rich but gameplay-readable, designed for a contemporary indie game. Style mode: topdown_asset. Output should hold up at 384x384 source resolution and still read clearly when scaled down in gameplay. Transparent or removable background. avoid chunky 8-bit nostalgia, avoid intentionally primitive low-detail treatment, avoid exaggerated CRT or old-console aesthetics.",
+      "generatedAt": "2026-04-12T16:02:54.236Z",
+      "metadata": {
+        "predictionId": "2wrceyyy19rmt0cxg9ptty5kg0",
+        "modelVersion": "8fa3491557e024ac62c4f3c0918774c54b948c25f6388c5741862dd4b523e311",
+        "category": "player",
+        "style": "topdown_asset",
+        "width": 384,
+        "height": 384
+      }
+    }
+  ]
+}

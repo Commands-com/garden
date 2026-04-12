@@ -8,6 +8,7 @@ const {
 const DAY_DATE = "2026-04-08";
 const EXPECTED_NAV_LINKS = [
   { text: "Home", href: "/" },
+  { text: "Game", href: "/game/" },
   { text: "Archive", href: "/archive/" },
   { text: "Judges", href: "/judges/" },
   { text: "Feedback", href: "/feedback/" },

@@ -21,7 +21,7 @@ usage() {
   cat <<EOF
 Usage: $(basename "$0") [OPTIONS]
 
-Package and deploy Command Garden Lambda functions (feedback, reactions, health).
+Package and deploy Command Garden Lambda functions.
 
 Options:
   --help    Show this help message
@@ -85,7 +85,10 @@ declare -A FUNCTION_MAP=(
   [feedback]="${STACK_NAME}-feedback"
   [reactions]="${STACK_NAME}-reactions"
   [health]="${STACK_NAME}-health"
+  [game-scores]="${STACK_NAME}-game-scores"
 )
+
+FUNCTION_KEYS=(feedback reactions health game-scores)
 
 echo -e "${YELLOW}Deploying Lambda functions for stack '${STACK_NAME}'...${NC}"
 echo ""
@@ -95,13 +98,13 @@ TOTAL=0
 TEMP_DIR=$(mktemp -d)
 trap 'rm -rf "$TEMP_DIR"' EXIT
 
-for FUNC_KEY in feedback reactions health; do
+for FUNC_KEY in "${FUNCTION_KEYS[@]}"; do
   TOTAL=$((TOTAL + 1))
   FUNC_DIR="$LAMBDA_DIR/$FUNC_KEY"
   FUNC_NAME="${FUNCTION_MAP[$FUNC_KEY]}"
   ZIP_FILE="$TEMP_DIR/${FUNC_KEY}.zip"
 
-  echo -e "${YELLOW}[$TOTAL/3] Deploying '${FUNC_KEY}' -> ${FUNC_NAME}${NC}"
+  echo -e "${YELLOW}[$TOTAL/${#FUNCTION_KEYS[@]}] Deploying '${FUNC_KEY}' -> ${FUNC_NAME}${NC}"
 
   # Check function directory exists
   if [[ ! -d "$FUNC_DIR" ]]; then

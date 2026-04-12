@@ -263,6 +263,22 @@ Resources:
               - GET
               - HEAD
 
+          # /api/game/* -> Game leaderboard Lambda
+          - PathPattern: '/api/game/*'
+            TargetOriginId: ApiGatewayOrigin
+            ViewerProtocolPolicy: redirect-to-https
+            Compress: true
+            CachePolicyId: 4135ea2d-6df8-44a3-9df3-4b5a84be39ad  # AWS managed CachingDisabled
+            OriginRequestPolicyId: !Ref ApiOriginRequestPolicy
+            AllowedMethods:
+              - GET
+              - HEAD
+              - OPTIONS
+              - POST
+            CachedMethods:
+              - GET
+              - HEAD
+
           # /days/*/decision.json -> S3 with 1-hour cache
           - PathPattern: '/days/*/decision.json'
             TargetOriginId: S3Origin
@@ -531,6 +547,29 @@ Resources:
         - AttributeName: runDate
           KeyType: HASH
 
+  GameScoresTable:
+    Type: AWS::DynamoDB::Table
+    DeletionPolicy: Retain
+    UpdateReplacePolicy: Retain
+    Properties:
+      TableName: !Sub '${TablePrefix}-${Environment}-game-scores'
+      BillingMode: PAY_PER_REQUEST
+      PointInTimeRecoverySpecification:
+        PointInTimeRecoveryEnabled: true
+      TimeToLiveSpecification:
+        AttributeName: ttl
+        Enabled: true
+      AttributeDefinitions:
+        - AttributeName: dayDate
+          AttributeType: S
+        - AttributeName: scoreKey
+          AttributeType: S
+      KeySchema:
+        - AttributeName: dayDate
+          KeyType: HASH
+        - AttributeName: scoreKey
+          KeyType: RANGE
+
   # ==========================================================================
   # IAM Roles - Lambda Execution
   # ==========================================================================
@@ -620,6 +659,33 @@ Resources:
                 Resource:
                   - !GetAtt RunsTable.Arn
 
+  GameScoresFunctionRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: !Sub '${AWS::StackName}-game-scores-lambda-role'
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: lambda.amazonaws.com
+            Action: sts:AssumeRole
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+      Policies:
+        - PolicyName: GameScoresTableAccess
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - dynamodb:PutItem
+                  - dynamodb:GetItem
+                  - dynamodb:Query
+                  - dynamodb:UpdateItem
+                Resource:
+                  - !GetAtt GameScoresTable.Arn
+
   # ==========================================================================
   # API Gateway (HTTP API)
   # ==========================================================================
@@ -703,6 +769,29 @@ Resources:
       ApiId: !Ref ApiGateway
       RouteKey: 'GET /api/health'
       Target: !Sub 'integrations/${HealthIntegration}'
+
+  # --- Game routes ---
+  GameScoresIntegration:
+    Type: AWS::ApiGatewayV2::Integration
+    Properties:
+      ApiId: !Ref ApiGateway
+      IntegrationType: AWS_PROXY
+      IntegrationUri: !GetAtt GameScoresFunction.Arn
+      PayloadFormatVersion: '2.0'
+
+  GameScoreRoute:
+    Type: AWS::ApiGatewayV2::Route
+    Properties:
+      ApiId: !Ref ApiGateway
+      RouteKey: 'POST /api/game/score'
+      Target: !Sub 'integrations/${GameScoresIntegration}'
+
+  GameLeaderboardRoute:
+    Type: AWS::ApiGatewayV2::Route
+    Properties:
+      ApiId: !Ref ApiGateway
+      RouteKey: 'GET /api/game/leaderboard'
+      Target: !Sub 'integrations/${GameScoresIntegration}'
 
   # ==========================================================================
   # Lambda Functions
@@ -797,6 +886,36 @@ Resources:
       Principal: apigateway.amazonaws.com
       SourceArn: !Sub 'arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${ApiGateway}/*'
 
+  GameScoresFunction:
+    Type: AWS::Lambda::Function
+    Properties:
+      FunctionName: !Sub '${AWS::StackName}-game-scores'
+      Runtime: nodejs20.x
+      Handler: index.handler
+      Role: !GetAtt GameScoresFunctionRole.Arn
+      MemorySize: 256
+      Timeout: 10
+      Code: !If
+        - HasLambdaCodeBucket
+        - S3Bucket: !Ref LambdaCodeBucket
+          S3Key: !Sub '${LambdaCodeVersion}/game-scores.zip'
+        - ZipFile: |
+            exports.handler = async (event) => {
+              return { statusCode: 200, body: JSON.stringify({ message: 'Game scores endpoint — deploy real code with scripts/deploy-lambdas.sh' }) };
+            };
+      Environment:
+        Variables:
+          GAME_SCORES_TABLE: !Ref GameScoresTable
+          ALLOWED_ORIGIN: '*'
+
+  GameScoresApiPermission:
+    Type: AWS::Lambda::Permission
+    Properties:
+      FunctionName: !Ref GameScoresFunction
+      Action: lambda:InvokeFunction
+      Principal: apigateway.amazonaws.com
+      SourceArn: !Sub 'arn:aws:execute-api:${AWS::Region}:${AWS::AccountId}:${ApiGateway}/*'
+
   # ==========================================================================
   # IAM - Deployment Policy (for CI / deploy scripts)
   # ==========================================================================
@@ -835,6 +954,7 @@ Resources:
               - !GetAtt FeedbackFunction.Arn
               - !GetAtt ReactionsFunction.Arn
               - !GetAtt HealthFunction.Arn
+              - !GetAtt GameScoresFunction.Arn
 
   DeploymentRole:
     Type: AWS::IAM::Role
@@ -937,6 +1057,10 @@ Outputs:
   RunsTableName:
     Description: Runs DynamoDB table name
     Value: !Ref RunsTable
+
+  GameScoresTableName:
+    Description: Game scores DynamoDB table name
+    Value: !Ref GameScoresTable
 
   DeploymentPolicyArn:
     Description: ARN of the deployment IAM policy for CI/CD
