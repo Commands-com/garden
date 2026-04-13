@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "updatedAt": "2026-04-12T19:35:09.615Z",
+  "updatedAt": "2026-04-13T14:10:00.000Z",
   "assets": [
     {
       "id": "briar-beetle",
@@ -40,6 +40,36 @@
           "frameWidth": 48,
           "frameHeight": 48
         }
+      }
+    },
+    {
+      "id": "bramble-spear",
+      "type": "sprite",
+      "kind": "sprite",
+      "provider": "repo",
+      "path": "/game/assets/manual/plants/bramble-spear.svg",
+      "prompt": "Hand-authored repo asset for the April 13 Bramble Spear roster plant. Distinct spear-petal silhouette with amber core so the second plant reads clearly even when asset generation times out.",
+      "generatedAt": "2026-04-13T14:10:00.000Z",
+      "metadata": {
+        "category": "player",
+        "format": "svg",
+        "width": 128,
+        "height": 128
+      }
+    },
+    {
+      "id": "bramble-spear-projectile",
+      "type": "sprite",
+      "kind": "sprite",
+      "provider": "repo",
+      "path": "/game/assets/manual/projectiles/bramble-spear-projectile.svg",
+      "prompt": "Hand-authored repo asset for the April 13 Bramble Spear projectile. Long bramble lance silhouette so piercing shots are visually distinct from Thorn Vine bolts.",
+      "generatedAt": "2026-04-13T14:10:00.000Z",
+      "metadata": {
+        "category": "projectile",
+        "format": "svg",
+        "width": 96,
+        "height": 32
       }
     },
     {

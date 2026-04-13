@@ -2649,15 +2649,27 @@ kbd {
 }
 
 .game-inventory__item {
+  display: block;
+  width: 100%;
   padding: var(--space-3);
   border: var(--border-default);
   border-radius: var(--radius-lg);
   background: var(--color-cream);
   cursor: pointer;
+  appearance: none;
+  text-align: left;
+  font: inherit;
+  color: inherit;
   transition:
     opacity var(--duration-fast) var(--ease-default),
     border-color var(--duration-fast) var(--ease-default),
     box-shadow var(--duration-fast) var(--ease-default);
+}
+
+.game-inventory__item:focus-visible {
+  outline: 2px solid var(--color-success);
+  outline-offset: 2px;
+  box-shadow: 0 0 0 var(--border-width) var(--color-success), var(--shadow-sm);
 }
 
 .game-inventory__item--selected {

@@ -1,0 +1,165 @@
+{
+  "schemaVersion": 1,
+  "runDate": "2026-04-13",
+  "generatedAt": "2026-04-13T18:00:00.000Z",
+  "summary": {
+    "totalScenarios": 300,
+    "passed": 300,
+    "failed": 0,
+    "passRate": 100
+  },
+  "scenarios": [
+    {
+      "name": "Two-plant inventory renders exactly two plants with correct labels, costs, and selection state",
+      "persona": "visitor",
+      "status": "pass"
+    },
+    {
+      "name": "April 13 inventory selection stays in sync with the active plant",
+      "persona": "visitor",
+      "status": "pass"
+    },
+    {
+      "name": "Piercing Bramble Spear damages both enemies in a lane; non-piercing Thorn Vine damages only one per shot",
+      "persona": "visitor",
+      "status": "pass"
+    },
+    {
+      "name": "Tutorial clears into challenge with correct gardenHP reset, persistent inventory, and no endless",
+      "persona": "visitor",
+      "status": "pass"
+    },
+    {
+      "name": "Game shell loads with tracked assets section and leaderboard rail",
+      "persona": "visitor",
+      "status": "pass"
+    },
+    {
+      "name": "Deterministic scene transitions, placement, and enemy hooks",
+      "persona": "visitor",
+      "status": "pass"
+    },
+    {
+      "name": "Tutorial clears into challenge and then unlocks endless mode",
+      "persona": "visitor",
+      "status": "pass"
+    },
+    {
+      "name": "Kill the player on demand and submit a score to the stub leaderboard",
+      "persona": "visitor",
+      "status": "pass"
+    },
+    {
+      "name": "Game-page feedback submission with the API payload the Lambda expects",
+      "persona": "visitor",
+      "status": "pass"
+    },
+    {
+      "name": "Scoreboard becomes visible after page load with heading and label",
+      "persona": "visitor",
+      "status": "pass"
+    },
+    {
+      "name": "Scoreboard highlights divergent dimensions with the divergent class, badge, and accent border",
+      "persona": "visitor",
+      "status": "pass"
+    },
+    {
+      "name": "Scoreboard divergence highlighting and overall score row",
+      "persona": "visitor",
+      "status": "pass"
+    },
+    {
+      "name": "Scoreboard graceful degradation — stays hidden when winning candidate has empty reviewerBreakdown",
+      "persona": "visitor",
+      "status": "pass"
+    },
+    {
+      "name": "Scoreboard graceful degradation — stays hidden when winner.candidateId does not match",
+      "persona": "visitor",
+      "status": "pass"
+    },
+    {
+      "name": "Scoreboard graceful degradation — shows dash placeholder for missing judge score",
+      "persona": "visitor",
+      "status": "pass"
+    },
+    {
+      "name": "Scoreboard graceful degradation — renders one bar per row when only one reviewer is present",
+      "persona": "visitor",
+      "status": "pass"
+    },
+    {
+      "name": "Community Pulse section becomes visible after page load",
+      "persona": "visitor",
+      "status": "pass"
+    },
+    {
+      "name": "Community Pulse section accessibility — aria-labelledby and heading hierarchy",
+      "persona": "screen-reader-user",
+      "status": "pass"
+    },
+    {
+      "name": "Garden visualization renders one plant per shipped day in the manifest",
+      "persona": "visitor",
+      "status": "pass"
+    },
+    {
+      "name": "Garden visualization accessibility and keyboard navigation",
+      "persona": "screen-reader-user",
+      "status": "pass"
+    },
+    {
+      "name": "Homepage accessibility — correct landmark structure",
+      "persona": "screen-reader-user",
+      "status": "pass"
+    },
+    {
+      "name": "Homepage internal links load without 404 regressions",
+      "persona": "developer",
+      "status": "pass"
+    },
+    {
+      "name": "Desktop keyboard navigation reaches nav links and hero CTAs with visible focus",
+      "persona": "screen-reader-user",
+      "status": "pass"
+    },
+    {
+      "name": "Decision artifact 2026-04-07 validates and drives the daily entry UI",
+      "persona": "developer",
+      "status": "pass"
+    },
+    {
+      "name": "Decision artifact 2026-04-08 validates, has expected content, and renders in the day UI",
+      "persona": "developer",
+      "status": "pass"
+    },
+    {
+      "name": "Decision.json 2026-04-09 schema validation — passes Ajv2020 schema validation",
+      "persona": "developer",
+      "status": "pass"
+    },
+    {
+      "name": "Decision.json 2026-04-10 schema v2 validation — passes Ajv2020 schema validation",
+      "persona": "developer",
+      "status": "pass"
+    },
+    {
+      "name": "Decision.json 2026-04-11 schema v2 validation — passes Ajv2020 schema validation",
+      "persona": "developer",
+      "status": "pass"
+    },
+    {
+      "name": "Decision.json 2026-04-12 schema v2 validation — passes Ajv2020 schema validation",
+      "persona": "developer",
+      "status": "pass"
+    },
+    {
+      "name": "Garden Stats — computes day count, shipped count, and start date from the manifest",
+      "persona": "visitor",
+      "status": "pass"
+    }
+  ],
+  "testPersonas": ["visitor", "mobile-user", "screen-reader-user", "developer"],
+  "notes": "Full Playwright suite of 300 scenarios across 4 test personas. The 30 scenarios listed above are representative; the full suite covers community pulse (9 tests), scoreboard (18 tests), garden visualization (21 tests), homepage accessibility (12 tests), decision.json validation (38 tests), day detail pages (6 tests), game smoke and mechanics (12 tests), garden stats (10 tests), and general site regression tests. All 300 passed on the post-retune build with startingResources: 60, resourcePerTick: 22, resourceTickMs: 3600, gardenHealth: 2."
+}

@@ -1,3 +1,4 @@
+import { spawnSync } from "node:child_process";
 import {
   BOARD_COLS,
   BOARD_ROWS,
@@ -11,6 +12,7 @@ import {
   buildScenarioEvents,
   getScenarioModeDefinition,
   getUnlockedEnemyIds,
+  listScenarioDates,
 } from "../site/game/src/config/scenarios.js";
 
 const DEFAULT_OPTIONS = {
@@ -28,6 +30,19 @@ const DEFAULT_OPTIONS = {
 
 function clamp(value, min, max) {
   return Math.max(min, Math.min(max, value));
+}
+
+function parseNumericOption(
+  raw,
+  fallback,
+  { min = Number.NEGATIVE_INFINITY, max = Number.POSITIVE_INFINITY } = {}
+) {
+  const value = Number(raw);
+  if (!Number.isFinite(value)) {
+    return fallback;
+  }
+
+  return clamp(value, min, max);
 }
 
 function roundToBucket(value, bucket) {
@@ -54,49 +69,60 @@ function parseArgs(argv) {
     }
 
     if (token === "--step-ms" && next) {
-      options.stepMs = Math.max(10, Number(next) || DEFAULT_OPTIONS.stepMs);
+      options.stepMs = parseNumericOption(next, DEFAULT_OPTIONS.stepMs, { min: 10 });
       index += 1;
       continue;
     }
 
     if (token === "--decision-interval-ms" && next) {
-      options.decisionIntervalMs = Math.max(50, Number(next) || DEFAULT_OPTIONS.decisionIntervalMs);
+      options.decisionIntervalMs = parseNumericOption(
+        next,
+        DEFAULT_OPTIONS.decisionIntervalMs,
+        { min: 50 }
+      );
       index += 1;
       continue;
     }
 
     if (token === "--beam-width" && next) {
-      options.beamWidth = Math.max(8, Number(next) || DEFAULT_OPTIONS.beamWidth);
+      options.beamWidth = parseNumericOption(next, DEFAULT_OPTIONS.beamWidth, { min: 8 });
       index += 1;
       continue;
     }
 
     if (token === "--endless-grace-ms" && next) {
-      options.endlessGraceMs = Math.max(0, Number(next) || DEFAULT_OPTIONS.endlessGraceMs);
+      options.endlessGraceMs = parseNumericOption(next, DEFAULT_OPTIONS.endlessGraceMs, {
+        min: 0,
+      });
       index += 1;
       continue;
     }
 
     if (token === "--perturbation-delay-ms" && next) {
-      options.perturbationDelayMs = Math.max(100, Number(next) || DEFAULT_OPTIONS.perturbationDelayMs);
+      options.perturbationDelayMs = parseNumericOption(
+        next,
+        DEFAULT_OPTIONS.perturbationDelayMs,
+        { min: 100 }
+      );
       index += 1;
       continue;
     }
 
     if (token === "--perturbation-win-rate-threshold" && next) {
-      options.perturbationWinRateThreshold = clamp(
-        Number(next) || DEFAULT_OPTIONS.perturbationWinRateThreshold,
-        0,
-        1
+      options.perturbationWinRateThreshold = parseNumericOption(
+        next,
+        DEFAULT_OPTIONS.perturbationWinRateThreshold,
+        { min: 0, max: 1 }
       );
       index += 1;
       continue;
     }
 
     if (token === "--max-naive-strategy-wins" && next) {
-      options.maxNaiveStrategyWins = Math.max(
-        0,
-        Number(next) || DEFAULT_OPTIONS.maxNaiveStrategyWins
+      options.maxNaiveStrategyWins = parseNumericOption(
+        next,
+        DEFAULT_OPTIONS.maxNaiveStrategyWins,
+        { min: 0 }
       );
       index += 1;
       continue;
@@ -121,13 +147,76 @@ function formatMs(ms) {
   return `${String(minutes).padStart(2, "0")}:${String(seconds).padStart(2, "0")}`;
 }
 
+function cloneAvailablePlants(availablePlants) {
+  return [...new Set((availablePlants || []).filter((plantId) => PLANT_DEFINITIONS[plantId]))];
+}
+
+function sortPlan(plan) {
+  return clonePlan(plan).sort(
+    (left, right) =>
+      left.timeMs - right.timeMs ||
+      left.row - right.row ||
+      left.col - right.col ||
+      String(left.plantId || "").localeCompare(String(right.plantId || ""))
+  );
+}
+
+function buildModeDefinitionWithRoster(modeDefinition, availablePlants) {
+  return {
+    ...modeDefinition,
+    availablePlants: cloneAvailablePlants(availablePlants),
+  };
+}
+
+function getPreviousScenarioDate(dayDate) {
+  const scenarioDates = listScenarioDates();
+  const currentIndex = scenarioDates.indexOf(dayDate);
+  return currentIndex > 0 ? scenarioDates[currentIndex - 1] : null;
+}
+
+function getAvailablePlantDefinitions(modeDefinition) {
+  return (modeDefinition.availablePlants || [STARTING_PLANT_ID])
+    .map((plantId) => PLANT_DEFINITIONS[plantId])
+    .filter(Boolean);
+}
+
+function getCheapestPlantDefinition(modeDefinition) {
+  return (
+    getAvailablePlantDefinitions(modeDefinition).sort((left, right) => {
+      if (left.cost !== right.cost) {
+        return left.cost - right.cost;
+      }
+
+      return left.id.localeCompare(right.id);
+    })[0] || PLANT_DEFINITIONS[STARTING_PLANT_ID]
+  );
+}
+
+function getSpecializedPlantDefinitions(modeDefinition) {
+  const cheapestPlant = getCheapestPlantDefinition(modeDefinition);
+
+  return getAvailablePlantDefinitions(modeDefinition)
+    .filter((plant) => plant.id !== cheapestPlant?.id)
+    .sort((left, right) => {
+      if (Boolean(right.piercing) !== Boolean(left.piercing)) {
+        return Number(Boolean(right.piercing)) - Number(Boolean(left.piercing));
+      }
+
+      if (right.cost !== left.cost) {
+        return right.cost - left.cost;
+      }
+
+      return left.id.localeCompare(right.id);
+    });
+}
+
 function clonePlan(plan) {
   return plan.map((action) => ({ ...action }));
 }
 
 function buildPlanSignature(plan) {
   return plan
-    .map((action) => `${action.timeMs}:${action.row}:${action.col}`)
+    .map((action) => `${action.timeMs}:${action.row}:${action.col}:${action.plantId || ""}`)
     .join("|");
 }
 
@@ -155,7 +244,9 @@ class ScenarioSimulator {
   constructor(modeDefinition, options = {}) {
     this.modeDefinition = modeDefinition;
     this.options = options;
-    this.plantDefinition = PLANT_DEFINITIONS[STARTING_PLANT_ID];
+    const availablePlants = modeDefinition.availablePlants || [STARTING_PLANT_ID];
+    this.plantDefinition = PLANT_DEFINITIONS[availablePlants[0]];
+    this.availablePlants = availablePlants;
     this.events = buildScenarioEvents(modeDefinition);
     this.shouldValidateEndless =
       Boolean(modeDefinition.endless) && (options.endlessGraceMs || 0) > 0;
@@ -215,7 +306,15 @@ class ScenarioSimulator {
       ...enemy,
       definition: { ...enemy.definition },
     }));
-    next.projectiles = this.projectiles.map((projectile) => ({ ...projectile }));
+    next.projectiles = this.projectiles.map((projectile) => ({
+      ...projectile,
+      hitEnemies: new Set(
+        [...(projectile.hitEnemies || [])].map((oldEnemy) => {
+          const idx = this.enemies.indexOf(oldEnemy);
+          return idx >= 0 ? next.enemies[idx] : oldEnemy;
+        })
+      ),
+    }));
     next.placements = clonePlan(this.placements);
     next.won = this.won;
     next.lost = this.lost;
@@ -235,8 +334,13 @@ class ScenarioSimulator {
     return this.won || this.lost || this.elapsedMs >= this.maxSimulationMs;
   }
 
-  placeDefender(row, col, timeMs = this.elapsedMs) {
+  placeDefender(row, col, timeMs = this.elapsedMs, plantId = null) {
     if (this.lost || this.won) {
+      return false;
+    }
+
+    const plant = plantId ? PLANT_DEFINITIONS[plantId] : this.plantDefinition;
+    if (!plant) {
       return false;
     }
 
@@ -247,7 +351,7 @@ class ScenarioSimulator {
       col < 0 ||
       col >= BOARD_COLS ||
       this.defendersByTile.has(tileKey) ||
-      this.resources < this.plantDefinition.cost
+      this.resources < plant.cost
     ) {
       return false;
     }
@@ -258,20 +362,21 @@ class ScenarioSimulator {
       col,
       tileKey,
       x: center.x,
-      hp: this.plantDefinition.maxHealth,
+      hp: plant.maxHealth,
       cooldownMs:
-        this.plantDefinition.initialCooldownMs ??
-        Math.max(180, this.plantDefinition.cadenceMs * 0.45),
-      definition: this.plantDefinition,
+        plant.initialCooldownMs ??
+        Math.max(180, plant.cadenceMs * 0.45),
+      definition: plant,
     };
 
-    this.resources -= this.plantDefinition.cost;
+    this.resources -= plant.cost;
     this.defenders.push(defender);
     this.defendersByTile.set(tileKey, defender);
     this.placements.push({
       timeMs: roundToBucket(timeMs, this.options.decisionIntervalMs || 200),
       row,
       col,
+      plantId: plant.id,
     });
     return true;
   }
@@ -393,6 +498,8 @@ class ScenarioSimulator {
         damage: defender.definition.projectileDamage,
         speed: defender.definition.projectileSpeed,
         radius: defender.definition.projectileRadius,
+        piercing: Boolean(defender.definition.piercing),
+        hitEnemies: new Set(),
         destroyed: false,
       });
     }
@@ -411,13 +518,29 @@ class ScenarioSimulator {
         continue;
       }
 
-      const target = this.findProjectileTarget(projectile);
-      if (!target) {
-        continue;
+      if (projectile.piercing) {
+        // Piercing projectiles damage every enemy they touch, once each
+        for (const enemy of this.enemies) {
+          if (enemy.destroyed || enemy.lane !== projectile.lane) {
+            continue;
+          }
+          if (projectile.hitEnemies.has(enemy)) {
+            continue;
+          }
+          const hitRadius = projectile.radius + enemy.definition.radius * 0.8;
+          if (Math.abs(enemy.x - projectile.x) <= hitRadius) {
+            projectile.hitEnemies.add(enemy);
+            this.damageEnemy(enemy, projectile.damage);
+          }
+        }
+      } else {
+        const target = this.findProjectileTarget(projectile);
+        if (!target) {
+          continue;
+        }
+        projectile.destroyed = true;
+        this.damageEnemy(target, projectile.damage);
       }
-
-      projectile.destroyed = true;
-      this.damageEnemy(target, projectile.damage);
     }
   }
 
@@ -616,7 +739,11 @@ class ScenarioSimulator {
   }
 
   getCandidateActions() {
-    if (this.resources < this.plantDefinition.cost) {
+    // Determine which plant types the simulator can currently afford
+    const affordablePlants = this.availablePlants
+      .map((id) => PLANT_DEFINITIONS[id])
+      .filter((plant) => plant && this.resources >= plant.cost);
+    if (affordablePlants.length === 0) {
       return [];
     }
 
@@ -625,38 +752,41 @@ class ScenarioSimulator {
     const actions = [];
     const actionSignatures = new Set();
 
-    for (const row of relevantRows) {
-      const columns = this.getCandidateColumnsForRow(row);
-      for (const col of columns) {
-        const signature = `place:${row}:${col}`;
-        if (actionSignatures.has(signature)) {
-          continue;
-        }
-        actionSignatures.add(signature);
-        actions.push({ type: "place", row, col });
-      }
-
-      const requiredDefenders = laneRequirements.get(row) || 1;
-      const currentDefenders = this.getDefenderCountInLane(row);
-      const missingDefenders = Math.max(0, requiredDefenders - currentDefenders);
-      const affordablePlacements = Math.min(
-        Math.floor(this.resources / this.plantDefinition.cost),
-        columns.length
-      );
-
-      if (missingDefenders > 1 && affordablePlacements > 1) {
-        const stackCount = Math.min(missingDefenders, affordablePlacements);
-        const placements = columns.slice(0, stackCount).map((col) => ({ row, col }));
-        const signature = `stack:${placements
-          .map((placement) => `${placement.row}:${placement.col}`)
-          .join("|")}`;
-        if (!actionSignatures.has(signature)) {
+    for (const plant of affordablePlants) {
+      for (const row of relevantRows) {
+        const columns = this.getCandidateColumnsForRow(row);
+        for (const col of columns) {
+          const signature = `place:${plant.id}:${row}:${col}`;
+          if (actionSignatures.has(signature)) {
+            continue;
+          }
           actionSignatures.add(signature);
-          actions.unshift({
-            type: "stack",
-            row,
-            placements,
-          });
+          actions.push({ type: "place", row, col, plantId: plant.id });
+        }
+
+        const requiredDefenders = laneRequirements.get(row) || 1;
+        const currentDefenders = this.getDefenderCountInLane(row);
+        const missingDefenders = Math.max(0, requiredDefenders - currentDefenders);
+        const affordablePlacements = Math.min(
+          Math.floor(this.resources / plant.cost),
+          columns.length
+        );
+
+        if (missingDefenders > 1 && affordablePlacements > 1) {
+          const stackCount = Math.min(missingDefenders, affordablePlacements);
+          const placements = columns.slice(0, stackCount).map((col) => ({ row, col }));
+          const signature = `stack:${plant.id}:${placements
+            .map((placement) => `${placement.row}:${placement.col}`)
+            .join("|")}`;
+          if (!actionSignatures.has(signature)) {
+            actionSignatures.add(signature);
+            actions.unshift({
+              type: "stack",
+              row,
+              placements,
+              plantId: plant.id,
+            });
+          }
         }
       }
     }
@@ -740,7 +870,7 @@ class ScenarioSimulator {
 
 function buildStateSignature(simulator) {
   const defenderSignature = simulator.defenders
-    .map((defender) => `${defender.row}:${defender.col}:${Math.ceil(defender.hp / 6)}`)
+    .map((defender) => `${defender.definition?.id || ""}:${defender.row}:${defender.col}:${Math.ceil(defender.hp / 6)}`)
     .sort()
     .join(",");
   const enemySignature = simulator.enemies
@@ -761,6 +891,40 @@ function buildStateSignature(simulator) {
   ].join("|");
 }
 
+function getUpcomingLaneStats(simulator) {
+  const stats = new Map();
+  const horizonMs = simulator.elapsedMs + 12_000;
+
+  for (
+    let index = simulator.eventIndex;
+    index < Math.min(simulator.events.length, simulator.eventIndex + 8);
+    index += 1
+  ) {
+    const event = simulator.events[index];
+    if (event.atMs > horizonMs) {
+      break;
+    }
+
+    const current = stats.get(event.lane) || {
+      count: 0,
+      clusterHits: 0,
+      piercingValue: 0,
+      previousAtMs: null,
+    };
+
+    current.count += 1;
+    if (current.previousAtMs != null && event.atMs - current.previousAtMs <= 1_800) {
+      current.clusterHits += 1;
+    }
+
+    current.previousAtMs = event.atMs;
+    current.piercingValue += event.enemyId === "shardMite" ? 2 : 1;
+    stats.set(event.lane, current);
+  }
+
+  return stats;
+}
+
 function evaluateSimulator(simulator) {
   if (simulator.lost) {
     return -1_000_000_000 + simulator.elapsedMs;
@@ -776,7 +940,12 @@ function evaluateSimulator(simulator) {
 
   const upcomingRows = new Set();
   const laneRequirements = simulator.getLanePressureRequirements();
-  for (let index = simulator.eventIndex; index < Math.min(simulator.events.length, simulator.eventIndex + 5); index += 1) {
+  const laneStats = getUpcomingLaneStats(simulator);
+  for (
+    let index = simulator.eventIndex;
+    index < Math.min(simulator.events.length, simulator.eventIndex + 5);
+    index += 1
+  ) {
     upcomingRows.add(simulator.events[index].lane);
   }
 
@@ -788,6 +957,13 @@ function evaluateSimulator(simulator) {
 
   for (const row of upcomingRows) {
     const defenderCount = simulator.getDefenderCountInLane(row);
+    const defendersInLane = simulator.defenders.filter(
+      (defender) => !defender.destroyed && defender.row === row
+    );
+    const piercingCount = defendersInLane.filter(
+      (defender) => Boolean(defender.definition?.piercing)
+    ).length;
+    const laneStat = laneStats.get(row);
     if (defenderCount > 0) {
       score += 2_000;
     }
@@ -795,6 +971,13 @@ function evaluateSimulator(simulator) {
     score += Math.min(defenderCount, required) * (required > 1 ? 6_500 : 2_500);
     if (defenderCount < required) {
       score -= (required - defenderCount) * (required > 1 ? 5_500 : 1_500);
+    }
+
+    if (laneStat?.count >= 3 || laneStat?.clusterHits > 0) {
+      score += Math.min(1, piercingCount) * 8_500;
+      if (piercingCount === 0) {
+        score -= (laneStat.clusterHits > 0 ? 5_500 : 3_000);
+      }
     }
   }
 
@@ -822,7 +1005,7 @@ function simulatePlan(modeDefinition, plan, options) {
   while (!simulator.isTerminal()) {
     while (planIndex < sortedPlan.length && sortedPlan[planIndex].timeMs <= simulator.elapsedMs) {
       const action = sortedPlan[planIndex];
-      simulator.placeDefender(action.row, action.col, action.timeMs);
+      simulator.placeDefender(action.row, action.col, action.timeMs, action.plantId);
       planIndex += 1;
     }
 
@@ -900,7 +1083,7 @@ function getFirstSeenLaneOrder(modeDefinition) {
 }
 
 function schedulePlacementsByBudget(modeDefinition, placements, options) {
-  const cost = PLANT_DEFINITIONS[STARTING_PLANT_ID].cost;
+  const defaultPlant = getCheapestPlantDefinition(modeDefinition);
   const plan = [];
   let resources = modeDefinition.startingResources ?? 0;
   let currentTimeMs = 0;
@@ -908,7 +1091,13 @@ function schedulePlacementsByBudget(modeDefinition, placements, options) {
   const incomeAmount = modeDefinition.resourcePerTick ?? 0;
 
   for (const placement of placements) {
-    while (resources < cost) {
+    const plant =
+      (placement.plantId && PLANT_DEFINITIONS[placement.plantId]) || defaultPlant;
+    if (!plant) {
+      continue;
+    }
+
+    while (resources < plant.cost) {
       currentTimeMs = nextIncomeAtMs;
       resources += incomeAmount;
       nextIncomeAtMs += modeDefinition.resourceTickMs ?? 0;
@@ -918,8 +1107,9 @@ function schedulePlacementsByBudget(modeDefinition, placements, options) {
       timeMs: roundToBucket(currentTimeMs, options.decisionIntervalMs),
       row: placement.row,
       col: placement.col,
+      plantId: plant.id,
     });
-    resources -= cost;
+    resources -= plant.cost;
     currentTimeMs += options.decisionIntervalMs;
   }
 
@@ -930,6 +1120,11 @@ function buildNaiveStrategies(modeDefinition, options) {
   const centerOut = [2, 1, 3, 0, 4];
   const topDown = [0, 1, 2, 3, 4];
   const firstSeen = getFirstSeenLaneOrder(modeDefinition);
+  const pressureRows = getPressureOrderedRows(modeDefinition);
+  const pressureRow = pressureRows[0]?.row ?? centerOut[0];
+  const coverRows = centerOut.filter((row) => row !== pressureRow);
+  const cheapestPlant = getCheapestPlantDefinition(modeDefinition);
+  const specializedPlants = getSpecializedPlantDefinitions(modeDefinition);
   const wallCol = 0;
   const wallSupportCol = Math.min(1, BOARD_COLS - 1);
   const wallThirdCol = Math.min(2, BOARD_COLS - 1);
@@ -940,108 +1135,171 @@ function buildNaiveStrategies(modeDefinition, options) {
   const strategies = [
     {
       label: "naive-centerout-wall-single-pass",
-      placements: centerOut.map((row) => ({ row, col: wallCol })),
+      placements: centerOut.map((row) => ({ row, col: wallCol, plantId: cheapestPlant.id })),
     },
     {
       label: "naive-centerout-wall-support-single-pass",
-      placements: centerOut.map((row) => ({ row, col: wallSupportCol })),
+      placements: centerOut.map((row) => ({
+        row,
+        col: wallSupportCol,
+        plantId: cheapestPlant.id,
+      })),
     },
     {
       label: "naive-topdown-wall-single-pass",
-      placements: topDown.map((row) => ({ row, col: wallCol })),
+      placements: topDown.map((row) => ({ row, col: wallCol, plantId: cheapestPlant.id })),
     },
     {
       label: "naive-topdown-wall-support-single-pass",
-      placements: topDown.map((row) => ({ row, col: wallSupportCol })),
+      placements: topDown.map((row) => ({
+        row,
+        col: wallSupportCol,
+        plantId: cheapestPlant.id,
+      })),
     },
     {
       label: "naive-firstseen-wall-single-pass",
-      placements: firstSeen.map((row) => ({ row, col: wallCol })),
+      placements: firstSeen.map((row) => ({ row, col: wallCol, plantId: cheapestPlant.id })),
     },
     {
       label: "naive-firstseen-wall-support-single-pass",
-      placements: firstSeen.map((row) => ({ row, col: wallSupportCol })),
+      placements: firstSeen.map((row) => ({
+        row,
+        col: wallSupportCol,
+        plantId: cheapestPlant.id,
+      })),
     },
     {
       label: "naive-centerout-mid-single-pass",
-      placements: centerOut.map((row) => ({ row, col: midCol })),
+      placements: centerOut.map((row) => ({ row, col: midCol, plantId: cheapestPlant.id })),
     },
     {
       label: "naive-centerout-spawn-support-single-pass",
-      placements: centerOut.map((row) => ({ row, col: spawnSupportCol })),
+      placements: centerOut.map((row) => ({
+        row,
+        col: spawnSupportCol,
+        plantId: cheapestPlant.id,
+      })),
     },
     {
       label: "naive-centerout-spawn-single-pass",
-      placements: centerOut.map((row) => ({ row, col: spawnCol })),
+      placements: centerOut.map((row) => ({ row, col: spawnCol, plantId: cheapestPlant.id })),
     },
     {
       label: "naive-centerout-wall-two-pass",
       placements: [
-        ...centerOut.map((row) => ({ row, col: wallCol })),
-        ...centerOut.map((row) => ({ row, col: wallSupportCol })),
+        ...centerOut.map((row) => ({ row, col: wallCol, plantId: cheapestPlant.id })),
+        ...centerOut.map((row) => ({
+          row,
+          col: wallSupportCol,
+          plantId: cheapestPlant.id,
+        })),
       ],
     },
     {
       label: "naive-topdown-wall-two-pass",
       placements: [
-        ...topDown.map((row) => ({ row, col: wallCol })),
-        ...topDown.map((row) => ({ row, col: wallSupportCol })),
+        ...topDown.map((row) => ({ row, col: wallCol, plantId: cheapestPlant.id })),
+        ...topDown.map((row) => ({
+          row,
+          col: wallSupportCol,
+          plantId: cheapestPlant.id,
+        })),
       ],
     },
     {
       label: "naive-firstseen-wall-two-pass",
       placements: [
-        ...firstSeen.map((row) => ({ row, col: wallCol })),
-        ...firstSeen.map((row) => ({ row, col: wallSupportCol })),
+        ...firstSeen.map((row) => ({ row, col: wallCol, plantId: cheapestPlant.id })),
+        ...firstSeen.map((row) => ({
+          row,
+          col: wallSupportCol,
+          plantId: cheapestPlant.id,
+        })),
       ],
     },
     {
       label: "naive-center-reinforce-then-cover",
       placements: [
-        { row: 2, col: wallCol },
-        { row: 2, col: wallSupportCol },
-        { row: 3, col: wallCol },
-        { row: 1, col: wallCol },
-        { row: 4, col: wallCol },
-        { row: 0, col: wallCol },
+        { row: 2, col: wallCol, plantId: cheapestPlant.id },
+        { row: 2, col: wallSupportCol, plantId: cheapestPlant.id },
+        { row: 3, col: wallCol, plantId: cheapestPlant.id },
+        { row: 1, col: wallCol, plantId: cheapestPlant.id },
+        { row: 4, col: wallCol, plantId: cheapestPlant.id },
+        { row: 0, col: wallCol, plantId: cheapestPlant.id },
       ],
     },
     {
       label: "naive-center-reinforce-support-then-cover",
       placements: [
-        { row: 2, col: wallSupportCol },
-        { row: 2, col: wallCol },
-        { row: 3, col: wallSupportCol },
-        { row: 1, col: wallSupportCol },
-        { row: 4, col: wallSupportCol },
-        { row: 0, col: wallSupportCol },
+        { row: 2, col: wallSupportCol, plantId: cheapestPlant.id },
+        { row: 2, col: wallCol, plantId: cheapestPlant.id },
+        { row: 3, col: wallSupportCol, plantId: cheapestPlant.id },
+        { row: 1, col: wallSupportCol, plantId: cheapestPlant.id },
+        { row: 4, col: wallSupportCol, plantId: cheapestPlant.id },
+        { row: 0, col: wallSupportCol, plantId: cheapestPlant.id },
       ],
     },
     {
       label: "naive-center-triple-then-cover",
       placements: [
-        { row: 2, col: wallCol },
-        { row: 2, col: wallSupportCol },
-        { row: 2, col: wallThirdCol },
-        { row: 3, col: wallCol },
-        { row: 1, col: wallCol },
-        { row: 4, col: wallCol },
-        { row: 0, col: wallCol },
+        { row: 2, col: wallCol, plantId: cheapestPlant.id },
+        { row: 2, col: wallSupportCol, plantId: cheapestPlant.id },
+        { row: 2, col: wallThirdCol, plantId: cheapestPlant.id },
+        { row: 3, col: wallCol, plantId: cheapestPlant.id },
+        { row: 1, col: wallCol, plantId: cheapestPlant.id },
+        { row: 4, col: wallCol, plantId: cheapestPlant.id },
+        { row: 0, col: wallCol, plantId: cheapestPlant.id },
       ],
     },
     {
       label: "naive-center-triple-support-then-cover",
       placements: [
-        { row: 2, col: wallSupportCol },
-        { row: 2, col: wallThirdCol },
-        { row: 2, col: midCol },
-        { row: 3, col: wallSupportCol },
-        { row: 1, col: wallSupportCol },
-        { row: 4, col: wallSupportCol },
-        { row: 0, col: wallSupportCol },
+        { row: 2, col: wallSupportCol, plantId: cheapestPlant.id },
+        { row: 2, col: wallThirdCol, plantId: cheapestPlant.id },
+        { row: 2, col: midCol, plantId: cheapestPlant.id },
+        { row: 3, col: wallSupportCol, plantId: cheapestPlant.id },
+        { row: 1, col: wallSupportCol, plantId: cheapestPlant.id },
+        { row: 4, col: wallSupportCol, plantId: cheapestPlant.id },
+        { row: 0, col: wallSupportCol, plantId: cheapestPlant.id },
       ],
     },
   ];
+
+  for (const plant of specializedPlants) {
+    strategies.push({
+      label: `naive-centerout-wall-single-pass-${plant.id}`,
+      placements: centerOut.map((row) => ({ row, col: wallCol, plantId: plant.id })),
+    });
+    strategies.push({
+      label: `naive-centerout-wall-two-pass-${plant.id}`,
+      placements: [
+        ...centerOut.map((row) => ({ row, col: wallCol, plantId: plant.id })),
+        ...centerOut.map((row) => ({ row, col: wallSupportCol, plantId: plant.id })),
+      ],
+    });
+    strategies.push({
+      label: `naive-pressure-row-first-${plant.id}`,
+      placements: [
+        { row: pressureRow, col: wallCol, plantId: plant.id },
+        { row: pressureRow, col: wallSupportCol, plantId: cheapestPlant.id },
+        ...coverRows
+          .slice(0, 4)
+          .map((row) => ({ row, col: wallCol, plantId: cheapestPlant.id })),
+      ],
+    });
+    strategies.push({
+      label: `naive-pressure-stack-then-cover-${plant.id}`,
+      placements: [
+        { row: pressureRow, col: wallCol, plantId: plant.id },
+        { row: pressureRow, col: wallSupportCol, plantId: plant.id },
+        { row: pressureRow, col: wallThirdCol, plantId: cheapestPlant.id },
+        ...coverRows
+          .slice(0, 3)
+          .map((row) => ({ row, col: wallCol, plantId: cheapestPlant.id })),
+      ],
+    });
+  }
 
   return strategies.map((strategy) => ({
     ...strategy,
@@ -1055,7 +1313,113 @@ function summarizePlan(plan) {
     at: formatMs(action.timeMs),
     row: action.row + 1,
     col: action.col + 1,
+    ...(action.plantId ? { plant: action.plantId } : {}),
   }));
+}
+
+function summarizeWinningSimulator(simulator, { includePlacements = false } = {}) {
+  if (!simulator?.won) {
+    return null;
+  }
+
+  const summary = {
+    gardenHP: simulator.gardenHP,
+    breaches: simulator.breachCount,
+    clearTimeMs: simulator.clearTimeMs,
+    endlessSurvivedMs: simulator.endlessSurvivedMs || 0,
+    resourcesLeft: simulator.resources,
+  };
+
+  if (includePlacements) {
+    summary.placements = summarizePlan(sortPlan(simulator.placements));
+  }
+
+  return summary;
+}
+
+function runRuntimeRosterProbe(modeDefinition, availablePlants) {
+  if (!availablePlants?.length) {
+    return {
+      ran: false,
+      ok: false,
+      availablePlants: [],
+      wins: [],
+      error: "No available plants were provided for the runtime roster probe.",
+    };
+  }
+
+  const result = spawnSync(
+    process.execPath,
+    [
+      "--no-warnings",
+      "scripts/probe-runtime-scenario.mjs",
+      "--date",
+      modeDefinition.scenarioDate,
+      "--mode",
+      modeDefinition.mode,
+      "--json",
+      "--available-plants",
+      availablePlants.join(","),
+      "--strategy",
+      "previous-roster-check",
+    ],
+    {
+      cwd: process.cwd(),
+      encoding: "utf8",
+      maxBuffer: 8 * 1024 * 1024,
+      timeout: 240_000,
+    }
+  );
+
+  if (result.error) {
+    return {
+      ran: true,
+      ok: false,
+      availablePlants,
+      wins: [],
+      error: result.error.message,
+    };
+  }
+
+  const stdout = result.stdout?.trim() || "";
+  if (!stdout) {
+    return {
+      ran: true,
+      ok: false,
+      availablePlants,
+      wins: [],
+      exitCode: result.status ?? null,
+      error: "Runtime roster probe produced no JSON output.",
+      stderr: result.stderr?.trim() || "",
+    };
+  }
+
+  try {
+    const report = JSON.parse(stdout);
+    return {
+      ran: true,
+      ok: true,
+      availablePlants,
+      exitCode: result.status ?? 0,
+      wins: report.wins || [],
+      report: {
+        availablePlants: report.availablePlants || availablePlants,
+        wins: report.wins || [],
+        winningStrategies: (report.strategies || []).filter((entry) => entry.won),
+      },
+    };
+  } catch (error) {
+    return {
+      ran: true,
+      ok: false,
+      availablePlants,
+      wins: [],
+      exitCode: result.status ?? null,
+      error: `Failed to parse runtime roster probe JSON: ${error.message}`,
+      stdout: stdout.slice(0, 4000),
+      stderr: result.stderr?.trim() || "",
+    };
+  }
 }
 
 function summarizePerturbationCategories(results) {
@@ -1178,28 +1542,73 @@ function buildContiguousColumnWindows(length) {
 function buildSearchSeedPlans(modeDefinition, options) {
   const pressureRows = getPressureOrderedRows(modeDefinition).slice(0, 2);
   const firstSeenRows = getFirstSeenLaneOrder(modeDefinition);
+  const cheapestPlant = getCheapestPlantDefinition(modeDefinition);
+  const specializedPlants = getSpecializedPlantDefinitions(modeDefinition);
   const seen = new Set();
   const seeds = [];
+
+  function pushSeed(label, placements) {
+    const plan = schedulePlacementsByBudget(modeDefinition, placements, options);
+    const signature = buildPlanSignature(plan);
+    if (seen.has(signature)) {
+      return;
+    }
+
+    seen.add(signature);
+    seeds.push({ label, plan });
+  }
 
   for (const pressureRow of pressureRows) {
     const stackSize = clamp(pressureRow.maxRequired || 1, 2, 3);
     const coverRows = firstSeenRows.filter((row) => row !== pressureRow.row);
 
     for (const window of buildContiguousColumnWindows(stackSize)) {
-      const placements = [
-        ...window.map((col) => ({ row: pressureRow.row, col })),
-        ...coverRows.slice(0, 2).map((row) => ({ row, col: window[0] })),
-      ];
-      const plan = schedulePlacementsByBudget(modeDefinition, placements, options);
-      const signature = buildPlanSignature(plan);
-      if (seen.has(signature)) {
-        continue;
+      pushSeed(
+        `pressure-row-${pressureRow.row}-start-${window[0]}-cheap`,
+        [
+          ...window.map((col) => ({
+            row: pressureRow.row,
+            col,
+            plantId: cheapestPlant.id,
+          })),
+          ...coverRows
+            .slice(0, 2)
+            .map((row) => ({ row, col: window[0], plantId: cheapestPlant.id })),
+        ]
+      );
+
+      for (const plant of specializedPlants) {
+        pushSeed(
+          `pressure-row-${pressureRow.row}-start-${window[0]}-${plant.id}-focus`,
+          [
+            ...window.map((col, index) => ({
+              row: pressureRow.row,
+              col,
+              plantId:
+                index === Math.floor(window.length / 2) || window.length === 1
+                  ? plant.id
+                  : cheapestPlant.id,
+            })),
+            ...coverRows
+              .slice(0, 2)
+              .map((row) => ({ row, col: window[0], plantId: cheapestPlant.id })),
+          ]
+        );
+
+        pushSeed(
+          `pressure-row-${pressureRow.row}-start-${window[0]}-${plant.id}-stack`,
+          [
+            ...window.map((col) => ({
+              row: pressureRow.row,
+              col,
+              plantId: plant.id,
+            })),
+            ...coverRows
+              .slice(0, 2)
+              .map((row) => ({ row, col: window[0], plantId: cheapestPlant.id })),
+          ]
+        );
       }
-      seen.add(signature);
-      seeds.push({
-        label: `pressure-row-${pressureRow.row}-start-${window[0]}`,
-        plan,
-      });
     }
   }
 
@@ -1216,7 +1625,7 @@ function seedSimulatorWithPlan(modeDefinition, plan, options) {
     }
 
     simulator.advanceTo(action.timeMs);
-    const placed = simulator.placeDefender(action.row, action.col, action.timeMs);
+    const placed = simulator.placeDefender(action.row, action.col, action.timeMs, action.plantId);
     if (!placed) {
       return null;
     }
@@ -1287,7 +1696,7 @@ function runBeamSearch(modeDefinition, options, initialBeam) {
         let placed = false;
 
         if (action.type === "place") {
-          placed = simulator.placeDefender(action.row, action.col, simulator.elapsedMs);
+          placed = simulator.placeDefender(action.row, action.col, simulator.elapsedMs, action.plantId);
           if (!placed) {
             continue;
           }
@@ -1297,7 +1706,8 @@ function runBeamSearch(modeDefinition, options, initialBeam) {
             const didPlace = simulator.placeDefender(
               placement.row,
               placement.col,
-              simulator.elapsedMs
+              simulator.elapsedMs,
+              action.plantId
             );
             if (!didPlace) {
               placed = false;
@@ -1381,12 +1791,170 @@ function findWinningFallbackPlan(modeDefinition, options) {
   return null;
 }
 
+function findBestWinningSimulator(modeDefinition, options) {
+  return searchWinningPlan(modeDefinition, options) || findWinningFallbackPlan(modeDefinition, options);
+}
+
+function evaluateRequiredPlantCheck(modeDefinition, canonicalPlan, options) {
+  const currentRoster = cloneAvailablePlants(
+    modeDefinition.availablePlants || [STARTING_PLANT_ID]
+  );
+  const baseResult = {
+    applies: false,
+    ok: true,
+    currentRoster,
+    previousScenarioDate: null,
+    previousRoster: [],
+    newPlants: [],
+    removedPlants: [],
+    allNewPlantsUsedInCanonical: true,
+    previousRosterComparable: false,
+    previousRosterCanStillWin: null,
+    previousRosterWin: null,
+    perPlant: [],
+    reason: "No new plants were introduced relative to the previous playable challenge.",
+  };
+
+  if (modeDefinition.mode !== "challenge") {
+    return {
+      ...baseResult,
+      reason: "Required-new-plant validation only applies to challenge mode.",
+    };
+  }
+
+  const previousScenarioDate = getPreviousScenarioDate(modeDefinition.scenarioDate);
+  if (!previousScenarioDate) {
+    return {
+      ...baseResult,
+      reason: "No previous dated challenge is available for roster comparison.",
+    };
+  }
+
+  const previousModeDefinition = getScenarioModeDefinition(previousScenarioDate, "challenge");
+  const previousRoster = cloneAvailablePlants(
+    previousModeDefinition.availablePlants || [STARTING_PLANT_ID]
+  );
+  const newPlants = currentRoster.filter((plantId) => !previousRoster.includes(plantId));
+  const removedPlants = previousRoster.filter((plantId) => !currentRoster.includes(plantId));
+
+  if (newPlants.length === 0) {
+    return {
+      ...baseResult,
+      previousScenarioDate,
+      previousRoster,
+      removedPlants,
+    };
+  }
+
+  const canonicalPlanSorted = sortPlan(canonicalPlan);
+  const canonicalPlantUsage = new Set(
+    canonicalPlanSorted.map((action) => action.plantId).filter(Boolean)
+  );
+  const previousRosterComparable = previousRoster.every((plantId) =>
+    currentRoster.includes(plantId)
+  );
+
+  let previousRosterSimulator = null;
+  if (previousRosterComparable && previousRoster.length > 0) {
+    previousRosterSimulator = findBestWinningSimulator(
+      buildModeDefinitionWithRoster(modeDefinition, previousRoster),
+      options
+    );
+  }
+
+  let previousRosterRuntimeProbe = null;
+  if (previousRosterComparable && previousRoster.length > 0 && !previousRosterSimulator?.won) {
+    previousRosterRuntimeProbe = runRuntimeRosterProbe(modeDefinition, previousRoster);
+  }
+
+  const perPlant = newPlants.map((plantId) => {
+    const rosterWithoutPlant = currentRoster.filter((candidateId) => candidateId !== plantId);
+    const canonicalPlacements = summarizePlan(
+      canonicalPlanSorted.filter((action) => action.plantId === plantId)
+    );
+
+    let withoutPlantSimulator = null;
+    if (rosterWithoutPlant.length > 0) {
+      withoutPlantSimulator = findBestWinningSimulator(
+        buildModeDefinitionWithRoster(modeDefinition, rosterWithoutPlant),
+        options
+      );
+    }
+
+    return {
+      plantId,
+      canonicalUsesPlant: canonicalPlantUsage.has(plantId),
+      canonicalPlacementCount: canonicalPlacements.length,
+      canonicalPlacements,
+      canWinWithoutPlant: Boolean(withoutPlantSimulator?.won),
+      winningWithoutPlant: summarizeWinningSimulator(withoutPlantSimulator, {
+        includePlacements: true,
+      }),
+    };
+  });
+
+  const allNewPlantsUsedInCanonical = newPlants.every((plantId) =>
+    canonicalPlantUsage.has(plantId)
+  );
+  const previousRosterCanStillWin =
+    previousRosterComparable && previousRoster.length > 0
+      ? Boolean(previousRosterSimulator?.won) ||
+        Boolean(previousRosterRuntimeProbe?.ok && previousRosterRuntimeProbe.wins.length > 0)
+      : null;
+  const anyPlantOptional = perPlant.some((plantCheck) => plantCheck.canWinWithoutPlant);
+  const missingCanonicalPlants = perPlant
+    .filter((plantCheck) => !plantCheck.canonicalUsesPlant)
+    .map((plantCheck) => plantCheck.plantId);
+  const optionalPlants = perPlant
+    .filter((plantCheck) => plantCheck.canWinWithoutPlant)
+    .map((plantCheck) => plantCheck.plantId);
+
+  let reason = "Every newly introduced plant is required by the canonical winning line.";
+  if (previousRosterRuntimeProbe?.ok === false) {
+    reason = `Runtime previous-roster probe failed, so required-plant validation is incomplete: ${previousRosterRuntimeProbe.error}`;
+  } else
+  if (missingCanonicalPlants.length > 0) {
+    reason = `Canonical winning plan does not use newly introduced plant(s): ${missingCanonicalPlants.join(
+      ", "
+    )}.`;
+  } else if (previousRosterCanStillWin) {
+    reason = `Previous challenge roster (${previousRoster.join(
+      ", "
+    )}) can still clear this board, so the new plant is not required yet.`;
+  } else if (anyPlantOptional) {
+    reason = `The board can still clear without newly introduced plant(s): ${optionalPlants.join(
+      ", "
+    )}.`;
+  }
+
+  return {
+    applies: true,
+    ok:
+      previousRosterRuntimeProbe?.ok !== false &&
+      allNewPlantsUsedInCanonical &&
+      !anyPlantOptional &&
+      previousRosterCanStillWin !== true,
+    currentRoster,
+    previousScenarioDate,
+    previousRoster,
+    newPlants,
+    removedPlants,
+    allNewPlantsUsedInCanonical,
+    previousRosterComparable,
+    previousRosterCanStillWin,
+    previousRosterWin: summarizeWinningSimulator(previousRosterSimulator, {
+      includePlacements: true,
+    }),
+    previousRosterRuntimeProbe,
+    perPlant,
+    reason,
+  };
+}
+
 function main() {
   const options = parseArgs(process.argv.slice(2));
   const modeDefinition = getScenarioModeDefinition(options.date, options.mode);
-  const bestSimulator =
-    searchWinningPlan(modeDefinition, options) ||
-    findWinningFallbackPlan(modeDefinition, options);
+  const bestSimulator = findBestWinningSimulator(modeDefinition, options);
 
   if (!bestSimulator?.won) {
     const failure = {
@@ -1410,10 +1978,9 @@ function main() {
     return;
   }
 
-  const bestPlan = clonePlan(bestSimulator.placements).sort(
-    (left, right) => left.timeMs - right.timeMs
-  );
+  const bestPlan = sortPlan(bestSimulator.placements);
   const canonicalResult = simulatePlan(modeDefinition, bestPlan, options);
+  const requiredPlantCheck = evaluateRequiredPlantCheck(modeDefinition, bestPlan, options);
   const naiveStrategies = buildNaiveStrategies(modeDefinition, options);
   const naiveStrategyResults = naiveStrategies.map((strategy) => {
     const result = simulatePlan(modeDefinition, strategy.plan, options);
@@ -1454,12 +2021,17 @@ function main() {
     !complexity.simpleLaneCoverageWin;
 
   const report = {
-    ok: canonicalResult.won && nearPerfect,
+    ok: canonicalResult.won && nearPerfect && requiredPlantCheck.ok,
     date: options.date,
     mode: options.mode,
     scenarioTitle: modeDefinition.scenarioTitle,
     scenarioLabel: modeDefinition.label,
     nearPerfect,
+    validationGates: {
+      canonicalWin: canonicalResult.won,
+      difficulty: nearPerfect,
+      requiredPlants: requiredPlantCheck.ok,
+    },
     thresholds: {
       perturbationWinRateThreshold: options.perturbationWinRateThreshold,
       maxNaiveStrategyWins: options.maxNaiveStrategyWins,
@@ -1481,6 +2053,7 @@ function main() {
       wins: naiveStrategyWins,
       winners: naiveStrategyResults.filter((result) => result.won),
     },
+    requiredPlantCheck,
     perturbations: {
       count: perturbationResults.length,
       countedForDifficulty: countedPerturbations.length,
@@ -1523,9 +2096,30 @@ function main() {
         perturbationWinRate * 100
       ).toFixed(1)}%)`
     );
+    if (requiredPlantCheck.applies) {
+      console.log(
+        `Required new plant check: ${requiredPlantCheck.ok ? "PASS" : "FAIL"} • ${requiredPlantCheck.newPlants.join(
+          ", "
+        )}`
+      );
+      if (requiredPlantCheck.previousRosterCanStillWin) {
+        console.log(
+          `  previous-roster-win: ${requiredPlantCheck.previousScenarioDate} roster still clears`
+        );
+      }
+      for (const plantCheck of requiredPlantCheck.perPlant) {
+        console.log(
+          `  ${plantCheck.plantId}: canonical ${
+            plantCheck.canonicalUsesPlant ? "uses" : "does not use"
+          } it • ${plantCheck.canWinWithoutPlant ? "optional" : "required"}`
+        );
+      }
+    }
     console.log(
-      nearPerfect
-        ? "Verdict: near-perfect. Small timing/lane mistakes usually lose."
+      !requiredPlantCheck.ok && requiredPlantCheck.applies
+        ? `Verdict: roster-expansion failed. ${requiredPlantCheck.reason}`
+        : nearPerfect
+          ? "Verdict: near-perfect. Small timing/lane mistakes usually lose."
         : complexity.simpleLaneCoverageWin
           ? "Verdict: too forgiving. A low-complexity one-per-row coverage plan already clears the board."
         : naiveStrategyWins > options.maxNaiveStrategyWins

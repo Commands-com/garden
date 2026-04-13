@@ -63,6 +63,16 @@ export function installGameTestHooks(game, bootstrap) {
       return playScene.placeDefender(row, col, plantId);
     },
 
+    selectPlant(plantId) {
+      const playScene = game.scene.getScene("play");
+      if (!playScene?.scene?.isActive() || typeof playScene.selectPlant !== "function") {
+        return false;
+      }
+
+      playScene.selectPlant(plantId);
+      return true;
+    },
+
     finishScenario() {
       const playScene = game.scene.getScene("play");
       if (!playScene?.scene?.isActive() || typeof playScene.forceScenarioClear !== "function") {
@@ -97,6 +107,32 @@ export function installGameTestHooks(game, bootstrap) {
 
     getLeaderboard() {
       return game.registry.get("leaderboardState") || null;
+    },
+
+    getSceneText(sceneKey = "title") {
+      const scene = game.scene.getScene(sceneKey);
+      if (!scene) {
+        return null;
+      }
+
+      const texts = (scene.children?.list || [])
+        .filter(
+          (child) =>
+            child &&
+            (child.type === "Text" || typeof child.text === "string") &&
+            typeof child.text === "string" &&
+            child.text.trim().length > 0
+        )
+        .map((child) => child.text);
+
+      return {
+        sceneKey,
+        isActive:
+          typeof scene.scene?.isActive === "function"
+            ? scene.scene.isActive()
+            : null,
+        texts,
+      };
     },
 
     setAlias(value) {

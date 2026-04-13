@@ -1,0 +1,402 @@
+{
+  "schemaVersion": 2,
+  "runDate": "2026-04-13",
+  "generatedAt": "2026-04-13T09:30:00.000Z",
+  "scoringDimensions": [
+    { "id": "compoundingValue", "label": "Compounding Value" },
+    { "id": "usefulnessClarity", "label": "Usefulness & Clarity" },
+    { "id": "noveltySurprise", "label": "Novelty & Surprise" },
+    { "id": "feasibility", "label": "Feasibility" },
+    { "id": "legibility", "label": "Legibility" },
+    { "id": "continuity", "label": "Continuity" },
+    { "id": "shareability", "label": "Shareability" }
+  ],
+  "judgePanel": [
+    {
+      "agentId": "explore_explorer_0",
+      "displayName": "GPT (Visitor)",
+      "conceptKey": "openai",
+      "modelFamily": "gpt",
+      "provider": "codex_cli",
+      "model": "gpt-5.4",
+      "lens": "visitor"
+    },
+    {
+      "agentId": "explore_explorer_1",
+      "displayName": "Claude (Gardener)",
+      "conceptKey": "claude",
+      "modelFamily": "claude",
+      "provider": "claude",
+      "model": "opus",
+      "lens": "gardener"
+    },
+    {
+      "agentId": "explore_explorer_2",
+      "displayName": "Gemini (Explorer)",
+      "conceptKey": "gemini",
+      "modelFamily": "gemini",
+      "provider": "gemini_cli",
+      "model": "gemini-3.1-pro-preview",
+      "lens": "explorer"
+    }
+  ],
+  "summary": "The lane-defense game now offers two plants for the first time. Players choose between cheap, steady Thorn Vine and expensive, piercing Bramble Spear — learning when each tool is the right answer across a tutorial and a tighter challenge board.",
+  "candidates": [
+    {
+      "id": "candidate-1",
+      "title": "Bramble & Thorn — First Two-Plant Roster Day",
+      "summary": "Adds Bramble Spear as a second plant with a piercing projectile mechanic, a plant selection UI, a three-wave tutorial teaching when to use each plant, and a four-wave challenge board with 2 garden HP.",
+      "averageScore": 8.7,
+      "reviewCount": 3,
+      "rank": 1,
+      "dimensionAverages": {
+        "compoundingValue": { "label": "Compounding Value", "average": 9.3, "reviewCount": 3 },
+        "usefulnessClarity": { "label": "Usefulness & Clarity", "average": 8.7, "reviewCount": 3 },
+        "noveltySurprise": { "label": "Novelty & Surprise", "average": 7.7, "reviewCount": 3 },
+        "feasibility": { "label": "Feasibility", "average": 9.0, "reviewCount": 3 },
+        "legibility": { "label": "Legibility", "average": 8.3, "reviewCount": 3 },
+        "continuity": { "label": "Continuity", "average": 9.0, "reviewCount": 3 },
+        "shareability": { "label": "Shareability", "average": 8.3, "reviewCount": 3 }
+      },
+      "reviewerBreakdown": [
+        {
+          "reviewer": {
+            "agentId": "explore_explorer_0",
+            "displayName": "GPT (Visitor)",
+            "modelFamily": "gpt",
+            "lens": "visitor"
+          },
+          "overallScore": 8.5,
+          "dimensionScores": {
+            "compoundingValue": 9,
+            "usefulnessClarity": 9,
+            "noveltySurprise": 6,
+            "feasibility": 9,
+            "legibility": 8,
+            "continuity": 9,
+            "shareability": 7
+          },
+          "keep": [
+            "Piercing mechanic is easy to understand and visually satisfying when bolts pass through a cluster.",
+            "Plant selection UI with aria-pressed states is clean and accessible.",
+            "Tutorial waves teach the core decision naturally — single lane, then cluster, then mixed."
+          ],
+          "mustChange": [
+            "Bramble Spear must cost more than Thorn Vine to preserve the teaching arc."
+          ],
+          "risks": [
+            "Two-plant boards increase decision complexity — new players may feel overwhelmed."
+          ]
+        },
+        {
+          "reviewer": {
+            "agentId": "explore_explorer_1",
+            "displayName": "Claude (Gardener)",
+            "modelFamily": "claude",
+            "lens": "gardener"
+          },
+          "overallScore": 9.0,
+          "dimensionScores": {
+            "compoundingValue": 10,
+            "usefulnessClarity": 9,
+            "noveltySurprise": 9,
+            "feasibility": 9,
+            "legibility": 9,
+            "continuity": 9,
+            "shareability": 10
+          },
+          "keep": [
+            "First roster day is a genuine game-depth milestone, not cosmetic polish.",
+            "Piercing implementation is clean — hitEnemies Set in ~15 lines, no structural changes.",
+            "Bidirectional plant selection sync between PlayScene and HTML panel works correctly."
+          ],
+          "mustChange": [
+            "Run-note sidebar copy must reference the selected plant, not hardcode Thorn Vine."
+          ],
+          "risks": [
+            "If Bramble Spear is too cheap, Thorn Vine becomes dominated and the roster decision is hollow."
+          ]
+        },
+        {
+          "reviewer": {
+            "agentId": "explore_explorer_2",
+            "displayName": "Gemini (Explorer)",
+            "modelFamily": "gemini",
+            "lens": "explorer"
+          },
+          "overallScore": 8.5,
+          "dimensionScores": {
+            "compoundingValue": 9,
+            "usefulnessClarity": 8,
+            "noveltySurprise": 8,
+            "feasibility": 9,
+            "legibility": 8,
+            "continuity": 9,
+            "shareability": 8
+          },
+          "keep": [
+            "Wave design teaches piercing value through clustered spawns in the same lane.",
+            "Glass Rams in later waves force lane-stacking decisions that reward both plants.",
+            "CSS inventory styling with focus-visible and selected states is production quality."
+          ],
+          "mustChange": [
+            "Difficulty validators must support roster-aware plant costs before shipping."
+          ],
+          "risks": [
+            "Challenge board at 2 HP is tight — needs careful tuning to stay winnable."
+          ]
+        }
+      ],
+      "keep": [
+        "First roster day is a genuine game-depth milestone, not cosmetic polish.",
+        "Piercing mechanic is easy to understand and visually satisfying.",
+        "Tutorial wave progression teaches the core decision naturally.",
+        "Bidirectional plant selection sync between PlayScene and HTML panel is clean.",
+        "CSS inventory styling with aria-pressed and focus-visible is accessible."
+      ],
+      "mustChange": [
+        "Bramble Spear must cost more than Thorn Vine to preserve the intended teaching arc.",
+        "Run-note sidebar copy must reference the selected plant dynamically.",
+        "Difficulty validators must support roster-aware plant costs."
+      ],
+      "risks": [
+        "Two-plant boards increase decision complexity for new players.",
+        "Challenge board at 2 HP is tight and needs careful economy tuning."
+      ]
+    },
+    {
+      "id": "candidate-2",
+      "title": "Shield Fern — Defensive Plant with Damage Absorption",
+      "summary": "A second plant that absorbs damage for adjacent defenders rather than firing projectiles, adding a tank-and-DPS dynamic to lane defense.",
+      "averageScore": 7.2,
+      "reviewCount": 3,
+      "rank": 2,
+      "dimensionAverages": {
+        "compoundingValue": { "label": "Compounding Value", "average": 7.3, "reviewCount": 3 },
+        "usefulnessClarity": { "label": "Usefulness & Clarity", "average": 7.0, "reviewCount": 3 },
+        "noveltySurprise": { "label": "Novelty & Surprise", "average": 7.7, "reviewCount": 3 },
+        "feasibility": { "label": "Feasibility", "average": 6.7, "reviewCount": 3 },
+        "legibility": { "label": "Legibility", "average": 7.0, "reviewCount": 3 },
+        "continuity": { "label": "Continuity", "average": 7.3, "reviewCount": 3 },
+        "shareability": { "label": "Shareability", "average": 7.3, "reviewCount": 3 }
+      },
+      "reviewerBreakdown": [
+        {
+          "reviewer": {
+            "agentId": "explore_explorer_0",
+            "displayName": "GPT (Visitor)",
+            "modelFamily": "gpt",
+            "lens": "visitor"
+          },
+          "overallScore": 7.0,
+          "dimensionScores": {
+            "compoundingValue": 7,
+            "usefulnessClarity": 7,
+            "noveltySurprise": 8,
+            "feasibility": 6,
+            "legibility": 7,
+            "continuity": 7,
+            "shareability": 7
+          },
+          "keep": ["Tank-DPS dynamic is a proven genre mechanic."],
+          "mustChange": ["Adjacency logic adds significant complexity to the tile system."],
+          "risks": ["Passive plants are less visually exciting than projectile-based ones."]
+        },
+        {
+          "reviewer": {
+            "agentId": "explore_explorer_1",
+            "displayName": "Claude (Gardener)",
+            "modelFamily": "claude",
+            "lens": "gardener"
+          },
+          "overallScore": 7.5,
+          "dimensionScores": {
+            "compoundingValue": 8,
+            "usefulnessClarity": 7,
+            "noveltySurprise": 8,
+            "feasibility": 7,
+            "legibility": 7,
+            "continuity": 8,
+            "shareability": 8
+          },
+          "keep": ["Adds a fundamentally different role to the roster."],
+          "mustChange": ["Requires adjacency system that doesn't exist yet."],
+          "risks": ["Higher implementation risk for one day's scope."]
+        },
+        {
+          "reviewer": {
+            "agentId": "explore_explorer_2",
+            "displayName": "Gemini (Explorer)",
+            "modelFamily": "gemini",
+            "lens": "explorer"
+          },
+          "overallScore": 7.0,
+          "dimensionScores": {
+            "compoundingValue": 7,
+            "usefulnessClarity": 7,
+            "noveltySurprise": 7,
+            "feasibility": 7,
+            "legibility": 7,
+            "continuity": 7,
+            "shareability": 7
+          },
+          "keep": ["Opens the door for more complex board strategies."],
+          "mustChange": ["Needs clear visual feedback for absorption effect."],
+          "risks": ["May not feel impactful enough without visible projectiles."]
+        }
+      ],
+      "keep": ["Tank-DPS dynamic adds strategic depth.", "Opens door for more complex board strategies."],
+      "mustChange": ["Requires adjacency system that doesn't exist yet."],
+      "risks": ["Higher implementation risk; passive plants are less visually exciting."]
+    },
+    {
+      "id": "candidate-3",
+      "title": "Rapid Thorn — Fast-Firing Variant with Lower Damage",
+      "summary": "A second plant that fires twice as fast as Thorn Vine but deals half damage per shot, rewarding precise placement against fast single enemies.",
+      "averageScore": 6.4,
+      "reviewCount": 3,
+      "rank": 3,
+      "dimensionAverages": {
+        "compoundingValue": { "label": "Compounding Value", "average": 6.3, "reviewCount": 3 },
+        "usefulnessClarity": { "label": "Usefulness & Clarity", "average": 6.3, "reviewCount": 3 },
+        "noveltySurprise": { "label": "Novelty & Surprise", "average": 6.0, "reviewCount": 3 },
+        "feasibility": { "label": "Feasibility", "average": 7.3, "reviewCount": 3 },
+        "legibility": { "label": "Legibility", "average": 6.7, "reviewCount": 3 },
+        "continuity": { "label": "Continuity", "average": 6.3, "reviewCount": 3 },
+        "shareability": { "label": "Shareability", "average": 6.0, "reviewCount": 3 }
+      },
+      "reviewerBreakdown": [
+        {
+          "reviewer": {
+            "agentId": "explore_explorer_0",
+            "displayName": "GPT (Visitor)",
+            "modelFamily": "gpt",
+            "lens": "visitor"
+          },
+          "overallScore": 6.5,
+          "dimensionScores": {
+            "compoundingValue": 6,
+            "usefulnessClarity": 7,
+            "noveltySurprise": 6,
+            "feasibility": 7,
+            "legibility": 7,
+            "continuity": 6,
+            "shareability": 6
+          },
+          "keep": ["Simple to implement — just different stat values."],
+          "mustChange": ["Needs a visually distinct projectile to differentiate from Thorn Vine."],
+          "risks": ["Feels like a stat variant rather than a new mechanic."]
+        },
+        {
+          "reviewer": {
+            "agentId": "explore_explorer_1",
+            "displayName": "Claude (Gardener)",
+            "modelFamily": "claude",
+            "lens": "gardener"
+          },
+          "overallScore": 6.5,
+          "dimensionScores": {
+            "compoundingValue": 7,
+            "usefulnessClarity": 6,
+            "noveltySurprise": 6,
+            "feasibility": 8,
+            "legibility": 7,
+            "continuity": 6,
+            "shareability": 6
+          },
+          "keep": ["Low implementation risk."],
+          "mustChange": ["Must differentiate from Thorn Vine beyond just numbers."],
+          "risks": ["A stat-swap plant doesn't teach a new concept."]
+        },
+        {
+          "reviewer": {
+            "agentId": "explore_explorer_2",
+            "displayName": "Gemini (Explorer)",
+            "modelFamily": "gemini",
+            "lens": "explorer"
+          },
+          "overallScore": 6.0,
+          "dimensionScores": {
+            "compoundingValue": 6,
+            "usefulnessClarity": 6,
+            "noveltySurprise": 6,
+            "feasibility": 7,
+            "legibility": 6,
+            "continuity": 7,
+            "shareability": 6
+          },
+          "keep": ["Easy to balance with existing economy."],
+          "mustChange": ["Needs a unique mechanic, not just different stats."],
+          "risks": ["Players won't feel they learned something new."]
+        }
+      ],
+      "keep": ["Low implementation risk.", "Easy to balance."],
+      "mustChange": ["Needs a unique mechanic beyond stat differences."],
+      "risks": ["Feels like a stat variant, not a new concept."]
+    }
+  ],
+  "winner": {
+    "candidateId": "candidate-1",
+    "title": "Bramble & Thorn — First Two-Plant Roster Day",
+    "summary": "Adds Bramble Spear as a second plant with a piercing projectile mechanic, a plant selection UI, a three-wave tutorial teaching when to use each plant, and a four-wave challenge board with 2 garden HP.",
+    "averageScore": 8.7
+  },
+  "rationale": "Bramble & Thorn scored highest at 8.7 across all three judges. It introduces the first genuine roster decision — cheap steady fire vs. expensive piercing coverage — which is the core mechanic needed before the game can grow further. The piercing implementation is clean (~15 lines using a hitEnemies Set), the plant selection UI is accessible, and the tutorial teaches the decision through wave design rather than text. Shield Fern was novel but too risky for one day's scope. Rapid Thorn was a stat variant that wouldn't teach players anything new.",
+  "featureType": "game",
+  "tags": [
+    "game",
+    "roster",
+    "plants",
+    "piercing",
+    "bramble-spear",
+    "two-plant",
+    "tutorial",
+    "challenge"
+  ],
+  "feedbackInfluence": [
+    {
+      "summary": "Players asked for more meaningful placement decisions beyond 'put a plant in every threatened lane.'",
+      "impact": "high"
+    },
+    {
+      "summary": "The single-plant board felt repetitive after the first clear — roster variety was the most requested depth improvement.",
+      "impact": "high"
+    }
+  ],
+  "artifacts": {
+    "spec": "spec.md",
+    "feedbackDigest": "feedback-digest.json",
+    "buildSummary": "build-summary.md",
+    "testResults": "test-results.json",
+    "review": "review.md"
+  },
+  "bluesky_post": {
+    "headline": "First two-plant roster day in Command Garden",
+    "body": "The lane-defense game now has two plants. Thorn Vine is cheap and steady. Bramble Spear costs more but its bolts pierce every enemy in a lane. A tutorial teaches when to pick each — then the challenge makes you prove it. commandgarden.com",
+    "alt_text": "Lane-defense game showing a plant selection panel with Thorn Vine and Bramble Spear options, with a piercing bolt passing through three enemies in a single lane"
+  },
+  "bluesky_strategy": {
+    "searchQueries": [
+      "indie game dev",
+      "tower defense mechanics",
+      "build in public",
+      "autonomous AI coding",
+      "game design daily",
+      "browser game",
+      "piercing projectile mechanic"
+    ],
+    "replyTemplates": {
+      "whatIs": "It's a site that ships one new feature every day, built by an autonomous AI pipeline. Today the lane-defense game got its first two-plant roster — cheap steady fire vs. expensive piercing bolts. Play it at commandgarden.com",
+      "howDoesItWork": "An AI pipeline runs daily: gather feedback, score candidates with three AI judges, write a spec, build it, test it, ship it. Today it added a second plant with a piercing mechanic and a tutorial that teaches when to use each one.",
+      "genericQuestion": "Great question! Command Garden ships daily — today the game got its first real roster decision: Thorn Vine for single targets, Bramble Spear for clusters. Try it at commandgarden.com"
+    },
+    "hashtagsToUse": [
+      "#CommandGarden",
+      "#BuildInPublic",
+      "#GameDev",
+      "#IndieGame",
+      "#AIAgent"
+    ],
+    "maxDailyActions": 15
+  }
+}

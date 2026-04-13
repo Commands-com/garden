@@ -25,6 +25,7 @@ Use this document when you are deciding, specifying, implementing, or validating
 - Prefer **one meaningful improvement per day**.
 - Prefer **config and content changes** over rewriting the gameplay engine.
 - Preserve **deterministic test hooks** and **silent runtime fallbacks**.
+- Treat fallback visuals as a safety net, not a ship criterion. A new roster unit or enemy should have a real manifest-backed art asset, not only the generic BootScene placeholder.
 - Use generated assets deliberately. Do not generate art or animation just because a model exists.
 
 ## Game Map
@@ -67,6 +68,7 @@ If you modify a core system, include regression coverage for the behavior you ar
 - Each scenario should define both a `tutorial` mode and a `challenge` mode.
 - The tutorial should only teach what the player needs for that day's challenge. Do not let it drift into a disconnected sandbox.
 - The tutorial should introduce the day's available plants, enemy types, lane pressures, or economy rules in a softer sequence than the challenge.
+- If the day adds a new plant, the challenge should require that plant to win and the tutorial should teach the exact board read, cluster, or timing pattern that tells the player when to use it.
 - The challenge should have a real scripted win state. It should be hard, but the spec and review should treat "winnable with good play" as a requirement.
 - After the scripted challenge is cleared, the run should continue into endless mode for leaderboard chasing.
 - Tutorial runs should stay local and should not clutter the public leaderboard.
@@ -78,14 +80,24 @@ If you modify a core system, include regression coverage for the behavior you ar
 - When tuning a daily board, run `npm run validate:scenario-difficulty -- --date YYYY-MM-DD`.
 - The validator uses a deterministic simulation plus beam search to find a winning plan, then perturbs that plan with small timing, row, column, and omission mistakes.
 - By default it now checks not only the scripted clear, but also a short post-clear endless follow-through window so boards that instantly collapse after unlock are flagged.
+- On roster-expansion days it should also prove the new plant is required, not merely available. The previous dated challenge roster should no longer clear the board.
 - Treat validator output as a gate:
-  - no winning plan found means the board is likely unwinnable
+  - a non-zero exit means validation did not pass, even if other tests are green
+  - no winning plan found means the board is likely unwinnable or the search is still incomplete
   - too many perturbed plans still win means the board is still too forgiving
+  - if the previous roster can still clear after a new plant is introduced, the roster-expansion day failed even if the full roster wins
 - Interpret that gate with judgment:
   - a canonical win does not need to preserve every wall segment; surviving with one wall segment left can still be the intended "hard but fair" line
   - if the validator reports no winning plan but human playtesting finds one, improve the search before retuning the board downward
   - common fixes are wider beam search, pressure-aware seed plans, and explicit exploration of early lane-stack openings for enemies like Glass Rams
+  - when a new plant day is simulator-sensitive, use the runtime probe to sanity-check whether the previous roster still has an easy human-clear path
 - The goal is not arbitrary cruelty. The goal is: **winnable with strong play, but not casually survivable through sloppy placement**.
+
+### Asset Validation
+
+- If a change adds a new defender, enemy, projectile, pickup, or other visible gameplay unit, add the matching art to `site/game/assets-manifest.json`.
+- The manifest entry should point at a real file under `site/game/assets/` or `site/game/assets/generated/`.
+- Do not count BootScene's procedural fallback textures as shipped unit art. They are there so the game still boots when assets are missing, but a roster-expansion day should fail review if the new unit only exists through fallback art.
 
 ## Asset Backends
 

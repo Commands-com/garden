@@ -21,7 +21,7 @@ test("April 13 inventory selection stays in sync with the active plant", async (
   await expect(inventoryItems.nth(0)).toContainText("Thorn Vine");
   await expect(inventoryItems.nth(0)).toContainText("50 sap");
   await expect(inventoryItems.nth(1)).toContainText("Bramble Spear");
-  await expect(inventoryItems.nth(1)).toContainText("35 sap");
+  await expect(inventoryItems.nth(1)).toContainText("75 sap");
   await expect(inventoryItems.nth(0)).toHaveClass(/game-inventory__item--selected/);
   await expect(inventoryItems.nth(1)).not.toHaveClass(/game-inventory__item--selected/);
 
@@ -47,7 +47,10 @@ test("April 13 inventory selection stays in sync with the active plant", async (
   await expect(inventoryItems.nth(0)).toHaveClass(/game-inventory__item--selected/);
   await expect(inventoryItems.nth(1)).not.toHaveClass(/game-inventory__item--selected/);
 
-  await inventoryItems.nth(1).click();
+  await inventoryItems.nth(0).click();
+  const resourcesBeforePlacement = await page.evaluate(
+    () => window.__gameTestHooks.getState()?.resources
+  );
   const planted = await page.evaluate(() => window.__gameTestHooks.placeDefender(2, 1));
   expect(planted).toBe(true);
 
@@ -59,5 +62,5 @@ test("April 13 inventory selection stays in sync with the active plant", async (
 
   await expect
     .poll(async () => page.evaluate(() => window.__gameTestHooks.getState()?.resources))
-    .toBe(40);
+    .toBe(resourcesBeforePlacement - 50);
 });

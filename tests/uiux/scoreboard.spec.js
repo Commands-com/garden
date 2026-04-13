@@ -201,8 +201,9 @@ test.describe("Scoreboard section", () => {
     const divergentLabels = await divergentRows
       .locator(".scoreboard__dim-label")
       .allTextContents();
-    expect(divergentLabels).toContain("Compounding Value");
-    expect(divergentLabels).toContain("Novelty & Surprise");
+    for (const dim of divergentDimensions) {
+      expect(divergentLabels).toContain(dim.label);
+    }
   });
 
   // Responsive / no overflow

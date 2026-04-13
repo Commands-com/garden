@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 96 32" role="img" aria-labelledby="title desc">
+  <title id="title">Bramble Spear projectile</title>
+  <desc id="desc">A long barbed bramble lance projectile with a golden thorn tip.</desc>
+  <defs>
+    <linearGradient id="shaft" x1="0" x2="1" y1="0" y2="0">
+      <stop offset="0%" stop-color="#275133"/>
+      <stop offset="100%" stop-color="#3e7546"/>
+    </linearGradient>
+    <linearGradient id="tip" x1="0" x2="1" y1="0" y2="1">
+      <stop offset="0%" stop-color="#fff0ba"/>
+      <stop offset="100%" stop-color="#c78a46"/>
+    </linearGradient>
+  </defs>
+
+  <path d="M7 16 L75 10 L75 22 Z" fill="url(#shaft)" stroke="#173120" stroke-width="2" stroke-linejoin="round"/>
+  <path d="M73 8 L92 16 L73 24 Z" fill="url(#tip)" stroke="#fff5d2" stroke-width="2" stroke-linejoin="round"/>
+  <path d="M26 10 L18 4 L22 13 Z" fill="#365d37" stroke="#edf5d4" stroke-width="1.5" stroke-linejoin="round"/>
+  <path d="M26 22 L18 28 L22 19 Z" fill="#365d37" stroke="#edf5d4" stroke-width="1.5" stroke-linejoin="round"/>
+  <path d="M51 10 L43 4 L47 13 Z" fill="#365d37" stroke="#edf5d4" stroke-width="1.5" stroke-linejoin="round"/>
+  <path d="M51 22 L43 28 L47 19 Z" fill="#365d37" stroke="#edf5d4" stroke-width="1.5" stroke-linejoin="round"/>
+</svg>

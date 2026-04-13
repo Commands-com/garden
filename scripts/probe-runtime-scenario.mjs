@@ -17,7 +17,28 @@ const DEFAULT_OPTIONS = {
   decisionIntervalMs: 200,
   json: false,
   strategy: "all",
+  availablePlants: null,
 };
+
+const PREVIOUS_ROSTER_CHECK_STRATEGIES = [
+  "center-triple-then-cover",
+  "pressure-quad-then-cover",
+  "center-reinforce-then-cover",
+  "naive-centerout-wall-two-pass",
+];
+
+function parseNumericOption(
+  raw,
+  fallback,
+  { min = Number.NEGATIVE_INFINITY, max = Number.POSITIVE_INFINITY } = {}
+) {
+  const value = Number(raw);
+  if (!Number.isFinite(value)) {
+    return fallback;
+  }
+
+  return Math.max(min, Math.min(max, value));
+}
 
 function parseArgs(argv) {
   const options = { ...DEFAULT_OPTIONS };
@@ -44,8 +65,18 @@ function parseArgs(argv) {
       continue;
     }
 
+    if (token === "--available-plants" && next) {
+      options.availablePlants = next;
+      index += 1;
+      continue;
+    }
+
     if (token === "--decision-interval-ms" && next) {
-      options.decisionIntervalMs = Math.max(50, Number(next) || DEFAULT_OPTIONS.decisionIntervalMs);
+      options.decisionIntervalMs = parseNumericOption(
+        next,
+        DEFAULT_OPTIONS.decisionIntervalMs,
+        { min: 50 }
+      );
       index += 1;
       continue;
     }
@@ -60,6 +91,46 @@ function parseArgs(argv) {
 
 function roundToBucket(value, bucket) {
   return Math.round(value / bucket) * bucket;
+}
+
+function cloneAvailablePlants(availablePlants) {
+  return [...new Set((availablePlants || []).filter((plantId) => PLANT_DEFINITIONS[plantId]))];
+}
+
+function getAvailablePlantDefinitions(modeDefinition) {
+  return (modeDefinition.availablePlants || [STARTING_PLANT_ID])
+    .map((plantId) => PLANT_DEFINITIONS[plantId])
+    .filter(Boolean);
+}
+
+function getCheapestPlantDefinition(modeDefinition) {
+  return (
+    getAvailablePlantDefinitions(modeDefinition).sort((left, right) => {
+      if (left.cost !== right.cost) {
+        return left.cost - right.cost;
+      }
+
+      return left.id.localeCompare(right.id);
+    })[0] || PLANT_DEFINITIONS[STARTING_PLANT_ID]
+  );
+}
+
+function getSpecializedPlantDefinitions(modeDefinition) {
+  const cheapestPlant = getCheapestPlantDefinition(modeDefinition);
+
+  return getAvailablePlantDefinitions(modeDefinition)
+    .filter((plant) => plant.id !== cheapestPlant?.id)
+    .sort((left, right) => {
+      if (Boolean(right.piercing) !== Boolean(left.piercing)) {
+        return Number(Boolean(right.piercing)) - Number(Boolean(left.piercing));
+      }
+
+      if (right.cost !== left.cost) {
+        return right.cost - left.cost;
+      }
+
+      return left.id.localeCompare(right.id);
+    });
 }
 
 function getFirstSeenLaneOrder(modeDefinition) {
@@ -82,8 +153,41 @@ function getFirstSeenLaneOrder(modeDefinition) {
   return order;
 }
 
+function getPressureOrderedRows(modeDefinition) {
+  const events = buildScenarioEvents(modeDefinition);
+  const horizonMs = Math.min(18_000, events[7]?.atMs ?? 18_000);
+  const statsByRow = new Map();
+
+  for (const event of events) {
+    if (event.atMs > horizonMs) {
+      break;
+    }
+
+    const current = statsByRow.get(event.lane) || {
+      row: event.lane,
+      count: 0,
+      firstAtMs: event.atMs,
+      pressure: 0,
+    };
+
+    current.count += 1;
+    current.firstAtMs = Math.min(current.firstAtMs, event.atMs);
+    current.pressure += Math.max(0, horizonMs - event.atMs) / 80;
+    current.pressure += event.enemyId === "glassRam" ? 180 : event.enemyId === "shardMite" ? 120 : 80;
+
+    statsByRow.set(event.lane, current);
+  }
+
+  return [...statsByRow.values()].sort(
+    (left, right) =>
+      right.pressure - left.pressure ||
+      left.firstAtMs - right.firstAtMs ||
+      left.row - right.row
+  );
+}
+
 function schedulePlacementsByBudget(modeDefinition, placements, options) {
-  const cost = PLANT_DEFINITIONS[STARTING_PLANT_ID].cost;
+  const defaultPlant = getCheapestPlantDefinition(modeDefinition);
   const plan = [];
   let resources = modeDefinition.startingResources ?? 0;
   let currentTimeMs = 0;
@@ -91,7 +195,13 @@ function schedulePlacementsByBudget(modeDefinition, placements, options) {
   const incomeAmount = modeDefinition.resourcePerTick ?? 0;
 
   for (const placement of placements) {
-    while (resources < cost) {
+    const plant =
+      (placement.plantId && PLANT_DEFINITIONS[placement.plantId]) || defaultPlant;
+    if (!plant) {
+      continue;
+    }
+
+    while (resources < plant.cost) {
       currentTimeMs = nextIncomeAtMs;
       resources += incomeAmount;
       nextIncomeAtMs += modeDefinition.resourceTickMs ?? 0;
@@ -101,8 +211,9 @@ function schedulePlacementsByBudget(modeDefinition, placements, options) {
       timeMs: roundToBucket(currentTimeMs, options.decisionIntervalMs),
       row: placement.row,
       col: placement.col,
+      plantId: plant.id,
     });
-    resources -= cost;
+    resources -= plant.cost;
     currentTimeMs += options.decisionIntervalMs;
   }
 
@@ -113,66 +224,135 @@ function buildStrategies(modeDefinition, options) {
   const centerOut = [2, 1, 3, 0, 4];
   const topDown = [0, 1, 2, 3, 4];
   const firstSeen = getFirstSeenLaneOrder(modeDefinition);
+  const pressureRows = getPressureOrderedRows(modeDefinition);
+  const pressureRow = pressureRows[0]?.row ?? firstSeen[0] ?? centerOut[0];
+  const coverRows = centerOut.filter((row) => row !== pressureRow);
+  const cheapestPlant = getCheapestPlantDefinition(modeDefinition);
+  const specializedPlants = getSpecializedPlantDefinitions(modeDefinition);
   const wallCol = 0;
   const wallSupportCol = Math.min(1, BOARD_COLS - 1);
+  const wallThirdCol = Math.min(2, BOARD_COLS - 1);
+  const wallFourthCol = Math.min(3, BOARD_COLS - 1);
   const midCol = Math.floor((BOARD_COLS - 1) / 2);
   const spawnSupportCol = Math.max(0, BOARD_COLS - 2);
 
   const definitions = [
     {
       label: "naive-centerout-wall-single-pass",
-      placements: centerOut.map((row) => ({ row, col: wallCol })),
+      placements: centerOut.map((row) => ({ row, col: wallCol, plantId: cheapestPlant.id })),
     },
     {
       label: "naive-topdown-wall-single-pass",
-      placements: topDown.map((row) => ({ row, col: wallCol })),
+      placements: topDown.map((row) => ({ row, col: wallCol, plantId: cheapestPlant.id })),
     },
     {
       label: "naive-firstseen-wall-single-pass",
-      placements: firstSeen.map((row) => ({ row, col: wallCol })),
+      placements: firstSeen.map((row) => ({ row, col: wallCol, plantId: cheapestPlant.id })),
     },
     {
       label: "naive-centerout-wall-two-pass",
       placements: [
-        ...centerOut.map((row) => ({ row, col: wallCol })),
-        ...centerOut.map((row) => ({ row, col: wallSupportCol })),
+        ...centerOut.map((row) => ({ row, col: wallCol, plantId: cheapestPlant.id })),
+        ...centerOut.map((row) => ({
+          row,
+          col: wallSupportCol,
+          plantId: cheapestPlant.id,
+        })),
       ],
     },
     {
       label: "center-reinforce-then-cover",
       placements: [
-        { row: 2, col: wallCol },
-        { row: 2, col: wallSupportCol },
-        { row: 3, col: wallCol },
-        { row: 1, col: wallCol },
-        { row: 4, col: wallCol },
-        { row: 0, col: wallCol },
+        { row: 2, col: wallCol, plantId: cheapestPlant.id },
+        { row: 2, col: wallSupportCol, plantId: cheapestPlant.id },
+        { row: 3, col: wallCol, plantId: cheapestPlant.id },
+        { row: 1, col: wallCol, plantId: cheapestPlant.id },
+        { row: 4, col: wallCol, plantId: cheapestPlant.id },
+        { row: 0, col: wallCol, plantId: cheapestPlant.id },
       ],
     },
     {
       label: "center-triple-then-cover",
       placements: [
-        { row: 2, col: wallCol },
-        { row: 2, col: wallSupportCol },
-        { row: 2, col: midCol },
-        { row: 3, col: wallCol },
-        { row: 1, col: wallCol },
-        { row: 4, col: wallCol },
-        { row: 0, col: wallCol },
+        { row: 2, col: wallCol, plantId: cheapestPlant.id },
+        { row: 2, col: wallSupportCol, plantId: cheapestPlant.id },
+        { row: 2, col: midCol, plantId: cheapestPlant.id },
+        { row: 3, col: wallCol, plantId: cheapestPlant.id },
+        { row: 1, col: wallCol, plantId: cheapestPlant.id },
+        { row: 4, col: wallCol, plantId: cheapestPlant.id },
+        { row: 0, col: wallCol, plantId: cheapestPlant.id },
+      ],
+    },
+    {
+      label: "pressure-triple-then-cover",
+      placements: [
+        { row: pressureRow, col: wallCol, plantId: cheapestPlant.id },
+        { row: pressureRow, col: wallSupportCol, plantId: cheapestPlant.id },
+        { row: pressureRow, col: wallThirdCol, plantId: cheapestPlant.id },
+        ...coverRows
+          .slice(0, 3)
+          .map((row) => ({ row, col: wallCol, plantId: cheapestPlant.id })),
+      ],
+    },
+    {
+      label: "pressure-quad-then-cover",
+      placements: [
+        { row: pressureRow, col: wallCol, plantId: cheapestPlant.id },
+        { row: pressureRow, col: wallSupportCol, plantId: cheapestPlant.id },
+        { row: pressureRow, col: wallThirdCol, plantId: cheapestPlant.id },
+        { row: pressureRow, col: wallFourthCol, plantId: cheapestPlant.id },
+        ...coverRows
+          .slice(0, 2)
+          .map((row) => ({ row, col: wallCol, plantId: cheapestPlant.id })),
+      ],
+    },
+    {
+      label: "pressure-triple-support-then-cover",
+      placements: [
+        { row: pressureRow, col: wallSupportCol, plantId: cheapestPlant.id },
+        { row: pressureRow, col: wallThirdCol, plantId: cheapestPlant.id },
+        { row: pressureRow, col: midCol, plantId: cheapestPlant.id },
+        ...coverRows
+          .slice(0, 3)
+          .map((row) => ({ row, col: wallSupportCol, plantId: cheapestPlant.id })),
       ],
     },
     {
       label: "spawn-side-center-stack",
       placements: [
-        { row: 2, col: spawnSupportCol },
-        { row: 2, col: wallSupportCol },
-        { row: 3, col: spawnSupportCol },
-        { row: 1, col: spawnSupportCol },
-        { row: 4, col: wallCol },
-        { row: 0, col: wallCol },
+        { row: 2, col: spawnSupportCol, plantId: cheapestPlant.id },
+        { row: 2, col: wallSupportCol, plantId: cheapestPlant.id },
+        { row: 3, col: spawnSupportCol, plantId: cheapestPlant.id },
+        { row: 1, col: spawnSupportCol, plantId: cheapestPlant.id },
+        { row: 4, col: wallCol, plantId: cheapestPlant.id },
+        { row: 0, col: wallCol, plantId: cheapestPlant.id },
       ],
     },
   ];
+
+  for (const plant of specializedPlants) {
+    definitions.push({
+      label: `mixed-pressure-row-first-${plant.id}`,
+      placements: [
+        { row: pressureRow, col: wallCol, plantId: plant.id },
+        { row: pressureRow, col: wallSupportCol, plantId: cheapestPlant.id },
+        ...coverRows
+          .slice(0, 3)
+          .map((row) => ({ row, col: wallCol, plantId: cheapestPlant.id })),
+      ],
+    });
+    definitions.push({
+      label: `mixed-pressure-stack-then-cover-${plant.id}`,
+      placements: [
+        { row: pressureRow, col: wallCol, plantId: plant.id },
+        { row: pressureRow, col: wallSupportCol, plantId: plant.id },
+        { row: pressureRow, col: wallThirdCol, plantId: cheapestPlant.id },
+        ...coverRows
+          .slice(0, 3)
+          .map((row) => ({ row, col: wallCol, plantId: cheapestPlant.id })),
+      ],
+    });
+  }
 
   const all = definitions.map((definition) => ({
     ...definition,
@@ -183,7 +363,19 @@ function buildStrategies(modeDefinition, options) {
     return all;
   }
 
-  return all.filter((strategy) => strategy.label === options.strategy);
+  const requestedLabels = new Set(
+    String(options.strategy || "")
+      .split(",")
+      .map((value) => value.trim())
+      .filter(Boolean)
+  );
+
+  if (requestedLabels.has("previous-roster-check")) {
+    PREVIOUS_ROSTER_CHECK_STRATEGIES.forEach((label) => requestedLabels.add(label));
+    requestedLabels.delete("previous-roster-check");
+  }
+
+  return all.filter((strategy) => requestedLabels.has(strategy.label));
 }
 
 async function readState(page) {
@@ -206,21 +398,20 @@ async function runPlan(page, modeDefinition, strategy) {
   await page.evaluate((mode) => window.__gameTestHooks.startMode(mode), modeDefinition.mode);
   await waitForPredicate(page, (state) => state?.scene === "play" && state?.mode === modeDefinition.mode, 5000);
 
-  const cost = PLANT_DEFINITIONS[STARTING_PLANT_ID].cost;
-
   for (const action of strategy.plan) {
+    const plant = PLANT_DEFINITIONS[action.plantId] || getCheapestPlantDefinition(modeDefinition);
     await waitForPredicate(
       page,
       (state) =>
         state?.scene === "play" &&
         (state?.survivedMs ?? 0) >= action.timeMs &&
-        (state?.resources ?? 0) >= cost,
+        (state?.resources ?? 0) >= (plant?.cost ?? 0),
       20000
     );
 
     const placed = await page.evaluate(
-      ({ row, col }) => window.__gameTestHooks.placeDefender(row, col),
-      { row: action.row, col: action.col }
+      ({ row, col, plantId }) => window.__gameTestHooks.placeDefender(row, col, plantId),
+      { row: action.row, col: action.col, plantId: action.plantId }
     );
 
     if (!placed) {
@@ -266,12 +457,20 @@ function summarizePlan(plan) {
     atMs: action.timeMs,
     row: action.row + 1,
     col: action.col + 1,
+    plant: action.plantId,
   }));
 }
 
 async function main() {
   const options = parseArgs(process.argv.slice(2));
-  const modeDefinition = getScenarioModeDefinition(options.date, options.mode);
+  const baseModeDefinition = getScenarioModeDefinition(options.date, options.mode);
+  const availablePlants = options.availablePlants
+    ? cloneAvailablePlants(options.availablePlants.split(","))
+    : cloneAvailablePlants(baseModeDefinition.availablePlants || [STARTING_PLANT_ID]);
+  const modeDefinition = {
+    ...baseModeDefinition,
+    availablePlants,
+  };
   const strategies = buildStrategies(modeDefinition, options);
 
   if (!strategies.length) {
@@ -311,6 +510,7 @@ async function main() {
       date: options.date,
       mode: options.mode,
       scenarioTitle: modeDefinition.scenarioTitle,
+      availablePlants,
       strategies: results,
       wins: results.filter((result) => result.won).map((result) => result.label),
     };

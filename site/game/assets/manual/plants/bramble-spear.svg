@@ -1,0 +1,39 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" role="img" aria-labelledby="title desc">
+  <title id="title">Bramble Spear defender</title>
+  <desc id="desc">A rooted bramble defender with spear-like thorn petals and a bright amber core.</desc>
+  <defs>
+    <linearGradient id="leaf" x1="0" x2="1" y1="0" y2="1">
+      <stop offset="0%" stop-color="#4f7a45"/>
+      <stop offset="100%" stop-color="#1f4627"/>
+    </linearGradient>
+    <linearGradient id="thorn" x1="0" x2="1" y1="0" y2="1">
+      <stop offset="0%" stop-color="#f5df9d"/>
+      <stop offset="100%" stop-color="#bb8640"/>
+    </linearGradient>
+    <radialGradient id="core" cx="50%" cy="45%" r="55%">
+      <stop offset="0%" stop-color="#fff5c2"/>
+      <stop offset="60%" stop-color="#d7b66b"/>
+      <stop offset="100%" stop-color="#8d6432"/>
+    </radialGradient>
+  </defs>
+
+  <ellipse cx="64" cy="101" rx="34" ry="14" fill="#102218" opacity=".36"/>
+  <ellipse cx="64" cy="97" rx="30" ry="11" fill="#224631" opacity=".8"/>
+
+  <path d="M64 46 L88 18 L78 62 Z" fill="url(#thorn)" stroke="#fff1c7" stroke-width="3" stroke-linejoin="round"/>
+  <path d="M64 48 L39 24 L50 66 Z" fill="url(#thorn)" stroke="#fff1c7" stroke-width="3" stroke-linejoin="round"/>
+  <path d="M62 54 L28 49 L54 78 Z" fill="url(#thorn)" stroke="#fff1c7" stroke-width="3" stroke-linejoin="round"/>
+  <path d="M66 54 L100 49 L74 78 Z" fill="url(#thorn)" stroke="#fff1c7" stroke-width="3" stroke-linejoin="round"/>
+
+  <path d="M64 88 C46 82 38 62 42 48 C46 34 58 28 64 28 C70 28 82 34 86 48 C90 62 82 82 64 88 Z"
+        fill="url(#leaf)" stroke="#12291a" stroke-width="4"/>
+  <path d="M64 84 C51 79 46 64 48 52 C50 41 58 36 64 36 C70 36 78 41 80 52 C82 64 77 79 64 84 Z"
+        fill="#355f37" opacity=".75"/>
+
+  <circle cx="64" cy="58" r="15" fill="url(#core)" stroke="#f8efc6" stroke-width="3"/>
+  <circle cx="64" cy="58" r="6" fill="#fff7d3" opacity=".95"/>
+
+  <path d="M48 87 C42 93 40 104 41 113" fill="none" stroke="#2b5933" stroke-width="6" stroke-linecap="round"/>
+  <path d="M80 87 C86 93 88 104 87 113" fill="none" stroke="#2b5933" stroke-width="6" stroke-linecap="round"/>
+  <path d="M64 89 C64 97 64 105 64 114" fill="none" stroke="#214428" stroke-width="7" stroke-linecap="round"/>
+</svg>

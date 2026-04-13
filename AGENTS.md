@@ -134,14 +134,18 @@ Before changing Phaser runtime code specifically, also read `docs/phaser-4-runti
 - If a generated sheet contains multiple facing directions, never cycle all rows blindly. Explicitly choose the row that matches gameplay direction in config, such as `animationFrames: [12, 13, 14, 15]` for a right-to-left enemy that should always face the wall.
 - Record animation choices in config files (`site/game/src/config/enemies.js`, later `plants.js` if needed), not as ad hoc magic numbers buried in scene code.
 - Generated sheets should carry `metadata.phaser.frameWidth` and `metadata.phaser.frameHeight` in `site/game/assets-manifest.json` so Boot can preload them as spritesheets.
+- If you add a new plant, enemy, projectile, or other gameplay-visible unit, ship a real manifest-backed art asset for it in `site/game/assets-manifest.json`. Boot's procedural fallback textures are only a resilience path; they do not count as shipped art for a new roster or enemy day.
 
 Rules:
 - Prefer config/content additions over rewriting the core loop.
 - Keep tutorial and challenge aligned. If the daily challenge adds a new plant, enemy, economy rule, or board rule, update the tutorial so it teaches that exact thing.
+- On a day that adds a new plant to the challenge roster, make that plant genuinely required for the board. The old roster should no longer have a winning line, and the tutorial should teach the exact pressure pattern or timing window that makes the new plant necessary.
 - Treat the daily challenge as a real board with a win state. Endless mode is the post-clear score chase, not the primary session structure.
 - Preserve shipped daily boards. Keep `site/game/src/config/scenarios.js` as the registry/helper layer and add new dated scenario files under `site/game/src/config/scenarios/` instead of overwriting the previous shipped board.
 - Only edit an older dated scenario file when fixing a real bug, impossible board, or broken archive experience. Historical boards are product content, not disposable scaffolding.
 - If you retune a daily board for difficulty, run `npm run validate:scenario-difficulty -- --date YYYY-MM-DD` and use its result when deciding whether the board is unwinnable, too forgiving, or acceptably knife-edge. That validator now includes a short post-clear endless follow-through check by default, so "challenge clears but endless collapses immediately" should count as a real validation problem.
+- On a roster-expansion day, `npm run validate:scenario-difficulty -- --date YYYY-MM-DD` should also prove the newly added plant is required. Compare the current challenge roster to the previous dated challenge roster; if the old roster can still clear, the board is not ready yet.
+- When you report difficulty validation, use the actual command result. A non-zero exit from `npm run validate:scenario-difficulty -- --date YYYY-MM-DD` means validation did not pass, even if Playwright coverage is green.
 - Do not assume a good challenge must clear with full wall health. A valid board may be "hard but winnable" even if the canonical winning line survives on the last wall segment after one intentional late breach.
 - Do not treat "no winning plan found" as automatic proof that the board must be softened. First ask whether the validator search is missing the real line because its beam width, seed plans, or pressure assumptions are too weak.
 - If you touch a core system file, add or update tests that protect existing behavior.

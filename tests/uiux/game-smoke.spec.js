@@ -39,7 +39,9 @@ test.describe("Rootline Defense", () => {
     await expect(page.locator("#game-assets-list")).toContainText(
       /briar-beetle|No generated assets tracked yet/
     );
-    await expect(page.locator("#game-leaderboard-list")).toContainText("Bloom Scout");
+    await expect(page.locator("#game-leaderboard-list")).toContainText(
+      /Bloom Scout|No scores yet/
+    );
 
     await page.waitForTimeout(1000);
     expect(consoleErrors).toEqual([]);

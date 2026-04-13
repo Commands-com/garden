@@ -83,6 +83,7 @@ function syncInventorySelection(selectedPlantId) {
   dom.inventory.querySelectorAll(".game-inventory__item").forEach((item) => {
     const isSelected = item.dataset.plantId === selectedPlantId;
     item.classList.toggle("game-inventory__item--selected", isSelected);
+    item.setAttribute("aria-pressed", String(isSelected));
   });
 }
 
@@ -111,12 +112,15 @@ function renderInventory(dayDate) {
 
     dom.inventory.appendChild(
       el(
-        "div",
+        "button",
         {
+          type: "button",
           className: `game-inventory__item${
             plantId === defaultPlantId ? " game-inventory__item--selected" : ""
           }`,
           dataset: { plantId },
+          "aria-label": `${plant.label}, ${plant.cost} sap`,
+          "aria-pressed": String(plantId === defaultPlantId),
         },
         el(
           "div",
@@ -274,9 +278,13 @@ function updateRuntimeReadout(state) {
   if (!dom.runNote) return;
 
   if (state.scene === "play") {
+    const selectedPlant = PLANT_DEFINITIONS[state.selectedPlantId];
+    const plantLabel = selectedPlant?.label || "Your plant";
+    const plantCost = selectedPlant?.cost || 50;
+
     if (state.mode === "tutorial") {
-      dom.runNote.textContent = state.resources >= 50
-        ? "Tutorial active. Thorn Vine is ready; place it in the lane that is under pressure."
+      dom.runNote.textContent = state.resources >= plantCost
+        ? `Tutorial active. ${plantLabel} is ready; place it in the lane that is under pressure.`
         : "Tutorial active. Sap is rebuilding so you can prepare for the next teaching wave.";
       return;
     }
@@ -287,8 +295,8 @@ function updateRuntimeReadout(state) {
       return;
     }
 
-    dom.runNote.textContent = state.resources >= 50
-      ? "Today's challenge is live. Thorn Vine is ready; plant where the current lane pressure is coming."
+    dom.runNote.textContent = state.resources >= plantCost
+      ? `Today's challenge is live. ${plantLabel} is ready; plant where the current lane pressure is coming.`
       : "Today's garden is hard but winnable. Sap is regenerating for the next placement.";
   } else if (state.scene === "gameover") {
     dom.runNote.textContent = state.mode === "tutorial"

@@ -102,9 +102,11 @@ export class PlayScene extends Phaser.Scene {
   }
 
   selectPlant(plantId) {
-    if (PLANT_DEFINITIONS[plantId]) {
+    if (this.getAvailablePlantIds().includes(plantId)) {
       this.selectedPlantId = plantId;
+      this.updateSeedTray();
       this.game.events.emit("plantSelected", this.selectedPlantId);
+      this.publishIfNeeded(true);
     }
   }
 
@@ -126,6 +128,12 @@ export class PlayScene extends Phaser.Scene {
 
   getStartingGardenHealth() {
     return this.modeDefinition.gardenHealth ?? GARDEN_MAX_HEALTH;
+  }
+
+  getAvailablePlantIds() {
+    return (this.modeDefinition.availablePlants || [STARTING_PLANT_ID]).filter(
+      (plantId) => PLANT_DEFINITIONS[plantId]
+    );
   }
 
   drawBoard() {
@@ -255,6 +263,95 @@ export class PlayScene extends Phaser.Scene {
         color: "#f5f0e8",
       }
     ).setOrigin(1, 0.5).setDepth(21);
+
+    this.createSeedTray(barY);
+  }
+
+  createSeedTray(anchorY) {
+    const availablePlantIds = this.getAvailablePlantIds();
+    const slotWidth = availablePlantIds.length >= 4 ? 124 : 142;
+    const slotHeight = 42;
+    const gap = 10;
+    const totalWidth =
+      availablePlantIds.length * slotWidth + Math.max(0, availablePlantIds.length - 1) * gap;
+    const startX = ARENA_WIDTH / 2 - totalWidth / 2 + slotWidth / 2;
+
+    this.seedTrayItems = availablePlantIds.map((plantId, index) => {
+      const plant = PLANT_DEFINITIONS[plantId];
+      const x = startX + index * (slotWidth + gap);
+      const y = anchorY;
+      const bg = this.add.rectangle(x, y, slotWidth, slotHeight, 0x102018, 0.94);
+      bg.setStrokeStyle(1, 0x31503d, 0.88);
+      bg.setDepth(22);
+      bg.setInteractive({ useHandCursor: true });
+      bg.on("pointerdown", () => this.selectPlant(plantId));
+
+      const icon = this.add.image(x - slotWidth / 2 + 20, y, plant.textureKey);
+      icon.setDisplaySize(26, 26);
+      icon.setDepth(23);
+
+      const keyLabel = this.add.text(x - slotWidth / 2 + 8, y - 11, `${index + 1}`, {
+        fontFamily: "DM Sans",
+        fontSize: "10px",
+        fontStyle: "700",
+        color: "#dce8d2",
+      }).setOrigin(0, 0.5).setDepth(23);
+
+      const nameText = this.add.text(x - slotWidth / 2 + 40, y - 6, plant.label, {
+        fontFamily: "DM Sans",
+        fontSize: "13px",
+        fontStyle: "700",
+        color: "#f5f0e8",
+      }).setOrigin(0, 0.5).setDepth(23);
+
+      const costText = this.add.text(x - slotWidth / 2 + 40, y + 10, `${plant.cost} sap`, {
+        fontFamily: "DM Sans",
+        fontSize: "11px",
+        color: "#c4a35a",
+      }).setOrigin(0, 0.5).setDepth(23);
+
+      return {
+        plantId,
+        plant,
+        x,
+        y,
+        width: slotWidth,
+        height: slotHeight,
+        bg,
+        icon,
+        keyLabel,
+        nameText,
+        costText,
+      };
+    });
+
+    this.updateSeedTray();
+  }
+
+  updateSeedTray() {
+    if (!Array.isArray(this.seedTrayItems)) {
+      return;
+    }
+
+    for (const item of this.seedTrayItems) {
+      const selected = item.plantId === this.selectedPlantId;
+      const affordable = this.resources >= item.plant.cost;
+
+      item.bg.setFillStyle(
+        selected ? 0x1d4f34 : affordable ? 0x102018 : 0x2a1d12,
+        selected ? 0.98 : 0.94
+      );
+      item.bg.setStrokeStyle(
+        selected ? 2 : 1,
+        selected ? 0x9fdd6b : affordable ? 0x31503d : 0xc4a35a,
+        selected ? 1 : 0.72
+      );
+      item.icon.setAlpha(selected ? 1 : affordable ? 0.92 : 0.58);
+      item.nameText.setColor(selected ? "#f7fbf6" : affordable ? "#d9e5dd" : "#d3c4ac");
+      item.costText.setColor(selected ? "#d8f5ae" : affordable ? "#c4a35a" : "#caa884");
+      item.keyLabel.setColor(selected ? "#f7fbf6" : "#bdd0c2");
+      item.bg.setAlpha(selected ? 1 : affordable ? 0.9 : 0.78);
+    }
   }
 
   installInput() {
@@ -293,6 +390,35 @@ export class PlayScene extends Phaser.Scene {
       }
 
       this.placeDefender(tile.row, tile.col, this.selectedPlantId);
+    });
+
+    this.input.keyboard?.on("keydown", (event) => {
+      if (this.transitioningToChallenge || this.gameEnding) {
+        return;
+      }
+
+      const activeTag = document.activeElement?.tagName;
+      if (
+        activeTag === "INPUT" ||
+        activeTag === "TEXTAREA" ||
+        activeTag === "SELECT" ||
+        activeTag === "BUTTON"
+      ) {
+        return;
+      }
+
+      const index = Number.parseInt(event.key, 10);
+      if (!Number.isFinite(index) || index < 1) {
+        return;
+      }
+
+      const plantId = this.getAvailablePlantIds()[index - 1];
+      if (!plantId) {
+        return;
+      }
+
+      event.preventDefault();
+      this.selectPlant(plantId);
     });
   }
 
@@ -498,6 +624,24 @@ export class PlayScene extends Phaser.Scene {
     }
 
     this.threatsLabel.setText(threats);
+    this.updateSeedTray();
+  }
+
+  getSeedTraySnapshot() {
+    if (!Array.isArray(this.seedTrayItems)) {
+      return [];
+    }
+
+    return this.seedTrayItems.map((item, index) => ({
+      plantId: item.plantId,
+      key: String(index + 1),
+      x: Math.round(item.x),
+      y: Math.round(item.y),
+      width: item.width,
+      height: item.height,
+      selected: item.plantId === this.selectedPlantId,
+      affordable: this.resources >= item.plant.cost,
+    }));
   }
 
   placeDefender(row, col, plantId = undefined) {
@@ -893,6 +1037,9 @@ export class PlayScene extends Phaser.Scene {
           ? "transition"
           : this.mode,
       challengeCleared: this.challengeCleared,
+      selectedPlantId: this.selectedPlantId,
+      availablePlantIds: this.getAvailablePlantIds(),
+      hudInventory: this.getSeedTraySnapshot(),
       status: this.gameEnding
         ? "resolving"
         : this.transitioningToChallenge

@@ -8,7 +8,7 @@ const {
   repoRoot,
 } = require("./helpers/local-site");
 
-const DAY_DATE = "2026-04-12";
+const DAY_DATE = "2026-04-13";
 const decision = JSON.parse(
   fs.readFileSync(
     path.join(repoRoot, `site/days/${DAY_DATE}/decision.json`),
