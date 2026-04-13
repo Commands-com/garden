@@ -76,6 +76,10 @@ export class PlayScene extends Phaser.Scene {
     this.resources = this.getStartingResources();
     this.gardenHP = this.getStartingGardenHealth();
 
+    this.selectedPlantId =
+      (this.modeDefinition.availablePlants && this.modeDefinition.availablePlants[0]) ||
+      STARTING_PLANT_ID;
+
     this.defenders = [];
     this.enemies = [];
     this.projectiles = [];
@@ -93,6 +97,15 @@ export class PlayScene extends Phaser.Scene {
 
     this.audioController.playEffect("start");
     this.publishIfNeeded(true);
+
+    this.game.events.emit("plantSelected", this.selectedPlantId);
+  }
+
+  selectPlant(plantId) {
+    if (PLANT_DEFINITIONS[plantId]) {
+      this.selectedPlantId = plantId;
+      this.game.events.emit("plantSelected", this.selectedPlantId);
+    }
   }
 
   getStartingResources() {
@@ -259,7 +272,7 @@ export class PlayScene extends Phaser.Scene {
 
       const center = getCellCenter(tile.row, tile.col);
       const occupied = this.defendersByTile.has(makeTileKey(tile.row, tile.col));
-      const plant = PLANT_DEFINITIONS[STARTING_PLANT_ID];
+      const plant = PLANT_DEFINITIONS[this.selectedPlantId];
       const affordable = this.resources >= plant.cost;
       const color = occupied ? 0xffa86a : affordable ? 0x9fdd6b : 0xc4a35a;
 
@@ -279,7 +292,7 @@ export class PlayScene extends Phaser.Scene {
         return;
       }
 
-      this.placeDefender(tile.row, tile.col, STARTING_PLANT_ID);
+      this.placeDefender(tile.row, tile.col, this.selectedPlantId);
     });
   }
 
@@ -359,9 +372,14 @@ export class PlayScene extends Phaser.Scene {
         continue;
       }
 
-      projectile.destroyed = true;
-      projectile.sprite.destroy();
-      this.damageEnemy(target, projectile.damage);
+      if (projectile.piercing) {
+        projectile.hitEnemies.add(target);
+        this.damageEnemy(target, projectile.damage);
+      } else {
+        projectile.destroyed = true;
+        projectile.sprite.destroy();
+        this.damageEnemy(target, projectile.damage);
+      }
     }
   }
 
@@ -482,7 +500,8 @@ export class PlayScene extends Phaser.Scene {
     this.threatsLabel.setText(threats);
   }
 
-  placeDefender(row, col, plantId = STARTING_PLANT_ID) {
+  placeDefender(row, col, plantId = undefined) {
+    plantId = plantId || this.selectedPlantId || STARTING_PLANT_ID;
     if (this.gameEnding || this.transitioningToChallenge) {
       return false;
     }
@@ -535,13 +554,18 @@ export class PlayScene extends Phaser.Scene {
     );
     sprite.setDepth(5);
 
+    const plantDef = defender.definition;
+    const piercing = plantDef.piercing || false;
+
     this.projectiles.push({
       lane: defender.row,
       x: defender.x + 18,
       y: defender.y,
-      damage: defender.definition.projectileDamage,
-      speed: defender.definition.projectileSpeed,
-      radius: defender.definition.projectileRadius,
+      damage: plantDef.projectileDamage,
+      speed: plantDef.projectileSpeed,
+      radius: plantDef.projectileRadius,
+      piercing,
+      hitEnemies: piercing ? new Set() : null,
       sprite,
       destroyed: false,
     });
@@ -688,6 +712,10 @@ export class PlayScene extends Phaser.Scene {
 
     for (const enemy of this.enemies) {
       if (enemy.destroyed || enemy.lane !== projectile.lane) {
+        continue;
+      }
+
+      if (projectile.piercing && projectile.hitEnemies && projectile.hitEnemies.has(enemy)) {
         continue;
       }
 
