@@ -121,6 +121,7 @@ Before changing Phaser runtime code specifically, also read `docs/phaser-4-runti
 - `site/game/src/config/enemies.js`
 - `site/game/src/config/plants.js`
 - `site/game/src/config/scenarios.js`
+- `site/game/src/config/scenarios/`
 - `site/game/src/config/board.js`
 - `site/game/src/config/balance.js`
 - `site/game/assets-manifest.json`
@@ -138,7 +139,9 @@ Rules:
 - Prefer config/content additions over rewriting the core loop.
 - Keep tutorial and challenge aligned. If the daily challenge adds a new plant, enemy, economy rule, or board rule, update the tutorial so it teaches that exact thing.
 - Treat the daily challenge as a real board with a win state. Endless mode is the post-clear score chase, not the primary session structure.
-- If you retune a daily board for difficulty, run `npm run validate:scenario-difficulty -- --date YYYY-MM-DD` and use its result when deciding whether the board is unwinnable, too forgiving, or acceptably knife-edge.
+- Preserve shipped daily boards. Keep `site/game/src/config/scenarios.js` as the registry/helper layer and add new dated scenario files under `site/game/src/config/scenarios/` instead of overwriting the previous shipped board.
+- Only edit an older dated scenario file when fixing a real bug, impossible board, or broken archive experience. Historical boards are product content, not disposable scaffolding.
+- If you retune a daily board for difficulty, run `npm run validate:scenario-difficulty -- --date YYYY-MM-DD` and use its result when deciding whether the board is unwinnable, too forgiving, or acceptably knife-edge. That validator now includes a short post-clear endless follow-through check by default, so "challenge clears but endless collapses immediately" should count as a real validation problem.
 - Do not assume a good challenge must clear with full wall health. A valid board may be "hard but winnable" even if the canonical winning line survives on the last wall segment after one intentional late breach.
 - Do not treat "no winning plan found" as automatic proof that the board must be softened. First ask whether the validator search is missing the real line because its beam width, seed plans, or pressure assumptions are too weak.
 - If you touch a core system file, add or update tests that protect existing behavior.

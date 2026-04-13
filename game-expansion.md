@@ -86,7 +86,7 @@ These are the safe surfaces for daily changes:
 
 - **`config/plants.js`** — defender definitions: cost, cooldown, attack cadence, projectile or aura behavior, sprite, sound key.
 - **`config/enemies.js`** — enemy definitions: HP, speed, damage, armor or shield traits, lane behavior, sprite, sound key.
-- **`config/scenarios.js`** — dated tutorial and challenge definitions, wave schedules, scenario summaries, and endless unlock pacing.
+- **`config/scenarios.js` + `config/scenarios/*.js`** — registry/helper layer plus dated tutorial and challenge definitions, wave schedules, scenario summaries, and endless unlock pacing.
 - **`config/board.js`** — lane count, grid dimensions, blocked tiles, special slots, breach rules.
 - **`config/balance.js`** — tunable numbers: starting resources, passive income, score multipliers, encounter pacing.
 - **`assets/sprites/`** and **`assets/audio/`** — new art and sound files referenced by the config entries above.
@@ -368,7 +368,7 @@ The first real lane-defense day should ship a deliberately small vertical slice:
   - `window.__gameTestHooks` exposing `goToScene()`, `grantResources()`, `spawnEnemy()`, `forceBreach()`, `getState()`
 - Config-driven content from the start:
   - The first defender is defined in `config/plants.js`, not hardcoded in the scene
-  - Dated tutorial/challenge boards are defined in `config/scenarios.js`
+  - Dated tutorial/challenge boards are defined in `config/scenarios/*.js`, with `config/scenarios.js` acting as the registry/helper layer
   - Board layout lives in `config/board.js`
   - Balance numbers live in `config/balance.js`
 

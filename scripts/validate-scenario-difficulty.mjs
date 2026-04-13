@@ -10,6 +10,7 @@ import { PLANT_DEFINITIONS, STARTING_PLANT_ID } from "../site/game/src/config/pl
 import {
   buildScenarioEvents,
   getScenarioModeDefinition,
+  getUnlockedEnemyIds,
 } from "../site/game/src/config/scenarios.js";
 
 const DEFAULT_OPTIONS = {
@@ -18,6 +19,7 @@ const DEFAULT_OPTIONS = {
   stepMs: 50,
   decisionIntervalMs: 200,
   beamWidth: 96,
+  endlessGraceMs: 25_000,
   perturbationDelayMs: 800,
   perturbationWinRateThreshold: 0.22,
   maxNaiveStrategyWins: 0,
@@ -65,6 +67,12 @@ function parseArgs(argv) {
 
     if (token === "--beam-width" && next) {
       options.beamWidth = Math.max(8, Number(next) || DEFAULT_OPTIONS.beamWidth);
+      index += 1;
+      continue;
+    }
+
+    if (token === "--endless-grace-ms" && next) {
+      options.endlessGraceMs = Math.max(0, Number(next) || DEFAULT_OPTIONS.endlessGraceMs);
       index += 1;
       continue;
     }
@@ -123,14 +131,41 @@ function buildPlanSignature(plan) {
     .join("|");
 }
 
+function xmur3(value) {
+  let hash = 1779033703 ^ value.length;
+
+  for (let index = 0; index < value.length; index += 1) {
+    hash = Math.imul(hash ^ value.charCodeAt(index), 3432918353);
+    hash = (hash << 13) | (hash >>> 19);
+  }
+
+  return function nextSeed() {
+    hash = Math.imul(hash ^ (hash >>> 16), 2246822507);
+    hash = Math.imul(hash ^ (hash >>> 13), 3266489909);
+    return (hash ^= hash >>> 16) >>> 0;
+  };
+}
+
+function createSeededState(seedInput) {
+  const source = xmur3(String(seedInput ?? ""));
+  return source();
+}
+
 class ScenarioSimulator {
   constructor(modeDefinition, options = {}) {
     this.modeDefinition = modeDefinition;
     this.options = options;
     this.plantDefinition = PLANT_DEFINITIONS[STARTING_PLANT_ID];
     this.events = buildScenarioEvents(modeDefinition);
+    this.shouldValidateEndless =
+      Boolean(modeDefinition.endless) && (options.endlessGraceMs || 0) > 0;
     this.maxSimulationMs =
-      (this.events[this.events.length - 1]?.atMs || 0) + 35000;
+      (this.events[this.events.length - 1]?.atMs || 0) +
+      35_000 +
+      (this.shouldValidateEndless ? options.endlessGraceMs || 0 : 0);
+    this.initialRandomState = createSeededState(
+      `validator:${modeDefinition.scenarioDate}:${modeDefinition.mode}`
+    );
     this.reset();
   }
 
@@ -140,6 +175,13 @@ class ScenarioSimulator {
     this.resources = this.modeDefinition.startingResources ?? 0;
     this.gardenHP = this.modeDefinition.gardenHealth ?? 0;
     this.nextIncomeAtMs = this.modeDefinition.resourceTickMs ?? 999999;
+    this.phase = "scripted";
+    this.wave = 1;
+    this.challengeClearMs = null;
+    this.endlessStartedAtMs = null;
+    this.endlessSurvivedMs = 0;
+    this.endlessBudgetMs = 0;
+    this.randomState = this.initialRandomState;
     this.defenders = [];
     this.defendersByTile = new Map();
     this.enemies = [];
@@ -158,6 +200,13 @@ class ScenarioSimulator {
     next.resources = this.resources;
     next.gardenHP = this.gardenHP;
     next.nextIncomeAtMs = this.nextIncomeAtMs;
+    next.phase = this.phase;
+    next.wave = this.wave;
+    next.challengeClearMs = this.challengeClearMs;
+    next.endlessStartedAtMs = this.endlessStartedAtMs;
+    next.endlessSurvivedMs = this.endlessSurvivedMs;
+    next.endlessBudgetMs = this.endlessBudgetMs;
+    next.randomState = this.randomState;
     next.defenders = this.defenders.map((defender) => ({ ...defender }));
     next.defendersByTile = new Map(
       next.defenders.map((defender) => [defender.tileKey, defender])
@@ -173,6 +222,13 @@ class ScenarioSimulator {
     next.clearTimeMs = this.clearTimeMs;
     next.breachCount = this.breachCount;
     return next;
+  }
+
+  nextRandom() {
+    this.randomState += 0x6d2b79f5;
+    let output = Math.imul(this.randomState ^ (this.randomState >>> 15), 1 | this.randomState);
+    output ^= output + Math.imul(output ^ (output >>> 7), 61 | output);
+    return ((output ^ (output >>> 14)) >>> 0) / 4294967296;
   }
 
   isTerminal() {
@@ -232,12 +288,12 @@ class ScenarioSimulator {
   step(deltaMs) {
     this.elapsedMs += deltaMs;
     this.awardResources();
-    this.spawnDueEvents();
+    this.spawnDueEvents(deltaMs);
     this.updateDefenders(deltaMs);
     this.updateProjectiles(deltaMs);
     this.updateEnemies(deltaMs);
     this.cleanupDestroyed();
-    this.checkScriptedClear();
+    this.checkProgression();
   }
 
   awardResources() {
@@ -254,14 +310,41 @@ class ScenarioSimulator {
     }
   }
 
-  spawnDueEvents() {
-    while (
-      this.eventIndex < this.events.length &&
-      this.events[this.eventIndex].atMs <= this.elapsedMs
-    ) {
-      const event = this.events[this.eventIndex];
-      this.spawnEnemy(event.enemyId, event.lane);
-      this.eventIndex += 1;
+  spawnDueEvents(deltaMs) {
+    if (this.phase === "scripted") {
+      while (
+        this.eventIndex < this.events.length &&
+        this.events[this.eventIndex].atMs <= this.elapsedMs
+      ) {
+        const event = this.events[this.eventIndex];
+        this.spawnEnemy(event.enemyId, event.lane);
+        this.wave = event.wave;
+        this.eventIndex += 1;
+      }
+      return;
+    }
+
+    if (this.phase === "endless" && this.modeDefinition.endless) {
+      const endlessConfig = this.modeDefinition.endless;
+      const endlessElapsedMs = Math.max(0, this.elapsedMs - (this.endlessStartedAtMs || 0));
+      const waveOffset = Math.floor(endlessElapsedMs / endlessConfig.waveDurationMs);
+      this.wave = (endlessConfig.startingWave || 4) + waveOffset;
+      this.endlessBudgetMs += deltaMs;
+
+      const cadenceMs = clamp(
+        endlessConfig.baseCadenceMs - waveOffset * endlessConfig.cadenceDropPerWave,
+        endlessConfig.cadenceFloorMs,
+        endlessConfig.baseCadenceMs
+      );
+
+      while (this.endlessBudgetMs >= cadenceMs) {
+        this.endlessBudgetMs -= cadenceMs;
+        const unlockedEnemyIds = getUnlockedEnemyIds(this.modeDefinition, this.wave);
+        const enemyId =
+          unlockedEnemyIds[Math.floor(this.nextRandom() * unlockedEnemyIds.length)];
+        const lane = Math.floor(this.nextRandom() * BOARD_ROWS);
+        this.spawnEnemy(enemyId, lane);
+      }
     }
   }
 
@@ -271,13 +354,21 @@ class ScenarioSimulator {
       return false;
     }
 
+    const endlessWave =
+      this.phase === "endless" ? Math.max(0, this.wave - 3) : 0;
+    const scaleFactor = 1 + endlessWave * 0.18;
+    const speedScale = 1 + endlessWave * 0.08;
+
     this.enemies.push({
       id: enemyId,
       lane,
       x: ENEMY_SPAWN_X,
-      hp: definition.maxHealth,
+      hp: Math.round(definition.maxHealth * scaleFactor),
       attackCooldownMs: definition.attackCadenceMs,
-      definition: { ...definition },
+      definition: {
+        ...definition,
+        speed: definition.speed * speedScale,
+      },
       destroyed: false,
     });
     return true;
@@ -481,15 +572,46 @@ class ScenarioSimulator {
     this.defenders = this.defenders.filter((defender) => !defender.destroyed);
   }
 
-  checkScriptedClear() {
+  getActiveEnemyCount() {
+    return this.enemies.reduce(
+      (count, enemy) => count + (enemy.destroyed ? 0 : 1),
+      0
+    );
+  }
+
+  checkProgression() {
+    if (this.won || this.lost) {
+      return;
+    }
+
     if (
-      !this.won &&
-      !this.lost &&
+      this.phase === "scripted" &&
       this.eventIndex >= this.events.length &&
-      this.enemies.length === 0
+      this.getActiveEnemyCount() === 0
     ) {
+      this.challengeClearMs = this.elapsedMs;
+
+      if (this.shouldValidateEndless) {
+        this.phase = "endless";
+        this.endlessStartedAtMs = this.elapsedMs;
+        this.endlessSurvivedMs = 0;
+        this.endlessBudgetMs = 0;
+        this.wave = this.modeDefinition.endless?.startingWave || this.wave + 1;
+        this.resources += this.modeDefinition.endlessRewardResources || 0;
+        return;
+      }
+
       this.won = true;
       this.clearTimeMs = this.elapsedMs;
+      return;
+    }
+
+    if (this.phase === "endless" && this.endlessStartedAtMs != null) {
+      this.endlessSurvivedMs = this.elapsedMs - this.endlessStartedAtMs;
+      if (this.endlessSurvivedMs >= (this.options.endlessGraceMs || 0)) {
+        this.won = true;
+        this.clearTimeMs = this.challengeClearMs ?? this.endlessStartedAtMs;
+      }
     }
   }
 
@@ -586,6 +708,18 @@ class ScenarioSimulator {
       requirements.set(event.lane, Math.max(requirements.get(event.lane) || 0, required));
     }
 
+    if (this.phase === "endless") {
+      const unlockedEnemyIds = getUnlockedEnemyIds(this.modeDefinition, this.wave);
+      const endlessRequirement = unlockedEnemyIds.reduce((maxRequired, enemyId) => {
+        const definition = ENEMY_BY_ID[enemyId];
+        return Math.max(maxRequired, definition?.requiredDefendersInLane || 1);
+      }, 1);
+
+      for (let row = 0; row < BOARD_ROWS; row += 1) {
+        requirements.set(row, Math.max(requirements.get(row) || 0, endlessRequirement));
+      }
+    }
+
     return requirements;
   }
 
@@ -616,9 +750,12 @@ function buildStateSignature(simulator) {
 
   return [
     roundToBucket(simulator.elapsedMs, 200),
+    simulator.phase,
+    simulator.wave,
     simulator.gardenHP,
     roundToBucket(simulator.resources, 5),
     simulator.eventIndex,
+    roundToBucket(simulator.endlessSurvivedMs || 0, 500),
     defenderSignature,
     enemySignature,
   ].join("|");
@@ -635,11 +772,18 @@ function evaluateSimulator(simulator) {
   score += simulator.resources * 120;
   score += simulator.defenders.length * 4_000;
   score += simulator.eventIndex * 2_500;
+  score += Math.round((simulator.endlessSurvivedMs || 0) / 250);
 
   const upcomingRows = new Set();
   const laneRequirements = simulator.getLanePressureRequirements();
   for (let index = simulator.eventIndex; index < Math.min(simulator.events.length, simulator.eventIndex + 5); index += 1) {
     upcomingRows.add(simulator.events[index].lane);
+  }
+
+  if (simulator.phase === "endless" && upcomingRows.size === 0) {
+    for (let row = 0; row < BOARD_ROWS; row += 1) {
+      upcomingRows.add(row);
+    }
   }
 
   for (const row of upcomingRows) {
@@ -663,6 +807,7 @@ function evaluateSimulator(simulator) {
   if (simulator.won) {
     score += 1_000_000_000;
     score += simulator.gardenHP * 12_500;
+    score += simulator.endlessSurvivedMs || 0;
     score -= simulator.clearTimeMs ?? simulator.elapsedMs;
   }
 
@@ -1250,7 +1395,10 @@ function main() {
       mode: options.mode,
       scenarioTitle: modeDefinition.scenarioTitle,
       nearPerfect: false,
-      reason: "No winning scripted plan found by the validator beam search.",
+      reason:
+        options.endlessGraceMs > 0 && modeDefinition.endless
+          ? `No winning plan found that clears the scripted challenge and survives ${options.endlessGraceMs}ms of endless follow-through.`
+          : "No winning scripted plan found by the validator beam search.",
     };
     if (options.json) {
       console.log(JSON.stringify(failure, null, 2));
@@ -1275,6 +1423,7 @@ function main() {
       gardenHP: result.gardenHP,
       breaches: result.breachCount,
       clearTimeMs: result.clearTimeMs,
+      endlessSurvivedMs: result.endlessSurvivedMs || 0,
       placements: summarizePlan(strategy.plan),
     };
   });
@@ -1288,6 +1437,7 @@ function main() {
       gardenHP: result.gardenHP,
       breaches: result.breachCount,
       clearTimeMs: result.clearTimeMs,
+      endlessSurvivedMs: result.endlessSurvivedMs || 0,
     };
   });
 
@@ -1313,12 +1463,15 @@ function main() {
     thresholds: {
       perturbationWinRateThreshold: options.perturbationWinRateThreshold,
       maxNaiveStrategyWins: options.maxNaiveStrategyWins,
+      endlessGraceMs: options.endlessGraceMs,
     },
     canonical: {
       won: canonicalResult.won,
       gardenHP: canonicalResult.gardenHP,
       breaches: canonicalResult.breachCount,
       clearTimeMs: canonicalResult.clearTimeMs,
+      endlessSurvivedMs: canonicalResult.endlessSurvivedMs || 0,
+      phaseAtEnd: canonicalResult.phase,
       resourcesLeft: canonicalResult.resources,
       complexity,
       placements: summarizePlan(bestPlan),
@@ -1351,7 +1504,7 @@ function main() {
     console.log(
       `Canonical result: ${canonicalResult.won ? "WIN" : "LOSS"} • wall ${canonicalResult.gardenHP} • clear ${formatMs(
         canonicalResult.clearTimeMs || 0
-      )} • resources left ${canonicalResult.resources}`
+      )} • endless ${formatMs(canonicalResult.endlessSurvivedMs || 0)} • resources left ${canonicalResult.resources}`
     );
     console.log("Best plan:");
     for (const action of summarizePlan(bestPlan)) {

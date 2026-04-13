@@ -45,6 +45,7 @@ Preferred mutation surfaces:
 - `site/game/src/config/plants.js`
 - `site/game/src/config/enemies.js`
 - `site/game/src/config/scenarios.js`
+- `site/game/src/config/scenarios/`
 - `site/game/assets-manifest.json`
 
 Core systems to touch cautiously:
@@ -61,7 +62,8 @@ If you modify a core system, include regression coverage for the behavior you ar
 
 ## Scenario Rules
 
-- Store dated boards in `site/game/src/config/scenarios.js`.
+- Keep `site/game/src/config/scenarios.js` as the registry/helper layer and store each dated board in its own file under `site/game/src/config/scenarios/`.
+- When shipping a new day, append a new dated scenario file and register it. Do not overwrite the previous shipped board just because today's design changed or the roster grew.
 - Each scenario should define both a `tutorial` mode and a `challenge` mode.
 - The tutorial should only teach what the player needs for that day's challenge. Do not let it drift into a disconnected sandbox.
 - The tutorial should introduce the day's available plants, enemy types, lane pressures, or economy rules in a softer sequence than the challenge.
@@ -69,11 +71,13 @@ If you modify a core system, include regression coverage for the behavior you ar
 - After the scripted challenge is cleared, the run should continue into endless mode for leaderboard chasing.
 - Tutorial runs should stay local and should not clutter the public leaderboard.
 - When adding a new date, keep old dates playable. Archive scenarios are part of the product.
+- Only retune an older scenario file for a real archive bug, an impossible board, or a broken teaching flow.
 
 ### Difficulty Validation
 
 - When tuning a daily board, run `npm run validate:scenario-difficulty -- --date YYYY-MM-DD`.
-- The validator uses a deterministic simulation plus beam search to find a winning scripted plan, then perturbs that plan with small timing, row, column, and omission mistakes.
+- The validator uses a deterministic simulation plus beam search to find a winning plan, then perturbs that plan with small timing, row, column, and omission mistakes.
+- By default it now checks not only the scripted clear, but also a short post-clear endless follow-through window so boards that instantly collapse after unlock are flagged.
 - Treat validator output as a gate:
   - no winning plan found means the board is likely unwinnable
   - too many perturbed plans still win means the board is still too forgiving
