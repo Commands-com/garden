@@ -186,6 +186,7 @@
   <script type="module" src="/game/src/main.js"></script>
   <script>
     (function () {
+      const MIN_FEEDBACK_LENGTH = 10;
       const form = document.getElementById("game-feedback-form");
       const text = document.getElementById("game-feedback-text");
       const status = document.getElementById("game-feedback-status");
@@ -194,23 +195,41 @@
       form.addEventListener("submit", async function (e) {
         e.preventDefault();
         const value = text.value.trim();
-        if (!value) return;
+        const submitButton = form.querySelector('button[type="submit"]');
+        if (!value) {
+          status.textContent = "Write a little feedback first.";
+          return;
+        }
+        if (value.length < MIN_FEEDBACK_LENGTH) {
+          status.textContent = `Use at least ${MIN_FEEDBACK_LENGTH} characters.`;
+          return;
+        }
 
         status.textContent = "Sending…";
+        if (submitButton) submitButton.disabled = true;
         try {
           const res = await fetch("/api/feedback", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ type: "suggestion", message: value, source: "game-page" }),
+            body: JSON.stringify({ type: "suggestion", content: value }),
           });
+          let payload = null;
+          try {
+            payload = await res.json();
+          } catch {
+            payload = null;
+          }
           if (res.ok) {
             status.textContent = "Sent — thanks!";
             text.value = "";
           } else {
-            status.textContent = "Failed to send. Try again.";
+            const details = Array.isArray(payload?.details) ? payload.details[0] : null;
+            status.textContent = details || payload?.error || "Failed to send. Try again.";
           }
         } catch {
           status.textContent = "Network error. Try again.";
+        } finally {
+          if (submitButton) submitButton.disabled = false;
         }
       });
     })();

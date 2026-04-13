@@ -123,6 +123,21 @@ test.describe("Rootline Defense", () => {
     await expect(page.locator("#game-leaderboard-list")).toContainText("Lane Tester");
   });
 
+  test("submits game-page feedback with the API payload the Lambda expects", async ({
+    page,
+  }) => {
+    await prepareGamePage(page, "/game/");
+
+    await page.fill(
+      "#game-feedback-text",
+      "Please add another defender that can slow a whole lane."
+    );
+    await page.locator("#game-feedback-form button[type='submit']").click();
+
+    await expect(page.locator("#game-feedback-status")).toHaveText("Sent — thanks!");
+    await expect(page.locator("#game-feedback-text")).toHaveValue("");
+  });
+
   test("keeps the page within the viewport on mobile", async ({ page }) => {
     await page.setViewportSize({ width: 390, height: 844 });
     await prepareGamePage(page, "/game/");

@@ -68,6 +68,10 @@ function getContentType(filePath) {
   }
 }
 
+function sanitizeFeedback(str) {
+  return String(str || "").replace(/<[^>]*>/g, "").trim();
+}
+
 async function installLocalSiteRoutes(page) {
   if (page.__commandGardenRoutesInstalled) {
     return;
@@ -120,6 +124,54 @@ async function installLocalSiteRoutes(page) {
         status: 200,
         contentType: "application/json; charset=utf-8",
         body: JSON.stringify({ reactions: {} }),
+      });
+      return;
+    }
+
+    if (url.pathname === "/api/feedback") {
+      let body = {};
+      try {
+        body = JSON.parse(route.request().postData() || "{}");
+      } catch {
+        await route.fulfill({
+          status: 400,
+          contentType: "application/json; charset=utf-8",
+          body: JSON.stringify({ error: "Invalid JSON body" }),
+        });
+        return;
+      }
+
+      const validTypes = new Set(["suggestion", "bug", "confusion"]);
+      const details = [];
+      const sanitizedContent = sanitizeFeedback(body.content);
+
+      if (!validTypes.has(body.type)) {
+        details.push("type must be one of: suggestion, bug, confusion");
+      }
+      if (typeof body.content !== "string") {
+        details.push("content must be a string");
+      } else if (sanitizedContent.length < 10) {
+        details.push("content must be at least 10 characters");
+      } else if (sanitizedContent.length > 2000) {
+        details.push("content must be at most 2000 characters");
+      }
+
+      if (details.length > 0) {
+        await route.fulfill({
+          status: 400,
+          contentType: "application/json; charset=utf-8",
+          body: JSON.stringify({ error: "Validation failed", details }),
+        });
+        return;
+      }
+
+      await route.fulfill({
+        status: 201,
+        contentType: "application/json; charset=utf-8",
+        body: JSON.stringify({
+          feedbackId: "local-feedback-1",
+          message: "Feedback submitted successfully",
+        }),
       });
       return;
     }
