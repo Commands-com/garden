@@ -63,6 +63,29 @@ const dom = {
 let game = null;
 let gameDate = todayDate;
 
+function getPlayScene() {
+  if (!game) {
+    return null;
+  }
+
+  try {
+    return game.scene.getScene("play");
+  } catch {
+    return null;
+  }
+}
+
+function syncInventorySelection(selectedPlantId) {
+  if (!dom.inventory) {
+    return;
+  }
+
+  dom.inventory.querySelectorAll(".game-inventory__item").forEach((item) => {
+    const isSelected = item.dataset.plantId === selectedPlantId;
+    item.classList.toggle("game-inventory__item--selected", isSelected);
+  });
+}
+
 function renderInventory(dayDate) {
   if (!dom.inventory) {
     return;
@@ -70,7 +93,8 @@ function renderInventory(dayDate) {
 
   const scenario = getScenarioForDate(dayDate);
   const plantIds = scenario.availablePlants || [];
-  dom.inventory.innerHTML = "";
+  const defaultPlantId = plantIds[0] || null;
+  dom.inventory.replaceChildren();
 
   if (!plantIds.length) {
     dom.inventory.appendChild(
@@ -88,7 +112,12 @@ function renderInventory(dayDate) {
     dom.inventory.appendChild(
       el(
         "div",
-        { className: "game-inventory__item" },
+        {
+          className: `game-inventory__item${
+            plantId === defaultPlantId ? " game-inventory__item--selected" : ""
+          }`,
+          dataset: { plantId },
+        },
         el(
           "div",
           { className: "game-inventory__header" },
@@ -102,6 +131,22 @@ function renderInventory(dayDate) {
         )
       )
     );
+  });
+
+  dom.inventory.querySelectorAll(".game-inventory__item").forEach((item) => {
+    item.addEventListener("click", () => {
+      const plantId = item.dataset.plantId;
+      if (!plantId) {
+        return;
+      }
+
+      const playScene = getPlayScene();
+      if (playScene && typeof playScene.selectPlant === "function") {
+        playScene.selectPlant(plantId);
+      }
+
+      syncInventorySelection(plantId);
+    });
   });
 }
 
@@ -386,10 +431,18 @@ async function init() {
     ],
   });
 
+  const handlePlantSelected = (plantId) => {
+    syncInventorySelection(plantId);
+  };
+
+  game.events.on("plantSelected", handlePlantSelected);
   const cleanupHooks = installGameTestHooks(game, bootstrap);
   window.addEventListener(
     "beforeunload",
     () => {
+      if (game?.events) {
+        game.events.off("plantSelected", handlePlantSelected);
+      }
       cleanupHooks();
       if (game) {
         game.destroy(true);

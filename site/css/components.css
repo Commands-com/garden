@@ -2650,8 +2650,23 @@ kbd {
 
 .game-inventory__item {
   padding: var(--space-3);
+  border: var(--border-default);
   border-radius: var(--radius-lg);
   background: var(--color-cream);
+  cursor: pointer;
+  transition:
+    opacity var(--duration-fast) var(--ease-default),
+    border-color var(--duration-fast) var(--ease-default),
+    box-shadow var(--duration-fast) var(--ease-default);
+}
+
+.game-inventory__item--selected {
+  border-color: var(--color-success);
+  box-shadow: 0 0 0 var(--border-width) var(--color-success), var(--shadow-sm);
+}
+
+.game-inventory__item:not(.game-inventory__item--selected) {
+  opacity: 0.65;
 }
 
 .game-inventory__header {

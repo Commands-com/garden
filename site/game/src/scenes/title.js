@@ -1,5 +1,6 @@
 import Phaser from "../phaser-bridge.js";
 import { ARENA_HEIGHT, ARENA_WIDTH } from "../config/balance.js";
+import { PLANT_DEFINITIONS } from "../config/plants.js";
 import { getScenarioForDate, getScenarioModeDefinition } from "../config/scenarios.js";
 
 function formatScenarioDate(dayDate) {
@@ -7,6 +8,25 @@ function formatScenarioDate(dayDate) {
     month: "short",
     day: "numeric",
   }).format(new Date(`${dayDate}T12:00:00Z`));
+}
+
+function formatChallengeCardCopy(availablePlants, challengeMode) {
+  if (!Array.isArray(availablePlants) || availablePlants.length <= 1) {
+    return "1 HP wall. Clear 4 waves to unlock endless.";
+  }
+
+  const plantLabels = availablePlants
+    .map((plantId) => PLANT_DEFINITIONS[plantId]?.label || plantId)
+    .filter(Boolean);
+  const defenderCountLabel = plantLabels.length === 2
+    ? "Two defenders"
+    : `${plantLabels.length} defenders`;
+  const waveCount = challengeMode?.waves?.length || 4;
+  const rosterLabel = plantLabels.length === 2
+    ? plantLabels.join(" & ")
+    : `${plantLabels.slice(0, -1).join(", ")} & ${plantLabels.at(-1)}`;
+
+  return `${defenderCountLabel}: ${rosterLabel}. Clear ${waveCount} waves to unlock endless.`;
 }
 
 export class TitleScene extends Phaser.Scene {
@@ -95,7 +115,7 @@ export class TitleScene extends Phaser.Scene {
       height: btnHeight,
       eyebrow: "Recommended",
       title: "Today's Challenge",
-      copy: "1 HP wall. Clear 4 waves to unlock endless.",
+      copy: formatChallengeCardCopy(scenario.availablePlants, challengeMode),
       onSelect: () => this.startMode("challenge"),
       fill: 0x1a4d2e,
       stroke: 0x9fdd6b,

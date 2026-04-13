@@ -1,8 +1,9 @@
 import { scenario20260412 } from "./scenarios/2026-04-12.js";
+import { scenario_2026_04_13 } from "./scenarios/2026-04-13.js";
 
 // Append new daily scenarios here. Keep prior dated files intact so archived
 // boards remain replayable instead of being overwritten by later runs.
-const SCENARIO_REGISTRY = [scenario20260412];
+const SCENARIO_REGISTRY = [scenario20260412, scenario_2026_04_13];
 
 function buildScenarioMap(scenarios) {
   const entries = scenarios.map((scenario) => [scenario.date, scenario]);
