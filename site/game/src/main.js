@@ -28,6 +28,7 @@ import { GardenAudio } from "./systems/audio.js";
 import { installGameTestHooks } from "./systems/test-hooks.js";
 import { PLANT_DEFINITIONS } from "./config/plants.js";
 import { getScenarioForDate } from "./config/scenarios.js";
+import { ENEMY_BY_ID } from "./config/enemies.js";
 
 const params = new URLSearchParams(window.location.search);
 const testMode = params.get("testMode") === "1";
@@ -58,6 +59,11 @@ const dom = {
   root: document.getElementById("game-root"),
   audioToggle: document.getElementById("game-audio-toggle"),
   volumeSlider: document.getElementById("game-volume-slider"),
+  scout: document.getElementById("game-scout"),
+  scoutEnemies: document.getElementById("game-scout-enemies"),
+  scoutPlants: document.getElementById("game-scout-plants"),
+  scoutWaves: document.getElementById("game-scout-waves"),
+  scoutDetail: document.getElementById("game-scout-detail"),
 };
 
 let game = null;
@@ -152,6 +158,188 @@ function renderInventory(dayDate) {
       syncInventorySelection(plantId);
     });
   });
+}
+
+function renderBoardScout(dayDate) {
+  const scenario = getScenarioForDate(dayDate);
+  if (!scenario) {
+    dom.scout?.classList.add("game-scout--empty");
+    if (dom.scoutEnemies)
+      dom.scoutEnemies.append(
+        el("p", { className: "game-scout__empty" }, "No board data available")
+      );
+    return;
+  }
+
+  // 1. Collect unique enemy IDs from both modes' events
+  const enemyIds = new Set();
+  for (const mode of [scenario.tutorial, scenario.challenge]) {
+    if (!mode?.waves) continue;
+    for (const wave of mode.waves) {
+      for (const evt of wave.events || []) {
+        enemyIds.add(evt.enemyId);
+      }
+    }
+  }
+
+  // 2. Render enemy cards
+  for (const id of enemyIds) {
+    const enemy = ENEMY_BY_ID[id];
+    if (!enemy) continue;
+    const card = el(
+      "button",
+      {
+        type: "button",
+        className: "game-scout__card game-scout__card--enemy",
+        dataset: { enemyId: id },
+        "aria-label": enemy.label,
+        onClick: () => selectScoutCard(card, "enemy", enemy, scenario),
+      },
+      el("div", { className: "game-scout__card-name" }, enemy.label),
+      el(
+        "div",
+        { className: "game-scout__card-stats" },
+        el("span", { className: "game-scout__card-stat" }, `HP: ${enemy.maxHealth}`),
+        el("span", { className: "game-scout__card-stat" }, `Speed: ${enemy.speed}`)
+      )
+    );
+    dom.scoutEnemies?.append(card);
+  }
+
+  // 3. Render plant cards
+  for (const id of scenario.availablePlants || []) {
+    const plant = PLANT_DEFINITIONS[id];
+    if (!plant) continue;
+    const card = el(
+      "button",
+      {
+        type: "button",
+        className: "game-scout__card game-scout__card--plant",
+        dataset: { plantId: id },
+        "aria-label": plant.label,
+        onClick: () => selectScoutCard(card, "plant", plant, scenario),
+      },
+      el("div", { className: "game-scout__card-name" }, plant.label),
+      el(
+        "div",
+        { className: "game-scout__card-stats" },
+        el("span", { className: "game-scout__card-stat" }, `Cost: ${plant.cost}`),
+        plant.piercing
+          ? el("span", { className: "game-scout__badge game-scout__badge--piercing" }, "Piercing")
+          : false
+      )
+    );
+    dom.scoutPlants?.append(card);
+  }
+
+  // 4. Render wave timelines for both modes
+  for (const [modeKey, modeLabel] of [
+    ["tutorial", "Tutorial"],
+    ["challenge", "Challenge"],
+  ]) {
+    const mode = scenario[modeKey];
+    if (!mode?.waves?.length) continue;
+    const timeline = el(
+      "div",
+      { className: "game-scout__timeline" },
+      el("h4", { className: "game-scout__timeline-title" }, `${modeLabel} Waves`)
+    );
+    let previousUnlocks = new Set();
+    for (const wave of mode.waves) {
+      const currentUnlocks = new Set(wave.unlocks || []);
+      const newThreats = [...currentUnlocks].filter((id) => !previousUnlocks.has(id));
+      const waveEl = el(
+        "div",
+        { className: "game-scout__wave" },
+        el("span", { className: "game-scout__wave-label" }, `Wave ${wave.wave}: ${wave.label}`),
+        ...newThreats.map((id) => {
+          const enemy = ENEMY_BY_ID[id];
+          return el(
+            "span",
+            { className: "game-scout__badge game-scout__badge--new-threat" },
+            `⚠ New: ${enemy?.label || id}`
+          );
+        })
+      );
+      timeline.append(waveEl);
+      previousUnlocks = currentUnlocks;
+    }
+    dom.scoutWaves?.append(timeline);
+  }
+
+  // 5. Toggle collapse
+  const toggle = dom.scout?.querySelector(".game-scout__toggle");
+  toggle?.addEventListener("click", () => {
+    const collapsed = dom.scout.classList.toggle("game-scout--collapsed");
+    toggle.textContent = collapsed ? "▸" : "▾";
+    toggle.setAttribute("aria-expanded", String(!collapsed));
+  });
+}
+
+// Board Scout card selection + detail view
+function selectScoutCard(card, type, data, scenario) {
+  // Clear previous selection
+  dom.scout
+    ?.querySelectorAll(".game-scout__card--selected")
+    .forEach((c) => c.classList.remove("game-scout__card--selected"));
+  card.classList.add("game-scout__card--selected");
+
+  // Build detail view
+  const detail = dom.scoutDetail;
+  if (!detail) return;
+  detail.hidden = false;
+  detail.textContent = "";
+
+  if (type === "enemy") {
+    // Compute wave presence from events
+    const wavePresence = [];
+    for (const [modeKey, modeLabel] of [
+      ["tutorial", "Tutorial"],
+      ["challenge", "Challenge"],
+    ]) {
+      const mode = scenario[modeKey];
+      if (!mode?.waves) continue;
+      for (const wave of mode.waves) {
+        if (wave.events?.some((e) => e.enemyId === data.id)) {
+          wavePresence.push(`${modeLabel} Wave ${wave.wave}`);
+        }
+      }
+    }
+    detail.append(
+      el("h4", { className: "game-scout__detail-title" }, data.label),
+      el(
+        "dl",
+        { className: "game-scout__detail-stats" },
+        el("dt", {}, "HP"),
+        el("dd", {}, String(data.maxHealth)),
+        el("dt", {}, "Speed"),
+        el("dd", {}, String(data.speed)),
+        el("dt", {}, "Attack Damage"),
+        el("dd", {}, String(data.attackDamage)),
+        el("dt", {}, "Attack Cadence"),
+        el("dd", {}, `${data.attackCadenceMs}ms`),
+        el("dt", {}, "Appears In"),
+        el("dd", {}, wavePresence.join(", ") || "No scripted waves")
+      )
+    );
+  } else {
+    detail.append(
+      el("h4", { className: "game-scout__detail-title" }, data.label),
+      el("p", { className: "game-scout__detail-desc" }, data.description || ""),
+      el(
+        "dl",
+        { className: "game-scout__detail-stats" },
+        el("dt", {}, "Cost"),
+        el("dd", {}, String(data.cost)),
+        el("dt", {}, "Piercing"),
+        el("dd", {}, data.piercing ? "Yes" : "No"),
+        el("dt", {}, "Fire Rate"),
+        el("dd", {}, `${data.cadenceMs}ms`),
+        el("dt", {}, "Damage"),
+        el("dd", {}, String(data.projectileDamage))
+      )
+    );
+  }
 }
 
 function normalizeAssetCatalog(payload) {
@@ -340,6 +528,7 @@ async function init() {
   seed = requestedSeed || `${DEFAULT_SEED}:${gameDate}`;
   dom.seedValue.textContent = seed;
   renderInventory(gameDate);
+  renderBoardScout(gameDate);
   setLatestRunCopy(latestDay);
 
   const audioController = new GardenAudio({ testMode });

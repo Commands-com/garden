@@ -2903,6 +2903,204 @@ kbd {
   word-break: break-word;
 }
 
+/* ── Board Scout Rail ─────────────────────────────────────────── */
+
+.game-scout {
+  margin-top: var(--space-5);
+  padding: var(--space-5);
+  border: 1px solid rgba(26, 77, 46, 0.1);
+  border-radius: var(--radius-xl);
+  background: rgba(255, 255, 255, 0.86);
+  box-shadow: var(--shadow-lg);
+}
+
+.game-scout__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--space-4);
+}
+
+.game-scout__toggle {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: var(--text-base);
+  color: var(--color-text-muted);
+  padding: var(--space-2);
+  transition: transform var(--duration-normal) var(--ease-default);
+}
+
+.game-scout__toggle:hover {
+  color: var(--color-deep-green);
+}
+
+.game-scout--collapsed .game-scout__body {
+  display: none;
+}
+
+.game-scout__body {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-4);
+}
+
+.game-scout__section-title {
+  font-size: var(--text-base);
+  font-weight: var(--weight-semibold);
+  color: var(--color-deep-green);
+  margin-bottom: var(--space-3);
+}
+
+.game-scout__section:last-of-type {
+  grid-column: 1 / -1;
+}
+
+.game-scout__roster {
+  display: flex;
+  gap: var(--space-3);
+  flex-wrap: wrap;
+}
+
+.game-scout__card {
+  border: var(--border-default);
+  border-radius: var(--radius-lg);
+  background: var(--color-cream);
+  padding: var(--space-3);
+  cursor: pointer;
+  text-align: left;
+  transition: border-color var(--duration-normal) var(--ease-default),
+              box-shadow var(--duration-normal) var(--ease-default);
+}
+
+.game-scout__card:hover {
+  border-color: var(--color-sage-light);
+}
+
+.game-scout__card--selected {
+  border-color: var(--color-success);
+  box-shadow: 0 0 0 2px rgba(45, 122, 79, 0.2);
+}
+
+.game-scout__card-name {
+  font-weight: var(--weight-semibold);
+  font-size: var(--text-sm);
+  color: var(--color-text-dark);
+  margin-bottom: var(--space-1);
+}
+
+.game-scout__card-stats {
+  display: flex;
+  gap: var(--space-2);
+}
+
+.game-scout__card-stat {
+  font-size: var(--text-xs);
+  color: var(--color-text-muted);
+  font-family: var(--font-mono);
+}
+
+.game-scout__badge {
+  display: inline-block;
+  font-size: var(--text-xs);
+  font-weight: var(--weight-semibold);
+  padding: 2px var(--space-2);
+  border-radius: var(--radius-full);
+  line-height: 1.4;
+}
+
+.game-scout__badge--new-threat {
+  background: var(--color-warning);
+  color: #fff;
+}
+
+.game-scout__badge--piercing {
+  background: var(--color-info);
+  color: #fff;
+}
+
+.game-scout__waves {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.game-scout__timeline {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.game-scout__timeline-title {
+  font-size: var(--text-sm);
+  font-weight: var(--weight-semibold);
+  color: var(--color-deep-green);
+  margin-bottom: var(--space-1);
+}
+
+.game-scout__wave {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  flex-wrap: wrap;
+}
+
+.game-scout__wave-label {
+  font-size: var(--text-sm);
+  color: var(--color-text-dark);
+}
+
+.game-scout__detail {
+  grid-column: 1 / -1;
+  border: var(--border-default);
+  border-radius: var(--radius-lg);
+  background: var(--surface-card);
+  padding: var(--space-4);
+  margin-top: var(--space-3);
+}
+
+.game-scout__detail[hidden] {
+  display: none;
+}
+
+.game-scout__detail-title {
+  font-size: var(--text-base);
+  font-weight: var(--weight-semibold);
+  color: var(--color-deep-green);
+  margin-bottom: var(--space-3);
+}
+
+.game-scout__detail-desc {
+  font-size: var(--text-sm);
+  color: var(--color-text-muted);
+  margin-bottom: var(--space-3);
+  line-height: 1.6;
+}
+
+.game-scout__detail-stats {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: var(--space-1) var(--space-3);
+  font-size: var(--text-sm);
+}
+
+.game-scout__detail-stats dt {
+  font-weight: var(--weight-semibold);
+  color: var(--color-text-dark);
+}
+
+.game-scout__detail-stats dd {
+  margin: 0;
+  color: var(--color-text-muted);
+  font-family: var(--font-mono);
+}
+
+.game-scout__empty {
+  font-size: var(--text-sm);
+  color: var(--color-text-muted);
+  font-style: italic;
+}
+
 @media (max-width: 767px) {
   .game-shell__topbar {
     flex-direction: column;
@@ -2967,6 +3165,10 @@ kbd {
   .scoreboard__bar-placeholder {
     height: 12px;
   }
+
+  .game-scout__body {
+    grid-template-columns: 1fr;
+  }
 }
 
 @media (max-width: 639px) {
@@ -3003,5 +3205,13 @@ kbd {
 
   .community-pulse-badge__count {
     font-size: var(--text-base);
+  }
+
+  .game-scout {
+    padding: var(--space-4);
+  }
+
+  .game-scout .game-panel__title {
+    font-size: var(--text-xl);
   }
 }
