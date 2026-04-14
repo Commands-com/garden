@@ -1,0 +1,425 @@
+{
+  "schemaVersion": 2,
+  "runDate": "2026-04-14",
+  "generatedAt": "2026-04-14T10:48:55Z",
+  "scoringDimensions": [
+    { "id": "compoundingValue", "label": "Compounding Value" },
+    { "id": "usefulnessClarity", "label": "Usefulness & Clarity" },
+    { "id": "noveltySurprise", "label": "Novelty & Surprise" },
+    { "id": "feasibility", "label": "Feasibility" },
+    { "id": "legibility", "label": "Legibility" },
+    { "id": "continuity", "label": "Continuity" },
+    { "id": "shareability", "label": "Shareability" }
+  ],
+  "judgePanel": [
+    {
+      "agentId": "explore_explorer_0",
+      "displayName": "GPT (Visitor)",
+      "conceptKey": "openai",
+      "modelFamily": "gpt",
+      "provider": "codex_cli",
+      "model": "gpt-5.4",
+      "lens": "visitor"
+    },
+    {
+      "agentId": "explore_explorer_1",
+      "displayName": "Claude (Gardener)",
+      "conceptKey": "claude",
+      "modelFamily": "claude",
+      "provider": "claude",
+      "model": "opus",
+      "lens": "gardener"
+    },
+    {
+      "agentId": "explore_explorer_2",
+      "displayName": "Gemini (Explorer)",
+      "conceptKey": "gemini",
+      "modelFamily": "gemini",
+      "provider": "gemini_cli",
+      "model": "gemini-3.1-pro-preview",
+      "lens": "explorer"
+    }
+  ],
+  "summary": "The game page now exposes today's enemy roster, plant roster, and tutorial/challenge wave structure before a run starts. Board Scout turns live scenario data into a planning surface, so players can inspect threats and required tools before they spend sap.",
+  "candidates": [
+    {
+      "id": "candidate-1",
+      "title": "Board Scout: Pre-Run Threat Intel for Rootline Defense",
+      "summary": "Adds a full-width Board Scout rail on `/game/` that reads the active scenario and renders today's enemy roster, plant roster, and tutorial/challenge wave timelines, with selectable cards that open detail stats and wave presence.",
+      "averageScore": 8.8,
+      "reviewCount": 3,
+      "rank": 1,
+      "dimensionAverages": {
+        "compoundingValue": { "label": "Compounding Value", "average": 9.0, "reviewCount": 3 },
+        "usefulnessClarity": { "label": "Usefulness & Clarity", "average": 9.3, "reviewCount": 3 },
+        "noveltySurprise": { "label": "Novelty & Surprise", "average": 7.7, "reviewCount": 3 },
+        "feasibility": { "label": "Feasibility", "average": 8.7, "reviewCount": 3 },
+        "legibility": { "label": "Legibility", "average": 9.3, "reviewCount": 3 },
+        "continuity": { "label": "Continuity", "average": 9.0, "reviewCount": 3 },
+        "shareability": { "label": "Shareability", "average": 8.7, "reviewCount": 3 }
+      },
+      "reviewerBreakdown": [
+        {
+          "reviewer": {
+            "agentId": "explore_explorer_0",
+            "displayName": "GPT (Visitor)",
+            "modelFamily": "gpt",
+            "lens": "visitor"
+          },
+          "overallScore": 8.5,
+          "dimensionScores": {
+            "compoundingValue": 9,
+            "usefulnessClarity": 10,
+            "noveltySurprise": 7,
+            "feasibility": 9,
+            "legibility": 9,
+            "continuity": 8,
+            "shareability": 8
+          },
+          "keep": [
+            "First-time players finally get a planning surface before they press Start.",
+            "Cards are grounded in live scenario and config data rather than hand-written hints.",
+            "Selectable details make the board feel learnable instead of opaque."
+          ],
+          "mustChange": [
+            "Keep the detail view explicit and compact so it reads quickly on mobile."
+          ],
+          "risks": [
+            "The extra rail adds page height and could feel heavy if the layout is cramped on small screens."
+          ]
+        },
+        {
+          "reviewer": {
+            "agentId": "explore_explorer_1",
+            "displayName": "Claude (Gardener)",
+            "modelFamily": "claude",
+            "lens": "gardener"
+          },
+          "overallScore": 9.0,
+          "dimensionScores": {
+            "compoundingValue": 9,
+            "usefulnessClarity": 9,
+            "noveltySurprise": 8,
+            "feasibility": 8,
+            "legibility": 10,
+            "continuity": 10,
+            "shareability": 9
+          },
+          "keep": [
+            "This compounds with every future board because it automatically reflects scenario changes.",
+            "It improves clarity without rewriting the core play loop.",
+            "Placing the rail above the three-panel grid preserves the existing page architecture."
+          ],
+          "mustChange": [
+            "Wave presence in the detail panel must be computed from `events`, not inferred from `unlocks`."
+          ],
+          "risks": [
+            "Date-edge cases need a graceful empty state when no scenario exists."
+          ]
+        },
+        {
+          "reviewer": {
+            "agentId": "explore_explorer_2",
+            "displayName": "Gemini (Explorer)",
+            "modelFamily": "gemini",
+            "lens": "explorer"
+          },
+          "overallScore": 9.0,
+          "dimensionScores": {
+            "compoundingValue": 9,
+            "usefulnessClarity": 9,
+            "noveltySurprise": 8,
+            "feasibility": 9,
+            "legibility": 9,
+            "continuity": 9,
+            "shareability": 9
+          },
+          "keep": [
+            "The 'new threat' badges make wave escalation visible at a glance.",
+            "Enemy and plant cards create a strong screenshot surface for the daily board.",
+            "The feature is inspectable enough to explain the game's growing roster to an external audience."
+          ],
+          "mustChange": [
+            "The collapse toggle needs a clear expanded/collapsed state for accessibility and compact returning visits."
+          ],
+          "risks": [
+            "If future scenario data stops treating `unlocks` cumulatively, the badge diff logic could mislead."
+          ]
+        }
+      ],
+      "keep": [
+        "Turns live scenario data into an inspectable planning surface before the run begins.",
+        "Compounds cleanly with every future board because it reads the active scenario instead of hardcoded copy.",
+        "Improves onboarding and strategy without touching core combat systems."
+      ],
+      "mustChange": [
+        "Compute enemy wave presence from `events`, not `unlocks`.",
+        "Keep the detail view compact and the collapse state explicit on small screens."
+      ],
+      "risks": [
+        "The extra vertical rail can crowd mobile layouts if spacing is not tuned.",
+        "Future scenario changes could invalidate the current 'new threat' unlock diff assumption."
+      ],
+      "feedbackReferences": [
+        "Players need to understand today's threats before committing to a run.",
+        "Richer rosters make pre-run planning more valuable than generic helper copy."
+      ]
+    },
+    {
+      "id": "candidate-2",
+      "title": "Wave Radar HUD: Upcoming Threat Preview During Runs",
+      "summary": "Adds an in-run HUD strip that previews the next wave label and incoming enemy mix while the player is already defending, giving reactive threat awareness inside the live match.",
+      "averageScore": 7.7,
+      "reviewCount": 3,
+      "rank": 2,
+      "dimensionAverages": {
+        "compoundingValue": { "label": "Compounding Value", "average": 8.0, "reviewCount": 3 },
+        "usefulnessClarity": { "label": "Usefulness & Clarity", "average": 7.7, "reviewCount": 3 },
+        "noveltySurprise": { "label": "Novelty & Surprise", "average": 7.3, "reviewCount": 3 },
+        "feasibility": { "label": "Feasibility", "average": 7.0, "reviewCount": 3 },
+        "legibility": { "label": "Legibility", "average": 7.3, "reviewCount": 3 },
+        "continuity": { "label": "Continuity", "average": 8.0, "reviewCount": 3 },
+        "shareability": { "label": "Shareability", "average": 7.7, "reviewCount": 3 }
+      },
+      "reviewerBreakdown": [
+        {
+          "reviewer": {
+            "agentId": "explore_explorer_0",
+            "displayName": "GPT (Visitor)",
+            "modelFamily": "gpt",
+            "lens": "visitor"
+          },
+          "overallScore": 7.5,
+          "dimensionScores": {
+            "compoundingValue": 8,
+            "usefulnessClarity": 8,
+            "noveltySurprise": 7,
+            "feasibility": 7,
+            "legibility": 7,
+            "continuity": 8,
+            "shareability": 7
+          },
+          "keep": [
+            "Helpful once the run starts, especially for players who already know the roster."
+          ],
+          "mustChange": [
+            "The HUD cannot steal attention from lane placement and sap management."
+          ],
+          "risks": [
+            "Adds live-match cognitive load instead of reducing pre-run confusion."
+          ]
+        },
+        {
+          "reviewer": {
+            "agentId": "explore_explorer_1",
+            "displayName": "Claude (Gardener)",
+            "modelFamily": "claude",
+            "lens": "gardener"
+          },
+          "overallScore": 7.5,
+          "dimensionScores": {
+            "compoundingValue": 8,
+            "usefulnessClarity": 7,
+            "noveltySurprise": 7,
+            "feasibility": 7,
+            "legibility": 7,
+            "continuity": 8,
+            "shareability": 8
+          },
+          "keep": [
+            "Wave data is already present, so the concept can reuse existing scenario structure."
+          ],
+          "mustChange": [
+            "Needs a clean integration point inside the play scene and DOM HUD."
+          ],
+          "risks": [
+            "Core scene integration is riskier than a pre-run surface for a one-day scope."
+          ]
+        },
+        {
+          "reviewer": {
+            "agentId": "explore_explorer_2",
+            "displayName": "Gemini (Explorer)",
+            "modelFamily": "gemini",
+            "lens": "explorer"
+          },
+          "overallScore": 8.0,
+          "dimensionScores": {
+            "compoundingValue": 8,
+            "usefulnessClarity": 8,
+            "noveltySurprise": 8,
+            "feasibility": 7,
+            "legibility": 8,
+            "continuity": 8,
+            "shareability": 8
+          },
+          "keep": [
+            "Could create a good moment-to-moment spectator view for clips and screenshots."
+          ],
+          "mustChange": [
+            "Must stay readable without overlapping the game canvas or seed tray."
+          ],
+          "risks": [
+            "Helps too late; players still enter the board blind."
+          ]
+        }
+      ],
+      "keep": [
+        "Reuses existing wave data and could improve live-match readability.",
+        "Creates a clearer spectator surface during runs."
+      ],
+      "mustChange": [
+        "Find a safe HUD integration that does not compete with placement controls."
+      ],
+      "risks": [
+        "Addresses the symptom during play rather than the problem before the run starts.",
+        "Requires more invasive runtime work than the scouting rail."
+      ]
+    },
+    {
+      "id": "candidate-3",
+      "title": "Daily Board Briefing: Text Strategy Notes Above the Game",
+      "summary": "Adds a prose briefing block above `/game/` with hand-authored notes about today's roster, expected threats, and the intended tutorial-to-challenge learning path.",
+      "averageScore": 6.8,
+      "reviewCount": 3,
+      "rank": 3,
+      "dimensionAverages": {
+        "compoundingValue": { "label": "Compounding Value", "average": 6.3, "reviewCount": 3 },
+        "usefulnessClarity": { "label": "Usefulness & Clarity", "average": 6.7, "reviewCount": 3 },
+        "noveltySurprise": { "label": "Novelty & Surprise", "average": 6.3, "reviewCount": 3 },
+        "feasibility": { "label": "Feasibility", "average": 8.3, "reviewCount": 3 },
+        "legibility": { "label": "Legibility", "average": 6.3, "reviewCount": 3 },
+        "continuity": { "label": "Continuity", "average": 7.0, "reviewCount": 3 },
+        "shareability": { "label": "Shareability", "average": 6.3, "reviewCount": 3 }
+      },
+      "reviewerBreakdown": [
+        {
+          "reviewer": {
+            "agentId": "explore_explorer_0",
+            "displayName": "GPT (Visitor)",
+            "modelFamily": "gpt",
+            "lens": "visitor"
+          },
+          "overallScore": 7.0,
+          "dimensionScores": {
+            "compoundingValue": 6,
+            "usefulnessClarity": 7,
+            "noveltySurprise": 6,
+            "feasibility": 9,
+            "legibility": 6,
+            "continuity": 7,
+            "shareability": 6
+          },
+          "keep": [
+            "Fastest path to giving players some orientation."
+          ],
+          "mustChange": [
+            "The copy would need to be generated from data, not manually curated prose."
+          ],
+          "risks": [
+            "Hand-authored advice will drift away from the actual scenario."
+          ]
+        },
+        {
+          "reviewer": {
+            "agentId": "explore_explorer_1",
+            "displayName": "Claude (Gardener)",
+            "modelFamily": "claude",
+            "lens": "gardener"
+          },
+          "overallScore": 6.5,
+          "dimensionScores": {
+            "compoundingValue": 6,
+            "usefulnessClarity": 6,
+            "noveltySurprise": 6,
+            "feasibility": 8,
+            "legibility": 6,
+            "continuity": 7,
+            "shareability": 6
+          },
+          "keep": [
+            "Low implementation risk."
+          ],
+          "mustChange": [
+            "Needs a truth-preserving source of record or it becomes stale immediately."
+          ],
+          "risks": [
+            "A prose block is less inspectable and less reusable than structured scouting data."
+          ]
+        },
+        {
+          "reviewer": {
+            "agentId": "explore_explorer_2",
+            "displayName": "Gemini (Explorer)",
+            "modelFamily": "gemini",
+            "lens": "explorer"
+          },
+          "overallScore": 7.0,
+          "dimensionScores": {
+            "compoundingValue": 7,
+            "usefulnessClarity": 7,
+            "noveltySurprise": 7,
+            "feasibility": 8,
+            "legibility": 7,
+            "continuity": 7,
+            "shareability": 7
+          },
+          "keep": [
+            "A text briefing is easy to ship and easy to read."
+          ],
+          "mustChange": [
+            "Needs a stronger visual hook than a paragraph of strategy notes."
+          ],
+          "risks": [
+            "Feels like helper copy, not a meaningful new capability."
+          ]
+        }
+      ],
+      "keep": [
+        "Quickest implementation path.",
+        "Would give players some immediate orientation."
+      ],
+      "mustChange": [
+        "Avoid manual copy drift by generating the briefing from structured data."
+      ],
+      "risks": [
+        "Static prose is less inspectable, less trustworthy, and less shareable than Board Scout."
+      ]
+    }
+  ],
+  "winner": {
+    "candidateId": "candidate-1",
+    "title": "Board Scout: Pre-Run Threat Intel for Rootline Defense",
+    "summary": "Adds a full-width Board Scout rail on `/game/` that reads the active scenario and renders today's enemy roster, plant roster, and tutorial/challenge wave timelines, with selectable cards that open detail stats and wave presence.",
+    "averageScore": 8.8
+  },
+  "rationale": "Board Scout scored highest at 8.8 across all three judges because it solves a real clarity problem without touching the fragile core loop. The game had grown into multiple plants, multiple enemy types, and distinct tutorial/challenge boards, but the page still asked players to learn the board only by starting a run. Board Scout turns the existing scenario config into a truthful planning surface: enemy and plant rosters come from live data, wave timelines expose the board structure, and card selection reveals explicit stats and wave presence. Wave Radar would have helped only after a run had already started, and the text briefing concept was too brittle because prose can drift away from the board.",
+  "featureType": "game",
+  "tags": [
+    "game",
+    "board-scout",
+    "onboarding",
+    "scenario-data",
+    "roster",
+    "waves",
+    "planning",
+    "ui"
+  ],
+  "feedbackInfluence": [
+    {
+      "summary": "Players needed to understand today's threats and tools before committing to a run, not only after they had already lost sap and wall health.",
+      "impact": "high"
+    },
+    {
+      "summary": "As the daily boards expanded beyond a single plant and a single enemy type, pre-run clarity became more valuable than adding more HUD chrome or explanatory prose.",
+      "impact": "high"
+    }
+  ],
+  "artifacts": {
+    "spec": "spec.md",
+    "feedbackDigest": "feedback-digest.json",
+    "buildSummary": "build-summary.md",
+    "testResults": "test-results.json",
+    "review": "review.md"
+  }
+}
