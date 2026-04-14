@@ -25,7 +25,7 @@ function getScoutCardByName(page, containerSelector, name) {
 }
 
 test.describe("Board Scout rail", () => {
-  test("renders above the card grid with populated enemy and plant rosters and no load errors", async ({
+  test("renders below the card grid with populated image-led enemy and plant rosters and no load errors", async ({
     page,
   }) => {
     const consoleErrors = [];
@@ -45,15 +45,24 @@ test.describe("Board Scout rail", () => {
     await expect(enemyCards.first()).toBeVisible();
     await expect(plantCards.first()).toBeVisible();
 
-    const scoutPrecedesGameCards = await page.evaluate(() => {
+    const scoutFollowsGameCards = await page.evaluate(() => {
       const scoutRail = document.getElementById("game-scout");
       const gameCards = document.querySelector(".game-cards");
-      return !!scoutRail && !!gameCards && scoutRail.nextElementSibling === gameCards;
+      return !!scoutRail && !!gameCards && gameCards.nextElementSibling === scoutRail;
     });
-    expect(scoutPrecedesGameCards).toBe(true);
+    expect(scoutFollowsGameCards).toBe(true);
 
     expect(await enemyCards.count()).toBeGreaterThan(0);
     expect(await plantCards.count()).toBeGreaterThan(0);
+    await expect(page.locator("#game-scout .game-scout__card-art")).toHaveCount(
+      (await enemyCards.count()) + (await plantCards.count())
+    );
+    await expect(page.locator("#game-scout-enemies .game-scout__thumb--ready")).toHaveCount(
+      await enemyCards.count()
+    );
+    await expect(page.locator("#game-scout-plants .game-scout__thumb-image")).toHaveCount(
+      await plantCards.count()
+    );
     expect(consoleErrors, consoleErrors.join("\n")).toEqual([]);
   });
 
@@ -117,6 +126,7 @@ test.describe("Board Scout rail", () => {
 
     await expect(thornVineCard.locator(".game-scout__card-stat")).toHaveText([
       "Cost: 50",
+      "DMG: 14",
     ]);
     await expect(
       thornVineCard.locator(".game-scout__badge--piercing")
@@ -124,6 +134,7 @@ test.describe("Board Scout rail", () => {
 
     await expect(brambleSpearCard.locator(".game-scout__card-stat")).toHaveText([
       "Cost: 75",
+      "DMG: 22",
     ]);
     await expect(
       brambleSpearCard.locator(".game-scout__badge--piercing")

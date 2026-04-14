@@ -69,6 +69,65 @@ const dom = {
 let game = null;
 let gameDate = todayDate;
 
+function buildAssetIndex(assetCatalog) {
+  const assets = assetCatalog?.assets || [];
+  return new Map(assets.map((asset) => [asset.id, asset]));
+}
+
+function createScoutArt(definition, assetIndex) {
+  const asset = assetIndex?.get(definition.textureKey);
+  const frameWidth = asset?.metadata?.phaser?.frameWidth;
+  const frameHeight = asset?.metadata?.phaser?.frameHeight;
+  const selectedFrame = Array.isArray(definition.animationFrames)
+    ? definition.animationFrames[0] || 0
+    : 0;
+  const wrapper = el("div", { className: "game-scout__card-art", "aria-hidden": "true" });
+
+  if (!asset?.path) {
+    wrapper.appendChild(
+      el("span", { className: "game-scout__card-art-fallback" }, (definition.label || "?").charAt(0))
+    );
+    return wrapper;
+  }
+
+  if (frameWidth && frameHeight) {
+    const thumb = el("div", { className: "game-scout__thumb game-scout__thumb--sheet" });
+    const preview = el("img", {
+      className: "game-scout__thumb-sheet-image",
+      src: asset.path,
+      alt: "",
+      loading: "lazy",
+      decoding: "async",
+    });
+    preview.addEventListener("load", () => {
+      const columns = Math.max(1, Math.floor(preview.naturalWidth / frameWidth));
+      const rows = Math.max(1, Math.floor(preview.naturalHeight / frameHeight));
+      const safeFrame = Math.min(selectedFrame, columns * rows - 1);
+      const column = safeFrame % columns;
+      const row = Math.floor(safeFrame / columns);
+      const scale = 72 / Math.max(frameWidth, frameHeight);
+      preview.style.width = `${preview.naturalWidth * scale}px`;
+      preview.style.height = `${preview.naturalHeight * scale}px`;
+      preview.style.transform = `translate(-${column * frameWidth * scale}px, -${row * frameHeight * scale}px)`;
+      thumb.classList.add("game-scout__thumb--ready");
+    });
+    thumb.appendChild(preview);
+    wrapper.appendChild(thumb);
+    return wrapper;
+  }
+
+  wrapper.appendChild(
+    el("img", {
+      className: "game-scout__thumb-image",
+      src: asset.path,
+      alt: "",
+      loading: "lazy",
+      decoding: "async",
+    })
+  );
+  return wrapper;
+}
+
 function getPlayScene() {
   if (!game) {
     return null;
@@ -164,8 +223,9 @@ function renderInventory(dayDate) {
   });
 }
 
-function renderBoardScout(dayDate) {
+function renderBoardScout(dayDate, assetCatalog) {
   const scenario = getScenarioForDate(dayDate);
+  const assetIndex = buildAssetIndex(assetCatalog);
   if (!scenario) {
     dom.scout?.classList.add("game-scout--empty");
     if (dom.scoutEnemies)
@@ -199,12 +259,21 @@ function renderBoardScout(dayDate) {
         "aria-label": enemy.label,
         onClick: () => selectScoutCard(card, "enemy", enemy, scenario),
       },
-      el("div", { className: "game-scout__card-name" }, enemy.label),
       el(
         "div",
-        { className: "game-scout__card-stats" },
-        el("span", { className: "game-scout__card-stat" }, `HP: ${enemy.maxHealth}`),
-        el("span", { className: "game-scout__card-stat" }, `Speed: ${enemy.speed}`)
+        { className: "game-scout__card-main" },
+        createScoutArt(enemy, assetIndex),
+        el(
+          "div",
+          { className: "game-scout__card-copy" },
+          el("div", { className: "game-scout__card-name" }, enemy.label),
+          el(
+            "div",
+            { className: "game-scout__card-stats" },
+            el("span", { className: "game-scout__card-stat" }, `HP: ${enemy.maxHealth}`),
+            el("span", { className: "game-scout__card-stat" }, `Speed: ${enemy.speed}`)
+          )
+        )
       )
     );
     dom.scoutEnemies?.append(card);
@@ -223,14 +292,26 @@ function renderBoardScout(dayDate) {
         "aria-label": plant.label,
         onClick: () => selectScoutCard(card, "plant", plant, scenario),
       },
-      el("div", { className: "game-scout__card-name" }, plant.label),
       el(
         "div",
-        { className: "game-scout__card-stats" },
-        el("span", { className: "game-scout__card-stat" }, `Cost: ${plant.cost}`),
-        plant.piercing
-          ? el("span", { className: "game-scout__badge game-scout__badge--piercing" }, "Piercing")
-          : false
+        { className: "game-scout__card-main" },
+        createScoutArt(plant, assetIndex),
+        el(
+          "div",
+          { className: "game-scout__card-copy" },
+          el("div", { className: "game-scout__card-name" }, plant.label),
+          el(
+            "div",
+            { className: "game-scout__card-stats" },
+            el("span", { className: "game-scout__card-stat" }, `Cost: ${plant.cost}`),
+            typeof plant.projectileDamage === "number"
+              ? el("span", { className: "game-scout__card-stat" }, `DMG: ${plant.projectileDamage}`)
+              : false,
+            plant.piercing
+              ? el("span", { className: "game-scout__badge game-scout__badge--piercing" }, "Piercing")
+              : false
+          )
+        )
       )
     );
     dom.scoutPlants?.append(card);
@@ -537,7 +618,7 @@ async function init() {
   seed = requestedSeed || `${DEFAULT_SEED}:${gameDate}`;
   dom.seedValue.textContent = seed;
   renderInventory(gameDate);
-  renderBoardScout(gameDate);
+  renderBoardScout(gameDate, assetCatalog);
   setLatestRunCopy(latestDay);
 
   const audioController = new GardenAudio({ testMode });

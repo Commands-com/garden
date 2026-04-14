@@ -2962,29 +2962,102 @@ kbd {
 }
 
 .game-scout__roster {
-  display: flex;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(168px, 1fr));
   gap: var(--space-3);
-  flex-wrap: wrap;
 }
 
 .game-scout__card {
+  display: block;
+  width: 100%;
   border: var(--border-default);
   border-radius: var(--radius-lg);
-  background: var(--color-cream);
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.96), rgba(245, 240, 232, 0.98));
   padding: var(--space-3);
   cursor: pointer;
   text-align: left;
   transition: border-color var(--duration-normal) var(--ease-default),
-              box-shadow var(--duration-normal) var(--ease-default);
+              box-shadow var(--duration-normal) var(--ease-default),
+              transform var(--duration-normal) var(--ease-default);
 }
 
 .game-scout__card:hover {
   border-color: var(--color-sage-light);
+  box-shadow: var(--shadow-md);
+  transform: translateY(-1px);
 }
 
 .game-scout__card--selected {
   border-color: var(--color-success);
   box-shadow: 0 0 0 2px rgba(45, 122, 79, 0.2);
+}
+
+.game-scout__card-main {
+  display: grid;
+  grid-template-columns: 72px minmax(0, 1fr);
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.game-scout__card-copy {
+  min-width: 0;
+}
+
+.game-scout__card-art {
+  width: 72px;
+  height: 72px;
+  border-radius: calc(var(--radius-lg) - 2px);
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background:
+    radial-gradient(circle at top, rgba(196, 163, 90, 0.28), transparent 58%),
+    linear-gradient(160deg, rgba(26, 77, 46, 0.16), rgba(92, 138, 110, 0.08));
+  border: 1px solid rgba(26, 77, 46, 0.12);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.6);
+}
+
+.game-scout__card-art-fallback {
+  font-size: var(--text-xl);
+  font-weight: var(--weight-bold);
+  color: var(--color-deep-green);
+}
+
+.game-scout__thumb {
+  width: 100%;
+  height: 100%;
+  position: relative;
+  overflow: hidden;
+  background-repeat: no-repeat;
+  background-position: center;
+  image-rendering: pixelated;
+  opacity: 0;
+  transition: opacity var(--duration-normal) var(--ease-default);
+}
+
+.game-scout__thumb--ready {
+  opacity: 1;
+}
+
+.game-scout__thumb-sheet-image,
+.game-scout__thumb-image {
+  display: block;
+  image-rendering: pixelated;
+  user-select: none;
+  -webkit-user-drag: none;
+}
+
+.game-scout__thumb-sheet-image {
+  max-width: none;
+  max-height: none;
+  transform-origin: top left;
+}
+
+.game-scout__thumb-image {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
 }
 
 .game-scout__card-name {
@@ -2997,6 +3070,7 @@ kbd {
 .game-scout__card-stats {
   display: flex;
   gap: var(--space-2);
+  flex-wrap: wrap;
 }
 
 .game-scout__card-stat {
@@ -3172,6 +3246,10 @@ kbd {
   }
 
   .game-scout__body {
+    grid-template-columns: 1fr;
+  }
+
+  .game-scout__roster {
     grid-template-columns: 1fr;
   }
 }

@@ -175,16 +175,16 @@ test.describe("Board Scout responsive layout (2026-04-14)", () => {
           scoutWidth: scoutRect.width,
           cardsTop: cardsRect.top,
           scoutBottom: scoutRect.bottom,
-          scoutBelowCards: scoutRect.bottom <= cardsRect.top + 2,
+          scoutFollowsCards: cardsRect.bottom <= scoutRect.top + 2,
           cardsGridColumns: cardsStyle.gridTemplateColumns,
         };
       });
 
       expect(layout).toBeTruthy();
-      // Scout rail should appear above the game-cards grid
+      // Scout rail should appear below the game-cards grid
       expect(
-        layout.scoutBelowCards,
-        "scout rail should be above game-cards"
+        layout.scoutFollowsCards,
+        "scout rail should be below game-cards"
       ).toBe(true);
       // Scout should span available width
       expect(layout.scoutWidth).toBeGreaterThan(0);

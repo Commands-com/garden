@@ -57,7 +57,12 @@ async function getExpectedScoutData(page, dayDate = "2026-04-14") {
       const plant = PLANT_DEFINITIONS[plantId];
       return {
         name: plant.label,
-        stats: [`Cost: ${plant.cost}`],
+        stats: [
+          `Cost: ${plant.cost}`,
+          ...(typeof plant.projectileDamage === "number"
+            ? [`DMG: ${plant.projectileDamage}`]
+            : []),
+        ],
         piercing: Boolean(plant.piercing),
       };
     });
@@ -114,18 +119,21 @@ test("Board Scout renders the April 14 scenario roster and wave structure from c
 
   await expect(scout).toBeVisible();
 
-  const scoutPrecedesGameCards = await page.evaluate(() => {
+  const scoutFollowsGameCards = await page.evaluate(() => {
     const scoutRail = document.getElementById("game-scout");
     const gameCards = document.querySelector(".game-cards");
-    return !!scoutRail && !!gameCards && scoutRail.nextElementSibling === gameCards;
+    return !!scoutRail && !!gameCards && gameCards.nextElementSibling === scoutRail;
   });
-  expect(scoutPrecedesGameCards).toBe(true);
+  expect(scoutFollowsGameCards).toBe(true);
 
   expect(expected.enemyCards.length).toBeGreaterThan(0);
   expect(expected.plantCards.length).toBeGreaterThan(0);
 
   await expect(enemyCards).toHaveCount(expected.enemyCards.length);
   await expect(plantCards).toHaveCount(expected.plantCards.length);
+  await expect(page.locator("#game-scout .game-scout__card-art")).toHaveCount(
+    expected.enemyCards.length + expected.plantCards.length
+  );
   await expect(page.locator("#game-scout-enemies .game-scout__card-name")).toHaveText(
     expected.enemyNames
   );
