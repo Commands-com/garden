@@ -2928,6 +2928,11 @@ kbd {
   font-size: var(--text-base);
   color: var(--color-text-muted);
   padding: var(--space-2);
+  min-width: 44px;
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   transition: transform var(--duration-normal) var(--ease-default);
 }
 

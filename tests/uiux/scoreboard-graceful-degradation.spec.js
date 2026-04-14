@@ -8,7 +8,13 @@ const {
   repoRoot,
 } = require("./helpers/local-site");
 
-const DAY_DATE = "2026-04-13";
+const manifest = JSON.parse(
+  fs.readFileSync(path.join(repoRoot, "site/days/manifest.json"), "utf8")
+);
+const latestDay = [...manifest.days].sort(
+  (a, b) => new Date(b.date) - new Date(a.date)
+)[0];
+const DAY_DATE = latestDay.date;
 const decision = JSON.parse(
   fs.readFileSync(
     path.join(repoRoot, `site/days/${DAY_DATE}/decision.json`),

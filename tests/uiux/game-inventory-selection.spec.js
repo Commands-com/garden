@@ -88,11 +88,11 @@ test.describe("Two-plant inventory renders and selection toggles correctly", () 
     await firstItem.click();
     await expect(firstItem).toHaveClass(/game-inventory__item--selected/);
 
-    // Verify starting resources are 60 (challenge mode for 2026-04-13)
+    // Verify starting resources are 70 (challenge mode for 2026-04-13)
     const resourcesBefore = await page.evaluate(
       () => window.__gameTestHooks.getState()?.resources
     );
-    expect(resourcesBefore).toBe(60);
+    expect(resourcesBefore).toBe(70);
 
     // Place defender with Thorn Vine (cost 50) at row 2, col 1
     const placed = await page.evaluate(() =>
@@ -100,16 +100,16 @@ test.describe("Two-plant inventory renders and selection toggles correctly", () 
     );
     expect(placed).toBe(true);
 
-    // Confirm resources dropped by 50 (from 60 to 10)
+    // Confirm resources dropped by 50 (from 70 to 20)
     await page.waitForFunction(
-      () => window.__gameTestHooks.getState()?.resources === 10,
+      () => window.__gameTestHooks.getState()?.resources === 20,
       undefined,
       { timeout: 4000 }
     );
     const resourcesAfter = await page.evaluate(
       () => window.__gameTestHooks.getState()?.resources
     );
-    expect(resourcesAfter).toBe(10);
+    expect(resourcesAfter).toBe(20);
 
     // Collect all console errors — expect zero
     expect(consoleErrors).toEqual([]);

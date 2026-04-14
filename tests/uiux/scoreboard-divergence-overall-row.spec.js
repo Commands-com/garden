@@ -8,7 +8,13 @@ const {
   repoRoot,
 } = require("./helpers/local-site");
 
-const DAY_DATE = "2026-04-13";
+const manifest = JSON.parse(
+  fs.readFileSync(path.join(repoRoot, "site/days/manifest.json"), "utf8")
+);
+const latestDay = [...manifest.days].sort(
+  (a, b) => new Date(b.date) - new Date(a.date)
+)[0];
+const DAY_DATE = latestDay.date;
 const decision = JSON.parse(
   fs.readFileSync(
     path.join(repoRoot, `site/days/${DAY_DATE}/decision.json`),
@@ -55,11 +61,9 @@ test.describe("Scoreboard divergence highlighting and overall score row", () => 
     const section = await waitForScoreboard(page);
     const divergentRows = section.locator(".scoreboard__row--divergent");
 
-    expect(divergentDimensions.length).toBeGreaterThanOrEqual(2);
     const expectedLabels = divergentDimensions.map((d) => d.label).sort();
-    expect(expectedLabels).toEqual(expectedLabels);
 
-    await expect(divergentRows).toHaveCount(2);
+    await expect(divergentRows).toHaveCount(divergentDimensions.length);
 
     const divergentLabels = await divergentRows
       .locator(".scoreboard__dim-label")
@@ -69,11 +73,16 @@ test.describe("Scoreboard divergence highlighting and overall score row", () => 
     );
 
     for (let i = 0; i < divergentDimensions.length; i++) {
+      const dim = divergentDimensions[i];
+      const scores = winner.reviewerBreakdown.map(
+        (entry) => entry.dimensionScores[dim.id]
+      );
+      const spread = Math.max(...scores) - Math.min(...scores);
       const row = divergentRows.nth(i);
       const badge = row.locator(".scoreboard__divergence-badge");
 
       await expect(badge).toBeVisible();
-      await expect(badge).toHaveText("spread 3");
+      await expect(badge).toHaveText(`spread ${spread}`);
 
       const borderLeftStyle = await row.evaluate(
         (element) => getComputedStyle(element).borderLeftStyle

@@ -181,14 +181,17 @@ test.describe("Scoreboard section", () => {
     const section = await waitForScoreboard(page);
 
     const divergentRows = section.locator(".scoreboard__row--divergent");
-    await expect(divergentRows).toHaveCount(2);
+    await expect(divergentRows).toHaveCount(divergentDimensions.length);
 
     // Each divergent row has a badge with spread text
-    for (let i = 0; i < 2; i++) {
+    for (let i = 0; i < divergentDimensions.length; i++) {
+      const dim = divergentDimensions[i];
+      const scores = reviewers.map((r) => r.dimensionScores[dim.id]);
+      const spread = Math.max(...scores) - Math.min(...scores);
       const row = divergentRows.nth(i);
       const badge = row.locator(".scoreboard__divergence-badge");
       await expect(badge).toBeVisible();
-      await expect(badge).toHaveText("spread 3");
+      await expect(badge).toHaveText(`spread ${spread}`);
 
       // Divergent row has a visible left border
       const borderLeftStyle = await row.evaluate((el) =>

@@ -2,6 +2,15 @@
   "schemaVersion": 1,
   "days": [
     {
+      "date": "2026-04-14",
+      "title": "Board Scout: Pre-Run Threat Intel for Rootline Defense",
+      "summary": "The game page now shows you what enemies, plants, and waves are in today's board before you start playing. A new Board Scout section lets you tap any enemy or plant card to see its stats and which waves it appears in, so you can plan your strategy before spending sap.",
+      "status": "shipped",
+      "featureType": "game",
+      "tags": ["game", "board-scout", "onboarding", "scenario-data", "roster", "waves", "planning", "ui"],
+      "publishedAt": "2026-04-14T10:48:55.000Z"
+    },
+    {
       "date": "2026-04-13",
       "title": "Bramble & Thorn — First Two-Plant Roster Day",
       "summary": "The lane-defense game now offers two plants. Players choose between cheap, steady Thorn Vine and expensive, piercing Bramble Spear — learning when each tool is the right answer across a tutorial and a tighter challenge board.",

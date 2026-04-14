@@ -150,9 +150,13 @@ function renderInventory(dayDate) {
         return;
       }
 
-      const playScene = getPlayScene();
-      if (playScene && typeof playScene.selectPlant === "function") {
-        playScene.selectPlant(plantId);
+      try {
+        const playScene = getPlayScene();
+        if (playScene && typeof playScene.selectPlant === "function") {
+          playScene.selectPlant(plantId);
+        }
+      } catch {
+        // Play scene may not be active yet; selection still syncs below
       }
 
       syncInventorySelection(plantId);
@@ -267,13 +271,18 @@ function renderBoardScout(dayDate) {
     dom.scoutWaves?.append(timeline);
   }
 
-  // 5. Toggle collapse
+  // 5. Toggle collapse (guarded against double-attachment)
   const toggle = dom.scout?.querySelector(".game-scout__toggle");
-  toggle?.addEventListener("click", () => {
-    const collapsed = dom.scout.classList.toggle("game-scout--collapsed");
-    toggle.textContent = collapsed ? "▸" : "▾";
-    toggle.setAttribute("aria-expanded", String(!collapsed));
-  });
+  if (toggle && !toggle.dataset.listenerAttached) {
+    toggle.dataset.listenerAttached = "true";
+    toggle.addEventListener("click", () => {
+      const body = dom.scout.querySelector(".game-scout__body");
+      const collapsed = dom.scout.classList.toggle("game-scout--collapsed");
+      toggle.textContent = collapsed ? "▸" : "▾";
+      toggle.setAttribute("aria-expanded", String(!collapsed));
+      if (body) body.hidden = collapsed;
+    });
+  }
 }
 
 // Board Scout card selection + detail view
