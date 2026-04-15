@@ -103,9 +103,15 @@ function getAvailablePlantDefinitions(modeDefinition) {
     .filter(Boolean);
 }
 
+function getAttackingPlantDefinitions(modeDefinition) {
+  return getAvailablePlantDefinitions(modeDefinition).filter(
+    (plant) => plant.role !== 'support'
+  );
+}
+
 function getCheapestPlantDefinition(modeDefinition) {
   return (
-    getAvailablePlantDefinitions(modeDefinition).sort((left, right) => {
+    getAttackingPlantDefinitions(modeDefinition).sort((left, right) => {
       if (left.cost !== right.cost) {
         return left.cost - right.cost;
       }
@@ -118,7 +124,7 @@ function getCheapestPlantDefinition(modeDefinition) {
 function getSpecializedPlantDefinitions(modeDefinition) {
   const cheapestPlant = getCheapestPlantDefinition(modeDefinition);
 
-  return getAvailablePlantDefinitions(modeDefinition)
+  return getAttackingPlantDefinitions(modeDefinition)
     .filter((plant) => plant.id !== cheapestPlant?.id)
     .sort((left, right) => {
       if (Boolean(right.piercing) !== Boolean(left.piercing)) {

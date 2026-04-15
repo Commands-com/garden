@@ -180,9 +180,21 @@ function getAvailablePlantDefinitions(modeDefinition) {
     .filter(Boolean);
 }
 
+function getAttackingPlantDefinitions(modeDefinition) {
+  return getAvailablePlantDefinitions(modeDefinition).filter(
+    (plant) => plant.role !== 'support'
+  );
+}
+
+function getSupportPlantDefinitions(modeDefinition) {
+  return getAvailablePlantDefinitions(modeDefinition).filter(
+    (plant) => plant.role === 'support'
+  );
+}
+
 function getCheapestPlantDefinition(modeDefinition) {
   return (
-    getAvailablePlantDefinitions(modeDefinition).sort((left, right) => {
+    getAttackingPlantDefinitions(modeDefinition).sort((left, right) => {
       if (left.cost !== right.cost) {
         return left.cost - right.cost;
       }
@@ -195,7 +207,7 @@ function getCheapestPlantDefinition(modeDefinition) {
 function getSpecializedPlantDefinitions(modeDefinition) {
   const cheapestPlant = getCheapestPlantDefinition(modeDefinition);
 
-  return getAvailablePlantDefinitions(modeDefinition)
+  return getAttackingPlantDefinitions(modeDefinition)
     .filter((plant) => plant.id !== cheapestPlant?.id)
     .sort((left, right) => {
       if (Boolean(right.piercing) !== Boolean(left.piercing)) {
@@ -482,6 +494,16 @@ class ScenarioSimulator {
   updateDefenders(deltaMs) {
     for (const defender of this.defenders) {
       if (defender.destroyed) {
+        continue;
+      }
+
+      // Support plants generate sap instead of firing projectiles
+      if (defender.definition.role === 'support') {
+        defender.cooldownMs -= deltaMs;
+        if (defender.cooldownMs <= 0) {
+          defender.cooldownMs = defender.definition.cadenceMs;
+          this.resources += defender.definition.sapPerPulse;
+        }
         continue;
       }
 
@@ -981,6 +1003,15 @@ function evaluateSimulator(simulator) {
     }
   }
 
+  // Bonus for support plants: early placement yields more total sap over time
+  for (const defender of simulator.defenders) {
+    if (!defender.destroyed && defender.definition.role === 'support') {
+      const remainingMs = Math.max(0, simulator.maxSimulationMs - simulator.elapsedMs);
+      const expectedPulses = Math.floor(remainingMs / defender.definition.cadenceMs);
+      score += expectedPulses * defender.definition.sapPerPulse * 60;
+    }
+  }
+
   for (const enemy of simulator.enemies) {
     const distanceToBreach = enemy.x - BREACH_X;
     score -= (800 - clamp(distanceToBreach, 0, 800)) * 32;
@@ -1301,6 +1332,47 @@ function buildNaiveStrategies(modeDefinition, options) {
     });
   }
 
+  // Support plant strategies: place economy plant early in a safe lane
+  const supportPlants = getSupportPlantDefinitions(modeDefinition);
+  const allLanes = [0, 1, 2, 3, 4];
+  const pressureLanes = new Set(pressureRows.map((row) => row.row));
+  const safeLanes = allLanes.filter((lane) => !pressureLanes.has(lane));
+  const safestLane = safeLanes.length > 0 ? safeLanes[0] : allLanes[allLanes.length - 1];
+
+  for (const supportPlant of supportPlants) {
+    // Place support plant first in safest lane, then cover with attackers
+    strategies.push({
+      label: `naive-early-${supportPlant.id}-safe-then-cover`,
+      placements: [
+        { row: safestLane, col: spawnCol, plantId: supportPlant.id },
+        ...centerOut
+          .filter((row) => row !== safestLane)
+          .slice(0, 4)
+          .map((row) => ({ row, col: wallCol, plantId: cheapestPlant.id })),
+        { row: safestLane, col: wallCol, plantId: cheapestPlant.id },
+      ],
+    });
+    // Place support plant first then fill all lanes
+    strategies.push({
+      label: `naive-early-${supportPlant.id}-then-wall`,
+      placements: [
+        { row: safestLane, col: spawnCol, plantId: supportPlant.id },
+        ...centerOut.map((row) => ({ row, col: wallCol, plantId: cheapestPlant.id })),
+      ],
+    });
+    // Place support plant after first attacker
+    strategies.push({
+      label: `naive-attacker-first-then-${supportPlant.id}`,
+      placements: [
+        { row: pressureRow, col: wallCol, plantId: cheapestPlant.id },
+        { row: safestLane, col: spawnCol, plantId: supportPlant.id },
+        ...coverRows
+          .slice(0, 4)
+          .map((row) => ({ row, col: wallCol, plantId: cheapestPlant.id })),
+      ],
+    });
+  }
+
   return strategies.map((strategy) => ({
     ...strategy,
     plan: schedulePlacementsByBudget(modeDefinition, strategy.placements, options),
@@ -1606,6 +1678,49 @@ function buildSearchSeedPlans(modeDefinition, options) {
             ...coverRows
               .slice(0, 2)
               .map((row) => ({ row, col: window[0], plantId: cheapestPlant.id })),
+          ]
+        );
+      }
+    }
+  }
+
+  // Support plant seed plans: invest in economy early, then cover lanes
+  const supportPlants = getSupportPlantDefinitions(modeDefinition);
+  if (supportPlants.length > 0) {
+    const allLanes = [0, 1, 2, 3, 4];
+    const pressureLaneSet = new Set(pressureRows.map((row) => row.row));
+    const safeLanes = allLanes.filter((lane) => !pressureLaneSet.has(lane));
+    const backCol = BOARD_COLS - 1;
+
+    for (const supportPlant of supportPlants) {
+      for (const safeLane of safeLanes.slice(0, 2)) {
+        // Economy-first: place support plant, then cover pressure lanes
+        pushSeed(
+          `early-${supportPlant.id}-lane-${safeLane}-then-cover`,
+          [
+            { row: safeLane, col: backCol, plantId: supportPlant.id },
+            ...pressureRows.slice(0, 2).map((pr) => ({
+              row: pr.row,
+              col: 0,
+              plantId: cheapestPlant.id,
+            })),
+            ...firstSeenRows
+              .filter((row) => row !== safeLane && !pressureLaneSet.has(row))
+              .slice(0, 2)
+              .map((row) => ({ row, col: 0, plantId: cheapestPlant.id })),
+          ]
+        );
+
+        // Attacker first on pressure lane, then support plant
+        pushSeed(
+          `pressure-first-then-${supportPlant.id}-lane-${safeLane}`,
+          [
+            { row: pressureRows[0]?.row ?? 2, col: 0, plantId: cheapestPlant.id },
+            { row: safeLane, col: backCol, plantId: supportPlant.id },
+            ...firstSeenRows
+              .filter((row) => row !== safeLane && row !== (pressureRows[0]?.row ?? 2))
+              .slice(0, 3)
+              .map((row) => ({ row, col: 0, plantId: cheapestPlant.id })),
           ]
         );
       }
