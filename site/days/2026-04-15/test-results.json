@@ -1,0 +1,49 @@
+{
+  "schemaVersion": 1,
+  "runDate": "2026-04-15",
+  "generatedAt": "2026-04-15T12:00:00.000Z",
+  "summary": {
+    "totalScenarios": 5,
+    "passed": 2,
+    "failed": 3,
+    "passRate": 40
+  },
+  "scenarios": [
+    {
+      "name": "Artifact schema validation",
+      "persona": "validator",
+      "status": "pass",
+      "description": "Validated the April 15 artifact directory with the repository schema validator.",
+      "details": "`node schemas/validate.js content/days/2026-04-15` passed decision.json, feedback-digest.json, test-results.json, spec.md, build-summary.md, and review.md."
+    },
+    {
+      "name": "Scenario difficulty validation",
+      "persona": "validator",
+      "status": "fail",
+      "description": "Ran the deterministic April 15 scenario difficulty validator.",
+      "details": "`npm run validate:scenario-difficulty -- --date 2026-04-15` found a canonical win but failed the roster-expansion gate because the April 14 two-plant roster can still clear the April 15 board. Sunroot Bloom is available but not required yet."
+    },
+    {
+      "name": "Sunroot targeted Playwright coverage",
+      "persona": "visitor",
+      "status": "pass",
+      "description": "Ran the Sunroot, roster asset, and April 14 alias test subset in routed local-file mode.",
+      "details": "`PLAYWRIGHT_DISABLE_WEBSERVER=1 npm run test:uiux -- tests/uiux/game-sunroot-bloom.spec.js tests/uiux/game-roster-assets.spec.js tests/uiux/game-board-scout-2026-04-14-validation.spec.js` passed 9 tests."
+    },
+    {
+      "name": "Default full Playwright suite",
+      "persona": "validator",
+      "status": "fail",
+      "description": "Attempted the requested default full UI/UX command.",
+      "details": "`npm run test:uiux` could not start the configured Playwright web server in the sandbox: `listen EPERM: operation not permitted 127.0.0.1:3000`."
+    },
+    {
+      "name": "Full Playwright suite in routed mode",
+      "persona": "validator",
+      "status": "fail",
+      "description": "Ran the full suite without a web server to gather a regression signal.",
+      "details": "`PLAYWRIGHT_DISABLE_WEBSERVER=1 npm run test:uiux` reported 284 passed and 61 failed after syncing older content artifacts. The failures are dominated by older tests that call bare `page.goto(\"/\")` or `request.get(\"/...\")`, which require the configured web server/baseURL and are incompatible with routed local-file mode."
+    }
+  ],
+  "testPersonas": ["validator", "visitor"]
+}

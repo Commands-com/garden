@@ -2,6 +2,15 @@
   "schemaVersion": 1,
   "days": [
     {
+      "date": "2026-04-15",
+      "title": "Sunroot Bloom: First Economy Plant for Rootline Defense",
+      "summary": "Rootline Defense now has its first economy plant. Sunroot Bloom costs 50 sap, does not attack, and produces +25 sap pulses, turning the April 15 board into a real investment-vs-defense decision.",
+      "status": "shipped",
+      "featureType": "game",
+      "tags": ["game", "rootline-defense", "sunroot-bloom", "economy", "support-plant", "sap", "scenario", "board-scout"],
+      "publishedAt": "2026-04-15T12:00:00.000Z"
+    },
+    {
       "date": "2026-04-14",
       "title": "Board Scout: Pre-Run Threat Intel for Rootline Defense",
       "summary": "The game page now shows you what enemies, plants, and waves are in today's board before you start playing. A new Board Scout section lets you tap any enemy or plant card to see its stats and which waves it appears in, so you can plan your strategy before spending sap.",

@@ -1,0 +1,455 @@
+{
+  "schemaVersion": 2,
+  "runDate": "2026-04-12",
+  "generatedAt": "2026-04-12T09:30:00.000Z",
+  "scoringDimensions": [
+    { "id": "compoundingValue", "label": "Compounding Value" },
+    { "id": "usefulnessClarity", "label": "Usefulness & Clarity" },
+    { "id": "noveltySurprise", "label": "Novelty & Surprise" },
+    { "id": "feasibility", "label": "Feasibility" },
+    { "id": "legibility", "label": "Legibility" },
+    { "id": "continuity", "label": "Continuity" },
+    { "id": "shareability", "label": "Shareability" }
+  ],
+  "judgePanel": [
+    {
+      "agentId": "explore_explorer_0",
+      "displayName": "GPT (Visitor)",
+      "conceptKey": "openai",
+      "modelFamily": "gpt",
+      "provider": "codex_cli",
+      "model": "gpt-5.4",
+      "lens": "visitor"
+    },
+    {
+      "agentId": "explore_explorer_1",
+      "displayName": "Claude (Gardener)",
+      "conceptKey": "claude",
+      "modelFamily": "claude",
+      "provider": "claude",
+      "model": "opus",
+      "lens": "gardener"
+    },
+    {
+      "agentId": "explore_explorer_2",
+      "displayName": "Gemini (Explorer)",
+      "conceptKey": "gemini",
+      "modelFamily": "gemini",
+      "provider": "gemini_cli",
+      "model": "gemini-3.1-pro-preview",
+      "lens": "explorer"
+    }
+  ],
+  "summary": "The homepage now shows how the AI judges scored today's winning candidate. A new Scoreboard section visualizes per-judge scores across seven dimensions, highlighting where the models agreed and diverged.",
+  "candidates": [
+    {
+      "id": "candidate-1",
+      "title": "The Scoreboard — Visual Judge Score Comparison on Homepage",
+      "summary": "A compact Scoreboard section on the homepage that visualizes how the AI judges scored today's winning candidate across the seven scoring dimensions, making judge disagreement visible at a glance.",
+      "averageScore": 8.4,
+      "reviewCount": 3,
+      "rank": 1,
+      "dimensionAverages": {
+        "compoundingValue": { "label": "Compounding Value", "average": 8.3, "reviewCount": 3 },
+        "usefulnessClarity": { "label": "Usefulness & Clarity", "average": 8.3, "reviewCount": 3 },
+        "noveltySurprise": { "label": "Novelty & Surprise", "average": 7.3, "reviewCount": 3 },
+        "feasibility": { "label": "Feasibility", "average": 8.7, "reviewCount": 3 },
+        "legibility": { "label": "Legibility", "average": 8.3, "reviewCount": 3 },
+        "continuity": { "label": "Continuity", "average": 8.7, "reviewCount": 3 },
+        "shareability": { "label": "Shareability", "average": 8.0, "reviewCount": 3 }
+      },
+      "reviewerBreakdown": [
+        {
+          "reviewer": {
+            "agentId": "explore_explorer_0",
+            "displayName": "GPT (Visitor)",
+            "modelFamily": "gpt",
+            "lens": "visitor"
+          },
+          "overallScore": 8,
+          "dimensionScores": {
+            "compoundingValue": 7,
+            "usefulnessClarity": 9,
+            "noveltySurprise": 6,
+            "feasibility": 9,
+            "legibility": 8,
+            "continuity": 8,
+            "shareability": 8
+          },
+          "keep": [
+            "Makes the judging process transparent without requiring visitors to dig into raw JSON.",
+            "Horizontal bars are immediately scannable — visitors get the gist in under two seconds.",
+            "Color-coded judge lanes let you compare models at a glance."
+          ],
+          "mustChange": [
+            "Ensure bar widths are proportional to a 1–10 scale, not just relative to each other."
+          ],
+          "risks": [
+            "If all scores cluster tightly, the section may feel visually flat and uninformative."
+          ]
+        },
+        {
+          "reviewer": {
+            "agentId": "explore_explorer_1",
+            "displayName": "Claude (Gardener)",
+            "modelFamily": "claude",
+            "lens": "gardener"
+          },
+          "overallScore": 9,
+          "dimensionScores": {
+            "compoundingValue": 10,
+            "usefulnessClarity": 8,
+            "noveltySurprise": 9,
+            "feasibility": 9,
+            "legibility": 9,
+            "continuity": 10,
+            "shareability": 8
+          },
+          "keep": [
+            "Continues the transparency progression: pipeline → garden → pulse → scoreboard.",
+            "Zero new data cost — exclusively reuses reviewerBreakdown from the existing decision.json.",
+            "Divergence highlighting makes judge disagreement a feature, not a flaw."
+          ],
+          "mustChange": [
+            "The section should gracefully hide when reviewerBreakdown is absent or empty."
+          ],
+          "risks": [
+            "Adding another section risks homepage length creep — keep it compact."
+          ]
+        },
+        {
+          "reviewer": {
+            "agentId": "explore_explorer_2",
+            "displayName": "Gemini (Explorer)",
+            "modelFamily": "gemini",
+            "lens": "explorer"
+          },
+          "overallScore": 8,
+          "dimensionScores": {
+            "compoundingValue": 8,
+            "usefulnessClarity": 8,
+            "noveltySurprise": 7,
+            "feasibility": 8,
+            "legibility": 8,
+            "continuity": 8,
+            "shareability": 8
+          },
+          "keep": [
+            "The divergence badge (≥3 spread) adds an editorial layer that pure numbers lack.",
+            "BEM component structure keeps it maintainable as the design evolves."
+          ],
+          "mustChange": [
+            "Mobile layout needs explicit testing — seven dimension rows with three bars each could overflow narrow viewports."
+          ],
+          "risks": [
+            "If the homepage becomes too information-dense, visitors may bounce before reaching the candidates section."
+          ]
+        }
+      ],
+      "keep": [
+        "Makes the judging process transparent without requiring visitors to dig into raw JSON.",
+        "Continues the transparency progression: pipeline → garden → pulse → scoreboard.",
+        "Zero new data cost — exclusively reuses reviewerBreakdown from the existing decision.json.",
+        "Divergence highlighting makes judge disagreement a feature, not a flaw.",
+        "The divergence badge (≥3 spread) adds an editorial layer that pure numbers lack."
+      ],
+      "mustChange": [
+        "Ensure bar widths are proportional to a 1–10 scale, not just relative to each other.",
+        "The section should gracefully hide when reviewerBreakdown is absent or empty.",
+        "Mobile layout needs explicit testing — seven dimension rows with three bars each could overflow narrow viewports."
+      ],
+      "risks": [
+        "If all scores cluster tightly, the section may feel visually flat and uninformative.",
+        "Adding another section risks homepage length creep — keep it compact.",
+        "If the homepage becomes too information-dense, visitors may bounce before reaching the candidates section."
+      ]
+    },
+    {
+      "id": "candidate-2",
+      "title": "Judge Consensus Heatmap — Grid View of All Scores",
+      "summary": "A compact heatmap grid showing all judge scores across all dimensions for the winning candidate, with color intensity mapping to score values.",
+      "averageScore": 7.3,
+      "reviewCount": 3,
+      "rank": 2,
+      "dimensionAverages": {
+        "compoundingValue": { "label": "Compounding Value", "average": 7.3, "reviewCount": 3 },
+        "usefulnessClarity": { "label": "Usefulness & Clarity", "average": 7.0, "reviewCount": 3 },
+        "noveltySurprise": { "label": "Novelty & Surprise", "average": 7.7, "reviewCount": 3 },
+        "feasibility": { "label": "Feasibility", "average": 7.0, "reviewCount": 3 },
+        "legibility": { "label": "Legibility", "average": 7.0, "reviewCount": 3 },
+        "continuity": { "label": "Continuity", "average": 7.3, "reviewCount": 3 },
+        "shareability": { "label": "Shareability", "average": 7.7, "reviewCount": 3 }
+      },
+      "reviewerBreakdown": [
+        {
+          "reviewer": {
+            "agentId": "explore_explorer_0",
+            "displayName": "GPT (Visitor)",
+            "modelFamily": "gpt",
+            "lens": "visitor"
+          },
+          "overallScore": 7,
+          "dimensionScores": {
+            "compoundingValue": 7,
+            "usefulnessClarity": 7,
+            "noveltySurprise": 8,
+            "feasibility": 7,
+            "legibility": 7,
+            "continuity": 7,
+            "shareability": 8
+          },
+          "keep": [
+            "Heatmaps are visually striking and screenshot-friendly."
+          ],
+          "mustChange": [
+            "Color-blind accessibility needs careful palette selection for the heatmap."
+          ],
+          "risks": [
+            "Heatmaps require context to interpret — visitors may not understand the color scale."
+          ]
+        },
+        {
+          "reviewer": {
+            "agentId": "explore_explorer_1",
+            "displayName": "Claude (Gardener)",
+            "modelFamily": "claude",
+            "lens": "gardener"
+          },
+          "overallScore": 7.5,
+          "dimensionScores": {
+            "compoundingValue": 8,
+            "usefulnessClarity": 7,
+            "noveltySurprise": 8,
+            "feasibility": 7,
+            "legibility": 7,
+            "continuity": 8,
+            "shareability": 8
+          },
+          "keep": [
+            "Dense information encoding fits more data in less space."
+          ],
+          "mustChange": [
+            "Needs a clear legend explaining what the color gradient means."
+          ],
+          "risks": [
+            "More complex CSS implementation than bar charts."
+          ]
+        },
+        {
+          "reviewer": {
+            "agentId": "explore_explorer_2",
+            "displayName": "Gemini (Explorer)",
+            "modelFamily": "gemini",
+            "lens": "explorer"
+          },
+          "overallScore": 7.3,
+          "dimensionScores": {
+            "compoundingValue": 7,
+            "usefulnessClarity": 7,
+            "noveltySurprise": 7,
+            "feasibility": 7,
+            "legibility": 7,
+            "continuity": 7,
+            "shareability": 7
+          },
+          "keep": [
+            "Grid layout scales well if more judges are added later."
+          ],
+          "mustChange": [
+            "Cell hover states need to show the numeric score."
+          ],
+          "risks": [
+            "On mobile the grid cells may be too small to tap."
+          ]
+        }
+      ],
+      "keep": [
+        "Heatmaps are visually striking and screenshot-friendly.",
+        "Dense information encoding fits more data in less space.",
+        "Grid layout scales well if more judges are added later."
+      ],
+      "mustChange": [
+        "Color-blind accessibility needs careful palette selection for the heatmap.",
+        "Needs a clear legend explaining what the color gradient means."
+      ],
+      "risks": [
+        "Heatmaps require context to interpret — visitors may not understand the color scale.",
+        "More complex CSS implementation than bar charts."
+      ]
+    },
+    {
+      "id": "candidate-3",
+      "title": "Judge Commentary Spotlight — Featured Reviewer Quotes",
+      "summary": "A rotating spotlight section showing one judge's 'keep' and 'mustChange' comments for the winning candidate, giving visitors a window into the AI judges' reasoning.",
+      "averageScore": 6.5,
+      "reviewCount": 3,
+      "rank": 3,
+      "dimensionAverages": {
+        "compoundingValue": { "label": "Compounding Value", "average": 6.7, "reviewCount": 3 },
+        "usefulnessClarity": { "label": "Usefulness & Clarity", "average": 6.3, "reviewCount": 3 },
+        "noveltySurprise": { "label": "Novelty & Surprise", "average": 6.7, "reviewCount": 3 },
+        "feasibility": { "label": "Feasibility", "average": 6.3, "reviewCount": 3 },
+        "legibility": { "label": "Legibility", "average": 6.7, "reviewCount": 3 },
+        "continuity": { "label": "Continuity", "average": 6.3, "reviewCount": 3 },
+        "shareability": { "label": "Shareability", "average": 6.7, "reviewCount": 3 }
+      },
+      "reviewerBreakdown": [
+        {
+          "reviewer": {
+            "agentId": "explore_explorer_0",
+            "displayName": "GPT (Visitor)",
+            "modelFamily": "gpt",
+            "lens": "visitor"
+          },
+          "overallScore": 6.5,
+          "dimensionScores": {
+            "compoundingValue": 7,
+            "usefulnessClarity": 6,
+            "noveltySurprise": 7,
+            "feasibility": 6,
+            "legibility": 7,
+            "continuity": 6,
+            "shareability": 7
+          },
+          "keep": [
+            "Qualitative commentary adds depth beyond numbers."
+          ],
+          "mustChange": [
+            "Rotation logic adds JavaScript complexity without clear UX benefit."
+          ],
+          "risks": [
+            "Text-heavy sections may be skipped by visitors scanning the page."
+          ]
+        },
+        {
+          "reviewer": {
+            "agentId": "explore_explorer_1",
+            "displayName": "Claude (Gardener)",
+            "modelFamily": "claude",
+            "lens": "gardener"
+          },
+          "overallScore": 6.5,
+          "dimensionScores": {
+            "compoundingValue": 7,
+            "usefulnessClarity": 6,
+            "noveltySurprise": 7,
+            "feasibility": 6,
+            "legibility": 7,
+            "continuity": 6,
+            "shareability": 7
+          },
+          "keep": [
+            "Shows the AI judges have distinct perspectives, not just different numbers."
+          ],
+          "mustChange": [
+            "Should show all judges simultaneously rather than rotating."
+          ],
+          "risks": [
+            "Commentary text length varies wildly — layout stability is a concern."
+          ]
+        },
+        {
+          "reviewer": {
+            "agentId": "explore_explorer_2",
+            "displayName": "Gemini (Explorer)",
+            "modelFamily": "gemini",
+            "lens": "explorer"
+          },
+          "overallScore": 6.5,
+          "dimensionScores": {
+            "compoundingValue": 6,
+            "usefulnessClarity": 7,
+            "noveltySurprise": 6,
+            "feasibility": 7,
+            "legibility": 6,
+            "continuity": 7,
+            "shareability": 6
+          },
+          "keep": [
+            "Humanizes the AI evaluation process."
+          ],
+          "mustChange": [
+            "Needs character limits on displayed text to prevent layout breakage."
+          ],
+          "risks": [
+            "Visitors may not understand why AI commentary matters."
+          ]
+        }
+      ],
+      "keep": [
+        "Qualitative commentary adds depth beyond numbers.",
+        "Shows the AI judges have distinct perspectives, not just different numbers.",
+        "Humanizes the AI evaluation process."
+      ],
+      "mustChange": [
+        "Rotation logic adds JavaScript complexity without clear UX benefit.",
+        "Should show all judges simultaneously rather than rotating."
+      ],
+      "risks": [
+        "Text-heavy sections may be skipped by visitors scanning the page.",
+        "Commentary text length varies wildly — layout stability is a concern."
+      ]
+    }
+  ],
+  "winner": {
+    "candidateId": "candidate-1",
+    "title": "The Scoreboard — Visual Judge Score Comparison on Homepage",
+    "summary": "A compact Scoreboard section on the homepage that visualizes how the AI judges scored today's winning candidate across the seven scoring dimensions, making judge disagreement visible at a glance.",
+    "averageScore": 8.4
+  },
+  "rationale": "The Scoreboard scored highest at 8.4 across all three judges. It continues the transparency progression (pipeline → garden → pulse → scoreboard), reuses existing reviewerBreakdown data with zero new API calls, and its divergence highlighting turns judge disagreement into a visible, engaging feature. The Heatmap alternative, while visually striking, adds interpretation overhead. The Commentary Spotlight relies on text-heavy content that visitors tend to skip.",
+  "featureType": "interaction",
+  "tags": [
+    "homepage",
+    "scoreboard",
+    "transparency",
+    "judges",
+    "visualization"
+  ],
+  "feedbackInfluence": [
+    {
+      "summary": "Visitors wanted to understand why certain features won over others — the scoring felt opaque.",
+      "impact": "high"
+    },
+    {
+      "summary": "The multi-judge panel was introduced but its per-dimension scoring was buried in the day detail page.",
+      "impact": "medium"
+    }
+  ],
+  "artifacts": {
+    "spec": "spec.md",
+    "feedbackDigest": "feedback-digest.json",
+    "buildSummary": "build-summary.md",
+    "testResults": "test-results.json",
+    "review": "review.md"
+  },
+  "bluesky_post": {
+    "headline": "Command Garden now shows its judge scoreboard",
+    "body": "The autonomous pipeline built a Scoreboard today. See how Claude, GPT, and Gemini scored each dimension — and where they disagreed most. Every score is public at commandgarden.com",
+    "alt_text": "Homepage showing a Scoreboard section with color-coded horizontal bars for three AI judges across seven scoring dimensions, with a divergence badge on one row"
+  },
+  "bluesky_strategy": {
+    "searchQueries": [
+      "AI evaluation transparency",
+      "build in public",
+      "autonomous coding",
+      "AI judges scoring",
+      "developer tools visualization",
+      "indie web project",
+      "AI shipping features"
+    ],
+    "replyTemplates": {
+      "whatIs": "It's a website that ships one new feature every day, built entirely by an AI pipeline. Today it added a scoreboard showing how three AI judges rated each feature dimension. Every decision is public at commandgarden.com",
+      "howDoesItWork": "A five-stage AI pipeline runs daily: gather feedback, score candidates with three AI judges, write a spec, build it, test it, ship it. Today's feature visualizes the judge scoring as a compact scoreboard.",
+      "genericQuestion": "Great question! Command Garden is radically transparent — every candidate, score, and spec is published. Check today's Scoreboard feature at commandgarden.com"
+    },
+    "hashtagsToUse": [
+      "#CommandGarden",
+      "#BuildInPublic",
+      "#AIAgent",
+      "#WebDev",
+      "#Transparency"
+    ],
+    "maxDailyActions": 15
+  }
+}

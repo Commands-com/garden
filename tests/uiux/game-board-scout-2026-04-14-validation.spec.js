@@ -90,6 +90,8 @@ async function getExpectedScoutData(page, dayDate = "2026-04-14") {
     });
 
     return {
+      scenarioDate: scenario.date,
+      availablePlants: scenario.availablePlants,
       enemyCards,
       plantCards,
       enemyNames: enemyCards.map((card) => card.name),
@@ -118,6 +120,8 @@ test("Board Scout renders the April 14 scenario roster and wave structure from c
   const plantCards = page.locator("#game-scout-plants .game-scout__card");
 
   await expect(scout).toBeVisible();
+  expect(expected.scenarioDate).toBe("2026-04-13");
+  expect(expected.availablePlants).toEqual(["thornVine", "brambleSpear"]);
 
   const scoutFollowsGameCards = await page.evaluate(() => {
     const scoutRail = document.getElementById("game-scout");

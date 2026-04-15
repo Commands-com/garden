@@ -1,0 +1,185 @@
+{
+  "schemaVersion": 1,
+  "runDate": "2026-04-12",
+  "generatedAt": "2026-04-12T16:00:00.000Z",
+  "summary": {
+    "totalScenarios": 285,
+    "passed": 285,
+    "failed": 0,
+    "passRate": 100
+  },
+  "scenarios": [
+    {
+      "name": "Scoreboard becomes visible after page load with heading and label",
+      "persona": "visitor",
+      "status": "pass"
+    },
+    {
+      "name": "Scoreboard sits between todays-change and candidates-section in DOM",
+      "persona": "visitor",
+      "status": "pass"
+    },
+    {
+      "name": "Judge legend renders with correct labels, role, and color swatches",
+      "persona": "visitor",
+      "status": "pass"
+    },
+    {
+      "name": "Legend uses design-system colors: Claude=sage, GPT=gold, Gemini=info",
+      "persona": "developer",
+      "status": "pass"
+    },
+    {
+      "name": "Renders 7 dimension rows with labeled bars",
+      "persona": "visitor",
+      "status": "pass"
+    },
+    {
+      "name": "Each dimension row has 3 bars with correct widths and aria-labels",
+      "persona": "visitor",
+      "status": "pass"
+    },
+    {
+      "name": "Bar widths are proportional to 0-10 scale",
+      "persona": "developer",
+      "status": "pass"
+    },
+    {
+      "name": "Divergent dimensions have scoreboard__row--divergent class",
+      "persona": "visitor",
+      "status": "pass"
+    },
+    {
+      "name": "Divergent rows show badge with spread value",
+      "persona": "visitor",
+      "status": "pass"
+    },
+    {
+      "name": "Compounding Value and Novelty & Surprise are marked divergent",
+      "persona": "visitor",
+      "status": "pass"
+    },
+    {
+      "name": "Overall score row renders with colored swatches and scores",
+      "persona": "visitor",
+      "status": "pass"
+    },
+    {
+      "name": "Section has aria-labelledby linked to scoreboard-heading",
+      "persona": "screen-reader-user",
+      "status": "pass"
+    },
+    {
+      "name": "Heading h2 has id=scoreboard-heading",
+      "persona": "screen-reader-user",
+      "status": "pass"
+    },
+    {
+      "name": "Section stays hidden when reviewerBreakdown is empty",
+      "persona": "visitor",
+      "status": "pass"
+    },
+    {
+      "name": "Raw HTML ships scoreboard section hidden with display:none",
+      "persona": "developer",
+      "status": "pass"
+    },
+    {
+      "name": "Mobile: no horizontal overflow at 375px viewport",
+      "persona": "mobile-user",
+      "status": "pass"
+    },
+    {
+      "name": "Mobile: bars and labels remain visible",
+      "persona": "mobile-user",
+      "status": "pass"
+    },
+    {
+      "name": "Mobile: bar height reduces to 12px at mobile breakpoint",
+      "persona": "mobile-user",
+      "status": "pass"
+    },
+    {
+      "name": "Heading hierarchy uses h2 inside scoreboard section",
+      "persona": "screen-reader-user",
+      "status": "pass"
+    },
+    {
+      "name": "Legend format uses capitalized name with lens in parentheses",
+      "persona": "visitor",
+      "status": "pass"
+    },
+    {
+      "name": "Unknown model family falls back to neutral other styling",
+      "persona": "developer",
+      "status": "pass"
+    },
+    {
+      "name": "Scoreboard renders when scoringDimensions field is absent",
+      "persona": "developer",
+      "status": "pass"
+    },
+    {
+      "name": "Scoreboard renders judges in judgePanel order",
+      "persona": "developer",
+      "status": "pass"
+    },
+    {
+      "name": "Overall score row uses capitalized model family names",
+      "persona": "visitor",
+      "status": "pass"
+    },
+    {
+      "name": "Terminal widget 2026-04-10 live data renders correctly via manifest pinning",
+      "persona": "developer",
+      "status": "pass"
+    },
+    {
+      "name": "All 43 scoreboard E2E tests pass",
+      "persona": "developer",
+      "status": "pass"
+    },
+    {
+      "name": "All 11 terminal-widget-2026-04-10 live data tests pass",
+      "persona": "developer",
+      "status": "pass"
+    },
+    {
+      "name": "[fixed] decision-json-2026-04-10: content/site byte-identical",
+      "persona": "developer",
+      "status": "pass",
+      "note": "Fixed: synced content/ and site/ copies of decision.json"
+    },
+    {
+      "name": "[fixed] decision-json-2026-04-11: content/site byte-identical",
+      "persona": "developer",
+      "status": "pass",
+      "note": "Fixed: synced content/ and site/ copies of decision.json"
+    },
+    {
+      "name": "[fixed] homepage-links: #todays-change link count updated for community pulse CTA",
+      "persona": "visitor",
+      "status": "pass",
+      "note": "Fixed: test now expects 2 links (hero CTA + community pulse CTA)"
+    },
+    {
+      "name": "[fixed] homepage-links-validation: hero CTA count updated",
+      "persona": "visitor",
+      "status": "pass",
+      "note": "Fixed: test now expects 2 links to #todays-change"
+    },
+    {
+      "name": "[fixed] homepage-a11y-landmarks: tab traversal reaches footer",
+      "persona": "screen-reader-user",
+      "status": "pass",
+      "note": "Fixed: increased maxTabs from 30 to 60 for denser homepage"
+    },
+    {
+      "name": "[fixed] homepage-internal-links-smoke: body text check scoped to h1",
+      "persona": "developer",
+      "status": "pass",
+      "note": "Fixed: check h1 not full body to avoid false positive from rendered artifact content"
+    }
+  ],
+  "testPersonas": ["visitor", "mobile-user", "screen-reader-user", "developer"]
+}

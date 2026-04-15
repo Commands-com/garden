@@ -6,6 +6,27 @@ const ROUTED_ORIGIN = "http://command-garden.test";
 const repoRoot = path.join(__dirname, "../../..");
 const siteRoot = path.join(repoRoot, "site");
 
+function createSilentWav() {
+  const buffer = Buffer.alloc(46);
+  buffer.write("RIFF", 0);
+  buffer.writeUInt32LE(38, 4);
+  buffer.write("WAVE", 8);
+  buffer.write("fmt ", 12);
+  buffer.writeUInt32LE(16, 16);
+  buffer.writeUInt16LE(1, 20);
+  buffer.writeUInt16LE(1, 22);
+  buffer.writeUInt32LE(44100, 24);
+  buffer.writeUInt32LE(88200, 28);
+  buffer.writeUInt16LE(2, 32);
+  buffer.writeUInt16LE(16, 34);
+  buffer.write("data", 36);
+  buffer.writeUInt32LE(2, 40);
+  buffer.writeUInt16LE(0, 44);
+  return buffer;
+}
+
+const SILENT_WAV = createSilentWav();
+
 function getSiteFilePath(urlString) {
   const url = new URL(urlString);
   const pathname = url.pathname;
@@ -66,6 +87,30 @@ function getContentType(filePath) {
     default:
       return "text/plain; charset=utf-8";
   }
+}
+
+function getGeneratedAssetFallback(pathname) {
+  if (!pathname.startsWith("/game/assets/generated/")) {
+    return null;
+  }
+
+  const ext = path.extname(pathname).toLowerCase();
+  if ([".png", ".jpg", ".jpeg", ".webp", ".svg"].includes(ext)) {
+    return {
+      contentType: "image/svg+xml; charset=utf-8",
+      body:
+        '<svg xmlns="http://www.w3.org/2000/svg" width="384" height="384" viewBox="0 0 384 384"><rect width="384" height="384" fill="#1a4d2e"/><circle cx="192" cy="192" r="120" fill="#c4a35a" opacity="0.65"/><path d="M192 74 278 310H106Z" fill="#f5f0e8" opacity="0.85"/></svg>',
+    };
+  }
+
+  if ([".mp3", ".wav", ".ogg", ".m4a"].includes(ext)) {
+    return {
+      contentType: "audio/wav",
+      body: SILENT_WAV,
+    };
+  }
+
+  return null;
 }
 
 function sanitizeFeedback(str) {
@@ -236,6 +281,16 @@ async function installLocalSiteRoutes(page) {
 
       const filePath = getSiteFilePath(url.toString());
       if (!fs.existsSync(filePath) || fs.statSync(filePath).isDirectory()) {
+        const fallback = getGeneratedAssetFallback(url.pathname);
+        if (fallback) {
+          await route.fulfill({
+            status: 200,
+            contentType: fallback.contentType,
+            body: fallback.body,
+          });
+          return;
+        }
+
         await route.fulfill({
           status: 404,
           contentType: "text/plain; charset=utf-8",

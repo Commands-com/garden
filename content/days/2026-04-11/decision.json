@@ -1,0 +1,614 @@
+{
+  "schemaVersion": 2,
+  "runDate": "2026-04-11",
+  "generatedAt": "2026-04-11T09:56:29.695Z",
+  "scoringDimensions": [
+    {
+      "id": "compoundingValue",
+      "label": "Compounding Value"
+    },
+    {
+      "id": "usefulnessClarity",
+      "label": "Usefulness & Clarity"
+    },
+    {
+      "id": "noveltySurprise",
+      "label": "Novelty & Surprise"
+    },
+    {
+      "id": "feasibility",
+      "label": "Feasibility"
+    },
+    {
+      "id": "legibility",
+      "label": "Legibility"
+    },
+    {
+      "id": "continuity",
+      "label": "Continuity"
+    },
+    {
+      "id": "shareability",
+      "label": "Shareability"
+    }
+  ],
+  "judgePanel": [
+    {
+      "agentId": "explore_explorer_0",
+      "displayName": "GPT (Visitor)",
+      "conceptKey": "openai",
+      "modelFamily": "gpt",
+      "provider": "codex_cli",
+      "model": "gpt-5.4",
+      "lens": "visitor"
+    },
+    {
+      "agentId": "explore_explorer_1",
+      "displayName": "Claude (Gardener)",
+      "conceptKey": "claude",
+      "modelFamily": "claude",
+      "provider": "claude",
+      "model": "opus",
+      "lens": "gardener"
+    },
+    {
+      "agentId": "explore_explorer_2",
+      "displayName": "Gemini (Explorer)",
+      "conceptKey": "gemini",
+      "modelFamily": "gemini",
+      "provider": "gemini_cli",
+      "model": "gemini-3.1-pro-preview",
+      "lens": "explorer"
+    }
+  ],
+  "summary": "The homepage now shows how visitors reacted over the past week. A new Community Pulse section displays emoji totals, highlights the most popular reaction, and links to the day that got the most love.",
+  "candidates": [
+    {
+      "id": "claude",
+      "title": "The Scoreboard — Visual Judge Score Comparison on the Homepage",
+      "summary": "Turn the buried AI judge scoring data into a visual, screenshot-ready scoreboard that shows how Claude, GPT, and Gemini disagreed on today's candidates — making every daily run produce shareable \"AI model comparison\" content.",
+      "averageScore": 8,
+      "reviewCount": 2,
+      "dimensionAverages": {
+        "compoundingValue": {
+          "label": "Compounding Value",
+          "average": 8,
+          "reviewCount": 2
+        },
+        "usefulnessClarity": {
+          "label": "Usefulness & Clarity",
+          "average": 7.5,
+          "reviewCount": 2
+        },
+        "noveltySurprise": {
+          "label": "Novelty & Surprise",
+          "average": 7.5,
+          "reviewCount": 2
+        },
+        "feasibility": {
+          "label": "Feasibility",
+          "average": 8,
+          "reviewCount": 2
+        },
+        "legibility": {
+          "label": "Legibility",
+          "average": 7.5,
+          "reviewCount": 2
+        },
+        "continuity": {
+          "label": "Continuity",
+          "average": 9,
+          "reviewCount": 2
+        },
+        "shareability": {
+          "label": "Shareability",
+          "average": 9,
+          "reviewCount": 2
+        }
+      },
+      "reviewerBreakdown": [
+        {
+          "reviewer": {
+            "agentId": "explore_explorer_2",
+            "displayName": "Gemini (Explorer)",
+            "conceptKey": "gemini",
+            "modelFamily": "gemini",
+            "provider": "gemini_cli",
+            "model": "gemini-3.1-pro-preview",
+            "lens": "explorer"
+          },
+          "overallScore": 8,
+          "dimensionScores": {
+            "compoundingValue": 8,
+            "usefulnessClarity": 7,
+            "noveltySurprise": 8,
+            "feasibility": 9,
+            "legibility": 7,
+            "continuity": 9,
+            "shareability": 9
+          },
+          "keep": [
+            "The core idea of visualizing AI judge scores for comparison. This directly leverages a unique asset of Command Garden and taps into a highly engaging social media topic.",
+            "The emphasis on \"screenshot-ready\" and using the existing design system. This is crucial for social shareability and visual consistency.",
+            "The identification of specific data points from `decision.json` that can be used directly, highlighting the low implementation cost.",
+            "The explicit testing boundaries with Playwright."
+          ],
+          "mustChange": [
+            "The \"CSS-only\" constraint for visualization should be revisited. While admirable, it introduces unnecessary risk for a \"screenshot-beautiful\" and \"information-dense\" component. A small, carefully chosen chart library could achieve better results with less effort and more consistency across browsers. The current project has `package.json`, so adding a minimal dependency is feasible.",
+            "The description of \"Compounding archive flow (power user)\" is a bit speculative. While possible, the primary focus should remain on the daily value and immediate shareability.",
+            "Clarify how \"divergence highlighting\" will be visually represented and if it will detract from overall legibility on a small screen."
+          ],
+          "risks": [
+            "Over-reliance on CSS-only rendering for complex data visualization. This could lead to a visually cluttered or amateurish output, directly contradicting the \"screenshot-beautiful\" goal.",
+            "The risk of \"visual clutter on an already-dense homepage\" is real and the proposed mitigations (compact, collapsible accordion) are valid, but the brief should explicitly choose one for the prototype to keep scope tight.",
+            "\"AI comparison\" framing attracting the wrong audience. This is a valid risk, and the proposed mitigation (emphasizing \"garden feature\") is important."
+          ],
+          "whyItWinsOrLoses": [
+            "This concept leverages a truly unique aspect of Command Garden (AI judges) and aligns perfectly with the goal of creating shareable content for social media. The data already exists, making implementation highly feasible. It provides clear user value by making an opaque process transparent and engaging. It loses a point for potentially over-constraining the visualization method, which could impact"
+          ]
+        },
+        {
+          "reviewer": {
+            "agentId": "explore_explorer_0",
+            "displayName": "GPT (Visitor)",
+            "conceptKey": "openai",
+            "modelFamily": "gpt",
+            "provider": "codex_cli",
+            "model": "gpt-5.4",
+            "lens": "visitor"
+          },
+          "overallScore": 8,
+          "dimensionScores": {
+            "compoundingValue": 8,
+            "usefulnessClarity": 8,
+            "noveltySurprise": 7,
+            "feasibility": 7,
+            "legibility": 8,
+            "continuity": 9,
+            "shareability": 9
+          },
+          "keep": [
+            "The strongest part is the product thesis: Command Garden already generates fresh multi-model comparison data every day, and that asset is mostly invisible.",
+            "The prototype question is sharp and useful: can a CSS-only, real-data scoreboard be both self-explanatory and screenshot-worthy?",
+            "The brief correctly anchors itself in existing artifacts and existing homepage data flow. Zero new API calls is a major advantage.",
+            "The social angle is concrete rather than generic. \u201cAI judge showdown\u201d is a clearer hook than \u201canother feature shipped.\u201d"
+          ],
+          "mustChange": [
+            "Reduce the prototype scope to homepage-first. Homepage plus day detail plus archive patterns is too much for one day.",
+            "Tighten the layout budget. The homepage is already getting dense, so this cannot become another large analytics block.",
+            "Be explicit about incomplete data. Some recent days have only partial reviewer coverage, and the brief needs a first-class fallback strategy.",
+            "Keep the framing garden-native. If it leans too far into benchmark-style model comparison, it will attract the wrong expectations.",
+            "Specify what a screenshot must communicate in under a second. The brief is close, but still slightly too broad on presentation variants."
+          ],
+          "risks": [
+            "A dense scoreboard can become chart clutter, especially on mobile and in screenshots.",
+            "The homepage may start feeling over-instrumented instead of inviting.",
+            "The social framing may over-index on model rivalry rather than the product itself.",
+            "Incomplete reviewer data could make the visual feel inconsistent across days."
+          ],
+          "whyItWinsOrLoses": [
+            "It wins because it is the clearest one-day, user-visible concept that compounds existing data, fits the current product, and has a believable social hook. It loses a bit on scope control and homepage density, but it is still materially closer to Prototype Room readiness than Gemini\u2019s brief."
+          ]
+        }
+      ],
+      "rank": 1,
+      "keep": [
+        "The core idea of visualizing AI judge scores for comparison. This directly leverages a unique asset of Command Garden and taps into a highly engaging social media topic.",
+        "The emphasis on \"screenshot-ready\" and using the existing design system. This is crucial for social shareability and visual consistency.",
+        "The identification of specific data points from `decision.json` that can be used directly, highlighting the low implementation cost.",
+        "The explicit testing boundaries with Playwright.",
+        "The strongest part is the product thesis: Command Garden already generates fresh multi-model comparison data every day, and that asset is mostly invisible.",
+        "The prototype question is sharp and useful: can a CSS-only, real-data scoreboard be both self-explanatory and screenshot-worthy?",
+        "The brief correctly anchors itself in existing artifacts and existing homepage data flow. Zero new API calls is a major advantage.",
+        "The social angle is concrete rather than generic. \u201cAI judge showdown\u201d is a clearer hook than \u201canother feature shipped.\u201d"
+      ],
+      "mustChange": [
+        "The \"CSS-only\" constraint for visualization should be revisited. While admirable, it introduces unnecessary risk for a \"screenshot-beautiful\" and \"information-dense\" component. A small, carefully chosen chart library could achieve better results with less effort and more consistency across browsers. The current project has `package.json`, so adding a minimal dependency is feasible.",
+        "The description of \"Compounding archive flow (power user)\" is a bit speculative. While possible, the primary focus should remain on the daily value and immediate shareability.",
+        "Clarify how \"divergence highlighting\" will be visually represented and if it will detract from overall legibility on a small screen.",
+        "Reduce the prototype scope to homepage-first. Homepage plus day detail plus archive patterns is too much for one day.",
+        "Tighten the layout budget. The homepage is already getting dense, so this cannot become another large analytics block.",
+        "Be explicit about incomplete data. Some recent days have only partial reviewer coverage, and the brief needs a first-class fallback strategy.",
+        "Keep the framing garden-native. If it leans too far into benchmark-style model comparison, it will attract the wrong expectations.",
+        "Specify what a screenshot must communicate in under a second. The brief is close, but still slightly too broad on presentation variants."
+      ],
+      "risks": [
+        "Over-reliance on CSS-only rendering for complex data visualization. This could lead to a visually cluttered or amateurish output, directly contradicting the \"screenshot-beautiful\" goal.",
+        "The risk of \"visual clutter on an already-dense homepage\" is real and the proposed mitigations (compact, collapsible accordion) are valid, but the brief should explicitly choose one for the prototype to keep scope tight.",
+        "\"AI comparison\" framing attracting the wrong audience. This is a valid risk, and the proposed mitigation (emphasizing \"garden feature\") is important.",
+        "A dense scoreboard can become chart clutter, especially on mobile and in screenshots.",
+        "The homepage may start feeling over-instrumented instead of inviting.",
+        "The social framing may over-index on model rivalry rather than the product itself.",
+        "Incomplete reviewer data could make the visual feel inconsistent across days."
+      ]
+    },
+    {
+      "id": "openai",
+      "title": "Judge Deliberation Spotlight",
+      "summary": "Turn the winning day\u2019s buried judge commentary into a visible, quote-driven homepage surface that explains the decision faster and gives Bluesky and Dev.to a stronger story to share.",
+      "averageScore": 7.5,
+      "reviewCount": 2,
+      "dimensionAverages": {
+        "compoundingValue": {
+          "label": "Compounding Value",
+          "average": 7,
+          "reviewCount": 2
+        },
+        "usefulnessClarity": {
+          "label": "Usefulness & Clarity",
+          "average": 7.5,
+          "reviewCount": 2
+        },
+        "noveltySurprise": {
+          "label": "Novelty & Surprise",
+          "average": 6,
+          "reviewCount": 2
+        },
+        "feasibility": {
+          "label": "Feasibility",
+          "average": 9,
+          "reviewCount": 2
+        },
+        "legibility": {
+          "label": "Legibility",
+          "average": 8,
+          "reviewCount": 2
+        },
+        "continuity": {
+          "label": "Continuity",
+          "average": 8.5,
+          "reviewCount": 2
+        },
+        "shareability": {
+          "label": "Shareability",
+          "average": 7,
+          "reviewCount": 2
+        }
+      },
+      "reviewerBreakdown": [
+        {
+          "reviewer": {
+            "agentId": "explore_explorer_2",
+            "displayName": "Gemini (Explorer)",
+            "conceptKey": "gemini",
+            "modelFamily": "gemini",
+            "provider": "gemini_cli",
+            "model": "gemini-3.1-pro-preview",
+            "lens": "explorer"
+          },
+          "overallScore": 7,
+          "dimensionScores": {
+            "compoundingValue": 6,
+            "usefulnessClarity": 7,
+            "noveltySurprise": 6,
+            "feasibility": 9,
+            "legibility": 8,
+            "continuity": 8,
+            "shareability": 7
+          },
+          "keep": [
+            "The focus on surfacing actual judge commentary. This adds depth and \"story\" to the daily decisions, which is more engaging than just scores.",
+            "The identification of `reviewerBreakdown`, `keep`, `mustChange`, and `risks` as direct data sources. This indicates a clear path to implementation with existing data.",
+            "The emphasis on making the decision process feel like a \"debate,\" which adds personality and a human-like element to the AI's actions.",
+            "The \"zero new API endpoints\" and \"no new pipeline stage\" constraints, ensuring high feasibility for a single-day ship."
+          ],
+          "mustChange": [
+            "The brief could be more explicit about *how* the 2-3 highlights per judge will be selected. Is it the top-scoring one? A random selection? The \"most interesting\"? This impacts legibility and usefulness.",
+            "While \"avoid historical backfill\" is good for the prototype, the long-term compounding value would be enhanced if these insights were available for past days, perhaps through a phased approach.",
+            "The prototype focus is a bit broad: \"Prove that surfacing short, real judge quotes can make the latest decision more legible and more shareable...\" This could be tightened to a specific UX element to prove."
+          ],
+          "risks": [
+            "The quality and variability of reviewer notes could lead to inconsistent or uninteresting \"spotlights.\" Some days might have fantastic quotes, others might be dry. This could reduce the intended \"debate\" feel.",
+            "\"Too much personality could read as gimmicky.\" This is a significant risk if the selected quotes feel forced or out of context.",
+            "The shareability of plain text quotes (even highlighted) might be lower compared to a visual graph or unique image."
+          ],
+          "whyItWinsOrLoses": [
+            "This concept is highly feasible and directly addresses the problem of buried insights within the `decision.json` files. It adds a valuable narrative layer to the daily runs. However, its shareability might be slightly lower than a compelling visual, and the consistency of the \"spotlight\" content is more dependent on the qualitative nature of the judge's feedback. It doesn't quite hit the \"novelty\""
+          ]
+        },
+        {
+          "reviewer": {
+            "agentId": "explore_explorer_1",
+            "displayName": "Claude (Gardener)",
+            "conceptKey": "claude",
+            "modelFamily": "claude",
+            "provider": "claude",
+            "model": "opus",
+            "lens": "gardener"
+          },
+          "overallScore": 8,
+          "dimensionScores": {
+            "compoundingValue": 8,
+            "usefulnessClarity": 8,
+            "noveltySurprise": 6,
+            "feasibility": 9,
+            "legibility": 8,
+            "continuity": 9,
+            "shareability": 7
+          },
+          "keep": [
+            "**The diagnosis is precise and correct.** \"The most interesting data is still buried inside `reviewerBreakdown`\" — this is exactly right. The terminal widget made the pipeline *visible*; the deliberation spotlight makes the *reasoning* visible. This is the natural next step in Command Garden's transparency story.",
+            "**The \"debate, not score table\" framing is the right design constraint.** Scores alone are boring. Quotes from judges disagreeing are inherently interesting. The brief correctly identifies that the value is in the *reasoning divergence*, not the numbers.",
+            "**Zero new infrastructure, zero new API calls, reads from existing data.** This is the feasibility standard a Day 6 feature should meet. The brief correctly identifies that the existing `reviewerBreakdown[].keep`, `mustChange`, and `risks` arrays contain real, specific, quotable text that's already loaded by the renderer.",
+            "**The graceful degradation strategy is concrete.** \"If `reviewerBreakdown` is missing, hide the block or fall back to a simpler rationale state\" — this handles the real data-quality problem (some days have 2 of 3 judges) without pretending it doesn't exist.",
+            "**Strong continuity argument.** The brief correctly connects to the observed audience pattern: \"the most promising content so far is transparent, visual, and easy to talk about in a feed.\" Judge quotes are exactly that."
+          ],
+          "mustChange": [
+            "**The quote selection algorithm is the hardest unsolved problem and the brief barely addresses it.** \"One highlight per judge\" sounds simple, but `keep` arrays contain 4-6 items of wildly varying length and specificity. Some are one-liners (\"Strong alignment with the seed\"), others are multi-sentence paragraphs with markdown bold. The brief needs to specify: max character length per quote? First i",
+            "**The section needs a visual identity beyond \"quotes in boxes.\"** The terminal widget works because it has a strong visual concept (retro terminal). The garden viz works because plants are distinctive. \"Judge quotes with scores\" risks looking like a generic testimonials section. The brief should specify a visual concept — debate podiums? Verdict cards? A courtroom metaphor? Something that gives th",
+            "**The brief doesn't specify where quotes come from for losing candidates.** It says \"winning candidate's real `reviewerBreakdown`\" — but the most interesting deliberation is often *why the losers lost*. A judge saying \"this concept drifts from the seed\" about a rejected candidate is more revealing than \"strong alignment\" about the winner. The prototype should consider showing one dissenting quote ",
+            "**Shareability is undersold.** The brief says \"social upside is plausible, not guaranteed\" — which is honest but doesn't lean into the opportunity. A Bluesky post template like \"Today GPT said 'strong alignment' while Claude demanded 3 changes. Here's who won \u2192\" is more engaging than anything Command Garden has posted yet. The brief should include a concrete social post template to prove the share"
+          ],
+          "risks": [
+            "**Quote quality variance is the biggest execution risk.** Some `reviewerBreakdown` entries are insightful and specific; others are generic (\"Good feasibility\"). If the prototype picks a bad day's data for the first impression, the section will feel hollow. The builder should test against multiple days' data during development.",
+            "**Overlap with the existing \"Top Candidates\" teaser section.** The homepage already shows a 3-card candidate preview. The deliberation spotlight covers similar territory (why did this candidate win?). The brief should specify whether it replaces, enhances, or sits adjacent to the existing candidates section — otherwise the homepage will have two sections that answer the same question differently.",
+            "**The \"one highlight per judge\" constraint may not produce enough tension.** If all three judges agree (which happens — the terminal widget got 9/9/9), the section becomes \"three people said the same thing.\" The brief should specify a fallback for consensus days: show `mustChange` items instead of `keep` to maintain interest."
+          ],
+          "whyItWinsOrLoses": [
+            "**Wins on feasibility, continuity, and prototype clarity.** This is the brief that best understands what Command Garden needs on Day 6: more value from existing data, not more infrastructure. It compounds the transparency story that's driven the best engagement so far (spec viewer post, garden viz post). It's buildable in a day with high confidence. It loses some ground on novelty — \"show judge qu"
+          ]
+        }
+      ],
+      "rank": 2,
+      "keep": [
+        "The focus on surfacing actual judge commentary. This adds depth and \"story\" to the daily decisions, which is more engaging than just scores.",
+        "The identification of `reviewerBreakdown`, `keep`, `mustChange`, and `risks` as direct data sources. This indicates a clear path to implementation with existing data.",
+        "The emphasis on making the decision process feel like a \"debate,\" which adds personality and a human-like element to the AI's actions.",
+        "The \"zero new API endpoints\" and \"no new pipeline stage\" constraints, ensuring high feasibility for a single-day ship.",
+        "**The diagnosis is precise and correct.** \"The most interesting data is still buried inside `reviewerBreakdown`\" — this is exactly right. The terminal widget made the pipeline *visible*; the deliberation spotlight makes the *reasoning* visible. This is the natural next step in Command Garden's transparency story.",
+        "**The \"debate, not score table\" framing is the right design constraint.** Scores alone are boring. Quotes from judges disagreeing are inherently interesting. The brief correctly identifies that the value is in the *reasoning divergence*, not the numbers.",
+        "**Zero new infrastructure, zero new API calls, reads from existing data.** This is the feasibility standard a Day 6 feature should meet. The brief correctly identifies that the existing `reviewerBreakdown[].keep`, `mustChange`, and `risks` arrays contain real, specific, quotable text that's already loaded by the renderer.",
+        "**The graceful degradation strategy is concrete.** \"If `reviewerBreakdown` is missing, hide the block or fall back to a simpler rationale state\" — this handles the real data-quality problem (some days have 2 of 3 judges) without pretending it doesn't exist.",
+        "**Strong continuity argument.** The brief correctly connects to the observed audience pattern: \"the most promising content so far is transparent, visual, and easy to talk about in a feed.\" Judge quotes are exactly that."
+      ],
+      "mustChange": [
+        "The brief could be more explicit about *how* the 2-3 highlights per judge will be selected. Is it the top-scoring one? A random selection? The \"most interesting\"? This impacts legibility and usefulness.",
+        "While \"avoid historical backfill\" is good for the prototype, the long-term compounding value would be enhanced if these insights were available for past days, perhaps through a phased approach.",
+        "The prototype focus is a bit broad: \"Prove that surfacing short, real judge quotes can make the latest decision more legible and more shareable...\" This could be tightened to a specific UX element to prove.",
+        "**The quote selection algorithm is the hardest unsolved problem and the brief barely addresses it.** \"One highlight per judge\" sounds simple, but `keep` arrays contain 4-6 items of wildly varying length and specificity. Some are one-liners (\"Strong alignment with the seed\"), others are multi-sentence paragraphs with markdown bold. The brief needs to specify: max character length per quote? First i",
+        "**The section needs a visual identity beyond \"quotes in boxes.\"** The terminal widget works because it has a strong visual concept (retro terminal). The garden viz works because plants are distinctive. \"Judge quotes with scores\" risks looking like a generic testimonials section. The brief should specify a visual concept — debate podiums? Verdict cards? A courtroom metaphor? Something that gives th",
+        "**The brief doesn't specify where quotes come from for losing candidates.** It says \"winning candidate's real `reviewerBreakdown`\" — but the most interesting deliberation is often *why the losers lost*. A judge saying \"this concept drifts from the seed\" about a rejected candidate is more revealing than \"strong alignment\" about the winner. The prototype should consider showing one dissenting quote",
+        "**Shareability is undersold.** The brief says \"social upside is plausible, not guaranteed\" — which is honest but doesn't lean into the opportunity. A Bluesky post template like \"Today GPT said 'strong alignment' while Claude demanded 3 changes. Here's who won \u2192\" is more engaging than anything Command Garden has posted yet. The brief should include a concrete social post template to prove the share"
+      ],
+      "risks": [
+        "The quality and variability of reviewer notes could lead to inconsistent or uninteresting \"spotlights.\" Some days might have fantastic quotes, others might be dry. This could reduce the intended \"debate\" feel.",
+        "\"Too much personality could read as gimmicky.\" This is a significant risk if the selected quotes feel forced or out of context.",
+        "The shareability of plain text quotes (even highlighted) might be lower compared to a visual graph or unique image.",
+        "**Quote quality variance is the biggest execution risk.** Some `reviewerBreakdown` entries are insightful and specific; others are generic (\"Good feasibility\"). If the prototype picks a bad day's data for the first impression, the section will feel hollow. The builder should test against multiple days' data during development.",
+        "**Overlap with the existing \"Top Candidates\" teaser section.** The homepage already shows a 3-card candidate preview. The deliberation spotlight covers similar territory (why did this candidate win?). The brief should specify whether it replaces, enhances, or sits adjacent to the existing candidates section — otherwise the homepage will have two sections that answer the same question differently.",
+        "**The \"one highlight per judge\" constraint may not produce enough tension.** If all three judges agree (which happens — the terminal widget got 9/9/9), the section becomes \"three people said the same thing.\" The brief should specify a fallback for consensus days: show `mustChange` items instead of `keep` to maintain interest."
+      ]
+    },
+    {
+      "id": "gemini",
+      "title": "Interactive Feature Seeds (Prompt-to-Plant)",
+      "summary": "A community-driven feedback mechanism where users \"plant seeds\" (feature ideas) in the visual garden, gamifying suggestions and creating a viral loop when the AI autonomously selects and builds their idea.",
+      "averageScore": 5.5,
+      "reviewCount": 2,
+      "dimensionAverages": {
+        "compoundingValue": {
+          "label": "Compounding Value",
+          "average": 6.5,
+          "reviewCount": 2
+        },
+        "usefulnessClarity": {
+          "label": "Usefulness & Clarity",
+          "average": 5,
+          "reviewCount": 2
+        },
+        "noveltySurprise": {
+          "label": "Novelty & Surprise",
+          "average": 8,
+          "reviewCount": 2
+        },
+        "feasibility": {
+          "label": "Feasibility",
+          "average": 3.5,
+          "reviewCount": 2
+        },
+        "legibility": {
+          "label": "Legibility",
+          "average": 5,
+          "reviewCount": 2
+        },
+        "continuity": {
+          "label": "Continuity",
+          "average": 5,
+          "reviewCount": 2
+        },
+        "shareability": {
+          "label": "Shareability",
+          "average": 8,
+          "reviewCount": 2
+        }
+      },
+      "reviewerBreakdown": [
+        {
+          "reviewer": {
+            "agentId": "explore_explorer_0",
+            "displayName": "GPT (Visitor)",
+            "conceptKey": "openai",
+            "modelFamily": "gpt",
+            "provider": "codex_cli",
+            "model": "gpt-5.4",
+            "lens": "visitor"
+          },
+          "overallScore": 5,
+          "dimensionScores": {
+            "compoundingValue": 6,
+            "usefulnessClarity": 5,
+            "noveltySurprise": 8,
+            "feasibility": 3,
+            "legibility": 5,
+            "continuity": 4,
+            "shareability": 8
+          },
+          "keep": [
+            "The core instinct is strong: Command Garden has almost no written feedback right now, so a lower-friction participation loop is a real business problem worth noticing.",
+            "The \u201cplant a seed\u201d metaphor fits the existing garden visual language better than a generic form upgrade would.",
+            "Asking for an optional Bluesky or Dev.to handle is a smart growth-oriented idea if attribution ever becomes real."
+          ],
+          "mustChange": [
+            "Narrow the scope hard. This is currently a new participatory product loop, not a one-day UI improvement.",
+            "Stop treating `feedback-digest.json` as a write target. In this codebase it is a generated artifact, not the live submission store.",
+            "Define the prototype around one thing to prove. Right now it mixes new submission UX, persistence, garden rendering, future pipeline selection, and future social tagging.",
+            "Reconcile the concept with the product thesis. Command Garden is currently \u201can autonomous site with transparent decisions,\u201d not \u201ca community idea game.\u201d",
+            "Add a concrete abuse and moderation path. An unauthenticated, publicly visualized submission flow is risky on day one."
+          ],
+          "risks": [
+            "It depends on future pipeline behavior to feel rewarding, so the prototype\u2019s payoff is delayed and uncertain.",
+            "The garden visualization could get noisy fast if pending seeds are mixed with shipped features.",
+            "Spam and junk suggestions become immediately visible unless there is a moderation buffer.",
+            "It risks changing visitor expectations from \u201cwatch the system evolve\u201d to \u201cmy idea should get built.\u201d"
+          ],
+          "whyItWinsOrLoses": [
+            "It loses because it drifts furthest from the current seeded direction and asks the prototype to prove too many things at once. The audience-growth instinct is good, but the concept is materially heavier than a single-run improvement and changes the product thesis more than it refines it."
+          ]
+        },
+        {
+          "reviewer": {
+            "agentId": "explore_explorer_1",
+            "displayName": "Claude (Gardener)",
+            "conceptKey": "claude",
+            "modelFamily": "claude",
+            "provider": "claude",
+            "model": "opus",
+            "lens": "gardener"
+          },
+          "overallScore": 6,
+          "dimensionScores": {
+            "compoundingValue": 7,
+            "usefulnessClarity": 5,
+            "noveltySurprise": 8,
+            "feasibility": 4,
+            "legibility": 5,
+            "continuity": 6,
+            "shareability": 8
+          },
+          "keep": [
+            "The core insight that zero community feedback is the most important problem to address, and that the feedback mechanism needs to feel *rewarding* rather than utilitarian. This is the right diagnosis.",
+            "The Bluesky handle capture idea is genuinely clever. Tagging users when their idea ships (\"@user's idea just bloomed!\") is one of the few organic growth loops available to a 4-follower account. This mechanic should survive even if the rest of the concept changes.",
+            "The \"plant a seed\" metaphor is the strongest naming choice across both briefs — it extends the garden vocabulary naturally and gives users a reason to care about the garden visualization they're already seeing."
+          ],
+          "mustChange": [
+            "**The scope is at least two days of work crammed into one.** The brief calls for: (1) a new terminal-themed form, (2) integration with the existing feedback Lambda, (3) social handle storage (new field in DynamoDB), (4) dynamic real-time garden visualization updates, and (5) a new visual state (\"pending seed\" vs \"shipped plant\") in the CSS garden. Any three of these would be a full day. The protot",
+            "**\"Visual Sprouting\" is the wrong prototype focus.** The brief says the prototype must prove that \"adding a visual seed to the garden feels instantaneous and rewarding.\" But the garden visualization currently renders from `manifest.json` — shipped features only. Injecting unshipped user ideas into the same visual space conflates two different data types and muddies the garden metaphor. A submitted",
+            "**The spam/moderation handwave is disqualifying at prototype scope.** \"Rely on the AI pipeline's existing prompt safety guardrails\" means the prototype ships an unauthenticated public form with no rate limiting, no content filtering, and no moderation queue — and hopes tomorrow's pipeline handles it. The existing feedback Lambda *does* have rate limiting, but the brief doesn't acknowledge this or ",
+            "**The \"zero feedback\" framing overstates the problem.** Today's digest has zero items, but April 8 had 55 reactions and the feedback form already exists. The problem isn't \"no way to participate\" — it's \"the existing way to participate isn't engaging enough.\" The brief should build on the existing feedback infrastructure, not propose a parallel system."
+          ],
+          "risks": [
+            "**Visual metaphor pollution.** If seeds (unbuilt ideas) appear alongside plants (shipped features) in the garden, visitors lose the ability to tell what's real and what's aspirational. The garden's current clarity — one plant per shipped day — is a design asset that this concept threatens.",
+            "**Chicken-and-egg with 4 followers.** The viral loop depends on users submitting ideas, getting tagged when they ship, and sharing. With 4 followers and 0 feedback items, the loop has no fuel. The concept assumes an audience that doesn't exist yet and builds infrastructure for scale the project hasn't earned.",
+            "**The \"disappointment churn\" risk is acknowledged but unmitigated.** If the pipeline ignores 90% of seeds (likely, since it evaluates 3 candidates/day from 3 AI models), most submitters will feel ignored. The brief offers no mitigation — no \"your seed is growing\" status updates, no explanation of selection criteria, no queue visibility.",
+            "**DynamoDB schema change required.** Storing Bluesky handles alongside feedback requires either a new field in the existing feedback table or a new table. This is small but crosses the \"no infra changes\" boundary that keeps Day 6 features shippable."
+          ],
+          "whyItWinsOrLoses": [
+            "**Loses on feasibility and prototype focus.** The concept is genuinely creative and the growth-loop mechanic is the strongest social strategy across both briefs. But the brief tries to ship a complete feature (form + API + visual + social handle storage) instead of identifying the one thing the prototype must prove. A Day 6 feature for a 4-follower site should be lean and visual, not a full partic"
+          ]
+        }
+      ],
+      "rank": 3,
+      "keep": [
+        "The core instinct is strong: Command Garden has almost no written feedback right now, so a lower-friction participation loop is a real business problem worth noticing.",
+        "The \u201cplant a seed\u201d metaphor fits the existing garden visual language better than a generic form upgrade would.",
+        "Asking for an optional Bluesky or Dev.to handle is a smart growth-oriented idea if attribution ever becomes real.",
+        "The core insight that zero community feedback is the most important problem to address, and that the feedback mechanism needs to feel *rewarding* rather than utilitarian. This is the right diagnosis.",
+        "The Bluesky handle capture idea is genuinely clever. Tagging users when their idea ships (\"@user's idea just bloomed!\") is one of the few organic growth loops available to a 4-follower account. This mechanic should survive even if the rest of the concept changes.",
+        "The \"plant a seed\" metaphor is the strongest naming choice across both briefs — it extends the garden vocabulary naturally and gives users a reason to care about the garden visualization they're already seeing."
+      ],
+      "mustChange": [
+        "Narrow the scope hard. This is currently a new participatory product loop, not a one-day UI improvement.",
+        "Stop treating `feedback-digest.json` as a write target. In this codebase it is a generated artifact, not the live submission store.",
+        "Define the prototype around one thing to prove. Right now it mixes new submission UX, persistence, garden rendering, future pipeline selection, and future social tagging.",
+        "Reconcile the concept with the product thesis. Command Garden is currently \u201can autonomous site with transparent decisions,\u201d not \u201ca community idea game.\u201d",
+        "Add a concrete abuse and moderation path. An unauthenticated, publicly visualized submission flow is risky on day one.",
+        "**The scope is at least two days of work crammed into one.** The brief calls for: (1) a new terminal-themed form, (2) integration with the existing feedback Lambda, (3) social handle storage (new field in DynamoDB), (4) dynamic real-time garden visualization updates, and (5) a new visual state (\"pending seed\" vs \"shipped plant\") in the CSS garden. Any three of these would be a full day. The protot",
+        "**\"Visual Sprouting\" is the wrong prototype focus.** The brief says the prototype must prove that \"adding a visual seed to the garden feels instantaneous and rewarding.\" But the garden visualization currently renders from `manifest.json` — shipped features only. Injecting unshipped user ideas into the same visual space conflates two different data types and muddies the garden metaphor. A submitted",
+        "**The spam/moderation handwave is disqualifying at prototype scope.** \"Rely on the AI pipeline's existing prompt safety guardrails\" means the prototype ships an unauthenticated public form with no rate limiting, no content filtering, and no moderation queue — and hopes tomorrow's pipeline handles it. The existing feedback Lambda *does* have rate limiting, but the brief doesn't acknowledge this or",
+        "**The \"zero feedback\" framing overstates the problem.** Today's digest has zero items, but April 8 had 55 reactions and the feedback form already exists. The problem isn't \"no way to participate\" — it's \"the existing way to participate isn't engaging enough.\" The brief should build on the existing feedback infrastructure, not propose a parallel system."
+      ],
+      "risks": [
+        "It depends on future pipeline behavior to feel rewarding, so the prototype\u2019s payoff is delayed and uncertain.",
+        "The garden visualization could get noisy fast if pending seeds are mixed with shipped features.",
+        "Spam and junk suggestions become immediately visible unless there is a moderation buffer.",
+        "It risks changing visitor expectations from \u201cwatch the system evolve\u201d to \u201cmy idea should get built.\u201d",
+        "**Visual metaphor pollution.** If seeds (unbuilt ideas) appear alongside plants (shipped features) in the garden, visitors lose the ability to tell what's real and what's aspirational. The garden's current clarity — one plant per shipped day — is a design asset that this concept threatens.",
+        "**Chicken-and-egg with 4 followers.** The viral loop depends on users submitting ideas, getting tagged when they ship, and sharing. With 4 followers and 0 feedback items, the loop has no fuel. The concept assumes an audience that doesn't exist yet and builds infrastructure for scale the project hasn't earned.",
+        "**The \"disappointment churn\" risk is acknowledged but unmitigated.** If the pipeline ignores 90% of seeds (likely, since it evaluates 3 candidates/day from 3 AI models), most submitters will feel ignored. The brief offers no mitigation — no \"your seed is growing\" status updates, no explanation of selection criteria, no queue visibility.",
+        "**DynamoDB schema change required.** Storing Bluesky handles alongside feedback requires either a new field in the existing feedback table or a new table. This is small but crosses the \"no infra changes\" boundary that keeps Day 6 features shippable."
+      ]
+    }
+  ],
+  "winner": {
+    "candidateId": "claude",
+    "title": "The Scoreboard — Visual Judge Score Comparison on the Homepage",
+    "summary": "Turn the buried AI judge scoring data into a visual, screenshot-ready scoreboard that shows how Claude, GPT, and Gemini disagreed on today's candidates — making every daily run produce shareable \"AI model comparison\" content.",
+    "averageScore": 8
+  },
+  "rationale": "Selected as the highest-scoring candidate with an average score of 8.0 across 2 judge(s).",
+  "featureType": "interaction",
+  "tags": [
+    "homepage",
+    "community",
+    "reactions",
+    "engagement"
+  ],
+  "feedbackInfluence": [
+    {
+      "summary": "Visitors wanted visible evidence that their emoji reactions are counted and meaningful.",
+      "impact": "high"
+    },
+    {
+      "summary": "The hero tagline promises community-responsive growth but no homepage surface proved it.",
+      "impact": "medium"
+    }
+  ],
+  "artifacts": {
+    "spec": "spec.md",
+    "feedbackDigest": "feedback-digest.json",
+    "buildSummary": "build-summary.md",
+    "testResults": "test-results.json",
+    "review": "review.md"
+  },
+  "bluesky_post": {
+    "headline": "Command Garden now shows its community pulse",
+    "body": "The autonomous pipeline built a Community Pulse section today. Emoji reaction totals from the last week now appear on the homepage — see which emoji leads and which day got the most love. commandgarden.com",
+    "alt_text": "Homepage showing a Community Pulse section with five emoji badges displaying aggregated reaction counts and a gold-highlighted top emoji"
+  },
+  "bluesky_strategy": {
+    "searchQueries": [
+      "community engagement metrics",
+      "build in public",
+      "autonomous coding",
+      "emoji reactions web",
+      "developer community",
+      "indie web project",
+      "AI shipping features"
+    ],
+    "replyTemplates": {
+      "whatIs": "It's a website that ships one new feature every day, built entirely by an AI pipeline. Today it added a community pulse showing how visitors react to each feature. Every decision is public at commandgarden.com",
+      "howDoesItWork": "A five-stage AI pipeline runs daily: gather feedback, score candidates with three AI judges, write a spec, build it, test it, ship it. Today's feature surfaces emoji reaction data as a community engagement scoreboard.",
+      "genericQuestion": "Great question! Command Garden is radically transparent — every candidate, score, and spec is published. Check today's Community Pulse feature at commandgarden.com"
+    },
+    "hashtagsToUse": [
+      "#CommandGarden",
+      "#BuildInPublic",
+      "#AIAgent",
+      "#WebDev",
+      "#CommunityEngagement"
+    ],
+    "maxDailyActions": 15
+  },
+  "outreachSummary": {
+    "postUri": "at://did:plc:zq2gcfpg7nfa3xqhpow3m65b/app.bsky.feed.post/3mj7l3yr5t32m",
+    "postsLiked": 10,
+    "accountsFollowed": 5,
+    "mentionsHandled": 0,
+    "searchQueries": [
+      "community engagement metrics",
+      "build in public",
+      "autonomous coding"
+    ],
+    "executedAt": "2026-04-11T09:56:39.235Z"
+  }
+}

@@ -1,0 +1,173 @@
+{
+  "schemaVersion": 1,
+  "runDate": "2026-04-14",
+  "generatedAt": "2026-04-14T12:00:00.000Z",
+  "summary": {
+    "totalScenarios": 338,
+    "passed": 338,
+    "failed": 0,
+    "passRate": 100
+  },
+  "scenarios": [
+    {
+      "name": "Board Scout renders above the card grid with populated enemy and plant rosters and no load errors",
+      "persona": "visitor",
+      "status": "pass"
+    },
+    {
+      "name": "Board Scout renders the April 13 enemy and plant roster data accurately",
+      "persona": "visitor",
+      "status": "pass"
+    },
+    {
+      "name": "Board Scout supports card selection and swaps the detail view between enemies and plants",
+      "persona": "visitor",
+      "status": "pass"
+    },
+    {
+      "name": "Board Scout renders tutorial and challenge wave timelines with the expected new-threat badges",
+      "persona": "visitor",
+      "status": "pass"
+    },
+    {
+      "name": "Board Scout collapses and expands the scout body from the toggle",
+      "persona": "visitor",
+      "status": "pass"
+    },
+    {
+      "name": "Board Scout stays visible without horizontal overflow on a mobile viewport",
+      "persona": "visitor",
+      "status": "pass"
+    },
+    {
+      "name": "Board Scout renders the April 14 scenario roster and wave structure from config data",
+      "persona": "visitor",
+      "status": "pass"
+    },
+    {
+      "name": "Board Scout detail panel starts with hidden attribute and is not visible",
+      "persona": "visitor",
+      "status": "pass"
+    },
+    {
+      "name": "Board Scout clicking an enemy card selects it and shows enemy detail stats",
+      "persona": "visitor",
+      "status": "pass"
+    },
+    {
+      "name": "Board Scout clicking a plant card deselects the enemy card and shows plant detail stats",
+      "persona": "visitor",
+      "status": "pass"
+    },
+    {
+      "name": "Board Scout collapse toggle hides the scout body and expand restores it",
+      "persona": "visitor",
+      "status": "pass"
+    },
+    {
+      "name": "Board Scout selecting a different enemy card after collapse/expand cycle updates detail correctly",
+      "persona": "visitor",
+      "status": "pass"
+    },
+    {
+      "name": "Board Scout exposes nav and heading semantics, and toggle collapse state is communicated",
+      "persona": "visitor",
+      "status": "pass"
+    },
+    {
+      "name": "Board Scout supports keyboard traversal through scout cards in DOM order and Enter selection",
+      "persona": "visitor",
+      "status": "pass"
+    },
+    {
+      "name": "Board Scout keeps inventory aria-pressed states and card-name contrast at AA",
+      "persona": "visitor",
+      "status": "pass"
+    },
+    {
+      "name": "Board Scout responsive mobile: scout is visible with no horizontal overflow",
+      "persona": "visitor",
+      "status": "pass"
+    },
+    {
+      "name": "Board Scout responsive mobile: every roster card fits within the viewport width",
+      "persona": "visitor",
+      "status": "pass"
+    },
+    {
+      "name": "Board Scout responsive mobile: opening the detail panel does not cause horizontal overflow",
+      "persona": "visitor",
+      "status": "pass"
+    },
+    {
+      "name": "Board Scout responsive mobile: collapse toggle meets minimum tap target size",
+      "persona": "visitor",
+      "status": "pass"
+    },
+    {
+      "name": "Board Scout responsive tablet: no horizontal overflow on scout or body",
+      "persona": "visitor",
+      "status": "pass"
+    },
+    {
+      "name": "Board Scout responsive tablet: no horizontal overflow after opening the detail panel",
+      "persona": "visitor",
+      "status": "pass"
+    },
+    {
+      "name": "Board Scout responsive tablet: scout rail and game-cards grid reflow at tablet width",
+      "persona": "visitor",
+      "status": "pass"
+    },
+    {
+      "name": "Board Scout responsive desktop: scout rail renders full-width within container",
+      "persona": "visitor",
+      "status": "pass"
+    },
+    {
+      "name": "Board Scout responsive desktop: roster cards display in a horizontal row layout",
+      "persona": "visitor",
+      "status": "pass"
+    },
+    {
+      "name": "Board Scout responsive desktop: no horizontal overflow at desktop width",
+      "persona": "visitor",
+      "status": "pass"
+    },
+    {
+      "name": "April 14 game page boots cleanly and keeps Board Scout stable through core smoke flows",
+      "persona": "visitor",
+      "status": "pass"
+    },
+    {
+      "name": "Game shell loads with tracked assets section and leaderboard rail",
+      "persona": "visitor",
+      "status": "pass"
+    },
+    {
+      "name": "Deterministic scene transitions, placement, and enemy hooks",
+      "persona": "visitor",
+      "status": "pass"
+    },
+    {
+      "name": "Tutorial clears into challenge and then unlocks endless mode",
+      "persona": "visitor",
+      "status": "pass"
+    },
+    {
+      "name": "April 13 inventory selection stays in sync with the active plant",
+      "persona": "visitor",
+      "status": "pass"
+    },
+    {
+      "name": "April 13 roster plants have manifest-backed art and projectile assets",
+      "persona": "visitor",
+      "status": "pass"
+    },
+    {
+      "name": "April 13 title scene shows two-plant roster copy and transitions into both modes",
+      "persona": "visitor",
+      "status": "pass"
+    }
+  ]
+}

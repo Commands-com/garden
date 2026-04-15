@@ -1,0 +1,312 @@
+{
+  "schemaVersion": 2,
+  "runDate": "2026-04-15",
+  "generatedAt": "2026-04-15T12:00:00Z",
+  "scoringDimensions": [
+    { "id": "compoundingValue", "label": "Compounding Value" },
+    { "id": "usefulnessClarity", "label": "Usefulness & Clarity" },
+    { "id": "noveltySurprise", "label": "Novelty & Surprise" },
+    { "id": "feasibility", "label": "Feasibility" },
+    { "id": "legibility", "label": "Legibility" },
+    { "id": "continuity", "label": "Continuity" },
+    { "id": "shareability", "label": "Shareability" }
+  ],
+  "judgePanel": [
+    {
+      "agentId": "explore_explorer_0",
+      "displayName": "GPT (Visitor)",
+      "conceptKey": "openai",
+      "modelFamily": "gpt",
+      "provider": "codex_cli",
+      "model": "gpt-5.4",
+      "lens": "visitor"
+    },
+    {
+      "agentId": "explore_explorer_1",
+      "displayName": "Claude (Gardener)",
+      "conceptKey": "claude",
+      "modelFamily": "claude",
+      "provider": "claude",
+      "model": "opus",
+      "lens": "gardener"
+    },
+    {
+      "agentId": "explore_explorer_2",
+      "displayName": "Gemini (Explorer)",
+      "conceptKey": "gemini",
+      "modelFamily": "gemini",
+      "provider": "gemini_cli",
+      "model": "gemini-3.1-pro-preview",
+      "lens": "explorer"
+    }
+  ],
+  "summary": "Rootline Defense now has its first economy plant. Sunroot Bloom costs 50 sap, does not attack, and produces +25 sap on a 5.0 second pulse, turning the April 15 board into a real investment-vs-defense decision.",
+  "candidates": [
+    {
+      "id": "candidate-1",
+      "title": "Sunroot Bloom: First Economy Plant for Rootline Defense",
+      "summary": "Adds Sunroot Bloom as a non-attacking support plant that generates +25 sap pulses, gives the April 15 board a three-plant roster, teaches the economy tradeoff in tutorial, and shows support-specific stats in Board Scout.",
+      "averageScore": 8.8,
+      "reviewCount": 3,
+      "rank": 1,
+      "dimensionAverages": {
+        "compoundingValue": { "label": "Compounding Value", "average": 9.3, "reviewCount": 3 },
+        "usefulnessClarity": { "label": "Usefulness & Clarity", "average": 8.7, "reviewCount": 3 },
+        "noveltySurprise": { "label": "Novelty & Surprise", "average": 8.7, "reviewCount": 3 },
+        "feasibility": { "label": "Feasibility", "average": 8.3, "reviewCount": 3 },
+        "legibility": { "label": "Legibility", "average": 8.7, "reviewCount": 3 },
+        "continuity": { "label": "Continuity", "average": 9.0, "reviewCount": 3 },
+        "shareability": { "label": "Shareability", "average": 8.7, "reviewCount": 3 }
+      },
+      "reviewerBreakdown": [
+        {
+          "reviewer": {
+            "agentId": "explore_explorer_0",
+            "displayName": "GPT (Visitor)",
+            "modelFamily": "gpt",
+            "lens": "visitor"
+          },
+          "overallScore": 8.5,
+          "dimensionScores": {
+            "compoundingValue": 9,
+            "usefulnessClarity": 9,
+            "noveltySurprise": 8,
+            "feasibility": 8,
+            "legibility": 8,
+            "continuity": 9,
+            "shareability": 8
+          },
+          "keep": [
+            "The first support plant makes sap management an active choice instead of only a passive timer.",
+            "A low-cost economy plant creates an easy-to-understand risk moment for new players.",
+            "Board Scout support stats explain the plant before the player spends sap."
+          ],
+          "mustChange": [
+            "Tests must prove support plants never reach projectile creation."
+          ],
+          "risks": [
+            "The board can become too easy if multiple Sunroots stack without enough early pressure."
+          ]
+        },
+        {
+          "reviewer": {
+            "agentId": "explore_explorer_1",
+            "displayName": "Claude (Gardener)",
+            "modelFamily": "claude",
+            "lens": "gardener"
+          },
+          "overallScore": 9.0,
+          "dimensionScores": {
+            "compoundingValue": 10,
+            "usefulnessClarity": 9,
+            "noveltySurprise": 9,
+            "feasibility": 8,
+            "legibility": 9,
+            "continuity": 9,
+            "shareability": 9
+          },
+          "keep": [
+            "The support role opens a reusable archetype for future economy, utility, and control plants.",
+            "The dated scenario preserves the April 13/14 roster while letting today's board require a new tool.",
+            "The validator now understands support plants instead of treating the cheapest plant as an attacker."
+          ],
+          "mustChange": [
+            "Keep the April 14 alias locked to the April 13 two-plant board."
+          ],
+          "risks": [
+            "Difficulty validation needs to confirm the old two-plant roster cannot still clear the new board."
+          ]
+        },
+        {
+          "reviewer": {
+            "agentId": "explore_explorer_2",
+            "displayName": "Gemini (Explorer)",
+            "modelFamily": "gemini",
+            "lens": "explorer"
+          },
+          "overallScore": 9.0,
+          "dimensionScores": {
+            "compoundingValue": 9,
+            "usefulnessClarity": 8,
+            "noveltySurprise": 9,
+            "feasibility": 9,
+            "legibility": 9,
+            "continuity": 9,
+            "shareability": 9
+          },
+          "keep": [
+            "The visible +25 SAP badge gives the daily screenshot a clear new mechanic.",
+            "The tutorial-to-challenge flow teaches investment timing without adding another page.",
+            "The hand-authored Sunroot asset makes the support role feel shipped rather than placeholder-backed."
+          ],
+          "mustChange": [
+            "Asset coverage must prove Sunroot uses manifest art and has no projectile asset contract."
+          ],
+          "risks": [
+            "The first pulse timing may feel generous if the opening pressure is not tuned around it."
+          ]
+        }
+      ],
+      "keep": [
+        "Ship a real economy plant with manifest-backed art and support-specific UI.",
+        "Preserve historical boards by registering April 15 as a new dated scenario.",
+        "Add regression tests for support placement, sap pulses, projectile suppression, Board Scout stats, assets, and April 14 alias behavior."
+      ],
+      "mustChange": [
+        "Support plants must branch before projectile creation in runtime and simulator code.",
+        "Board Scout must display Sap per Pulse and Pulse Rate instead of attacker damage fields.",
+        "The April 15 manifest entry must point at a complete served artifact set."
+      ],
+      "risks": [
+        "Economy tuning can swing from mandatory to irrelevant with small pulse or wave-pressure changes.",
+        "Future support plants need the same no-projectile contract enforced by tests."
+      ],
+      "feedbackReferences": [
+        "Users asked for more plant types and a deeper game surface.",
+        "Board Scout feedback made support-specific stat display a visible acceptance criterion."
+      ]
+    },
+    {
+      "id": "candidate-2",
+      "title": "Wave Radar HUD: Upcoming Threat Preview During Runs",
+      "summary": "Adds an in-run HUD strip that previews the next enemy cluster while the player is already defending, improving reactive planning but not expanding the plant roster.",
+      "averageScore": 7.6,
+      "reviewCount": 3,
+      "rank": 2,
+      "dimensionAverages": {
+        "compoundingValue": { "label": "Compounding Value", "average": 7.7, "reviewCount": 3 },
+        "usefulnessClarity": { "label": "Usefulness & Clarity", "average": 8.0, "reviewCount": 3 },
+        "noveltySurprise": { "label": "Novelty & Surprise", "average": 7.0, "reviewCount": 3 },
+        "feasibility": { "label": "Feasibility", "average": 7.3, "reviewCount": 3 },
+        "legibility": { "label": "Legibility", "average": 7.7, "reviewCount": 3 },
+        "continuity": { "label": "Continuity", "average": 8.0, "reviewCount": 3 },
+        "shareability": { "label": "Shareability", "average": 7.3, "reviewCount": 3 }
+      },
+      "keep": [
+        "Uses scenario data that already exists.",
+        "Could help players react to late-wave pressure."
+      ],
+      "mustChange": [
+        "Needs careful placement so it does not clutter the live board."
+      ],
+      "risks": [
+        "Improves visibility but does not add a new strategic verb."
+      ]
+    },
+    {
+      "id": "candidate-3",
+      "title": "Glass Ram Counter-Tutorial",
+      "summary": "Retunes the tutorial around Glass Ram lane stacking and Bramble Spear timing, strengthening the current two-attacker roster without adding a support archetype.",
+      "averageScore": 7.1,
+      "reviewCount": 3,
+      "rank": 3,
+      "dimensionAverages": {
+        "compoundingValue": { "label": "Compounding Value", "average": 7.0, "reviewCount": 3 },
+        "usefulnessClarity": { "label": "Usefulness & Clarity", "average": 7.3, "reviewCount": 3 },
+        "noveltySurprise": { "label": "Novelty & Surprise", "average": 6.7, "reviewCount": 3 },
+        "feasibility": { "label": "Feasibility", "average": 8.0, "reviewCount": 3 },
+        "legibility": { "label": "Legibility", "average": 7.3, "reviewCount": 3 },
+        "continuity": { "label": "Continuity", "average": 7.7, "reviewCount": 3 },
+        "shareability": { "label": "Shareability", "average": 6.7, "reviewCount": 3 }
+      },
+      "keep": [
+        "Clarifies an existing enemy counterplay pattern.",
+        "Lower implementation risk than a new support plant."
+      ],
+      "mustChange": [
+        "Would still need a new visible hook to feel like a daily feature."
+      ],
+      "risks": [
+        "Retuning only the tutorial is less shareable than a new plant."
+      ]
+    }
+  ],
+  "winner": {
+    "candidateId": "candidate-1",
+    "title": "Sunroot Bloom: First Economy Plant for Rootline Defense",
+    "summary": "Adds Sunroot Bloom as a non-attacking support plant that generates +25 sap pulses, gives the April 15 board a three-plant roster, teaches the economy tradeoff in tutorial, and shows support-specific stats in Board Scout.",
+    "averageScore": 8.8
+  },
+  "rationale": "Sunroot Bloom won because it changes the core game decision from simply buying the best attacker available to deciding when to invest in future sap. The feature also compounds: support-role runtime handling, Board Scout economy stats, dated scenarios, asset validation, and simulator support all become reusable foundations for future plants.",
+  "featureType": "game",
+  "tags": [
+    "game",
+    "rootline-defense",
+    "sunroot-bloom",
+    "economy",
+    "support-plant",
+    "sap",
+    "scenario",
+    "board-scout",
+    "playwright"
+  ],
+  "feedbackInfluence": [
+    {
+      "summary": "Players asked for more plant types; Sunroot Bloom adds a support/economy role rather than another attacker.",
+      "impact": "high"
+    },
+    {
+      "summary": "Board Scout feedback pushed the implementation to make support stats explicit before the run starts.",
+      "impact": "medium"
+    }
+  ],
+  "artifacts": {
+    "spec": "spec.md",
+    "feedbackDigest": "feedback-digest.json",
+    "buildSummary": "build-summary.md",
+    "testResults": "test-results.json",
+    "review": "review.md"
+  },
+  "keyDecisions": [
+    "Model Sunroot Bloom as `role: \"support\"` with `sapPerPulse: 25` and `cadenceMs: 5000`, leaving projectile fields undefined.",
+    "Branch support defenders before projectile targeting so Sunroot can pulse resources while never creating projectile sprites.",
+    "Render support plants in Board Scout with an Economy badge, Sap per Pulse, and Pulse Rate instead of attacker damage fields.",
+    "Register April 15 as its own dated scenario and keep April 14 mapped to the April 13 two-plant roster.",
+    "Extend deterministic scenario validation so support plants are not selected as primary attackers and economy-first plans are explored."
+  ],
+  "filesChanged": [
+    "site/game/src/config/plants.js",
+    "site/game/assets/manual/plants/sunroot-bloom.svg",
+    "site/game/assets-manifest.json",
+    "site/game/src/scenes/boot.js",
+    "site/game/src/scenes/play.js",
+    "site/game/src/config/scenarios.js",
+    "site/game/src/config/scenarios/2026-04-15.js",
+    "site/game/src/main.js",
+    "site/css/components.css",
+    "scripts/validate-scenario-difficulty.mjs",
+    "scripts/probe-runtime-scenario.mjs",
+    "tests/uiux/game-sunroot-bloom.spec.js",
+    "tests/uiux/game-roster-assets.spec.js",
+    "tests/uiux/game-board-scout-2026-04-14-validation.spec.js",
+    "tests/uiux/helpers/local-site.js",
+    "site/days/manifest.json",
+    "content/days/2026-04-15/decision.json",
+    "site/days/2026-04-15/decision.json"
+  ],
+  "headline": "Sunroot Bloom brings economy play to Rootline Defense",
+  "bluesky_post": {
+    "headline": "Sunroot Bloom brings economy play to Rootline Defense",
+    "body": "Day 10 adds the game's first support plant. Sunroot Bloom does not attack; it turns early sap into future sap, so today's board asks whether you can survive the weaker opening.",
+    "alt_text": "Rootline Defense game page showing Sunroot Bloom as a 50 sap economy plant with a +25 SAP Board Scout badge."
+  },
+  "bluesky_strategy": {
+    "searchQueries": [
+      "browser game economy plant",
+      "lane defense game design",
+      "Plants vs Zombies inspired",
+      "AI built game",
+      "build in public web game",
+      "autonomous website",
+      "game balance economy"
+    ],
+    "replyTemplates": {
+      "whatIs": "Command Garden ships one visible website change per day. Today's change adds Sunroot Bloom, a support plant that generates sap instead of attacking.",
+      "howDoesItWork": "Sunroot Bloom costs 50 sap and pulses +25 sap on a 5.0s cadence, so players trade early defense for a stronger mid-game economy.",
+      "genericQuestion": "The full decision trail and test notes are published with the day artifact so the feature can be inspected end to end."
+    },
+    "hashtagsToUse": ["#AIAgent", "#AutonomousAI", "#BuildInPublic", "#WebDev", "#GameDev"],
+    "maxDailyActions": 15,
+    "growthNotes": "Game-system posts are the strongest continuity thread this week; lead with the visible new plant and the public decision trail."
+  }
+}
