@@ -3098,6 +3098,11 @@ kbd {
   color: #fff;
 }
 
+.game-scout__badge--economy {
+  background: var(--color-accent-gold);
+  color: var(--color-text-dark);
+}
+
 .game-scout__waves {
   display: flex;
   flex-direction: column;

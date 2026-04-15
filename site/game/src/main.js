@@ -128,6 +128,16 @@ function createScoutArt(definition, assetIndex) {
   return wrapper;
 }
 
+function formatCadenceSeconds(cadenceMs) {
+  return `${(Number(cadenceMs || 0) / 1000).toFixed(1)}s`;
+}
+
+function formatSapPulse(sapPerPulse, uppercase = false) {
+  const amount = Number(sapPerPulse || 0);
+  const unit = uppercase ? "SAP" : "sap";
+  return `${amount >= 0 ? "+" : ""}${amount} ${unit}`;
+}
+
 function getPlayScene() {
   if (!game) {
     return null;
@@ -304,10 +314,17 @@ function renderBoardScout(dayDate, assetCatalog) {
             "div",
             { className: "game-scout__card-stats" },
             el("span", { className: "game-scout__card-stat" }, `Cost: ${plant.cost}`),
-            typeof plant.projectileDamage === "number"
+            plant.role === "support"
+              ? el(
+                  "span",
+                  { className: "game-scout__badge game-scout__badge--economy" },
+                  formatSapPulse(plant.sapPerPulse, true)
+                )
+              : false,
+            plant.role !== "support" && typeof plant.projectileDamage === "number"
               ? el("span", { className: "game-scout__card-stat" }, `DMG: ${plant.projectileDamage}`)
               : false,
-            plant.piercing
+            plant.role !== "support" && plant.piercing
               ? el("span", { className: "game-scout__badge game-scout__badge--piercing" }, "Piercing")
               : false
           )
@@ -410,6 +427,21 @@ function selectScoutCard(card, type, data, scenario) {
         el("dd", {}, `${data.attackCadenceMs}ms`),
         el("dt", {}, "Appears In"),
         el("dd", {}, wavePresence.join(", ") || "No scripted waves")
+      )
+    );
+  } else if (data.role === "support") {
+    detail.append(
+      el("h4", { className: "game-scout__detail-title" }, data.label),
+      el("p", { className: "game-scout__detail-desc" }, data.description || ""),
+      el(
+        "dl",
+        { className: "game-scout__detail-stats" },
+        el("dt", {}, "Cost"),
+        el("dd", {}, String(data.cost)),
+        el("dt", {}, "Sap per Pulse"),
+        el("dd", {}, formatSapPulse(data.sapPerPulse)),
+        el("dt", {}, "Pulse Rate"),
+        el("dd", {}, formatCadenceSeconds(data.cadenceMs))
       )
     );
   } else {
