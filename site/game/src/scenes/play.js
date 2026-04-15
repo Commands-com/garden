@@ -467,6 +467,32 @@ export class PlayScene extends Phaser.Scene {
         continue;
       }
 
+      // Support plants generate sap instead of firing projectiles
+      if (defender.definition.role === 'support') {
+        defender.cooldownMs -= deltaMs;
+        if (defender.cooldownMs <= 0) {
+          defender.cooldownMs = defender.definition.cadenceMs;
+          this.grantResources(defender.definition.sapPerPulse);
+          // visual pulse on the sunroot sprite (scale bump + gold tint)
+          this.tweens.add({
+            targets: defender.sprite,
+            scaleX: defender.baseScaleX * 1.2,
+            scaleY: defender.baseScaleY * 1.2,
+            duration: 150,
+            yoyo: true,
+          });
+          defender.sprite.setTint(0xFFD700);
+          this.time.delayedCall(200, () => {
+            if (defender.sprite?.active) {
+              defender.sprite.clearTint();
+            }
+          });
+          // pulse resource text to match existing awardResources() pattern
+          this.pulseText(this.resourceText);
+        }
+        continue; // skip projectile logic entirely
+      }
+
       defender.cooldownMs -= deltaMs;
       const target = this.getFrontEnemyInLane(defender.row, defender.x);
       if (!target || defender.cooldownMs > 0) {
