@@ -1156,6 +1156,21 @@ async function main() {
   const durationMs = Date.now() - startTime;
   const durationMin = (durationMs / 60_000).toFixed(1);
 
+  // Drain consumed feedback BEFORE branching on pipeline status. The pipeline
+  // already saw these items (they were baked into the digest that fed the run),
+  // so they should not reappear in tomorrow's digest regardless of whether the
+  // final status is success, timeout, or failure. The only path that skips
+  // draining is "pipeline failed to start" above, which exits before reaching
+  // this point.
+  if (aggregatedFeedbackKeys.length > 0) {
+    log(`Marking ${aggregatedFeedbackKeys.length} feedback item(s) as processed...`);
+    try {
+      await markFeedbackProcessed(config, aggregatedFeedbackKeys, runDate);
+    } catch (err) {
+      logError(`Marking feedback as processed failed: ${err.message}`);
+    }
+  }
+
   // 8. Handle final result
   if (pipelineResult.status === 'success') {
     log(`Pipeline completed successfully in ${durationMin} minutes`);
@@ -1345,19 +1360,6 @@ async function main() {
       });
     } catch (err) {
       logError(`Run metadata update failed: ${err.message}`);
-    }
-
-    // Mark all feedback items that fed into this run as processed so they
-    // don't reappear in tomorrow's digest. Runs regardless of whether an
-    // individual suggestion was acted on — the user asked us to drain the
-    // queue on every successful run.
-    if (aggregatedFeedbackKeys.length > 0) {
-      log(`Marking ${aggregatedFeedbackKeys.length} feedback item(s) as processed...`);
-      try {
-        await markFeedbackProcessed(config, aggregatedFeedbackKeys, runDate);
-      } catch (err) {
-        logError(`Marking feedback as processed failed: ${err.message}`);
-      }
     }
 
     // Commit and push whatever the Review/Validation/post-pipeline steps
