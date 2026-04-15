@@ -58,6 +58,21 @@
       }
     },
     {
+      "id": "sunroot-bloom",
+      "type": "sprite",
+      "kind": "sprite",
+      "provider": "repo",
+      "path": "/game/assets/manual/plants/sunroot-bloom.svg",
+      "prompt": "Hand-authored repo asset for the Sunroot Bloom economy plant. Warm gold/amber flower with sap-drop motif, support-role visual identity.",
+      "generatedAt": "2026-04-15T00:00:00.000Z",
+      "metadata": {
+        "category": "player",
+        "format": "svg",
+        "width": 128,
+        "height": 128
+      }
+    },
+    {
       "id": "bramble-spear-projectile",
       "type": "sprite",
       "kind": "sprite",

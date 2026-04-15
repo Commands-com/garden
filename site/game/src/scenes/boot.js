@@ -140,7 +140,7 @@ export class BootScene extends Phaser.Scene {
         createPlantTexture(this, plant.textureKey);
       }
 
-      if (!this.textures.exists(plant.projectileTextureKey)) {
+      if (plant.projectileTextureKey && !this.textures.exists(plant.projectileTextureKey)) {
         createProjectileTexture(this, plant.projectileTextureKey);
       }
     }

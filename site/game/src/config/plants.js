@@ -33,6 +33,21 @@ export const PLANT_DEFINITIONS = {
     displayWidth: 48,
     displayHeight: 52,
   },
+  sunrootBloom: {
+    id: "sunrootBloom",
+    label: "Sunroot Bloom",
+    description:
+      "Economy plant that generates bonus sap instead of attacking.",
+    role: "support",
+    textureKey: "sunroot-bloom",
+    cost: 50,
+    maxHealth: 20,
+    cadenceMs: 5000,
+    initialCooldownMs: 1000,
+    sapPerPulse: 25,
+    displayWidth: 48,
+    displayHeight: 48,
+  },
 };
 
 export const STARTING_PLANT_ID = "thornVine";

@@ -1,0 +1,80 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" role="img" aria-labelledby="title desc">
+  <title id="title">Sunroot Bloom defender</title>
+  <desc id="desc">A warm golden economy flower with sap-drop motifs that generates bonus sap instead of attacking.</desc>
+  <defs>
+    <radialGradient id="bloom-core" cx="50%" cy="45%" r="50%">
+      <stop offset="0%" stop-color="#fff8d6"/>
+      <stop offset="45%" stop-color="#ffd54f"/>
+      <stop offset="100%" stop-color="#c98a1a"/>
+    </radialGradient>
+    <linearGradient id="petal" x1="0" x2="1" y1="0" y2="1">
+      <stop offset="0%" stop-color="#ffcc33"/>
+      <stop offset="100%" stop-color="#d4882a"/>
+    </linearGradient>
+    <linearGradient id="stem-grad" x1="0.5" x2="0.5" y1="0" y2="1">
+      <stop offset="0%" stop-color="#4a7a3a"/>
+      <stop offset="100%" stop-color="#2b5420"/>
+    </linearGradient>
+    <radialGradient id="sap-drop" cx="50%" cy="30%" r="60%">
+      <stop offset="0%" stop-color="#fff4b0"/>
+      <stop offset="60%" stop-color="#f0c040"/>
+      <stop offset="100%" stop-color="#c88820"/>
+    </radialGradient>
+    <linearGradient id="leaf-grad" x1="0" x2="1" y1="0" y2="1">
+      <stop offset="0%" stop-color="#5a8a48"/>
+      <stop offset="100%" stop-color="#2a5428"/>
+    </linearGradient>
+  </defs>
+
+  <!-- ground shadow -->
+  <ellipse cx="64" cy="108" rx="36" ry="12" fill="#102218" opacity=".32"/>
+
+  <!-- roots -->
+  <path d="M56 96 C50 102 46 112 48 120" fill="none" stroke="#2b5420" stroke-width="5" stroke-linecap="round"/>
+  <path d="M72 96 C78 102 82 112 80 120" fill="none" stroke="#2b5420" stroke-width="5" stroke-linecap="round"/>
+  <path d="M64 98 C64 106 64 114 64 122" fill="none" stroke="#234a1c" stroke-width="6" stroke-linecap="round"/>
+
+  <!-- stem -->
+  <path d="M64 92 C64 78 64 65 64 52" fill="none" stroke="url(#stem-grad)" stroke-width="8" stroke-linecap="round"/>
+
+  <!-- leaves on stem -->
+  <path d="M60 80 C48 72 38 74 34 78 C38 82 50 82 60 78 Z" fill="url(#leaf-grad)" stroke="#1e3d16" stroke-width="1.5"/>
+  <path d="M68 72 C80 64 90 66 94 70 C90 74 78 74 68 70 Z" fill="url(#leaf-grad)" stroke="#1e3d16" stroke-width="1.5"/>
+
+  <!-- petals - outer ring -->
+  <ellipse cx="64" cy="26" rx="10" ry="18" fill="url(#petal)" stroke="#c88020" stroke-width="1.5" transform="rotate(0,64,48)"/>
+  <ellipse cx="64" cy="26" rx="10" ry="18" fill="url(#petal)" stroke="#c88020" stroke-width="1.5" transform="rotate(45,64,48)"/>
+  <ellipse cx="64" cy="26" rx="10" ry="18" fill="url(#petal)" stroke="#c88020" stroke-width="1.5" transform="rotate(90,64,48)"/>
+  <ellipse cx="64" cy="26" rx="10" ry="18" fill="url(#petal)" stroke="#c88020" stroke-width="1.5" transform="rotate(135,64,48)"/>
+  <ellipse cx="64" cy="26" rx="10" ry="18" fill="url(#petal)" stroke="#c88020" stroke-width="1.5" transform="rotate(180,64,48)"/>
+  <ellipse cx="64" cy="26" rx="10" ry="18" fill="url(#petal)" stroke="#c88020" stroke-width="1.5" transform="rotate(225,64,48)"/>
+  <ellipse cx="64" cy="26" rx="10" ry="18" fill="url(#petal)" stroke="#c88020" stroke-width="1.5" transform="rotate(270,64,48)"/>
+  <ellipse cx="64" cy="26" rx="10" ry="18" fill="url(#petal)" stroke="#c88020" stroke-width="1.5" transform="rotate(315,64,48)"/>
+
+  <!-- inner petal ring -->
+  <ellipse cx="64" cy="34" rx="7" ry="12" fill="#ffe066" stroke="#d4a030" stroke-width="1" opacity=".85" transform="rotate(22.5,64,48)"/>
+  <ellipse cx="64" cy="34" rx="7" ry="12" fill="#ffe066" stroke="#d4a030" stroke-width="1" opacity=".85" transform="rotate(67.5,64,48)"/>
+  <ellipse cx="64" cy="34" rx="7" ry="12" fill="#ffe066" stroke="#d4a030" stroke-width="1" opacity=".85" transform="rotate(112.5,64,48)"/>
+  <ellipse cx="64" cy="34" rx="7" ry="12" fill="#ffe066" stroke="#d4a030" stroke-width="1" opacity=".85" transform="rotate(157.5,64,48)"/>
+  <ellipse cx="64" cy="34" rx="7" ry="12" fill="#ffe066" stroke="#d4a030" stroke-width="1" opacity=".85" transform="rotate(202.5,64,48)"/>
+  <ellipse cx="64" cy="34" rx="7" ry="12" fill="#ffe066" stroke="#d4a030" stroke-width="1" opacity=".85" transform="rotate(247.5,64,48)"/>
+  <ellipse cx="64" cy="34" rx="7" ry="12" fill="#ffe066" stroke="#d4a030" stroke-width="1" opacity=".85" transform="rotate(292.5,64,48)"/>
+  <ellipse cx="64" cy="34" rx="7" ry="12" fill="#ffe066" stroke="#d4a030" stroke-width="1" opacity=".85" transform="rotate(337.5,64,48)"/>
+
+  <!-- center core -->
+  <circle cx="64" cy="48" r="14" fill="url(#bloom-core)" stroke="#e8c840" stroke-width="2.5"/>
+  <circle cx="64" cy="46" r="6" fill="#fff8e0" opacity=".9"/>
+
+  <!-- sap drop motifs floating above -->
+  <path d="M44 36 C44 30 48 24 48 24 C48 24 52 30 52 36 C52 40 48 43 48 43 C48 43 44 40 44 36 Z"
+        fill="url(#sap-drop)" stroke="#d4a020" stroke-width="1.5" opacity=".85"/>
+  <circle cx="48" cy="34" r="2" fill="#fff8d0" opacity=".7"/>
+
+  <path d="M76 36 C76 30 80 24 80 24 C80 24 84 30 84 36 C84 40 80 43 80 43 C80 43 76 40 76 36 Z"
+        fill="url(#sap-drop)" stroke="#d4a020" stroke-width="1.5" opacity=".85"/>
+  <circle cx="80" cy="34" r="2" fill="#fff8d0" opacity=".7"/>
+
+  <path d="M58 18 C58 13 61 8 61 8 C61 8 64 13 64 18 C64 21 61 24 61 24 C61 24 58 21 58 18 Z"
+        fill="url(#sap-drop)" stroke="#d4a020" stroke-width="1.2" opacity=".75"/>
+  <circle cx="61" cy="16" r="1.5" fill="#fff8d0" opacity=".6"/>
+</svg>
