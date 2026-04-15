@@ -1,6 +1,5 @@
 import Phaser from "../phaser-bridge.js";
 import { ARENA_HEIGHT, ARENA_WIDTH } from "../config/balance.js";
-import { PLANT_DEFINITIONS } from "../config/plants.js";
 import { getScenarioForDate, getScenarioModeDefinition } from "../config/scenarios.js";
 
 function formatScenarioDate(dayDate) {
@@ -11,22 +10,20 @@ function formatScenarioDate(dayDate) {
 }
 
 function formatChallengeCardCopy(availablePlants, challengeMode) {
-  if (!Array.isArray(availablePlants) || availablePlants.length <= 1) {
-    return "1 HP wall. Clear 4 waves to unlock endless.";
-  }
-
-  const plantLabels = availablePlants
-    .map((plantId) => PLANT_DEFINITIONS[plantId]?.label || plantId)
-    .filter(Boolean);
-  const defenderCountLabel = plantLabels.length === 2
-    ? "Two defenders"
-    : `${plantLabels.length} defenders`;
   const waveCount = challengeMode?.waves?.length || 4;
-  const rosterLabel = plantLabels.length === 2
-    ? plantLabels.join(" & ")
-    : `${plantLabels.slice(0, -1).join(", ")} & ${plantLabels.at(-1)}`;
+  const plantCount = Array.isArray(availablePlants) && availablePlants.length > 0
+    ? availablePlants.length
+    : 1;
+  const plantLabel = plantCount === 1 ? "1 plant" : `${plantCount} plants`;
 
-  return `${defenderCountLabel}: ${rosterLabel}. Clear ${waveCount} waves to unlock endless.`;
+  return `${plantLabel} • ${waveCount} waves • Unlock endless`;
+}
+
+function formatBriefingText(briefing = []) {
+  const visibleLines = briefing.slice(0, 3);
+  return visibleLines
+    .map((line) => `•  ${line}`)
+    .join("\n");
 }
 
 export class TitleScene extends Phaser.Scene {
@@ -59,17 +56,17 @@ export class TitleScene extends Phaser.Scene {
     );
 
     // Title + date badge
-    this.add.text(ARENA_WIDTH / 2, 52, "Rootline Defense", {
+    this.add.text(ARENA_WIDTH / 2, 44, "Rootline Defense", {
       fontFamily: "DM Sans",
-      fontSize: "42px",
+      fontSize: "38px",
       fontStyle: "700",
       color: "#f5f0e8",
       align: "center",
     }).setOrigin(0.5);
 
-    this.add.text(ARENA_WIDTH / 2, 92, `${formatScenarioDate(scenario.date)} • ${scenario.title}`, {
+    this.add.text(ARENA_WIDTH / 2, 80, `${formatScenarioDate(scenario.date)} • ${scenario.title}`, {
       fontFamily: "DM Sans",
-      fontSize: "17px",
+      fontSize: "16px",
       color: "#c4a35a",
       align: "center",
     }).setOrigin(0.5);
@@ -79,34 +76,32 @@ export class TitleScene extends Phaser.Scene {
       ? `Archive scenario from ${scenario.date}. Clear the tutorial to roll into the saved daily board.`
       : scenario.summary;
 
-    this.add.text(ARENA_WIDTH / 2, 130, summaryText, {
+    this.add.text(ARENA_WIDTH / 2, 108, summaryText, {
       fontFamily: "DM Sans",
-      fontSize: "16px",
-      lineSpacing: 6,
+      fontSize: "14px",
+      lineSpacing: 4,
       color: "#bdd0c2",
       align: "center",
-      wordWrap: { width: 700 },
+      wordWrap: { width: 660 },
     }).setOrigin(0.5, 0);
 
     // Briefing bullets
-    const briefingText = tutorialMode.briefing
-      .map((line) => `•  ${line}`)
-      .join("\n");
+    const briefingText = formatBriefingText(tutorialMode.briefing);
 
-    this.add.text(ARENA_WIDTH / 2, 190, briefingText, {
+    this.add.text(ARENA_WIDTH / 2, 164, briefingText, {
       fontFamily: "DM Sans",
-      fontSize: "14px",
-      lineSpacing: 10,
+      fontSize: "12px",
+      lineSpacing: 6,
       color: "#d8e5db",
       align: "center",
-      wordWrap: { width: 680 },
+      wordWrap: { width: 640 },
     }).setOrigin(0.5, 0);
 
     // Two action buttons side by side
-    const btnY = 370;
-    const btnWidth = 340;
-    const btnHeight = 90;
-    const gap = 24;
+    const btnY = 348;
+    const btnWidth = 326;
+    const btnHeight = 92;
+    const gap = 20;
 
     this.createMenuButton({
       x: ARENA_WIDTH / 2 - btnWidth / 2 - gap / 2,
@@ -137,7 +132,7 @@ export class TitleScene extends Phaser.Scene {
     // Keyboard hints + seed
     this.add.text(
       ARENA_WIDTH / 2,
-      btnY + btnHeight / 2 + 30,
+      btnY + btnHeight / 2 + 28,
       `Enter / Space: challenge  •  T: tutorial  •  Seed: ${this.bootstrap.seed}`,
       {
         fontFamily: "DM Sans",
@@ -191,7 +186,7 @@ export class TitleScene extends Phaser.Scene {
     button.setStrokeStyle(2, stroke, 0.95);
     button.setInteractive({ useHandCursor: true });
 
-    this.add.text(x, y - 28, eyebrow, {
+    this.add.text(x, y - 25, eyebrow, {
       fontFamily: "DM Sans",
       fontSize: "12px",
       fontStyle: "700",
@@ -199,20 +194,20 @@ export class TitleScene extends Phaser.Scene {
       align: "center",
     }).setOrigin(0.5);
 
-    const titleLabel = this.add.text(x, y - 4, title, {
+    const titleLabel = this.add.text(x, y - 3, title, {
       fontFamily: "DM Sans",
-      fontSize: "22px",
+      fontSize: "20px",
       fontStyle: "700",
       color: "#f5f0e8",
       align: "center",
     }).setOrigin(0.5);
 
-    const copyLabel = this.add.text(x, y + 18, copy, {
+    const copyLabel = this.add.text(x, y + 16, copy, {
       fontFamily: "DM Sans",
-      fontSize: "13px",
+      fontSize: "12px",
       color: "#d8e5db",
       align: "center",
-      wordWrap: { width: width - 32 },
+      wordWrap: { width: width - 36 },
     }).setOrigin(0.5, 0);
 
     const setHover = (hovered) => {

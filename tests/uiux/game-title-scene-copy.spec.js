@@ -43,7 +43,7 @@ test("April 13 title scene shows two-plant roster copy and transitions into both
   const titleScene = await readTitleSceneText(page);
   expect(titleScene.isActive).toBe(true);
   expect(titleScene.texts).toContain(
-    "Two defenders: Thorn Vine & Bramble Spear. Clear 4 waves to unlock endless."
+    "2 plants • 4 waves • Unlock endless"
   );
   expect(titleScene.texts).toContain("Apr 13 • Bramble & Thorn");
   expect(titleScene.texts).toContain(

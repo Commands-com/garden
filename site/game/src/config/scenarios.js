@@ -1,6 +1,8 @@
 import { scenario20260412 } from "./scenarios/2026-04-12.js";
 import {
   scenario_2026_04_13,
+  // April 14 intentionally reuses the April 13 two-plant board as a
+  // historical alias — no separate scenario file exists for that date.
   scenario_2026_04_13 as scenario_2026_04_14,
 } from "./scenarios/2026-04-13.js";
 import scenario_2026_04_15 from "./scenarios/2026-04-15.js";
@@ -100,6 +102,14 @@ export function getScenarioWave(modeDefinition, elapsedMs) {
 }
 
 export function getUnlockedEnemyIds(modeDefinition, waveNumber) {
+  const endless = modeDefinition?.endless;
+  if (
+    endless?.enemyPool?.length &&
+    waveNumber >= (endless.startingWave || Number.POSITIVE_INFINITY)
+  ) {
+    return [...endless.enemyPool];
+  }
+
   const waves = modeDefinition?.waves || [];
   const match =
     [...waves].reverse().find((wave) => waveNumber >= wave.wave) || waves[0] || null;

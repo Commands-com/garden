@@ -335,7 +335,8 @@ export class PlayScene extends Phaser.Scene {
 
     for (const item of this.seedTrayItems) {
       const selected = item.plantId === this.selectedPlantId;
-      const affordable = this.resources >= item.plant.cost;
+      const limited = this.isPlantLimitReached(item.plantId);
+      const affordable = this.resources >= item.plant.cost && !limited;
 
       item.bg.setFillStyle(
         selected ? 0x1d4f34 : affordable ? 0x102018 : 0x2a1d12,
@@ -348,7 +349,9 @@ export class PlayScene extends Phaser.Scene {
       );
       item.icon.setAlpha(selected ? 1 : affordable ? 0.92 : 0.58);
       item.nameText.setColor(selected ? "#f7fbf6" : affordable ? "#d9e5dd" : "#d3c4ac");
-      item.costText.setColor(selected ? "#d8f5ae" : affordable ? "#c4a35a" : "#caa884");
+      item.costText.setColor(
+        limited ? "#d3c4ac" : selected ? "#d8f5ae" : affordable ? "#c4a35a" : "#caa884"
+      );
       item.keyLabel.setColor(selected ? "#f7fbf6" : "#bdd0c2");
       item.bg.setAlpha(selected ? 1 : affordable ? 0.9 : 0.78);
     }
@@ -370,8 +373,8 @@ export class PlayScene extends Phaser.Scene {
       const center = getCellCenter(tile.row, tile.col);
       const occupied = this.defendersByTile.has(makeTileKey(tile.row, tile.col));
       const plant = PLANT_DEFINITIONS[this.selectedPlantId];
-      const affordable = this.resources >= plant.cost;
-      const color = occupied ? 0xffa86a : affordable ? 0x9fdd6b : 0xc4a35a;
+      const unavailable = this.resources < plant.cost || this.isPlantLimitReached(this.selectedPlantId);
+      const color = occupied ? 0xffa86a : unavailable ? 0xc4a35a : 0x9fdd6b;
 
       this.hoverTile.setPosition(center.x, center.y);
       this.hoverTile.setFillStyle(color, occupied ? 0.18 : 0.12);
@@ -666,8 +669,25 @@ export class PlayScene extends Phaser.Scene {
       width: item.width,
       height: item.height,
       selected: item.plantId === this.selectedPlantId,
-      affordable: this.resources >= item.plant.cost,
+      affordable: this.resources >= item.plant.cost && !this.isPlantLimitReached(item.plantId),
+      limitReached: this.isPlantLimitReached(item.plantId),
     }));
+  }
+
+  getActivePlantCount(plantId) {
+    return this.defenders.reduce(
+      (count, defender) =>
+        !defender.destroyed && defender.definition.id === plantId ? count + 1 : count,
+      0
+    );
+  }
+
+  isPlantLimitReached(plantId) {
+    const definition = PLANT_DEFINITIONS[plantId];
+    return Boolean(
+      definition?.maxActive &&
+        this.getActivePlantCount(plantId) >= definition.maxActive
+    );
   }
 
   placeDefender(row, col, plantId = undefined) {
@@ -678,7 +698,12 @@ export class PlayScene extends Phaser.Scene {
 
     const definition = PLANT_DEFINITIONS[plantId];
     const tileKey = makeTileKey(row, col);
-    if (!definition || this.defendersByTile.has(tileKey) || this.resources < definition.cost) {
+    if (
+      !definition ||
+      this.defendersByTile.has(tileKey) ||
+      this.resources < definition.cost ||
+      this.isPlantLimitReached(plantId)
+    ) {
       return false;
     }
 
@@ -912,13 +937,27 @@ export class PlayScene extends Phaser.Scene {
     return count;
   }
 
+  getCombatDefenderCountInLane(row) {
+    let count = 0;
+    for (const defender of this.defenders) {
+      if (
+        !defender.destroyed &&
+        defender.row === row &&
+        defender.definition.role !== "support"
+      ) {
+        count += 1;
+      }
+    }
+    return count;
+  }
+
   getEffectiveProjectileDamage(enemy, damage) {
     const requiredDefenders = enemy.definition.requiredDefendersInLane || 0;
     if (requiredDefenders <= 1) {
       return damage;
     }
 
-    const defenderCount = this.getDefenderCountInLane(enemy.lane);
+    const defenderCount = this.getCombatDefenderCountInLane(enemy.lane);
     if (defenderCount >= requiredDefenders) {
       return damage;
     }

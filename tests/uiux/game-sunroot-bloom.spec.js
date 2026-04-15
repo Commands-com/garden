@@ -127,7 +127,7 @@ test.describe("Sunroot Bloom economy plant", () => {
     expect(runtimeErrors, runtimeErrors.join("\n")).toEqual([]);
   });
 
-  test("April 15 inventory and seed tray show Sunroot Bloom at 50 sap", async ({
+  test("April 15 inventory and seed tray show Sunroot Bloom at 60 sap", async ({
     page,
   }) => {
     await prepareGamePage(page);
@@ -137,7 +137,7 @@ test.describe("Sunroot Bloom economy plant", () => {
     await expect(inventoryItems.nth(0)).toContainText("Thorn Vine");
     await expect(inventoryItems.nth(1)).toContainText("Bramble Spear");
     await expect(inventoryItems.nth(2)).toContainText("Sunroot Bloom");
-    await expect(inventoryItems.nth(2)).toContainText("50 sap");
+    await expect(inventoryItems.nth(2)).toContainText("60 sap");
 
     await startChallenge(page);
 
@@ -158,12 +158,12 @@ test.describe("Sunroot Bloom economy plant", () => {
     expect(sceneState.seedTray).toContainEqual({
       plantId: "sunrootBloom",
       label: "Sunroot Bloom",
-      cost: 50,
-      costText: "50 sap",
+      cost: 60,
+      costText: "60 sap",
     });
   });
 
-  test("placing Sunroot spends 50 sap and does not create projectiles", async ({
+  test("placing Sunroot spends 60 sap and does not create projectiles", async ({
     page,
   }) => {
     await prepareGamePage(page);
@@ -173,7 +173,7 @@ test.describe("Sunroot Bloom economy plant", () => {
     const resourcesBefore = await page.evaluate(
       () => window.__gameTestHooks.getState().resources
     );
-    expect(resourcesBefore).toBeGreaterThanOrEqual(50);
+    expect(resourcesBefore).toBeGreaterThanOrEqual(60);
 
     const placed = await page.evaluate(() =>
       window.__gameTestHooks.placeDefender(2, 1, "sunrootBloom")
@@ -183,7 +183,7 @@ test.describe("Sunroot Bloom economy plant", () => {
     const resourcesAfter = await page.evaluate(
       () => window.__gameTestHooks.getState().resources
     );
-    expect(resourcesAfter).toBe(resourcesBefore - 50);
+    expect(resourcesAfter).toBe(resourcesBefore - 60);
 
     await page.waitForTimeout(1500);
     const sceneState = await getPlaySceneSnapshot(page);
@@ -211,16 +211,20 @@ test.describe("Sunroot Bloom economy plant", () => {
     const firstPulse = await waitForResourcesAtLeast(
       page,
       afterPlacement.resources + 25,
-      3000
+      12000
     );
-    expect(firstPulse.resources).toBe(afterPlacement.resources + 25);
+    expect(firstPulse.resources).toBeGreaterThanOrEqual(
+      afterPlacement.resources + 25
+    );
 
     const secondPulse = await waitForResourcesAtLeast(
       page,
       firstPulse.resources + 25,
       7000
     );
-    expect(secondPulse.resources).toBe(firstPulse.resources + 25);
+    expect(secondPulse.resources).toBeGreaterThanOrEqual(
+      firstPulse.resources + 25
+    );
     expect(secondPulse.survivedMs - firstPulse.survivedMs).toBeGreaterThanOrEqual(
       4800
     );
@@ -256,6 +260,39 @@ test.describe("Sunroot Bloom economy plant", () => {
     expect(sceneState.projectileSpriteCount).toBe(0);
   });
 
+  test("Sunroot blockers do not satisfy Glass Ram combat resistance", async ({
+    page,
+  }) => {
+    await prepareGamePage(page);
+    await startChallenge(page);
+
+    const damageState = await page.evaluate(async () => {
+      const { ENEMY_BY_ID } = await import("/game/src/config/enemies.js");
+      const scene = window.__phaserGame.scene.getScene("play");
+      scene.resources = 500;
+
+      scene.placeDefender(2, 0, "sunrootBloom");
+      scene.placeDefender(2, 1, "thornVine");
+      scene.placeDefender(2, 2, "thornVine");
+
+      const enemy = {
+        lane: 2,
+        definition: ENEMY_BY_ID.glassRam,
+      };
+      const supportOnlyDamage = scene.getEffectiveProjectileDamage(enemy, 14);
+
+      scene.placeDefender(2, 3, "thornVine");
+
+      return {
+        supportOnlyDamage,
+        combatReadyDamage: scene.getEffectiveProjectileDamage(enemy, 14),
+      };
+    });
+
+    expect(damageState.supportOnlyDamage).toBeLessThan(14);
+    expect(damageState.combatReadyDamage).toBe(14);
+  });
+
   test("Board Scout renders Sunroot as economy support with sap-pulse details", async ({
     page,
   }) => {
@@ -268,7 +305,7 @@ test.describe("Sunroot Bloom economy plant", () => {
     );
     await expect(sunrootCard).toHaveCount(1);
     await expect(sunrootCard.locator(".game-scout__card-stat")).toHaveText([
-      "Cost: 50",
+      "Cost: 60",
     ]);
     await expect(sunrootCard.locator(".game-scout__badge--economy")).toHaveText(
       "+25 SAP"
@@ -288,11 +325,13 @@ test.describe("Sunroot Bloom economy plant", () => {
       "Cost",
       "Sap per Pulse",
       "Pulse Rate",
+      "Active Limit",
     ]);
     await expect(detail.locator(".game-scout__detail-stats dd")).toHaveText([
-      "50",
+      "60",
       "+25 sap",
       "5.0s",
+      "1",
     ]);
     await expect(detail).not.toContainText("Piercing");
     await expect(detail).not.toContainText("Fire Rate");

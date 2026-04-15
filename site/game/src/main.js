@@ -68,6 +68,7 @@ const dom = {
 
 let game = null;
 let gameDate = todayDate;
+let selectedScoutCard = null;
 
 function buildAssetIndex(assetCatalog) {
   const assets = assetCatalog?.assets || [];
@@ -213,7 +214,7 @@ function renderInventory(dayDate) {
   });
 
   dom.inventory.querySelectorAll(".game-inventory__item").forEach((item) => {
-    item.addEventListener("click", () => {
+    const choosePlant = () => {
       const plantId = item.dataset.plantId;
       if (!plantId) {
         return;
@@ -229,6 +230,17 @@ function renderInventory(dayDate) {
       }
 
       syncInventorySelection(plantId);
+    };
+
+    item.addEventListener("click", choosePlant);
+    item.addEventListener("keydown", (event) => {
+      if (event.key !== "Enter" && event.key !== " ") {
+        return;
+      }
+
+      event.preventDefault();
+      event.stopPropagation();
+      choosePlant();
     });
   });
 }
@@ -381,6 +393,31 @@ function renderBoardScout(dayDate, assetCatalog) {
       if (body) body.hidden = collapsed;
     });
   }
+
+  if (dom.scout && !dom.scout.dataset.detailDismissAttached) {
+    dom.scout.dataset.detailDismissAttached = "true";
+    document.addEventListener(
+      "keydown",
+      (event) => {
+        if (event.key !== "Escape" || dom.scoutDetail?.hidden) {
+          return;
+        }
+
+        event.preventDefault();
+        event.stopPropagation();
+        closeScoutDetail({ restoreFocus: true });
+      },
+      true
+    );
+
+    document.addEventListener("pointerdown", (event) => {
+      if (dom.scoutDetail?.hidden || dom.scout?.contains(event.target)) {
+        return;
+      }
+
+      closeScoutDetail({ restoreFocus: true });
+    });
+  }
 }
 
 // Board Scout card selection + detail view
@@ -390,6 +427,7 @@ function selectScoutCard(card, type, data, scenario) {
     ?.querySelectorAll(".game-scout__card--selected")
     .forEach((c) => c.classList.remove("game-scout__card--selected"));
   card.classList.add("game-scout__card--selected");
+  selectedScoutCard = card;
 
   // Build detail view
   const detail = dom.scoutDetail;
@@ -441,7 +479,9 @@ function selectScoutCard(card, type, data, scenario) {
         el("dt", {}, "Sap per Pulse"),
         el("dd", {}, formatSapPulse(data.sapPerPulse)),
         el("dt", {}, "Pulse Rate"),
-        el("dd", {}, formatCadenceSeconds(data.cadenceMs))
+        el("dd", {}, formatCadenceSeconds(data.cadenceMs)),
+        el("dt", {}, "Active Limit"),
+        el("dd", {}, data.maxActive ? String(data.maxActive) : "None")
       )
     );
   } else {
@@ -461,6 +501,24 @@ function selectScoutCard(card, type, data, scenario) {
         el("dd", {}, String(data.projectileDamage))
       )
     );
+  }
+}
+
+function closeScoutDetail({ restoreFocus = false } = {}) {
+  const cardToFocus = selectedScoutCard;
+  dom.scout
+    ?.querySelectorAll(".game-scout__card--selected")
+    .forEach((card) => card.classList.remove("game-scout__card--selected"));
+
+  selectedScoutCard = null;
+
+  if (dom.scoutDetail) {
+    dom.scoutDetail.hidden = true;
+    dom.scoutDetail.textContent = "";
+  }
+
+  if (restoreFocus && cardToFocus && document.contains(cardToFocus)) {
+    cardToFocus.focus();
   }
 }
 

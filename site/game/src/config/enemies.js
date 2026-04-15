@@ -43,7 +43,7 @@ export const ENEMY_DEFINITIONS = [
     textureKey: "glass-ram-walk",
     radius: 24,
     maxHealth: 160,
-    speed: 50,
+    speed: 36,
     attackDamage: 14,
     attackCadenceMs: 840,
     contactRange: 56,

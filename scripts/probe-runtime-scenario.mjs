@@ -199,6 +199,8 @@ function schedulePlacementsByBudget(modeDefinition, placements, options) {
   let currentTimeMs = 0;
   let nextIncomeAtMs = modeDefinition.resourceTickMs ?? Number.POSITIVE_INFINITY;
   const incomeAmount = modeDefinition.resourcePerTick ?? 0;
+  const activeSupportPlants = [];
+  const activePlantCounts = new Map();
 
   for (const placement of placements) {
     const plant =
@@ -207,10 +209,32 @@ function schedulePlacementsByBudget(modeDefinition, placements, options) {
       continue;
     }
 
+    const activeCount = activePlantCounts.get(plant.id) || 0;
+    if (plant.maxActive && activeCount >= plant.maxActive) {
+      continue;
+    }
+
     while (resources < plant.cost) {
-      currentTimeMs = nextIncomeAtMs;
-      resources += incomeAmount;
-      nextIncomeAtMs += modeDefinition.resourceTickMs ?? 0;
+      let soonestMs = nextIncomeAtMs;
+      for (const support of activeSupportPlants) {
+        if (support.nextPulseMs < soonestMs) {
+          soonestMs = support.nextPulseMs;
+        }
+      }
+
+      currentTimeMs = soonestMs;
+
+      while (nextIncomeAtMs <= currentTimeMs) {
+        resources += incomeAmount;
+        nextIncomeAtMs += modeDefinition.resourceTickMs ?? 0;
+      }
+
+      for (const support of activeSupportPlants) {
+        while (support.nextPulseMs <= currentTimeMs) {
+          resources += support.sapPerPulse;
+          support.nextPulseMs += support.cadenceMs;
+        }
+      }
     }
 
     plan.push({
@@ -220,6 +244,16 @@ function schedulePlacementsByBudget(modeDefinition, placements, options) {
       plantId: plant.id,
     });
     resources -= plant.cost;
+    activePlantCounts.set(plant.id, activeCount + 1);
+
+    if (plant.role === "support" && plant.sapPerPulse) {
+      activeSupportPlants.push({
+        sapPerPulse: plant.sapPerPulse,
+        cadenceMs: plant.cadenceMs,
+        nextPulseMs: currentTimeMs + (plant.initialCooldownMs ?? plant.cadenceMs),
+      });
+    }
+
     currentTimeMs += options.decisionIntervalMs;
   }
 
@@ -235,6 +269,9 @@ function buildStrategies(modeDefinition, options) {
   const coverRows = centerOut.filter((row) => row !== pressureRow);
   const cheapestPlant = getCheapestPlantDefinition(modeDefinition);
   const specializedPlants = getSpecializedPlantDefinitions(modeDefinition);
+  const supportPlants = getAvailablePlantDefinitions(modeDefinition).filter(
+    (plant) => plant.role === "support"
+  );
   const wallCol = 0;
   const wallSupportCol = Math.min(1, BOARD_COLS - 1);
   const wallThirdCol = Math.min(2, BOARD_COLS - 1);
@@ -358,6 +395,48 @@ function buildStrategies(modeDefinition, options) {
           .map((row) => ({ row, col: wallCol, plantId: cheapestPlant.id })),
       ],
     });
+  }
+
+  for (const supportPlant of supportPlants) {
+    definitions.push({
+      label: `sunroot-rush-pressure-wall-stack-${supportPlant.id}`,
+      placements: [
+        { row: pressureRow, col: wallCol, plantId: supportPlant.id },
+        { row: pressureRow, col: wallSupportCol, plantId: cheapestPlant.id },
+        { row: pressureRow, col: wallThirdCol, plantId: cheapestPlant.id },
+        ...coverRows
+          .slice(0, 4)
+          .map((row) => ({ row, col: wallCol, plantId: cheapestPlant.id })),
+      ],
+    });
+
+    definitions.push({
+      label: `sunroot-rush-safe-wall-cover-${supportPlant.id}`,
+      placements: [
+        { row: coverRows[0] ?? pressureRow, col: wallCol, plantId: supportPlant.id },
+        { row: pressureRow, col: wallCol, plantId: cheapestPlant.id },
+        { row: pressureRow, col: wallSupportCol, plantId: cheapestPlant.id },
+        ...coverRows
+          .slice(1, 4)
+          .map((row) => ({ row, col: wallCol, plantId: cheapestPlant.id })),
+      ],
+    });
+
+    for (const cornerLane of [0, BOARD_ROWS - 1]) {
+      definitions.push({
+        label: `sunroot-corner-bank-pressure-stack-${supportPlant.id}-${cornerLane}`,
+        placements: [
+          { row: cornerLane, col: wallCol, plantId: supportPlant.id },
+          { row: pressureRow, col: wallCol, plantId: cheapestPlant.id },
+          { row: pressureRow, col: wallSupportCol, plantId: cheapestPlant.id },
+          { row: pressureRow, col: wallThirdCol, plantId: cheapestPlant.id },
+          ...centerOut
+            .filter((row) => row !== pressureRow && row !== cornerLane)
+            .map((row) => ({ row, col: wallCol, plantId: cheapestPlant.id })),
+          { row: cornerLane, col: wallSupportCol, plantId: cheapestPlant.id },
+        ],
+      });
+    }
   }
 
   const all = definitions.map((definition) => ({

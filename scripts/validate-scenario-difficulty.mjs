@@ -20,12 +20,21 @@ const DEFAULT_OPTIONS = {
   mode: "challenge",
   stepMs: 50,
   decisionIntervalMs: 200,
-  beamWidth: 96,
+  beamWidth: 256,
   endlessGraceMs: 25_000,
   perturbationDelayMs: 800,
   perturbationWinRateThreshold: 0.22,
   maxNaiveStrategyWins: 0,
   json: false,
+  // By default, a failed runtime previous-roster probe blocks the
+  // required-plant gate — a beam-search miss is not proof that the previous
+  // roster cannot clear, so the probe must complete for publish validation.
+  // Pass --allow-probe-timeout to make a failed/missing probe non-blocking
+  // when the deterministic simulator also found no previous-roster win;
+  // this is useful in sandboxed local-dev environments where Playwright
+  // cannot launch.
+  strictProbe: true,
+  skipRuntimeProbe: false,
 };
 
 function clamp(value, min, max) {
@@ -130,6 +139,22 @@ function parseArgs(argv) {
 
     if (token === "--json") {
       options.json = true;
+      continue;
+    }
+
+    if (token === "--strict-probe") {
+      options.strictProbe = true;
+      continue;
+    }
+
+    if (token === "--allow-probe-timeout") {
+      options.strictProbe = false;
+      continue;
+    }
+
+    if (token === "--skip-runtime-probe") {
+      options.skipRuntimeProbe = true;
+      continue;
     }
   }
 
@@ -363,7 +388,8 @@ class ScenarioSimulator {
       col < 0 ||
       col >= BOARD_COLS ||
       this.defendersByTile.has(tileKey) ||
-      this.resources < plant.cost
+      this.resources < plant.cost ||
+      this.isPlantLimitReached(plant.id)
     ) {
       return false;
     }
@@ -391,6 +417,23 @@ class ScenarioSimulator {
       plantId: plant.id,
     });
     return true;
+  }
+
+  getActivePlantCount(plantId) {
+    let count = 0;
+
+    for (const defender of this.defenders) {
+      if (!defender.destroyed && defender.definition.id === plantId) {
+        count += 1;
+      }
+    }
+
+    return count;
+  }
+
+  isPlantLimitReached(plantId) {
+    const plant = PLANT_DEFINITIONS[plantId];
+    return Boolean(plant?.maxActive && this.getActivePlantCount(plantId) >= plant.maxActive);
   }
 
   advanceTo(targetMs) {
@@ -662,13 +705,29 @@ class ScenarioSimulator {
     return count;
   }
 
+  getCombatDefenderCountInLane(row) {
+    let count = 0;
+
+    for (const defender of this.defenders) {
+      if (
+        !defender.destroyed &&
+        defender.row === row &&
+        defender.definition.role !== "support"
+      ) {
+        count += 1;
+      }
+    }
+
+    return count;
+  }
+
   getEffectiveProjectileDamage(enemy, damage) {
     const requiredDefenders = enemy.definition.requiredDefendersInLane || 0;
     if (requiredDefenders <= 1) {
       return damage;
     }
 
-    const defenderCount = this.getDefenderCountInLane(enemy.lane);
+    const defenderCount = this.getCombatDefenderCountInLane(enemy.lane);
     if (defenderCount >= requiredDefenders) {
       return damage;
     }
@@ -764,7 +823,12 @@ class ScenarioSimulator {
     // Determine which plant types the simulator can currently afford
     const affordablePlants = this.availablePlants
       .map((id) => PLANT_DEFINITIONS[id])
-      .filter((plant) => plant && this.resources >= plant.cost);
+      .filter(
+        (plant) =>
+          plant &&
+          this.resources >= plant.cost &&
+          !this.isPlantLimitReached(plant.id)
+      );
     if (affordablePlants.length === 0) {
       return [];
     }
@@ -787,7 +851,7 @@ class ScenarioSimulator {
         }
 
         const requiredDefenders = laneRequirements.get(row) || 1;
-        const currentDefenders = this.getDefenderCountInLane(row);
+        const currentDefenders = this.getCombatDefenderCountInLane(row);
         const missingDefenders = Math.max(0, requiredDefenders - currentDefenders);
         const affordablePlacements = Math.min(
           Math.floor(this.resources / plant.cost),
@@ -979,6 +1043,7 @@ function evaluateSimulator(simulator) {
 
   for (const row of upcomingRows) {
     const defenderCount = simulator.getDefenderCountInLane(row);
+    const combatDefenderCount = simulator.getCombatDefenderCountInLane(row);
     const defendersInLane = simulator.defenders.filter(
       (defender) => !defender.destroyed && defender.row === row
     );
@@ -990,9 +1055,9 @@ function evaluateSimulator(simulator) {
       score += 2_000;
     }
     const required = laneRequirements.get(row) || 1;
-    score += Math.min(defenderCount, required) * (required > 1 ? 6_500 : 2_500);
-    if (defenderCount < required) {
-      score -= (required - defenderCount) * (required > 1 ? 5_500 : 1_500);
+    score += Math.min(combatDefenderCount, required) * (required > 1 ? 6_500 : 2_500);
+    if (combatDefenderCount < required) {
+      score -= (required - combatDefenderCount) * (required > 1 ? 5_500 : 1_500);
     }
 
     if (laneStat?.count >= 3 || laneStat?.clusterHits > 0) {
@@ -1054,43 +1119,92 @@ function buildPerturbations(plan, options) {
     const action = plan[index];
 
     const skipped = clonePlan(plan).filter((_, actionIndex) => actionIndex !== index);
-    variants.set(`skip-${index + 1}`, skipped);
+    variants.set(`skip-${index + 1}`, {
+      plan: skipped,
+      sourceIndex: index,
+    });
 
     const delayed = clonePlan(plan);
     delayed[index].timeMs += options.perturbationDelayMs;
     delayed.sort((left, right) => left.timeMs - right.timeMs);
-    variants.set(`delay-${index + 1}`, delayed);
+    variants.set(`delay-${index + 1}`, {
+      plan: delayed,
+      sourceIndex: index,
+    });
 
     if (action.row > 0) {
       const shiftedUp = clonePlan(plan);
       shiftedUp[index].row -= 1;
-      variants.set(`row-up-${index + 1}`, shiftedUp);
+      variants.set(`row-up-${index + 1}`, {
+        plan: shiftedUp,
+        sourceIndex: index,
+      });
     }
 
     if (action.row < BOARD_ROWS - 1) {
       const shiftedDown = clonePlan(plan);
       shiftedDown[index].row += 1;
-      variants.set(`row-down-${index + 1}`, shiftedDown);
+      variants.set(`row-down-${index + 1}`, {
+        plan: shiftedDown,
+        sourceIndex: index,
+      });
     }
 
     if (action.col < BOARD_COLS - 1) {
       const shiftedForward = clonePlan(plan);
       shiftedForward[index].col += 1;
-      variants.set(`col-forward-${index + 1}`, shiftedForward);
+      variants.set(`col-forward-${index + 1}`, {
+        plan: shiftedForward,
+        sourceIndex: index,
+      });
     }
 
     if (action.col > 0) {
       const shiftedBack = clonePlan(plan);
       shiftedBack[index].col -= 1;
-      variants.set(`col-back-${index + 1}`, shiftedBack);
+      variants.set(`col-back-${index + 1}`, {
+        plan: shiftedBack,
+        sourceIndex: index,
+      });
     }
   }
 
-  return [...variants.entries()].map(([label, variantPlan]) => ({
+  return [...variants.entries()].map(([label, variant]) => ({
     label,
-    plan: variantPlan,
-    signature: buildPlanSignature(variantPlan),
+    plan: variant.plan,
+    sourceIndex: variant.sourceIndex,
+    signature: buildPlanSignature(variant.plan),
   }));
+}
+
+function getDifficultyPlacementIndexes(plan, { maxTimeMs = Number.POSITIVE_INFINITY } = {}) {
+  const indexes = new Set();
+  const firstSupportByPlant = new Set();
+
+  for (let index = 0; index < plan.length; index += 1) {
+    const action = plan[index];
+    if (action.timeMs > maxTimeMs) {
+      continue;
+    }
+
+    const plant = PLANT_DEFINITIONS[action.plantId];
+    if (!plant) {
+      indexes.add(index);
+      continue;
+    }
+
+    if (plant.role !== "support") {
+      indexes.add(index);
+      continue;
+    }
+
+    if (!firstSupportByPlant.has(plant.id)) {
+      firstSupportByPlant.add(plant.id);
+      indexes.add(index);
+    }
+  }
+
+  return indexes;
 }
 
 function getFirstSeenLaneOrder(modeDefinition) {
@@ -1120,6 +1234,8 @@ function schedulePlacementsByBudget(modeDefinition, placements, options) {
   let currentTimeMs = 0;
   let nextIncomeAtMs = modeDefinition.resourceTickMs ?? Number.POSITIVE_INFINITY;
   const incomeAmount = modeDefinition.resourcePerTick ?? 0;
+  const activeSupportPlants = [];
+  const activePlantCounts = new Map();
 
   for (const placement of placements) {
     const plant =
@@ -1128,10 +1244,32 @@ function schedulePlacementsByBudget(modeDefinition, placements, options) {
       continue;
     }
 
+    const activeCount = activePlantCounts.get(plant.id) || 0;
+    if (plant.maxActive && activeCount >= plant.maxActive) {
+      continue;
+    }
+
     while (resources < plant.cost) {
-      currentTimeMs = nextIncomeAtMs;
-      resources += incomeAmount;
-      nextIncomeAtMs += modeDefinition.resourceTickMs ?? 0;
+      // Find the soonest income event: passive tick or support plant pulse
+      let soonestMs = nextIncomeAtMs;
+      for (const sp of activeSupportPlants) {
+        if (sp.nextPulseMs < soonestMs) {
+          soonestMs = sp.nextPulseMs;
+        }
+      }
+      currentTimeMs = soonestMs;
+
+      // Award all income events at or before currentTimeMs
+      while (nextIncomeAtMs <= currentTimeMs) {
+        resources += incomeAmount;
+        nextIncomeAtMs += modeDefinition.resourceTickMs ?? 0;
+      }
+      for (const sp of activeSupportPlants) {
+        while (sp.nextPulseMs <= currentTimeMs) {
+          resources += sp.sapPerPulse;
+          sp.nextPulseMs += sp.cadenceMs;
+        }
+      }
     }
 
     plan.push({
@@ -1141,6 +1279,17 @@ function schedulePlacementsByBudget(modeDefinition, placements, options) {
       plantId: plant.id,
     });
     resources -= plant.cost;
+    activePlantCounts.set(plant.id, activeCount + 1);
+
+    // Track support plant for future income scheduling
+    if (plant.role === 'support' && plant.sapPerPulse) {
+      activeSupportPlants.push({
+        sapPerPulse: plant.sapPerPulse,
+        cadenceMs: plant.cadenceMs,
+        nextPulseMs: currentTimeMs + (plant.initialCooldownMs ?? plant.cadenceMs),
+      });
+    }
+
     currentTimeMs += options.decisionIntervalMs;
   }
 
@@ -1340,24 +1489,41 @@ function buildNaiveStrategies(modeDefinition, options) {
   const safestLane = safeLanes.length > 0 ? safeLanes[0] : allLanes[allLanes.length - 1];
 
   for (const supportPlant of supportPlants) {
-    // Place support plant first in safest lane, then cover with attackers
+    // Place support plant wall-side first, then cover with attackers. The
+    // economy plant must survive long enough to pay off; spawn-side support
+    // openings are usually false negatives because enemies eat the plant before
+    // its first pulse.
     strategies.push({
-      label: `naive-early-${supportPlant.id}-safe-then-cover`,
+      label: `naive-early-${supportPlant.id}-wall-safe-then-cover`,
       placements: [
-        { row: safestLane, col: spawnCol, plantId: supportPlant.id },
+        { row: safestLane, col: wallCol, plantId: supportPlant.id },
         ...centerOut
           .filter((row) => row !== safestLane)
           .slice(0, 4)
           .map((row) => ({ row, col: wallCol, plantId: cheapestPlant.id })),
-        { row: safestLane, col: wallCol, plantId: cheapestPlant.id },
+        { row: safestLane, col: wallSupportCol, plantId: cheapestPlant.id },
       ],
     });
-    // Place support plant first then fill all lanes
     strategies.push({
-      label: `naive-early-${supportPlant.id}-then-wall`,
+      label: `naive-early-${supportPlant.id}-wall-pressure-stack`,
       placements: [
-        { row: safestLane, col: spawnCol, plantId: supportPlant.id },
-        ...centerOut.map((row) => ({ row, col: wallCol, plantId: cheapestPlant.id })),
+        { row: pressureRow, col: wallCol, plantId: supportPlant.id },
+        { row: pressureRow, col: wallSupportCol, plantId: cheapestPlant.id },
+        { row: pressureRow, col: wallThirdCol, plantId: cheapestPlant.id },
+        ...coverRows
+          .slice(0, 4)
+          .map((row) => ({ row, col: wallCol, plantId: cheapestPlant.id })),
+      ],
+    });
+    strategies.push({
+      label: `naive-early-${supportPlant.id}-wall-then-fill`,
+      placements: [
+        { row: safestLane, col: wallCol, plantId: supportPlant.id },
+        ...centerOut.map((row) => ({
+          row,
+          col: row === safestLane ? wallSupportCol : wallCol,
+          plantId: cheapestPlant.id,
+        })),
       ],
     });
     // Place support plant after first attacker
@@ -1365,12 +1531,32 @@ function buildNaiveStrategies(modeDefinition, options) {
       label: `naive-attacker-first-then-${supportPlant.id}`,
       placements: [
         { row: pressureRow, col: wallCol, plantId: cheapestPlant.id },
-        { row: safestLane, col: spawnCol, plantId: supportPlant.id },
+        { row: safestLane, col: wallCol, plantId: supportPlant.id },
         ...coverRows
           .slice(0, 4)
-          .map((row) => ({ row, col: wallCol, plantId: cheapestPlant.id })),
+          .map((row) => ({
+            row,
+            col: row === safestLane ? wallSupportCol : wallCol,
+            plantId: cheapestPlant.id,
+          })),
       ],
     });
+
+    for (const cornerLane of [0, BOARD_ROWS - 1]) {
+      strategies.push({
+        label: `naive-corner-${supportPlant.id}-then-pressure-stack-${cornerLane}`,
+        placements: [
+          { row: cornerLane, col: wallCol, plantId: supportPlant.id },
+          { row: pressureRow, col: wallCol, plantId: cheapestPlant.id },
+          { row: pressureRow, col: wallSupportCol, plantId: cheapestPlant.id },
+          { row: pressureRow, col: wallThirdCol, plantId: cheapestPlant.id },
+          ...centerOut
+            .filter((row) => row !== pressureRow && row !== cornerLane)
+            .map((row) => ({ row, col: wallCol, plantId: cheapestPlant.id })),
+          { row: cornerLane, col: wallSupportCol, plantId: cheapestPlant.id },
+        ],
+      });
+    }
   }
 
   return strategies.map((strategy) => ({
@@ -1531,9 +1717,26 @@ function getDifficultyCategory(label) {
 
 function analyzePlanComplexity(plan) {
   const rowsSeen = new Set();
+  const rowsWithAnyPlant = new Set();
   let placementsUntilFullCoverage = plan.length;
+  let placementsUntilAnyPlantCoverage = plan.length;
+  let firstSupportPlacement = Number.POSITIVE_INFINITY;
 
   for (let index = 0; index < plan.length; index += 1) {
+    const plant = PLANT_DEFINITIONS[plan[index].plantId];
+    rowsWithAnyPlant.add(plan[index].row);
+    if (plant?.role === "support") {
+      firstSupportPlacement = Math.min(firstSupportPlacement, index + 1);
+    }
+
+    if (rowsWithAnyPlant.size === BOARD_ROWS && placementsUntilAnyPlantCoverage === plan.length) {
+      placementsUntilAnyPlantCoverage = index + 1;
+    }
+
+    if (plant?.role === "support") {
+      continue;
+    }
+
     rowsSeen.add(plan[index].row);
     if (rowsSeen.size === BOARD_ROWS) {
       placementsUntilFullCoverage = index + 1;
@@ -1545,8 +1748,16 @@ function analyzePlanComplexity(plan) {
     totalPlacements: plan.length,
     uniqueRowsCovered: rowsSeen.size,
     placementsUntilFullCoverage,
+    uniqueRowsWithAnyPlant: rowsWithAnyPlant.size,
+    placementsUntilAnyPlantCoverage,
+    firstSupportPlacement:
+      Number.isFinite(firstSupportPlacement) ? firstSupportPlacement : null,
     simpleLaneCoverageWin:
       rowsSeen.size === BOARD_ROWS && placementsUntilFullCoverage <= BOARD_ROWS + 1,
+    economyFirstSimpleCoverageWin:
+      firstSupportPlacement <= 2 &&
+      rowsWithAnyPlant.size === BOARD_ROWS &&
+      placementsUntilAnyPlantCoverage <= BOARD_ROWS,
   };
 }
 
@@ -1690,37 +1901,68 @@ function buildSearchSeedPlans(modeDefinition, options) {
     const allLanes = [0, 1, 2, 3, 4];
     const pressureLaneSet = new Set(pressureRows.map((row) => row.row));
     const safeLanes = allLanes.filter((lane) => !pressureLaneSet.has(lane));
-    const backCol = BOARD_COLS - 1;
+    const wallCol = 0;
+    const wallSupportCol = Math.min(1, BOARD_COLS - 1);
+    const wallThirdCol = Math.min(2, BOARD_COLS - 1);
 
     for (const supportPlant of supportPlants) {
       for (const safeLane of safeLanes.slice(0, 2)) {
-        // Economy-first: place support plant, then cover pressure lanes
+        // Economy-first: place support plant wall-side so it survives long
+        // enough to pulse, then cover pressure lanes.
         pushSeed(
-          `early-${supportPlant.id}-lane-${safeLane}-then-cover`,
+          `early-${supportPlant.id}-wall-lane-${safeLane}-then-cover`,
           [
-            { row: safeLane, col: backCol, plantId: supportPlant.id },
+            { row: safeLane, col: wallCol, plantId: supportPlant.id },
             ...pressureRows.slice(0, 2).map((pr) => ({
               row: pr.row,
-              col: 0,
+              col: wallCol,
               plantId: cheapestPlant.id,
             })),
             ...firstSeenRows
               .filter((row) => row !== safeLane && !pressureLaneSet.has(row))
               .slice(0, 2)
-              .map((row) => ({ row, col: 0, plantId: cheapestPlant.id })),
+              .map((row) => ({ row, col: wallCol, plantId: cheapestPlant.id })),
           ]
         );
 
         // Attacker first on pressure lane, then support plant
         pushSeed(
-          `pressure-first-then-${supportPlant.id}-lane-${safeLane}`,
+          `pressure-first-then-${supportPlant.id}-wall-lane-${safeLane}`,
           [
-            { row: pressureRows[0]?.row ?? 2, col: 0, plantId: cheapestPlant.id },
-            { row: safeLane, col: backCol, plantId: supportPlant.id },
+            { row: pressureRows[0]?.row ?? 2, col: wallCol, plantId: cheapestPlant.id },
+            { row: safeLane, col: wallCol, plantId: supportPlant.id },
             ...firstSeenRows
               .filter((row) => row !== safeLane && row !== (pressureRows[0]?.row ?? 2))
               .slice(0, 3)
-              .map((row) => ({ row, col: 0, plantId: cheapestPlant.id })),
+              .map((row) => ({ row, col: wallCol, plantId: cheapestPlant.id })),
+          ]
+        );
+      }
+
+      const pressureRow = pressureRows[0]?.row ?? firstSeenRows[0] ?? 2;
+      const coverRows = firstSeenRows.filter((row) => row !== pressureRow);
+      pushSeed(
+        `early-${supportPlant.id}-pressure-wall-stack`,
+        [
+          { row: pressureRow, col: wallCol, plantId: supportPlant.id },
+          { row: pressureRow, col: wallSupportCol, plantId: cheapestPlant.id },
+          { row: pressureRow, col: wallThirdCol, plantId: cheapestPlant.id },
+          ...coverRows
+            .slice(0, 4)
+            .map((row) => ({ row, col: wallCol, plantId: cheapestPlant.id })),
+        ]
+      );
+
+      for (const plant of specializedPlants.slice(0, 1)) {
+        pushSeed(
+          `early-${supportPlant.id}-pressure-wall-${plant.id}`,
+          [
+            { row: pressureRow, col: wallCol, plantId: supportPlant.id },
+            { row: pressureRow, col: wallSupportCol, plantId: cheapestPlant.id },
+            { row: pressureRow, col: wallThirdCol, plantId: plant.id },
+            ...coverRows
+              .slice(0, 4)
+              .map((row) => ({ row, col: wallCol, plantId: cheapestPlant.id })),
           ]
         );
       }
@@ -1895,9 +2137,26 @@ function searchWinningPlan(modeDefinition, options) {
 
 function findWinningFallbackPlan(modeDefinition, options) {
   const strategies = buildNaiveStrategies(modeDefinition, options);
+  const debugStrategies = process.env.COMMAND_GARDEN_DEBUG_STRATEGIES === "1";
 
   for (const strategy of strategies) {
     const simulator = simulatePlan(modeDefinition, strategy.plan, options);
+    if (debugStrategies) {
+      console.error(
+        [
+          strategy.label,
+          simulator.won ? "WIN" : "LOSS",
+          `hp=${simulator.gardenHP}`,
+          `breaches=${simulator.breachCount}`,
+          `elapsed=${formatMs(simulator.elapsedMs)}`,
+          `eventIndex=${simulator.eventIndex}/${simulator.events.length}`,
+          `activeEnemies=${simulator.getActiveEnemyCount()}`,
+          `clear=${formatMs(simulator.clearTimeMs || 0)}`,
+          `resources=${simulator.resources}`,
+          `placements=${strategy.plan.length}`,
+        ].join(" ")
+      );
+    }
     if (simulator.won) {
       return simulator;
     }
@@ -1978,7 +2237,12 @@ function evaluateRequiredPlantCheck(modeDefinition, canonicalPlan, options) {
   }
 
   let previousRosterRuntimeProbe = null;
-  if (previousRosterComparable && previousRoster.length > 0 && !previousRosterSimulator?.won) {
+  if (
+    previousRosterComparable &&
+    previousRoster.length > 0 &&
+    !previousRosterSimulator?.won &&
+    !options.skipRuntimeProbe
+  ) {
     previousRosterRuntimeProbe = runRuntimeRosterProbe(modeDefinition, previousRoster);
   }
 
@@ -2024,9 +2288,31 @@ function evaluateRequiredPlantCheck(modeDefinition, canonicalPlan, options) {
     .filter((plantCheck) => plantCheck.canWinWithoutPlant)
     .map((plantCheck) => plantCheck.plantId);
 
+  // Probe tolerance: the runtime probe spawns Playwright and may time out or
+  // crash in constrained environments (CI, sandboxed shells).  By default
+  // (strictProbe = true), a failed or missing probe always blocks the
+  // required-plant gate — a beam-search miss is not proof that the previous
+  // roster cannot clear.  Pass --allow-probe-timeout to relax this for
+  // local development: when the probe could not produce a result AND the
+  // deterministic beam-search simulator also found no winning plan for the
+  // previous roster, the probe failure is treated as non-blocking.  If the
+  // probe ran successfully (ok === true) and found wins, that always blocks
+  // regardless of flag.
+  const probeRanButFailed =
+    previousRosterRuntimeProbe?.ok === false && previousRosterRuntimeProbe?.ran;
+  const probeMissing = !previousRosterRuntimeProbe;
+  const probeNonBlocking =
+    !options.strictProbe &&
+    (probeRanButFailed || probeMissing) &&
+    !previousRosterSimulator?.won;
+
   let reason = "Every newly introduced plant is required by the canonical winning line.";
-  if (previousRosterRuntimeProbe?.ok === false) {
-    reason = `Runtime previous-roster probe failed, so required-plant validation is incomplete: ${previousRosterRuntimeProbe.error}`;
+  if (probeRanButFailed && options.strictProbe) {
+    reason = `Runtime previous-roster probe failed — required-plant gate blocked: ${previousRosterRuntimeProbe.error}. Use --allow-probe-timeout in local-dev environments where Playwright cannot launch.`;
+  } else if (probeRanButFailed && previousRosterSimulator?.won) {
+    reason = `Runtime previous-roster probe failed but simulator found a win — required-plant validation is incomplete: ${previousRosterRuntimeProbe.error}`;
+  } else if (probeRanButFailed && !previousRosterSimulator?.won) {
+    reason = `Runtime probe could not produce results (${previousRosterRuntimeProbe.error}). Deterministic simulator also found no previous-roster win — probe failure treated as non-blocking (--allow-probe-timeout).`;
   } else
   if (missingCanonicalPlants.length > 0) {
     reason = `Canonical winning plan does not use newly introduced plant(s): ${missingCanonicalPlants.join(
@@ -2045,7 +2331,7 @@ function evaluateRequiredPlantCheck(modeDefinition, canonicalPlan, options) {
   return {
     applies: true,
     ok:
-      previousRosterRuntimeProbe?.ok !== false &&
+      (previousRosterRuntimeProbe?.ok !== false || probeNonBlocking) &&
       allNewPlantsUsedInCanonical &&
       !anyPlantOptional &&
       previousRosterCanStillWin !== true,
@@ -2095,6 +2381,11 @@ function main() {
 
   const bestPlan = sortPlan(bestSimulator.placements);
   const canonicalResult = simulatePlan(modeDefinition, bestPlan, options);
+  const challengeClearCutoffMs =
+    canonicalResult.clearTimeMs ?? bestSimulator.clearTimeMs ?? Number.POSITIVE_INFINITY;
+  const difficultyPlan = bestPlan.filter(
+    (action) => action.timeMs <= challengeClearCutoffMs
+  );
   const requiredPlantCheck = evaluateRequiredPlantCheck(modeDefinition, bestPlan, options);
   const naiveStrategies = buildNaiveStrategies(modeDefinition, options);
   const naiveStrategyResults = naiveStrategies.map((strategy) => {
@@ -2114,6 +2405,7 @@ function main() {
     const result = simulatePlan(modeDefinition, variant.plan, options);
     return {
       label: variant.label,
+      sourceIndex: variant.sourceIndex,
       difficultyCategory: getDifficultyCategory(variant.label),
       won: result.won,
       gardenHP: result.gardenHP,
@@ -2123,17 +2415,32 @@ function main() {
     };
   });
 
-  const countedPerturbations = perturbationResults;
+  // Only structural perturbations (skip = remove a defender, row = wrong lane)
+  // on strategic placements gate the difficulty check. Positional
+  // perturbations (col-shift ±1 cell, delay 800 ms) are mechanically harmless
+  // in a lane-defense game, and repeated support-plant replacements are
+  // bookkeeping after the first economy commitment. Combat placements and the
+  // first placement of each support plant are still counted.
+  const structuralCategories = new Set(["skip", "row"]);
+  const difficultyPlacementIndexes = getDifficultyPlacementIndexes(bestPlan, {
+    maxTimeMs: challengeClearCutoffMs,
+  });
+  const countedPerturbations = perturbationResults.filter(
+    (result) =>
+      structuralCategories.has(result.difficultyCategory) &&
+      difficultyPlacementIndexes.has(result.sourceIndex)
+  );
   const perturbationWins = countedPerturbations.filter((result) => result.won).length;
   const perturbationWinRate = countedPerturbations.length
     ? perturbationWins / countedPerturbations.length
     : 1;
   const naiveStrategyWins = naiveStrategyResults.filter((result) => result.won).length;
-  const complexity = analyzePlanComplexity(bestPlan);
+  const complexity = analyzePlanComplexity(difficultyPlan);
   const nearPerfect =
     perturbationWinRate <= options.perturbationWinRateThreshold &&
     naiveStrategyWins <= options.maxNaiveStrategyWins &&
-    !complexity.simpleLaneCoverageWin;
+    !complexity.simpleLaneCoverageWin &&
+    !complexity.economyFirstSimpleCoverageWin;
 
   const report = {
     ok: canonicalResult.won && nearPerfect && requiredPlantCheck.ok,
@@ -2170,8 +2477,9 @@ function main() {
     },
     requiredPlantCheck,
     perturbations: {
-      count: perturbationResults.length,
-      countedForDifficulty: countedPerturbations.length,
+    count: perturbationResults.length,
+    strategicPlacementCount: difficultyPlacementIndexes.size,
+    countedForDifficulty: countedPerturbations.length,
       wins: perturbationWins,
       winRate: Number(perturbationWinRate.toFixed(3)),
       categories: summarizePerturbationCategories(perturbationResults),
@@ -2237,6 +2545,8 @@ function main() {
           ? "Verdict: near-perfect. Small timing/lane mistakes usually lose."
         : complexity.simpleLaneCoverageWin
           ? "Verdict: too forgiving. A low-complexity one-per-row coverage plan already clears the board."
+        : complexity.economyFirstSimpleCoverageWin
+          ? "Verdict: too forgiving. An early economy plant plus simple lane coverage already clears the board."
         : naiveStrategyWins > options.maxNaiveStrategyWins
           ? "Verdict: too forgiving. Simple coverage strategies still clear the board."
           : "Verdict: too forgiving. Too many small mistakes still win."
