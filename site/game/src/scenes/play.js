@@ -84,7 +84,9 @@ export class PlayScene extends Phaser.Scene {
     this.defenders = [];
     this.enemies = [];
     this.projectiles = [];
+    this.enemyProjectiles = [];
     this.defendersByTile = new Map();
+    this.nextDefenderId = 1;
 
     this.drawBoard();
     this.createHud();
@@ -132,9 +134,12 @@ export class PlayScene extends Phaser.Scene {
   }
 
   getAvailablePlantIds() {
-    return (this.modeDefinition.availablePlants || [STARTING_PLANT_ID]).filter(
-      (plantId) => PLANT_DEFINITIONS[plantId]
-    );
+    const waveOverride = this.encounterSystem?.getCurrentWave?.()?.availablePlants;
+    const source =
+      Array.isArray(waveOverride) && waveOverride.length > 0
+        ? waveOverride
+        : this.modeDefinition.availablePlants || [STARTING_PLANT_ID];
+    return source.filter((plantId) => PLANT_DEFINITIONS[plantId]);
   }
 
   drawBoard() {
@@ -451,6 +456,7 @@ export class PlayScene extends Phaser.Scene {
     this.updateDefenders(stepDelta);
     this.updateProjectiles(stepDelta);
     this.updateEnemies(stepDelta);
+    this.updateEnemyProjectiles(stepDelta);
     this.cleanupEntities();
     this.checkModeTransitions();
     this.updateHud();
@@ -554,6 +560,12 @@ export class PlayScene extends Phaser.Scene {
 
       this.advanceEnemyAnimation(enemy, deltaMs);
 
+      if (enemy.definition.behavior === "sniper") {
+        this.updateSniperEnemy(enemy, deltaMs);
+        enemy.sprite.setPosition(enemy.x, enemy.y);
+        continue;
+      }
+
       const blocker = this.getBlockingDefender(enemy);
       if (blocker) {
         enemy.attackCooldownMs -= deltaMs;
@@ -574,6 +586,194 @@ export class PlayScene extends Phaser.Scene {
       }
 
       enemy.sprite.setPosition(enemy.x, enemy.y);
+    }
+  }
+
+  updateSniperEnemy(enemy, deltaMs) {
+    const def = enemy.definition;
+    if (enemy.snipeState === "approach") {
+      enemy.x -= def.speed * (deltaMs / 1000);
+      if (enemy.x <= def.attackAnchorX) {
+        enemy.x = def.attackAnchorX;
+        enemy.snipeState = "idle";
+      }
+      return;
+    }
+
+    if (enemy.snipeState === "idle") {
+      const target = this.findSniperTarget(enemy);
+      if (target) {
+        enemy.snipeState = "aim";
+        enemy.aimTimerMs = def.aimDurationMs;
+        enemy.targetDefenderId = target.id;
+        enemy.targetTileKey = target.tileKey;
+        enemy.targetX = target.x;
+        enemy.targetY = target.y;
+      }
+      return;
+    }
+
+    if (enemy.snipeState === "aim") {
+      // Re-check the target: if destroyed, try to re-lock; if nothing valid, drop to idle.
+      const target = this.getDefenderById(enemy.targetDefenderId);
+      if (!target || target.destroyed) {
+        const replacement = this.findSniperTarget(enemy);
+        if (!replacement) {
+          this.clearSniperAimLine(enemy);
+          enemy.snipeState = "idle";
+          enemy.targetDefenderId = null;
+          enemy.targetTileKey = null;
+          return;
+        }
+        enemy.targetDefenderId = replacement.id;
+        enemy.targetTileKey = replacement.tileKey;
+        enemy.targetX = replacement.x;
+        enemy.targetY = replacement.y;
+      }
+
+      this.renderSniperAimLine(enemy);
+      enemy.aimTimerMs -= deltaMs;
+      if (enemy.aimTimerMs <= 0) {
+        this.spawnEnemyProjectile(enemy);
+        this.clearSniperAimLine(enemy);
+        enemy.snipeState = "cooldown";
+        enemy.cooldownMs = def.attackCadenceMs;
+      }
+      return;
+    }
+
+    if (enemy.snipeState === "cooldown") {
+      enemy.cooldownMs -= deltaMs;
+      if (enemy.cooldownMs <= 0) {
+        const target = this.findSniperTarget(enemy);
+        if (target) {
+          enemy.snipeState = "aim";
+          enemy.aimTimerMs = def.aimDurationMs;
+          enemy.targetDefenderId = target.id;
+          enemy.targetTileKey = target.tileKey;
+          enemy.targetX = target.x;
+          enemy.targetY = target.y;
+        } else {
+          enemy.snipeState = "idle";
+          enemy.targetDefenderId = null;
+          enemy.targetTileKey = null;
+        }
+      }
+    }
+  }
+
+  getDefenderById(defenderId) {
+    if (defenderId == null) return null;
+    for (const defender of this.defenders) {
+      if (defender.id === defenderId) return defender;
+    }
+    return null;
+  }
+
+  findSniperTarget(enemy) {
+    // Returns highest-priority eligible defender in the sniper's lane.
+    // Eligibility: no attacker plant strictly between the defender and the sniper.
+    // Priority: support > piercing-attacker > attacker; tiebreak = closest to sniper (largest X).
+    const lane = enemy.lane;
+    const sniperX = enemy.x;
+    const inLane = this.defenders.filter(
+      (d) => !d.destroyed && d.row === lane && d.x < sniperX
+    );
+
+    const eligible = inLane.filter((defender) => {
+      // Any attacker strictly between defender and sniper screens this defender.
+      for (const other of inLane) {
+        if (other === defender) continue;
+        if ((other.definition.role || "attacker") !== "attacker") continue;
+        if (other.x > defender.x && other.x < sniperX) {
+          return false;
+        }
+      }
+      return true;
+    });
+
+    if (eligible.length === 0) return null;
+
+    const priorityOf = (defender) => {
+      const role = defender.definition.role || "attacker";
+      if (role === "support") return 0;
+      if (defender.definition.subRole === "piercing") return 1;
+      return 2;
+    };
+
+    eligible.sort((left, right) => {
+      const pl = priorityOf(left);
+      const pr = priorityOf(right);
+      if (pl !== pr) return pl - pr;
+      // closer to sniper (larger X) wins
+      return right.x - left.x;
+    });
+
+    return eligible[0];
+  }
+
+  renderSniperAimLine(enemy) {
+    if (!enemy.aimLine) {
+      enemy.aimLine = this.add.graphics();
+      enemy.aimLine.setDepth(7);
+    }
+    const alpha = enemy.aimTimerMs <= 400 ? 0.6 : 0.85;
+    enemy.aimLine.clear();
+    enemy.aimLine.lineStyle(2, 0xff7766, alpha);
+    enemy.aimLine.lineBetween(enemy.x, enemy.y, enemy.targetX, enemy.targetY);
+  }
+
+  clearSniperAimLine(enemy) {
+    if (enemy.aimLine) {
+      enemy.aimLine.destroy();
+      enemy.aimLine = null;
+    }
+  }
+
+  spawnEnemyProjectile(enemy) {
+    const def = enemy.definition;
+    const textureKey = def.projectileTextureKey;
+    const sprite = this.add.image(enemy.x - 18, enemy.y, textureKey);
+    sprite.setDisplaySize(22, 12);
+    sprite.setDepth(5);
+    sprite.setFlipX(true);
+
+    this.enemyProjectiles.push({
+      lane: enemy.lane,
+      x: enemy.x - 18,
+      y: enemy.y,
+      targetTileKey: enemy.targetTileKey,
+      targetX: enemy.targetX,
+      damage: def.projectileDamage,
+      speed: def.projectileSpeed,
+      sprite,
+      destroyed: false,
+    });
+  }
+
+  updateEnemyProjectiles(deltaMs) {
+    for (const projectile of this.enemyProjectiles) {
+      if (projectile.destroyed) continue;
+
+      projectile.x -= projectile.speed * (deltaMs / 1000);
+      projectile.sprite.setPosition(projectile.x, projectile.y);
+
+      // If reached the target tile's X band, resolve against the tile snapshot.
+      if (projectile.x <= projectile.targetX + 14) {
+        const defender = this.defendersByTile.get(projectile.targetTileKey);
+        if (defender && !defender.destroyed) {
+          this.damageDefender(defender, projectile.damage);
+        }
+        projectile.destroyed = true;
+        projectile.sprite.destroy();
+        continue;
+      }
+
+      // Safety: if the projectile somehow reaches the wall, waste it. Never damages garden.
+      if (projectile.x <= WALL_X) {
+        projectile.destroyed = true;
+        projectile.sprite.destroy();
+      }
     }
   }
 
@@ -723,18 +923,31 @@ export class PlayScene extends Phaser.Scene {
       const enemies = this.enemies
         .filter((enemy) => !enemy.destroyed && enemy.lane === row)
         .sort((left, right) => left.x - right.x)
-        .map((enemy) => ({
-          enemyId: enemy.id,
-          label: enemy.definition.label,
-          row,
-          x: Math.round(enemy.x),
-          hp: Math.round(enemy.hp),
-          maxHealth: enemy.definition.maxHealth,
-          speed: Math.round(enemy.definition.speed),
-          distanceToWall: Math.max(0, Math.round(enemy.x - WALL_X)),
-          distanceToBreach: Math.max(0, Math.round(enemy.x - BREACH_X)),
-          requiredDefendersInLane: enemy.definition.requiredDefendersInLane || 0,
-        }));
+        .map((enemy) => {
+          const base = {
+            enemyId: enemy.id,
+            label: enemy.definition.label,
+            row,
+            x: Math.round(enemy.x),
+            hp: Math.round(enemy.hp),
+            maxHealth: enemy.definition.maxHealth,
+            speed: Math.round(enemy.definition.speed),
+            distanceToWall: Math.max(0, Math.round(enemy.x - WALL_X)),
+            distanceToBreach: Math.max(0, Math.round(enemy.x - BREACH_X)),
+            requiredDefendersInLane: enemy.definition.requiredDefendersInLane || 0,
+            behavior: enemy.definition.behavior || "walker",
+          };
+          if (enemy.definition.behavior === "sniper") {
+            base.sniper = {
+              snipeState: enemy.snipeState,
+              aimTimerMs: Math.max(0, Math.round(enemy.aimTimerMs || 0)),
+              cooldownMs: Math.max(0, Math.round(enemy.cooldownMs || 0)),
+              targetDefenderId: enemy.targetDefenderId,
+              targetTileKey: enemy.targetTileKey,
+            };
+          }
+          return base;
+        });
 
       return {
         row,
@@ -786,10 +999,20 @@ export class PlayScene extends Phaser.Scene {
       },
       lanes,
       upcomingEvents,
+      enemyProjectiles: this.enemyProjectiles
+        .filter((projectile) => !projectile.destroyed)
+        .map((projectile) => ({
+          lane: projectile.lane,
+          x: Math.round(projectile.x),
+          y: Math.round(projectile.y),
+          targetTileKey: projectile.targetTileKey,
+          damage: projectile.damage,
+        })),
       activeCounts: {
         plants: this.defenders.filter((defender) => !defender.destroyed).length,
         enemies: this.enemies.filter((enemy) => !enemy.destroyed).length,
         projectiles: this.projectiles.filter((projectile) => !projectile.destroyed).length,
+        enemyProjectiles: this.enemyProjectiles.filter((projectile) => !projectile.destroyed).length,
       },
       status: this.gameEnding
         ? "resolving"
@@ -846,6 +1069,7 @@ export class PlayScene extends Phaser.Scene {
     const baseScaleY = sprite.scaleY;
 
     const defender = {
+      id: this.nextDefenderId++,
       tileKey,
       row,
       col,
@@ -954,6 +1178,14 @@ export class PlayScene extends Phaser.Scene {
       animationFrameIndex: 0,
       animationElapsedMs: 0,
       destroyed: false,
+      snipeState: definition.behavior === "sniper" ? "approach" : null,
+      aimTimerMs: 0,
+      cooldownMs: 0,
+      targetDefenderId: null,
+      targetTileKey: null,
+      targetX: 0,
+      targetY: 0,
+      aimLine: null,
     };
 
     this.applyEnemyAnimationFrame(enemy);
@@ -1177,6 +1409,15 @@ export class PlayScene extends Phaser.Scene {
 
   cleanupEntities() {
     this.projectiles = this.projectiles.filter((projectile) => !projectile.destroyed);
+    this.enemyProjectiles = this.enemyProjectiles.filter(
+      (projectile) => !projectile.destroyed
+    );
+    for (const enemy of this.enemies) {
+      if (enemy.destroyed && enemy.aimLine) {
+        enemy.aimLine.destroy();
+        enemy.aimLine = null;
+      }
+    }
     this.enemies = this.enemies.filter((enemy) => !enemy.destroyed);
     this.defenders = this.defenders.filter((defender) => !defender.destroyed);
   }

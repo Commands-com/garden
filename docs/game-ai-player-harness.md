@@ -113,9 +113,17 @@ Use this harness as the bridge between model play and deterministic validation:
 2. It chooses actions with `applyAction()`.
 3. It exports a replay plan.
 4. `npm run replay:scenario -- --plan ...` verifies the exact plan.
-5. `npm run validate:scenario-difficulty -- --date YYYY-MM-DD` remains the hard validation gate.
+5. `npm run validate:scenario-difficulty -- --date YYYY-MM-DD` remains the hard validation gate on walker-only boards.
 
 Future pipeline runs should publish AI play reports only after the replay succeeds. If the AI finds an exploit or an old-roster clear, save that plan as evidence and retune the board rather than relying on prose claims.
+
+### Ranged-enemy scenarios
+
+On boards that include `behavior: "sniper"` enemies (starting with the April 16 Briar Sniper), the difficulty validator returns an `indeterminate` verdict because it does not simulate aim telegraphs, attacker-only screening, or enemy projectiles. For those scenarios:
+
+- `getObservation()` exposes a per-enemy `sniper` block (`snipeState`, `aimTimerMs`, `cooldownMs`, `targetDefenderId`, `targetTileKey`) and a top-level `enemyProjectiles[]` list so agents can see what the sniper is about to do and react before the bolt lands.
+- `scripts/probe-runtime-scenario.mjs --replay <plan.json>` runs a single plan against the live Phaser runtime so ranged-enemy boards still have an executable difficulty signal.
+- Playwright specs (`tests/uiux/game-briar-sniper.spec.js`, `tests/uiux/game-board-scout-2026-04-16.spec.js`) carry the regression guarantees the validator cannot.
 
 ## Local Bot Player
 

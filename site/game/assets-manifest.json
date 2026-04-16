@@ -1,7 +1,37 @@
 {
   "schemaVersion": 1,
-  "updatedAt": "2026-04-13T14:10:00.000Z",
+  "updatedAt": "2026-04-16T00:00:00.000Z",
   "assets": [
+    {
+      "id": "briar-sniper",
+      "type": "sprite",
+      "kind": "sprite",
+      "provider": "repo",
+      "path": "/game/assets/manual/enemies/briar-sniper.svg",
+      "prompt": "Hand-authored repo asset for the April 16 Briar Sniper ranged enemy. Crouched briar-mantis archer with a tensioned thorn crossbow aimed leftward so sniper threat reads as ranged.",
+      "generatedAt": "2026-04-16T00:00:00.000Z",
+      "metadata": {
+        "category": "enemy",
+        "format": "svg",
+        "width": 128,
+        "height": 128
+      }
+    },
+    {
+      "id": "briar-sniper-projectile",
+      "type": "sprite",
+      "kind": "sprite",
+      "provider": "repo",
+      "path": "/game/assets/manual/projectiles/briar-sniper-projectile.svg",
+      "prompt": "Hand-authored repo asset for the April 16 Briar Sniper projectile. Crimson thorn bolt with fletching so sniper shots are visually distinct from plant-owned projectiles.",
+      "generatedAt": "2026-04-16T00:00:00.000Z",
+      "metadata": {
+        "category": "projectile",
+        "format": "svg",
+        "width": 96,
+        "height": 32
+      }
+    },
     {
       "id": "briar-beetle",
       "type": "sprite",

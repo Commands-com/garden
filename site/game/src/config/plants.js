@@ -3,6 +3,7 @@ export const PLANT_DEFINITIONS = {
     id: "thornVine",
     label: "Thorn Vine",
     description: "Fires thorn bolts down a single lane. Cheap, steady, and best when planted where pressure is actually coming.",
+    role: "attacker",
     textureKey: "thorn-vine",
     cost: 50,
     maxHealth: 34,
@@ -20,6 +21,8 @@ export const PLANT_DEFINITIONS = {
     label: "Bramble Spear",
     description:
       "Launches piercing bolts that pass through all enemies in a lane, damaging each once. Slow and expensive, but devastating against clustered foes.",
+    role: "attacker",
+    subRole: "piercing",
     textureKey: "bramble-spear",
     cost: 75,
     maxHealth: 26,

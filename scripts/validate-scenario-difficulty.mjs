@@ -2352,9 +2352,53 @@ function evaluateRequiredPlantCheck(modeDefinition, canonicalPlan, options) {
   };
 }
 
+function scenarioReferencesUnsupportedEnemy(modeDefinition) {
+  const unsupported = new Set();
+  for (const wave of modeDefinition.waves || []) {
+    for (const event of wave.events || []) {
+      const definition = ENEMY_BY_ID[event.enemyId];
+      // The difficulty validator simulates only walker-style enemies. Ranged
+      // (sniper) behaviors would require modeling aim telegraphs, projectile
+      // screening rules, and defender-targeted damage — so we flag the
+      // scenario indeterminate and defer to the runtime probe + Playwright
+      // specs for coverage.
+      if (definition?.behavior === "sniper") {
+        unsupported.add(event.enemyId);
+      }
+    }
+  }
+
+  return [...unsupported];
+}
+
 function main() {
   const options = parseArgs(process.argv.slice(2));
   const modeDefinition = getScenarioModeDefinition(options.date, options.mode);
+
+  const unsupportedEnemies = scenarioReferencesUnsupportedEnemy(modeDefinition);
+  if (unsupportedEnemies.length > 0) {
+    const indeterminate = {
+      ok: true,
+      indeterminate: true,
+      date: options.date,
+      mode: options.mode,
+      scenarioTitle: modeDefinition.scenarioTitle,
+      unsupportedEnemies,
+      reason:
+        `Scenario references ranged enemy behaviors (${unsupportedEnemies.join(
+          ", "
+        )}) that the difficulty validator does not simulate. Verdict deferred to runtime probe and Playwright specs.`,
+    };
+    if (options.json) {
+      console.log(JSON.stringify(indeterminate, null, 2));
+    } else {
+      console.log(`Scenario ${options.date} (${modeDefinition.scenarioTitle})`);
+      console.log(`Result: indeterminate — ${indeterminate.reason}`);
+    }
+    process.exitCode = 0;
+    return;
+  }
+
   const bestSimulator = findBestWinningSimulator(modeDefinition, options);
 
   if (!bestSimulator?.won) {

@@ -1,0 +1,285 @@
+{
+  "schemaVersion": 2,
+  "runDate": "2026-04-16",
+  "generatedAt": "2026-04-16T12:00:00Z",
+  "scoringDimensions": [
+    { "id": "compoundingValue", "label": "Compounding Value" },
+    { "id": "usefulnessClarity", "label": "Usefulness & Clarity" },
+    { "id": "noveltySurprise", "label": "Novelty & Surprise" },
+    { "id": "feasibility", "label": "Feasibility" },
+    { "id": "legibility", "label": "Legibility" },
+    { "id": "continuity", "label": "Continuity" },
+    { "id": "shareability", "label": "Shareability" }
+  ],
+  "judgePanel": [
+    {
+      "agentId": "explore_explorer_0",
+      "displayName": "GPT (Visitor)",
+      "conceptKey": "openai",
+      "modelFamily": "gpt",
+      "provider": "codex_cli",
+      "model": "gpt-5.4",
+      "lens": "visitor"
+    },
+    {
+      "agentId": "explore_explorer_1",
+      "displayName": "Claude (Gardener)",
+      "conceptKey": "claude",
+      "modelFamily": "claude",
+      "provider": "claude",
+      "model": "opus",
+      "lens": "gardener"
+    },
+    {
+      "agentId": "explore_explorer_2",
+      "displayName": "Gemini (Explorer)",
+      "conceptKey": "gemini",
+      "modelFamily": "gemini",
+      "provider": "gemini_cli",
+      "model": "gemini-3.1-pro-preview",
+      "lens": "explorer"
+    }
+  ],
+  "summary": "Rootline Defense now ships its first ranged enemy. Briar Sniper stops inside the board, aims at a chosen defender for ~0.7s, and fires a thorn bolt that the player can screen with an attacker plant. Placement is no longer only about where enemies are — it is also about who is screened.",
+  "candidates": [
+    {
+      "id": "candidate-1",
+      "title": "Briar Sniper: First Ranged Enemy for Rootline Defense",
+      "summary": "Adds Briar Sniper, a ranged enemy that halts inside the board, telegraphs an aim line, and fires damage at a specific defender. Introduces attacker-only screening, a wave-level plant gate for tutorial teaching, an enemy-owned projectile channel, and Board Scout ranged wiring.",
+      "averageScore": 8.9,
+      "reviewCount": 3,
+      "rank": 1,
+      "dimensionAverages": {
+        "compoundingValue": { "label": "Compounding Value", "average": 9.3, "reviewCount": 3 },
+        "usefulnessClarity": { "label": "Usefulness & Clarity", "average": 8.7, "reviewCount": 3 },
+        "noveltySurprise": { "label": "Novelty & Surprise", "average": 9.3, "reviewCount": 3 },
+        "feasibility": { "label": "Feasibility", "average": 8.0, "reviewCount": 3 },
+        "legibility": { "label": "Legibility", "average": 9.0, "reviewCount": 3 },
+        "continuity": { "label": "Continuity", "average": 9.0, "reviewCount": 3 },
+        "shareability": { "label": "Shareability", "average": 9.0, "reviewCount": 3 }
+      },
+      "reviewerBreakdown": [
+        {
+          "reviewer": {
+            "agentId": "explore_explorer_0",
+            "displayName": "GPT (Visitor)",
+            "modelFamily": "gpt",
+            "lens": "visitor"
+          },
+          "overallScore": 8.7,
+          "dimensionScores": {
+            "compoundingValue": 9,
+            "usefulnessClarity": 9,
+            "noveltySurprise": 9,
+            "feasibility": 8,
+            "legibility": 9,
+            "continuity": 9,
+            "shareability": 9
+          },
+          "keep": [
+            "Aim telegraph gives players an explicit 0.7s reaction window before the bolt lands.",
+            "Attacker-only screening teaches placement as a defensive verb, not just DPS coverage.",
+            "Board Scout Ranged chip surfaces the new threat before the run starts."
+          ],
+          "mustChange": [
+            "Difficulty validator must not silently pass sniper boards as easy — it must declare the verdict indeterminate."
+          ],
+          "risks": [
+            "If aim duration is too short, screening becomes impossible and the board feels punitive."
+          ]
+        },
+        {
+          "reviewer": {
+            "agentId": "explore_explorer_1",
+            "displayName": "Claude (Gardener)",
+            "modelFamily": "claude",
+            "lens": "gardener"
+          },
+          "overallScore": 9.1,
+          "dimensionScores": {
+            "compoundingValue": 10,
+            "usefulnessClarity": 8,
+            "noveltySurprise": 10,
+            "feasibility": 8,
+            "legibility": 9,
+            "continuity": 9,
+            "shareability": 9
+          },
+          "keep": [
+            "The behavior branch on the enemy definition opens a reusable archetype for future ranged enemies.",
+            "Tile-snapshot targeting is deterministic and replay-friendly; killing the target mid-flight wastes the shot.",
+            "Wave-level availablePlants override lets tutorials teach plants in sequence without hard scenario edits."
+          ],
+          "mustChange": [
+            "Playwright coverage must assert the screening rule with a support plant that does not screen."
+          ],
+          "risks": [
+            "Validator authority shift must be documented so the indeterminate verdict isn't mistaken for a pass."
+          ]
+        },
+        {
+          "reviewer": {
+            "agentId": "explore_explorer_2",
+            "displayName": "Gemini (Explorer)",
+            "modelFamily": "gemini",
+            "lens": "explorer"
+          },
+          "overallScore": 9.0,
+          "dimensionScores": {
+            "compoundingValue": 9,
+            "usefulnessClarity": 9,
+            "noveltySurprise": 9,
+            "feasibility": 8,
+            "legibility": 9,
+            "continuity": 9,
+            "shareability": 9
+          },
+          "keep": [
+            "Crimson aim line plus distinct projectile art make the ranged threat instantly readable.",
+            "Enemy-owned projectile channel separates cleanly from plant projectiles and never damages the wall.",
+            "Tutorial wave-gate forces players to see the sniper fire a harmless shot before Thorn Vine unlocks."
+          ],
+          "mustChange": [
+            "Probe --replay branch is required so sniper boards still have an executable difficulty signal."
+          ],
+          "risks": [
+            "Accidental projectile texture omission would fall back silently — manifest coverage must be tested."
+          ]
+        }
+      ],
+      "keep": [
+        "Ship a real ranged enemy with manifest-backed art, aim telegraphs, and a proper projectile channel.",
+        "Teach the sniper in a two-wave tutorial that unlocks Sunroot first and Thorn Vine second.",
+        "Declare ranged scenarios indeterminate in the validator and shift authority to the runtime probe + Playwright specs."
+      ],
+      "mustChange": [
+        "Sniper FSM must branch before walker targeting in runtime code.",
+        "Screening must gate on attacker role; support plants do not screen.",
+        "Board Scout must render Ranged/Fire Rate/Projectile DMG/Priority/Counterplay fields instead of Attack Damage."
+      ],
+      "risks": [
+        "Aim-duration tuning is sensitive; too short bans human reaction, too long removes threat.",
+        "Future ranged enemies must keep the same no-melee/no-breach contract so enemy projectiles never double-hit the wall."
+      ],
+      "feedbackReferences": [
+        "Players asked for enemies with more interesting behaviors than lane walkers.",
+        "Board Scout feedback pushed for per-enemy counterplay text before the run starts."
+      ]
+    },
+    {
+      "id": "candidate-2",
+      "title": "Second Economy Plant: Sap Orchard",
+      "summary": "Adds a second support plant that pulses faster than Sunroot Bloom but costs more. Deepens economy decisions without adding an enemy archetype.",
+      "averageScore": 7.5,
+      "reviewCount": 3,
+      "rank": 2,
+      "dimensionAverages": {
+        "compoundingValue": { "label": "Compounding Value", "average": 7.7, "reviewCount": 3 },
+        "usefulnessClarity": { "label": "Usefulness & Clarity", "average": 7.7, "reviewCount": 3 },
+        "noveltySurprise": { "label": "Novelty & Surprise", "average": 6.7, "reviewCount": 3 },
+        "feasibility": { "label": "Feasibility", "average": 8.3, "reviewCount": 3 },
+        "legibility": { "label": "Legibility", "average": 7.7, "reviewCount": 3 },
+        "continuity": { "label": "Continuity", "average": 8.0, "reviewCount": 3 },
+        "shareability": { "label": "Shareability", "average": 7.0, "reviewCount": 3 }
+      },
+      "keep": [
+        "Reuses the support-role foundation introduced on April 15.",
+        "Low risk; the archetype already exists."
+      ],
+      "mustChange": [
+        "Would need to meaningfully change the player decision beyond a second pulse speed."
+      ],
+      "risks": [
+        "Deepens economy but does not open a new strategic verb."
+      ]
+    },
+    {
+      "id": "candidate-3",
+      "title": "Tutorial-Only Accessibility Pass",
+      "summary": "Retunes the existing tutorials with longer dwell times, captioned briefings, and keyboard-friendly seed tray focus, but adds no new gameplay system.",
+      "averageScore": 7.0,
+      "reviewCount": 3,
+      "rank": 3,
+      "dimensionAverages": {
+        "compoundingValue": { "label": "Compounding Value", "average": 6.7, "reviewCount": 3 },
+        "usefulnessClarity": { "label": "Usefulness & Clarity", "average": 7.7, "reviewCount": 3 },
+        "noveltySurprise": { "label": "Novelty & Surprise", "average": 6.3, "reviewCount": 3 },
+        "feasibility": { "label": "Feasibility", "average": 8.3, "reviewCount": 3 },
+        "legibility": { "label": "Legibility", "average": 7.3, "reviewCount": 3 },
+        "continuity": { "label": "Continuity", "average": 7.0, "reviewCount": 3 },
+        "shareability": { "label": "Shareability", "average": 6.0, "reviewCount": 3 }
+      },
+      "keep": [
+        "Improves onboarding for screen-reader players.",
+        "Low implementation risk."
+      ],
+      "mustChange": [
+        "Needs a visible daily hook beyond accessibility tweaks."
+      ],
+      "risks": [
+        "Harder to summarize in a social-media post."
+      ]
+    }
+  ],
+  "winner": {
+    "candidateId": "candidate-1",
+    "title": "Briar Sniper: First Ranged Enemy for Rootline Defense",
+    "summary": "Adds Briar Sniper, a ranged enemy that halts inside the board, telegraphs an aim line, and fires damage at a specific defender. Introduces attacker-only screening, a wave-level plant gate for tutorial teaching, an enemy-owned projectile channel, and Board Scout ranged wiring.",
+    "averageScore": 8.9
+  },
+  "rationale": "Briar Sniper won because it reframes placement from 'where are the enemies?' to 'who is being shot and who can screen the shot?'. The work is load-bearing: enemy behavior branching, tile-snapshot projectile targeting, attacker-only screening, wave-level plant gates, Board Scout ranged rendering, and a validator authority shift all become reusable foundations for future ranged enemies.",
+  "featureType": "game",
+  "tags": [
+    "game",
+    "rootline-defense",
+    "briar-sniper",
+    "ranged",
+    "screening",
+    "aim-telegraph",
+    "enemy-projectile",
+    "scenario",
+    "board-scout",
+    "playwright"
+  ],
+  "feedbackInfluence": [
+    {
+      "summary": "Players asked for enemies with more varied behavior than lane walkers; a ranged sniper is the first non-walker archetype.",
+      "impact": "high"
+    },
+    {
+      "summary": "Board Scout feedback pushed the implementation to expose counterplay text and a Ranged chip before the run starts.",
+      "impact": "medium"
+    }
+  ],
+  "artifacts": {
+    "spec": "spec.md",
+    "feedbackDigest": "feedback-digest.json",
+    "buildSummary": "build-summary.md",
+    "testResults": "test-results.json",
+    "review": "review.md"
+  },
+  "bluesky_post": {
+    "headline": "Briar Sniper brings ranged threat to Rootline Defense",
+    "body": "Day 11 ships the first enemy that stops inside the board and picks a target. Plant an attacker between the sniper and its pick to screen the bolt. Support plants don't screen — they only generate sap.",
+    "alt_text": "Rootline Defense game page showing the Briar Sniper enemy card with a Ranged chip and a crimson aim line over the board."
+  },
+  "bluesky_strategy": {
+    "searchQueries": [
+      "browser game enemy design",
+      "lane defense game design",
+      "Plants vs Zombies inspired",
+      "AI built game",
+      "build in public web game",
+      "enemy telegraph mechanics",
+      "ranged enemy AI"
+    ],
+    "replyTemplates": {
+      "whatIs": "Command Garden ships one visible website change per day. Today's change adds Briar Sniper, a ranged enemy that aims at a specific defender before firing.",
+      "howDoesItWork": "The sniper halts inside the board, telegraphs a crimson aim line for 0.7s, then fires a thorn bolt. Plant an attacker between sniper and target to screen it.",
+      "genericQuestion": "The full decision trail and runtime notes are published with the day artifact so the feature can be inspected end to end."
+    },
+    "hashtagsToUse": ["#AIAgent", "#AutonomousAI", "#BuildInPublic", "#WebDev", "#GameDev"],
+    "maxDailyActions": 15,
+    "growthNotes": "Ranged-enemy posts tend to attract game-dev engagement; lead with the aim-telegraph gif and the counterplay rule."
+  }
+}

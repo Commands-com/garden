@@ -1,5 +1,7 @@
 import { chromium } from "@playwright/test";
 import { createRequire } from "node:module";
+import fs from "node:fs";
+import path from "node:path";
 import { buildScenarioEvents, getScenarioModeDefinition } from "../site/game/src/config/scenarios.js";
 import { BOARD_COLS, BOARD_ROWS } from "../site/game/src/config/board.js";
 import { PLANT_DEFINITIONS, STARTING_PLANT_ID } from "../site/game/src/config/plants.js";
@@ -18,6 +20,7 @@ const DEFAULT_OPTIONS = {
   json: false,
   strategy: "all",
   availablePlants: null,
+  replay: null,
 };
 
 const PREVIOUS_ROSTER_CHECK_STRATEGIES = [
@@ -84,9 +87,61 @@ function parseArgs(argv) {
     if (token === "--json") {
       options.json = true;
     }
+
+    if (token === "--replay" && next) {
+      options.replay = next;
+      index += 1;
+      continue;
+    }
   }
 
   return options;
+}
+
+function loadReplayStrategy(replayPath) {
+  const resolved = path.resolve(process.cwd(), replayPath);
+  if (!fs.existsSync(resolved)) {
+    throw new Error(`Replay file not found: ${resolved}`);
+  }
+
+  const raw = JSON.parse(fs.readFileSync(resolved, "utf8"));
+  const placements = Array.isArray(raw.placements)
+    ? raw.placements
+    : Array.isArray(raw.plan)
+      ? raw.plan
+      : null;
+
+  if (!placements) {
+    throw new Error(
+      `Replay file must contain a "placements" or "plan" array: ${resolved}`
+    );
+  }
+
+  const plan = placements.map((entry, index) => {
+    const rawRow = entry.row;
+    const rawCol = entry.col;
+    // Accept 1-based rows/cols from summarizePlan() output or 0-based internal plans.
+    const row = typeof rawRow === "number" && rawRow >= BOARD_ROWS ? rawRow - 1 : rawRow;
+    const col = typeof rawCol === "number" && rawCol >= BOARD_COLS ? rawCol - 1 : rawCol;
+
+    return {
+      timeMs: Number(entry.timeMs ?? entry.atMs ?? 0),
+      row: Number(row),
+      col: Number(col),
+      plantId: entry.plantId || entry.plant || STARTING_PLANT_ID,
+      step: entry.step ?? index + 1,
+    };
+  });
+
+  return {
+    label: raw.label || `replay:${path.basename(resolved)}`,
+    placements: plan.map((action) => ({
+      row: action.row,
+      col: action.col,
+      plantId: action.plantId,
+    })),
+    plan,
+  };
 }
 
 function roundToBucket(value, bucket) {
@@ -556,7 +611,9 @@ async function main() {
     ...baseModeDefinition,
     availablePlants,
   };
-  const strategies = buildStrategies(modeDefinition, options);
+  const strategies = options.replay
+    ? [loadReplayStrategy(options.replay)]
+    : buildStrategies(modeDefinition, options);
 
   if (!strategies.length) {
     console.error(`Unknown strategy: ${options.strategy}`);

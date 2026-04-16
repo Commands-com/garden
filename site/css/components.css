@@ -3103,6 +3103,11 @@ kbd {
   color: var(--color-text-dark);
 }
 
+.game-scout__badge--ranged {
+  background: #7c1a32;
+  color: #fff;
+}
+
 .game-scout__waves {
   display: flex;
   flex-direction: column;

@@ -131,7 +131,19 @@ export class BootScene extends Phaser.Scene {
 
     for (const enemy of ENEMY_DEFINITIONS) {
       if (!this.textures.exists(enemy.textureKey)) {
-        createCircleTexture(this, enemy.textureKey, enemy.radius, enemy.tint);
+        const fallbackTint = enemy.tint != null
+          ? enemy.tint
+          : enemy.behavior === "sniper"
+            ? 0x8f2d4a
+            : 0x633b2a;
+        createCircleTexture(this, enemy.textureKey, enemy.radius, fallbackTint);
+      }
+
+      if (
+        enemy.projectileTextureKey &&
+        !this.textures.exists(enemy.projectileTextureKey)
+      ) {
+        createProjectileTexture(this, enemy.projectileTextureKey);
       }
     }
 

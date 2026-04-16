@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 96 32" role="img" aria-labelledby="title desc">
+  <title id="title">Briar Sniper projectile</title>
+  <desc id="desc">A crimson thorn bolt with fletching trailing behind a sharpened tip, travelling leftward.</desc>
+  <defs>
+    <linearGradient id="bolt" x1="0" x2="1" y1="0" y2="0">
+      <stop offset="0%" stop-color="#ffd0a0"/>
+      <stop offset="55%" stop-color="#c83a46"/>
+      <stop offset="100%" stop-color="#5a0f24"/>
+    </linearGradient>
+    <linearGradient id="fletch" x1="0" x2="1" y1="0" y2="1">
+      <stop offset="0%" stop-color="#7c1a32"/>
+      <stop offset="100%" stop-color="#3c0818"/>
+    </linearGradient>
+  </defs>
+
+  <path d="M6 16 L22 12 L22 20 Z" fill="url(#fletch)" stroke="#1b0510" stroke-width="1.6" stroke-linejoin="round"/>
+  <path d="M6 16 L18 6 L24 14 Z" fill="url(#fletch)" stroke="#1b0510" stroke-width="1.4" stroke-linejoin="round"/>
+  <path d="M6 16 L18 26 L24 18 Z" fill="url(#fletch)" stroke="#1b0510" stroke-width="1.4" stroke-linejoin="round"/>
+
+  <path d="M18 14 L76 14 L76 18 L18 18 Z" fill="url(#bolt)" stroke="#2a0710" stroke-width="1.6" stroke-linejoin="round"/>
+
+  <path d="M76 10 L94 16 L76 22 Z" fill="#ffd4a0" stroke="#5a0f24" stroke-width="1.6" stroke-linejoin="round"/>
+  <path d="M80 14 L88 16 L80 18 Z" fill="#5a0f24" opacity=".55"/>
+
+  <path d="M30 14 L34 8" stroke="#ffe7c0" stroke-width="1.2" stroke-linecap="round" opacity=".7"/>
+  <path d="M42 18 L46 24" stroke="#ffe7c0" stroke-width="1.2" stroke-linecap="round" opacity=".55"/>
+</svg>

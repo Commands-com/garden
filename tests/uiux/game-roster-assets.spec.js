@@ -49,6 +49,39 @@ test("April 13 roster plants have manifest-backed art and projectile assets", as
   expect(assetIds.has("bramble-spear-projectile")).toBe(true);
 });
 
+test("April 16 Briar Sniper has manifest-backed enemy art and projectile asset", async ({
+  page,
+}) => {
+  await installLocalSiteRoutes(page);
+  await page.goto(getAppUrl("/game/?testMode=1&date=2026-04-16"));
+  await page.waitForFunction(
+    () =>
+      window.__gameTestHooks &&
+      typeof window.__gameTestHooks.getState === "function"
+  );
+
+  const assetManifest = await page.evaluate(async () => {
+    const response = await fetch("/game/assets-manifest.json");
+    return response.json();
+  });
+
+  const assets = assetManifest.assets || [];
+  const sniperAsset = assets.find((asset) => asset.id === "briar-sniper");
+  const sniperProjectileAsset = assets.find(
+    (asset) => asset.id === "briar-sniper-projectile"
+  );
+
+  expect(sniperAsset).toBeTruthy();
+  expect(sniperAsset.provider).toBe("repo");
+  expect(sniperAsset.path).toBe("/game/assets/manual/enemies/briar-sniper.svg");
+
+  expect(sniperProjectileAsset).toBeTruthy();
+  expect(sniperProjectileAsset.provider).toBe("repo");
+  expect(sniperProjectileAsset.path).toBe(
+    "/game/assets/manual/projectiles/briar-sniper-projectile.svg"
+  );
+});
+
 test("April 15 Sunroot Bloom loads manifest-backed art and expects no projectile", async ({
   page,
 }) => {

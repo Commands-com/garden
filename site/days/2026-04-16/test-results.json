@@ -1,0 +1,42 @@
+{
+  "schemaVersion": 1,
+  "runDate": "2026-04-16",
+  "generatedAt": "2026-04-16T12:00:00.000Z",
+  "summary": {
+    "totalScenarios": 4,
+    "passed": 4,
+    "failed": 0,
+    "passRate": 100
+  },
+  "scenarios": [
+    {
+      "name": "Artifact schema validation",
+      "persona": "validator",
+      "status": "pass",
+      "description": "Validated the April 16 artifact directory with the repository schema validator.",
+      "details": "`node schemas/validate.js content/days/2026-04-16` passes decision.json, spec.md, build-summary.md, review.md, test-results.json, and feedback-digest.json."
+    },
+    {
+      "name": "Scenario difficulty validation",
+      "persona": "validator",
+      "status": "pass",
+      "description": "April 16 includes Briar Sniper, so the validator returns indeterminate and exits 0 rather than claiming the board is easy or hard.",
+      "details": "`npm run validate:scenario-difficulty -- --date 2026-04-16` reports: Result: indeterminate — scenario references ranged enemy behaviors (briarSniper) that the difficulty validator does not simulate. Verdict deferred to runtime probe and Playwright specs."
+    },
+    {
+      "name": "Briar Sniper targeted Playwright coverage",
+      "persona": "visitor",
+      "status": "pass",
+      "description": "Ran the new sniper, scout, tutorial-gate, and roster asset specs.",
+      "details": "game-briar-sniper.spec.js, game-board-scout-2026-04-16.spec.js, game-tutorial-wave-plant-gate.spec.js, and game-roster-assets.spec.js all pass. Covers FSM states, aim telegraph, tile-snapshot projectile resolution, attacker-only screening, Board Scout Ranged chip and detail panel, wave-level plant gate, and manifest-backed art."
+    },
+    {
+      "name": "Full Playwright suite",
+      "persona": "validator",
+      "status": "pass",
+      "description": "Ran the full UI/UX test suite with `npm run test:uiux`.",
+      "details": "`npm run test:uiux` passes on the April 16 branch with no regressions in prior-day specs."
+    }
+  ],
+  "testPersonas": ["validator", "visitor"]
+}

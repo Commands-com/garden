@@ -93,6 +93,15 @@ If you modify a core system, include regression coverage for the behavior you ar
   - when a new plant day is simulator-sensitive, use the runtime probe to sanity-check whether the previous roster still has an easy human-clear path
 - The goal is not arbitrary cruelty. The goal is: **winnable with strong play, but not casually survivable through sloppy placement**.
 
+#### Authority shift: ranged enemy scenarios
+
+- The difficulty validator simulates only walker-style enemies (contact attackers, Glass Ram underdefended rule, etc.). Ranged behaviors — Briar Sniper and any future sniper-class enemy — require modeling aim telegraphs, attacker-only screening, and enemy-owned projectiles that damage defenders, which the validator does not do.
+- On scenarios that reference a `behavior: "sniper"` enemy, `validate:scenario-difficulty` returns an `indeterminate` verdict and exits 0. It does **not** silently pass the board as "easy" or "hard" — it explicitly defers.
+- For those boards the authoritative difficulty signal is the combination of:
+  - `scripts/probe-runtime-scenario.mjs` (including the `--replay` branch for specific candidate plans), which executes real Phaser frames where the sniper FSM, aim lines, and enemy projectiles all run, and
+  - the Playwright specs under `tests/uiux/game-briar-sniper.spec.js` and `tests/uiux/game-board-scout-2026-04-16.spec.js`, which assert the sniper FSM, screening rule, and Board Scout wiring.
+- If a future change teaches the validator to model ranged behaviors, remove the indeterminate branch in `scripts/validate-scenario-difficulty.mjs` and fold the scenario back into the regular gate.
+
 ### AI Player Replay Harness
 
 - Use `docs/game-ai-player-harness.md` when a daily run needs agent-style playtesting instead of only static validation.

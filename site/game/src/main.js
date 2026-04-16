@@ -293,7 +293,14 @@ function renderBoardScout(dayDate, assetCatalog) {
             "div",
             { className: "game-scout__card-stats" },
             el("span", { className: "game-scout__card-stat" }, `HP: ${enemy.maxHealth}`),
-            el("span", { className: "game-scout__card-stat" }, `Speed: ${enemy.speed}`)
+            el("span", { className: "game-scout__card-stat" }, `Speed: ${enemy.speed}`),
+            enemy.behavior === "sniper"
+              ? el(
+                  "span",
+                  { className: "game-scout__badge game-scout__badge--ranged" },
+                  "Ranged"
+                )
+              : false
           )
         )
       )
@@ -450,23 +457,49 @@ function selectScoutCard(card, type, data, scenario) {
         }
       }
     }
-    detail.append(
-      el("h4", { className: "game-scout__detail-title" }, data.label),
-      el(
-        "dl",
-        { className: "game-scout__detail-stats" },
-        el("dt", {}, "HP"),
-        el("dd", {}, String(data.maxHealth)),
-        el("dt", {}, "Speed"),
-        el("dd", {}, String(data.speed)),
-        el("dt", {}, "Attack Damage"),
-        el("dd", {}, String(data.attackDamage)),
-        el("dt", {}, "Attack Cadence"),
-        el("dd", {}, `${data.attackCadenceMs}ms`),
-        el("dt", {}, "Appears In"),
-        el("dd", {}, wavePresence.join(", ") || "No scripted waves")
-      )
-    );
+    if (data.behavior === "sniper") {
+      detail.append(
+        el("h4", { className: "game-scout__detail-title" }, data.label),
+        el(
+          "dl",
+          { className: "game-scout__detail-stats" },
+          el("dt", {}, "HP"),
+          el("dd", {}, String(data.maxHealth)),
+          el("dt", {}, "Speed"),
+          el("dd", {}, String(data.speed)),
+          el("dt", {}, "Range"),
+          el("dd", {}, "Lane (stops inside board)"),
+          el("dt", {}, "Fire Rate"),
+          el("dd", {}, `${data.attackCadenceMs}ms`),
+          el("dt", {}, "Projectile DMG"),
+          el("dd", {}, String(data.projectileDamage)),
+          el("dt", {}, "Priority"),
+          el("dd", {}, "Support > Piercing attacker > Attacker"),
+          el("dt", {}, "Counterplay"),
+          el("dd", {}, "Screen it — plant an attacker between sniper and target"),
+          el("dt", {}, "Appears In"),
+          el("dd", {}, wavePresence.join(", ") || "No scripted waves")
+        )
+      );
+    } else {
+      detail.append(
+        el("h4", { className: "game-scout__detail-title" }, data.label),
+        el(
+          "dl",
+          { className: "game-scout__detail-stats" },
+          el("dt", {}, "HP"),
+          el("dd", {}, String(data.maxHealth)),
+          el("dt", {}, "Speed"),
+          el("dd", {}, String(data.speed)),
+          el("dt", {}, "Attack Damage"),
+          el("dd", {}, String(data.attackDamage)),
+          el("dt", {}, "Attack Cadence"),
+          el("dd", {}, `${data.attackCadenceMs}ms`),
+          el("dt", {}, "Appears In"),
+          el("dd", {}, wavePresence.join(", ") || "No scripted waves")
+        )
+      );
+    }
   } else if (data.role === "support") {
     detail.append(
       el("h4", { className: "game-scout__detail-title" }, data.label),
