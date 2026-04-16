@@ -1,0 +1,15 @@
+{
+  "label": "2026-04-16-old-opening",
+  "date": "2026-04-16",
+  "mode": "challenge",
+  "description": "April 15 memorized opening ported to April 16: distributed three-plant deploy with no attacker screen in the lane-2 sniper's line of fire. Expected to FAIL because (a) the lane-2 Sunroot has no screen so the first sniper shot kills it before the first sap payoff, and (b) walkers in lanes outside the deployed positions breach the 1-HP garden in Wave 1.",
+  "expect": {
+    "outcome": "gameover",
+    "reason": "lane-2-sunroot-unscreened-and-walker-breach"
+  },
+  "placements": [
+    { "timeMs": 0,     "row": 1, "col": 1, "plantId": "thornVine",    "note": "front-of-wall Thorn in lane 1 (April 15 walker habit)" },
+    { "timeMs": 4000,  "row": 2, "col": 0, "plantId": "sunrootBloom", "note": "back-column Sunroot in lane 2 — the memorized April 15 bank slot; unscreened against the lane-2 sniper" },
+    { "timeMs": 14000, "row": 3, "col": 3, "plantId": "brambleSpear", "note": "mid-board Bramble in lane 3 (April 15 piercing habit)" }
+  ]
+}

@@ -37,6 +37,7 @@ export class TitleScene extends Phaser.Scene {
     const tutorialMode = getScenarioModeDefinition(this.bootstrap.dayDate, "tutorial");
     const challengeMode = getScenarioModeDefinition(this.bootstrap.dayDate, "challenge");
     const isArchiveRun = this.bootstrap.dayDate !== this.bootstrap.todayDate;
+    const endlessUnlocked = Boolean(this.bootstrap.endlessUnlocked);
 
     this.add.tileSprite(
       ARENA_WIDTH / 2,
@@ -129,6 +130,29 @@ export class TitleScene extends Phaser.Scene {
       stroke: 0xc4a35a,
     });
 
+    if (endlessUnlocked) {
+      this.add.text(ARENA_WIDTH / 2, btnY - 74, "Endless Unlocked", {
+        fontFamily: "DM Sans",
+        fontSize: "18px",
+        fontStyle: "700",
+        color: "#9fdd6b",
+        align: "center",
+      }).setOrigin(0.5);
+
+      this.add.text(
+        ARENA_WIDTH / 2,
+        btnY - 52,
+        "Today's challenge is cleared. Return to the board to keep the endless score chase going.",
+        {
+          fontFamily: "DM Sans",
+          fontSize: "12px",
+          color: "#d8e5db",
+          align: "center",
+          wordWrap: { width: 620 },
+        }
+      ).setOrigin(0.5, 0);
+    }
+
     // Keyboard hints + seed
     this.add.text(
       ARENA_WIDTH / 2,
@@ -168,7 +192,8 @@ export class TitleScene extends Phaser.Scene {
       mode: "menu",
       scenarioTitle: scenario.title,
       scenarioPhase: "menu",
-      challengeCleared: false,
+      challengeCleared: endlessUnlocked,
+      endlessUnlocked,
       survivedMs: 0,
       status: "ready",
     });

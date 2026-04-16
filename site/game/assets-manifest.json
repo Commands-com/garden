@@ -1,30 +1,30 @@
 {
   "schemaVersion": 1,
-  "updatedAt": "2026-04-16T00:00:00.000Z",
+  "updatedAt": "2026-04-16T21:22:48.040Z",
   "assets": [
     {
-      "id": "briar-sniper",
+      "id": "bramble-spear",
       "type": "sprite",
       "kind": "sprite",
       "provider": "repo",
-      "path": "/game/assets/manual/enemies/briar-sniper.svg",
-      "prompt": "Hand-authored repo asset for the April 16 Briar Sniper ranged enemy. Crouched briar-mantis archer with a tensioned thorn crossbow aimed leftward so sniper threat reads as ranged.",
-      "generatedAt": "2026-04-16T00:00:00.000Z",
+      "path": "/game/assets/manual/plants/bramble-spear.svg",
+      "prompt": "Hand-authored repo asset for the April 13 Bramble Spear roster plant. Distinct spear-petal silhouette with amber core so the second plant reads clearly even when asset generation times out.",
+      "generatedAt": "2026-04-13T14:10:00.000Z",
       "metadata": {
-        "category": "enemy",
+        "category": "player",
         "format": "svg",
         "width": 128,
         "height": 128
       }
     },
     {
-      "id": "briar-sniper-projectile",
+      "id": "bramble-spear-projectile",
       "type": "sprite",
       "kind": "sprite",
       "provider": "repo",
-      "path": "/game/assets/manual/projectiles/briar-sniper-projectile.svg",
-      "prompt": "Hand-authored repo asset for the April 16 Briar Sniper projectile. Crimson thorn bolt with fletching so sniper shots are visually distinct from plant-owned projectiles.",
-      "generatedAt": "2026-04-16T00:00:00.000Z",
+      "path": "/game/assets/manual/projectiles/bramble-spear-projectile.svg",
+      "prompt": "Hand-authored repo asset for the April 13 Bramble Spear projectile. Long bramble lance silhouette so piercing shots are visually distinct from Thorn Vine bolts.",
+      "generatedAt": "2026-04-13T14:10:00.000Z",
       "metadata": {
         "category": "projectile",
         "format": "svg",
@@ -73,48 +73,56 @@
       }
     },
     {
-      "id": "bramble-spear",
+      "id": "briar-sniper",
       "type": "sprite",
       "kind": "sprite",
       "provider": "repo",
-      "path": "/game/assets/manual/plants/bramble-spear.svg",
-      "prompt": "Hand-authored repo asset for the April 13 Bramble Spear roster plant. Distinct spear-petal silhouette with amber core so the second plant reads clearly even when asset generation times out.",
-      "generatedAt": "2026-04-13T14:10:00.000Z",
+      "path": "/game/assets/manual/enemies/briar-sniper.svg",
+      "prompt": "Hand-authored repo asset for the April 16 Briar Sniper ranged enemy. Crouched briar-mantis archer with a tensioned thorn crossbow aimed leftward so sniper threat reads as ranged.",
+      "generatedAt": "2026-04-16T00:00:00.000Z",
       "metadata": {
-        "category": "player",
+        "category": "enemy",
         "format": "svg",
         "width": 128,
         "height": 128
       }
     },
     {
-      "id": "sunroot-bloom",
+      "id": "briar-sniper-projectile",
       "type": "sprite",
       "kind": "sprite",
       "provider": "repo",
-      "path": "/game/assets/manual/plants/sunroot-bloom.svg",
-      "prompt": "Hand-authored repo asset for the Sunroot Bloom economy plant. Warm gold/amber flower with sap-drop motif, support-role visual identity.",
-      "generatedAt": "2026-04-15T00:00:00.000Z",
-      "metadata": {
-        "category": "player",
-        "format": "svg",
-        "width": 128,
-        "height": 128
-      }
-    },
-    {
-      "id": "bramble-spear-projectile",
-      "type": "sprite",
-      "kind": "sprite",
-      "provider": "repo",
-      "path": "/game/assets/manual/projectiles/bramble-spear-projectile.svg",
-      "prompt": "Hand-authored repo asset for the April 13 Bramble Spear projectile. Long bramble lance silhouette so piercing shots are visually distinct from Thorn Vine bolts.",
-      "generatedAt": "2026-04-13T14:10:00.000Z",
+      "path": "/game/assets/manual/projectiles/briar-sniper-projectile.svg",
+      "prompt": "Hand-authored repo asset for the April 16 Briar Sniper projectile. Crimson thorn bolt with fletching so sniper shots are visually distinct from plant-owned projectiles.",
+      "generatedAt": "2026-04-16T00:00:00.000Z",
       "metadata": {
         "category": "projectile",
         "format": "svg",
         "width": 96,
         "height": 32
+      }
+    },
+    {
+      "id": "briar-sniper-walk",
+      "type": "sprite",
+      "kind": "animation",
+      "provider": "replicate",
+      "path": "/game/assets/generated/animations/enemies/briar-sniper-walk.png",
+      "prompt": "Create an animated enemy sprite of crouched briar-mantis archer with a tensioned thorn crossbow aimed leftward. Idle breathing stance cycling into a draw-and-aim pose: bow rises, string tensions, shoulders brace, then settles back. Reads clearly as an archer holding position, not walking. Crimson carapace, amber-gold bow, thorn-bolt nocked. Facing left the entire animation.. hostile lane-pushing creature for a top-down lane-defense game, readable attack silhouette, visually distinct body shape, premium indie-game finish. Render a cohesive low-framerate gameplay animation with consistent character volume, palette, and positioning across frames. Use the rd-animation style walking_and_idle. Each frame must keep the same subject identity, palette, and camera angle while showing one coherent gameplay action. Target frame size 48x48. No text, labels, borders, UI panels, or background scene dressing. modern polished pixel art, crisp readable silhouettes, consistent shading, and strong gameplay clarity. avoid muddy low-contrast frames, avoid random pose drift, avoid noisy background detail, avoid deliberately primitive 8-bit nostalgia.",
+      "generatedAt": "2026-04-16T21:22:48.024Z",
+      "metadata": {
+        "predictionId": "m4gk616gxdrmr0cxk0nrxp38pc",
+        "modelVersion": "2e4eabbc836578423e151ba27352a1d8a566c6f1186c0da3ddf66c54deacf28b",
+        "model": "rd-animation",
+        "category": "enemy",
+        "style": "walking_and_idle",
+        "width": 48,
+        "height": 48,
+        "returnSpritesheet": true,
+        "phaser": {
+          "frameWidth": 48,
+          "frameHeight": 48
+        }
       }
     },
     {
@@ -192,6 +200,21 @@
           "frameWidth": 48,
           "frameHeight": 48
         }
+      }
+    },
+    {
+      "id": "sunroot-bloom",
+      "type": "sprite",
+      "kind": "sprite",
+      "provider": "repo",
+      "path": "/game/assets/manual/plants/sunroot-bloom.svg",
+      "prompt": "Hand-authored repo asset for the Sunroot Bloom economy plant. Warm gold/amber flower with sap-drop motif, support-role visual identity.",
+      "generatedAt": "2026-04-15T00:00:00.000Z",
+      "metadata": {
+        "category": "player",
+        "format": "svg",
+        "width": 128,
+        "height": 128
       }
     },
     {

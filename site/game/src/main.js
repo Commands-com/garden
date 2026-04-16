@@ -163,6 +163,23 @@ function syncInventorySelection(selectedPlantId) {
   });
 }
 
+function syncInventoryAvailability(availablePlantIds = null) {
+  if (!dom.inventory) {
+    return;
+  }
+
+  const allowedPlants = Array.isArray(availablePlantIds) && availablePlantIds.length > 0
+    ? new Set(availablePlantIds)
+    : null;
+
+  dom.inventory.querySelectorAll(".game-inventory__item").forEach((item) => {
+    const plantId = item.dataset.plantId || "";
+    const isAvailable = !allowedPlants || allowedPlants.has(plantId);
+    item.classList.toggle("game-inventory__item--disabled", !isAvailable);
+    item.setAttribute("aria-disabled", String(!isAvailable));
+  });
+}
+
 function renderInventory(dayDate) {
   if (!dom.inventory) {
     return;
@@ -196,6 +213,7 @@ function renderInventory(dayDate) {
           }`,
           dataset: { plantId },
           "aria-label": `${plant.label}, ${plant.cost} sap`,
+          "aria-disabled": "false",
           "aria-pressed": String(plantId === defaultPlantId),
         },
         el(
@@ -220,10 +238,16 @@ function renderInventory(dayDate) {
         return;
       }
 
+      if (item.getAttribute("aria-disabled") === "true") {
+        return;
+      }
+
       try {
         const playScene = getPlayScene();
         if (playScene && typeof playScene.selectPlant === "function") {
           playScene.selectPlant(plantId);
+          syncInventorySelection(playScene.selectedPlantId || plantId);
+          return;
         }
       } catch {
         // Play scene may not be active yet; selection still syncs below
@@ -675,6 +699,7 @@ function updateRuntimeReadout(state) {
   if (dom.wallValue) dom.wallValue.textContent = `${state.gardenHP ?? 0} / ${state.maxGardenHealth ?? 0}`;
   if (dom.defendersValue) dom.defendersValue.textContent = String(state.defenderCount ?? 0);
   if (dom.enemyValue) dom.enemyValue.textContent = String(state.enemyCount ?? 0);
+  syncInventoryAvailability(state.scene === "play" ? state.availablePlantIds : null);
 
   if (!dom.runNote) return;
 
@@ -704,8 +729,9 @@ function updateRuntimeReadout(state) {
       ? "Tutorial attempt complete. Clear it to roll straight into today's challenge."
       : "Run complete. Challenge and endless scores submit if the API is reachable.";
   } else {
-    dom.runNote.textContent =
-      "Choose Tutorial First to learn today's roster, or jump straight into Today's Challenge.";
+    dom.runNote.textContent = state.challengeCleared || state.endlessUnlocked
+      ? "Today's challenge is cleared. Endless mode is unlocked for this board now."
+      : "Choose Tutorial First to learn today's roster, or jump straight into Today's Challenge.";
   }
 }
 
@@ -751,6 +777,7 @@ async function init() {
     seed,
     todayDate,
     dayDate: gameDate,
+    endlessUnlocked: false,
     assetCatalog,
     audio: audioController,
     setAlias(value) {

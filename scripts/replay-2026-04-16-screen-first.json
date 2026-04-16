@@ -1,0 +1,20 @@
+{
+  "label": "2026-04-16-screen-first",
+  "date": "2026-04-16",
+  "mode": "challenge",
+  "description": "Same plant roster as the old-opening replay but places a Thorn Vine in every sniper lane before any Sunroot, and before the sniper's first aim cycle in that lane. Expected to CLEAR because every sniper targets an attacker screen (retargeting per spec AC-3), and the screens also hold the walker pressure.",
+  "expect": {
+    "outcome": "cleared",
+    "reason": "every-sniper-lane-screened-before-first-aim"
+  },
+  "placements": [
+    { "timeMs": 0,     "row": 2, "col": 1, "plantId": "thornVine",    "note": "screen lane-2 sniper (Wave 1 @ 2500ms; also Wave 4 @ 63000ms)" },
+    { "timeMs": 4000,  "row": 1, "col": 1, "plantId": "thornVine",    "note": "defend lane-1 walker @ 9000ms; also screen lane-1 sniper (Wave 2 @ 21500ms)" },
+    { "timeMs": 12000, "row": 3, "col": 1, "plantId": "thornVine",    "note": "defend lane-3 walker @ 12500ms; also screen lane-3 sniper (Wave 2 @ 24500ms)" },
+    { "timeMs": 24000, "row": 0, "col": 1, "plantId": "thornVine",    "note": "screen lane-0 sniper (Wave 3 @ 41200ms; also Wave 4 @ 68500ms)" },
+    { "timeMs": 36000, "row": 4, "col": 1, "plantId": "thornVine",    "note": "screen lane-4 sniper (Wave 3 @ 43600ms); before spawn so the first aim cycle retargets to the Thorn" },
+    { "timeMs": 48000, "row": 2, "col": 0, "plantId": "sunrootBloom", "note": "Sunroot placed AFTER lane-2 screen; sap kicks in before Wave 4" },
+    { "timeMs": 58000, "row": 2, "col": 3, "plantId": "brambleSpear", "note": "mid-board Bramble absorbs lane-2 volley on Wave 4; piercing cleans clustered walkers" },
+    { "timeMs": 68000, "row": 4, "col": 3, "plantId": "thornVine",    "note": "reinforce lane 4 for Wave 4 Glass Ram pressure" }
+  ]
+}

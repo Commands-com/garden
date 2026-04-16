@@ -94,7 +94,7 @@ test.describe("Briar Sniper ranged enemy", () => {
 
     expect(contract.exists).toBe(true);
     expect(contract.behavior).toBe("sniper");
-    expect(contract.textureKey).toBe("briar-sniper");
+    expect(contract.textureKey).toBe("briar-sniper-walk");
     expect(contract.projectileTextureKey).toBe("briar-sniper-projectile");
     expect(contract.aimDurationMs).toBeGreaterThanOrEqual(700);
     expect(contract.attackAnchorX).toBe(679);
@@ -210,7 +210,7 @@ test.describe("Briar Sniper ranged enemy", () => {
     const maxHealth = await page.evaluate(() => {
       const scene = window.__phaserGame.scene.getScene("play");
       const defender = scene.defenders.find((d) => d.row === 1);
-      return defender?.health;
+      return defender?.hp;
     });
 
     await page.evaluate(() =>
@@ -225,7 +225,7 @@ test.describe("Briar Sniper ranged enemy", () => {
           (d) => d.row === 1 && d.col === 1
         );
         if (!defender || defender.destroyed) return true;
-        return defender.health < startingHealth;
+        return defender.hp < startingHealth;
       },
       maxHealth,
       { timeout: 15000 }
@@ -237,10 +237,10 @@ test.describe("Briar Sniper ranged enemy", () => {
       return {
         exists: Boolean(defender),
         destroyed: defender?.destroyed ?? true,
-        health: defender?.health ?? 0,
+        hp: defender?.hp ?? 0,
       };
     });
-    expect(postHit.destroyed || postHit.health < maxHealth).toBe(true);
+    expect(postHit.destroyed || postHit.hp < maxHealth).toBe(true);
   });
 
   test("an attacker screens the sniper's line of fire; a support plant does not", async ({
@@ -255,10 +255,8 @@ test.describe("Briar Sniper ranged enemy", () => {
       const scene = window.__phaserGame.scene.getScene("play");
       scene.resources = 600;
 
-      // Target at col 0, support in front (col 1), attacker at col 2.
+      // Support at col 0, attacker screen at col 2 closer to sniper.
       const supportPlaced = scene.placeDefender(2, 0, "sunrootBloom");
-      const targetPlaced = scene.placeDefender(2, 1, "thornVine");
-      // Insert the screen at col 2 (closer to sniper than target at col 1).
       const screenPlaced = scene.placeDefender(2, 2, "thornVine");
 
       const fakeSniper = {
@@ -267,9 +265,12 @@ test.describe("Briar Sniper ranged enemy", () => {
         definition: ENEMY_BY_ID.briarSniper,
       };
 
+      // With the attacker screen at col 2, the sniper retargets the attacker
+      // (the front attacker takes the shot instead of the support behind it).
       const withScreen = scene.findSniperTarget(fakeSniper);
 
-      // Remove the screen to see the exposed priority.
+      // Remove the screen: only the support remains. Since supports do not
+      // screen, it is the lone eligible target.
       const screen = scene.defenders.find((d) => d.row === 2 && d.col === 2);
       if (screen) {
         screen.destroyed = true;
@@ -278,7 +279,6 @@ test.describe("Briar Sniper ranged enemy", () => {
 
       return {
         supportPlaced,
-        targetPlaced,
         screenPlaced,
         withScreenCol: withScreen?.col ?? null,
         withScreenRole: withScreen?.definition?.role || null,
@@ -288,14 +288,14 @@ test.describe("Briar Sniper ranged enemy", () => {
     });
 
     expect(resolution.supportPlaced).toBe(true);
-    expect(resolution.targetPlaced).toBe(true);
     expect(resolution.screenPlaced).toBe(true);
 
-    // With the attacker screen at col 2, neither attacker at col 1 nor support
-    // at col 0 should be eligible (the screen blocks line of fire).
-    expect(resolution.withScreenCol).toBeNull();
+    // With the attacker screen in front of the support, the sniper targets
+    // the attacker (the screen takes the shot in place of the bloom).
+    expect(resolution.withScreenRole).toBe("attacker");
+    expect(resolution.withScreenCol).toBe(2);
 
-    // Without the screen, support > attacker, so sunroot at col 0 is chosen.
+    // Without the screen, the support is the only remaining target.
     expect(resolution.withoutScreenRole).toBe("support");
     expect(resolution.withoutScreenCol).toBe(0);
   });

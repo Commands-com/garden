@@ -43,15 +43,21 @@ test.describe("April 16 tutorial wave-level plant gate", () => {
       window.__gameTestHooks.startMode("tutorial")
     );
     await page.waitForFunction(
-      () =>
-        window.__gameTestHooks.getState()?.scene === "play" &&
-        window.__gameTestHooks.getState()?.mode === "tutorial"
+      () => {
+        const state = window.__gameTestHooks.getState();
+        return (
+          state?.scene === "play" &&
+          state?.mode === "tutorial" &&
+          Array.isArray(state?.availablePlantIds) &&
+          state.availablePlantIds.includes("sunrootBloom")
+        );
+      }
     );
 
     // Wave 1 should restrict available plants to Sunroot Bloom only.
     const wave1 = await page.evaluate(() => {
-      const state = window.__gameTestHooks.getState();
-      return state.availablePlantIds;
+      const scene = window.__phaserGame.scene.getScene("play");
+      return scene?.getAvailablePlantIds?.() ?? null;
     });
     expect(wave1).toEqual(["sunrootBloom"]);
 
@@ -75,19 +81,18 @@ test.describe("April 16 tutorial wave-level plant gate", () => {
 
     await page.waitForFunction(
       () => {
-        const state = window.__gameTestHooks.getState();
-        return (
-          (state.availablePlantIds || []).includes("thornVine") &&
-          (state.availablePlantIds || []).includes("sunrootBloom")
-        );
+        const scene = window.__phaserGame.scene.getScene("play");
+        const ids = scene?.getAvailablePlantIds?.() || [];
+        return ids.includes("thornVine") && ids.includes("sunrootBloom");
       },
       undefined,
       { timeout: 4000 }
     );
 
-    const wave2 = await page.evaluate(
-      () => window.__gameTestHooks.getState().availablePlantIds
-    );
+    const wave2 = await page.evaluate(() => {
+      const scene = window.__phaserGame.scene.getScene("play");
+      return scene?.getAvailablePlantIds?.() ?? [];
+    });
     expect(wave2).toContain("sunrootBloom");
     expect(wave2).toContain("thornVine");
     // Wave 2 only adds Thorn Vine, not Bramble Spear.

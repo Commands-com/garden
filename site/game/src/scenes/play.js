@@ -97,6 +97,7 @@ export class PlayScene extends Phaser.Scene {
       spawnEnemy: (enemyId, lane) => this.spawnEnemy(enemyId, lane),
       modeDefinition: this.modeDefinition,
     });
+    this.syncSelectedPlantAvailability();
 
     this.audioController.playEffect("start");
     this.publishIfNeeded(true);
@@ -140,6 +141,19 @@ export class PlayScene extends Phaser.Scene {
         ? waveOverride
         : this.modeDefinition.availablePlants || [STARTING_PLANT_ID];
     return source.filter((plantId) => PLANT_DEFINITIONS[plantId]);
+  }
+
+  syncSelectedPlantAvailability() {
+    const availablePlantIds = this.getAvailablePlantIds();
+    const fallbackPlantId = availablePlantIds[0] || STARTING_PLANT_ID;
+
+    if (!availablePlantIds.includes(this.selectedPlantId)) {
+      this.selectedPlantId = fallbackPlantId;
+      this.game.events.emit("plantSelected", this.selectedPlantId);
+      return true;
+    }
+
+    return false;
   }
 
   drawBoard() {
@@ -609,6 +623,7 @@ export class PlayScene extends Phaser.Scene {
         enemy.targetTileKey = target.tileKey;
         enemy.targetX = target.x;
         enemy.targetY = target.y;
+        this.renderSniperAimLine(enemy);
       }
       return;
     }
@@ -653,6 +668,7 @@ export class PlayScene extends Phaser.Scene {
           enemy.targetTileKey = target.tileKey;
           enemy.targetX = target.x;
           enemy.targetY = target.y;
+          this.renderSniperAimLine(enemy);
         } else {
           enemy.snipeState = "idle";
           enemy.targetDefenderId = null;
@@ -717,10 +733,67 @@ export class PlayScene extends Phaser.Scene {
       enemy.aimLine = this.add.graphics();
       enemy.aimLine.setDepth(7);
     }
-    const alpha = enemy.aimTimerMs <= 400 ? 0.6 : 0.85;
-    enemy.aimLine.clear();
-    enemy.aimLine.lineStyle(2, 0xff7766, alpha);
-    enemy.aimLine.lineBetween(enemy.x, enemy.y, enemy.targetX, enemy.targetY);
+    const g = enemy.aimLine;
+    g.clear();
+
+    const color = 0xff7766;
+    const imminent = enemy.aimTimerMs <= 400;
+    const lineAlpha = imminent ? 0.9 : 0.75;
+    const reticleAlpha = imminent ? 0.95 : 0.8;
+
+    const dx = enemy.targetX - enemy.x;
+    const dy = enemy.targetY - enemy.y;
+    const len = Math.hypot(dx, dy);
+    if (len < 1) return;
+    const nx = dx / len;
+    const ny = dy / len;
+
+    // Dashed trajectory between the sniper muzzle and the target reticle.
+    const muzzleGap = 22;
+    const reticleGap = 26;
+    const segStart = muzzleGap;
+    const segEnd = Math.max(segStart, len - reticleGap);
+    const dashOn = 12;
+    const dashOff = 5;
+    g.lineStyle(2, color, lineAlpha);
+    let traveled = segStart;
+    while (traveled < segEnd) {
+      const end = Math.min(traveled + dashOn, segEnd);
+      g.lineBetween(
+        enemy.x + nx * traveled,
+        enemy.y + ny * traveled,
+        enemy.x + nx * end,
+        enemy.y + ny * end
+      );
+      traveled = end + dashOff;
+    }
+
+    // Reticle on the target tile: two rings + four tick marks, pulsing when imminent.
+    const pulse = imminent ? 1 + 0.1 * Math.sin(this.time.now / 70) : 1;
+    const rOuter = 18 * pulse;
+    const rInner = 9 * pulse;
+    g.lineStyle(2, color, reticleAlpha);
+    g.strokeCircle(enemy.targetX, enemy.targetY, rOuter);
+    g.lineStyle(1.5, color, reticleAlpha * 0.85);
+    g.strokeCircle(enemy.targetX, enemy.targetY, rInner);
+    g.lineStyle(2, color, reticleAlpha);
+    const tick = 5;
+    g.lineBetween(
+      enemy.targetX - rOuter - tick, enemy.targetY,
+      enemy.targetX - rOuter + tick, enemy.targetY
+    );
+    g.lineBetween(
+      enemy.targetX + rOuter - tick, enemy.targetY,
+      enemy.targetX + rOuter + tick, enemy.targetY
+    );
+    g.lineBetween(
+      enemy.targetX, enemy.targetY - rOuter - tick,
+      enemy.targetX, enemy.targetY - rOuter + tick
+    );
+    g.lineBetween(
+      enemy.targetX, enemy.targetY + rOuter - tick,
+      enemy.targetX, enemy.targetY + rOuter + tick
+    );
   }
 
   clearSniperAimLine(enemy) {
@@ -816,6 +889,7 @@ export class PlayScene extends Phaser.Scene {
   enterEndlessMode() {
     this.challengeCleared = true;
     this.endlessActive = true;
+    this.bootstrap.endlessUnlocked = true;
     this.resources += this.modeDefinition.endlessRewardResources || 0;
     this.score += this.modeDefinition.endlessRewardScore || 0;
     this.audioController.playEffect("challenge-clear");
@@ -834,6 +908,7 @@ export class PlayScene extends Phaser.Scene {
     const threats = (currentWave.unlocks || [])
       .map((id) => ENEMY_BY_ID[id]?.label || id)
       .join("  ·  ");
+    const selectedPlantChanged = this.syncSelectedPlantAvailability();
 
     this.resourceText.setText(`Sap ${this.resources}`);
     this.healthText.setText(
@@ -862,6 +937,10 @@ export class PlayScene extends Phaser.Scene {
 
     this.threatsLabel.setText(threats);
     this.updateSeedTray();
+
+    if (selectedPlantChanged) {
+      this.publishIfNeeded(true);
+    }
   }
 
   getSeedTraySnapshot() {
@@ -1048,6 +1127,7 @@ export class PlayScene extends Phaser.Scene {
     col = Math.round(Number(col));
     const definition = PLANT_DEFINITIONS[plantId];
     const tileKey = makeTileKey(row, col);
+    const availablePlantIds = this.getAvailablePlantIds();
     if (
       !definition ||
       row < 0 ||
@@ -1056,7 +1136,8 @@ export class PlayScene extends Phaser.Scene {
       col >= BOARD_COLS ||
       this.defendersByTile.has(tileKey) ||
       this.resources < definition.cost ||
-      this.isPlantLimitReached(plantId)
+      this.isPlantLimitReached(plantId) ||
+      !availablePlantIds.includes(plantId)
     ) {
       return false;
     }

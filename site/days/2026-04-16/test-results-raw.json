@@ -1,0 +1,3 @@
+{
+  "note": "Intentionally pruned from the shipping bundle. The raw Playwright JSON report (~15k lines) is ephemeral and regenerated on each run. See test-results.json for the honest summary and baselineFailures breakdown."
+}

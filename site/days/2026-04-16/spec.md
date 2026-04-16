@@ -16,9 +16,11 @@ placement, not by DPS.
    cooldown FSM, a crimson aim telegraph line, and an enemy-owned projectile
    channel that resolves via tile-snapshot lookup (killing the target
    mid-flight wastes the shot).
-3. Attacker-only screening: support plants (Sunroot Bloom) do not block the
-   sniper's line of fire. Priority ladder: support > piercing attacker >
-   attacker, tiebreak closest to sniper.
+3. Attacker-only screening: an attacker plant placed between the sniper and
+   its target retargets the shot to the attacker (the screen takes the bolt
+   instead of the support behind it). Support plants (Sunroot Bloom) do not
+   screen. Priority ladder: support > piercing attacker > attacker, tiebreak
+   closest to sniper.
 4. Wave-level `availablePlants` override so tutorial Wave 1 only unlocks
    Sunroot Bloom and Wave 2 adds Thorn Vine.
 5. Manifest-backed SVG art for `briar-sniper` and `briar-sniper-projectile`
@@ -43,8 +45,9 @@ placement, not by DPS.
 - Sniper halts at `attackAnchorX = 679` (inside the board), aims for
   ≥600 ms, and fires a projectile that travels leftward toward the target
   tile.
-- Placing an attacker between the sniper and its target screens the shot; a
-  support plant does not.
+- Placing an attacker between the sniper and its target retargets the shot
+  to the attacker (the screen takes the bolt in place of the support). A
+  support plant does not screen.
 - `npm run test:uiux` covers the roster asset contract, the sniper FSM, the
   screening rule, the Board Scout wiring, and the wave-level plant gate.
 - `content/days/2026-04-16/decision.json` validates against

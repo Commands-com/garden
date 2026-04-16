@@ -40,7 +40,7 @@ export const ENEMY_DEFINITIONS = [
   {
     id: "briarSniper",
     label: "Briar Sniper",
-    textureKey: "briar-sniper",
+    textureKey: "briar-sniper-walk",
     behavior: "sniper",
     radius: 20,
     maxHealth: 44,
@@ -59,8 +59,8 @@ export const ENEMY_DEFINITIONS = [
     tint: null,
     displayWidth: 68,
     displayHeight: 68,
-    animationFrames: [0],
-    animationFrameDurationMs: 200,
+    animationFrames: [12, 13, 14, 15],
+    animationFrameDurationMs: 140,
   },
   {
     id: "glassRam",

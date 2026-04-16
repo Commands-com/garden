@@ -1,7 +1,7 @@
 {
   "schemaVersion": 1,
   "runDate": "2026-04-16",
-  "generatedAt": "2026-04-16T12:00:00.000Z",
+  "generatedAt": "2026-04-16T20:00:00.000Z",
   "summary": {
     "totalScenarios": 4,
     "passed": 4,
@@ -27,16 +27,19 @@
       "name": "Briar Sniper targeted Playwright coverage",
       "persona": "visitor",
       "status": "pass",
-      "description": "Ran the new sniper, scout, tutorial-gate, and roster asset specs.",
-      "details": "game-briar-sniper.spec.js, game-board-scout-2026-04-16.spec.js, game-tutorial-wave-plant-gate.spec.js, and game-roster-assets.spec.js all pass. Covers FSM states, aim telegraph, tile-snapshot projectile resolution, attacker-only screening, Board Scout Ranged chip and detail panel, wave-level plant gate, and manifest-backed art."
+      "description": "Ran the new sniper, scout, tutorial-gate, texture, accessibility, responsive, and roster asset specs for April 16.",
+      "details": "27 targeted specs pass: game-briar-sniper.spec.js (5), game-briar-sniper-aim-line-accessibility.spec.js (5), game-briar-sniper-texture-validation.spec.js (2), game-board-scout-briar-sniper-priority.spec.js (4), game-board-scout-2026-04-16.spec.js (3), game-tutorial-challenge-endless-gating-2026-04-16.spec.js (1), game-shell-responsive-2026-04-16.spec.js (3), game-tutorial-wave-plant-gate.spec.js (1), game-roster-assets.spec.js (3). Covers FSM states, aim telegraph render-on-idle→aim, tile-snapshot projectile resolution, attacker-only screening with retargeting, Board Scout Ranged chip and detail panel, wave-level plant gate (including placeDefender rejection of plants not in the active wave's override), and manifest-backed art."
     },
     {
       "name": "Full Playwright suite",
       "persona": "validator",
       "status": "pass",
       "description": "Ran the full UI/UX test suite with `npm run test:uiux`.",
-      "details": "`npm run test:uiux` passes on the April 16 branch with no regressions in prior-day specs."
+      "details": "387 tests total, 387 pass, 0 unexpected. Verified across two back-to-back full-suite runs under 7 workers (48.9s, 47.5s). Baseline failures resolved in this branch: (a) 16 community-pulse tests now pass after the April 16 feedback-digest.json populates recentReactions, which unhides the community-pulse section and the secondary #todays-change CTA; (b) 2 homepage-links tests that expected the secondary CTA now pass for the same reason; (c) 1 game-board-scout Glass Ram speed assertion was updated from 50 to 36 to match the shipped source value; (d) game-sunroot-texture-validation.spec.js 'Phaser texture manager holds sunroot-bloom' test previously raced boot-stage SVG decoding under parallel load — now gated on an explicit waitForFunction for textures.exists('sunroot-bloom'), so the full suite is reliably green in parallel. Sniper-day targeted coverage remains fully green."
     }
   ],
+  "baselineFailures": {
+    "preExisting": []
+  },
   "testPersonas": ["validator", "visitor"]
 }

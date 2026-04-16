@@ -83,6 +83,14 @@ test.describe("Sunroot Bloom texture loads from SVG, not procedural fallback", (
         typeof window.__gameTestHooks.getState === "function" &&
         window.__phaserGame != null
     );
+    // Boot-stage SVG decoding is asynchronous; under heavy parallel load the
+    // test can otherwise sample the texture manager before sunroot-bloom has
+    // finished registering. Wait for the manifest-backed texture to resolve
+    // before asserting against it.
+    await page.waitForFunction(
+      () =>
+        window.__phaserGame?.textures?.exists("sunroot-bloom") === true
+    );
 
     const textureState = await page.evaluate(() => {
       const textures = window.__phaserGame.textures;

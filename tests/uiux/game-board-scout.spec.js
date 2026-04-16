@@ -110,7 +110,7 @@ test.describe("Board Scout rail", () => {
     ]);
     await expect(glassRamCard.locator(".game-scout__card-stat")).toHaveText([
       "HP: 160",
-      "Speed: 50",
+      "Speed: 36",
     ]);
 
     const thornVineCard = getScoutCardByName(
