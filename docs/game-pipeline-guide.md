@@ -93,6 +93,18 @@ If you modify a core system, include regression coverage for the behavior you ar
   - when a new plant day is simulator-sensitive, use the runtime probe to sanity-check whether the previous roster still has an easy human-clear path
 - The goal is not arbitrary cruelty. The goal is: **winnable with strong play, but not casually survivable through sloppy placement**.
 
+### AI Player Replay Harness
+
+- Use `docs/game-ai-player-harness.md` when a daily run needs agent-style playtesting instead of only static validation.
+- `window.__gameTestHooks.getObservation()` exposes a compact, zero-based board state for bots and future LLM players.
+- `window.__gameTestHooks.applyAction()` applies replay-style actions such as `place`, `selectPlant`, and `wait`.
+- `npm run replay:scenario -- --plan path/to/plan.json` verifies that an AI, bot, or human-produced plan actually replays in the Phaser runtime.
+- `npm run bot:play-scenario -- --date YYYY-MM-DD --output /tmp/plan.json` runs the local observation-driven player and emits a replay plan.
+- `npm run codex:plan-scenario -- --date YYYY-MM-DD --attempts 3 --output /tmp/codex-plan.json` asks Codex CLI for a full replay plan, verifies it in Phaser, and feeds replay failures back to Codex for another try.
+- `npm run ai:play-scenario -- --date YYYY-MM-DD --provider openai --output /tmp/ai-plan.json` lets an API model play move-by-move through the same observation/action protocol and emits a replay plan.
+- Treat replay plans as evidence, not opinions. If an AI claims a board is winnable or exploitable, save the plan and replay it.
+- The replay harness complements the validator. A successful replay proves one line works; `validate:scenario-difficulty` still decides whether the board is hard enough and whether new plants are genuinely required.
+
 ### Asset Validation
 
 - If a change adds a new defender, enemy, projectile, pickup, or other visible gameplay unit, add the matching art to `site/game/assets-manifest.json`.

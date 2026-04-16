@@ -3,6 +3,8 @@ export function installGameTestHooks(game, bootstrap) {
     return () => {};
   }
 
+  const getPlayScene = () => game.scene.getScene("play");
+
   const hooks = {
     startMode(mode = "challenge") {
       const resolvedMode = mode === "tutorial" ? "tutorial" : "challenge";
@@ -46,7 +48,7 @@ export function installGameTestHooks(game, bootstrap) {
     },
 
     grantResources(amount = 0) {
-      const playScene = game.scene.getScene("play");
+      const playScene = getPlayScene();
       if (!playScene?.scene?.isActive() || typeof playScene.grantResources !== "function") {
         return false;
       }
@@ -55,7 +57,7 @@ export function installGameTestHooks(game, bootstrap) {
     },
 
     placeDefender(row = 0, col = 0, plantId) {
-      const playScene = game.scene.getScene("play");
+      const playScene = getPlayScene();
       if (!playScene?.scene?.isActive() || typeof playScene.placeDefender !== "function") {
         return false;
       }
@@ -64,7 +66,7 @@ export function installGameTestHooks(game, bootstrap) {
     },
 
     selectPlant(plantId) {
-      const playScene = game.scene.getScene("play");
+      const playScene = getPlayScene();
       if (!playScene?.scene?.isActive() || typeof playScene.selectPlant !== "function") {
         return false;
       }
@@ -74,7 +76,7 @@ export function installGameTestHooks(game, bootstrap) {
     },
 
     finishScenario() {
-      const playScene = game.scene.getScene("play");
+      const playScene = getPlayScene();
       if (!playScene?.scene?.isActive() || typeof playScene.forceScenarioClear !== "function") {
         return false;
       }
@@ -83,7 +85,7 @@ export function installGameTestHooks(game, bootstrap) {
     },
 
     spawnEnemy(lane = 0, enemyId = "briarBeetle") {
-      const playScene = game.scene.getScene("play");
+      const playScene = getPlayScene();
       if (!playScene?.scene?.isActive() || typeof playScene.spawnEnemy !== "function") {
         return false;
       }
@@ -92,13 +94,75 @@ export function installGameTestHooks(game, bootstrap) {
     },
 
     forceBreach(amount = 1) {
-      const playScene = game.scene.getScene("play");
+      const playScene = getPlayScene();
       if (!playScene?.scene?.isActive() || typeof playScene.forceBreach !== "function") {
         return false;
       }
 
       void playScene.forceBreach(amount);
       return true;
+    },
+
+    setTimeScale(multiplier = 1) {
+      const parsed = Number(multiplier);
+      bootstrap.testTimeScale = Number.isFinite(parsed)
+        ? Math.max(0.1, Math.min(parsed, 24))
+        : 1;
+      return bootstrap.testTimeScale;
+    },
+
+    setPaused(paused = true) {
+      bootstrap.testPaused = Boolean(paused);
+      return bootstrap.testPaused;
+    },
+
+    getObservation() {
+      const playScene = getPlayScene();
+      if (!playScene?.scene?.isActive() || typeof playScene.getObservation !== "function") {
+        return null;
+      }
+
+      return playScene.getObservation();
+    },
+
+    applyAction(action = {}) {
+      const type = action.type || (action.plantId ? "place" : "wait");
+      if (type === "wait") {
+        return { ok: true, type };
+      }
+
+      if (type === "selectPlant" || type === "select") {
+        return { ok: hooks.selectPlant(action.plantId), type };
+      }
+
+      if (type === "place") {
+        return {
+          ok: hooks.placeDefender(action.row, action.col, action.plantId),
+          type,
+        };
+      }
+
+      if (type === "grantResources") {
+        return { ok: hooks.grantResources(action.amount), type };
+      }
+
+      if (type === "spawnEnemy") {
+        return { ok: hooks.spawnEnemy(action.row ?? action.lane, action.enemyId), type };
+      }
+
+      if (type === "forceBreach") {
+        return { ok: hooks.forceBreach(action.amount), type };
+      }
+
+      if (type === "finishScenario") {
+        return { ok: hooks.finishScenario(), type };
+      }
+
+      return {
+        ok: false,
+        type,
+        reason: `unsupported-action:${type}`,
+      };
     },
 
     getState() {

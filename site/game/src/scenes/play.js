@@ -11,6 +11,7 @@ import {
 } from "../config/balance.js";
 import {
   BOARD_CENTER_X,
+  BOARD_COLS,
   BOARD_HEIGHT,
   BOARD_ROWS,
   BOARD_TOP,
@@ -430,8 +431,15 @@ export class PlayScene extends Phaser.Scene {
       return;
     }
 
+    if (this.bootstrap.testMode && this.bootstrap.testPaused) {
+      return;
+    }
+
+    const testTimeScale = this.bootstrap.testMode
+      ? clamp(Number(this.bootstrap.testTimeScale) || 1, 0.1, 24)
+      : 1;
     const stepDelta = this.bootstrap.testMode
-      ? TEST_MODE_DELTA
+      ? TEST_MODE_DELTA * testTimeScale
       : Math.min(Math.max(delta || TEST_MODE_DELTA, 10), 34);
 
     this.elapsedMs += stepDelta;
@@ -674,6 +682,123 @@ export class PlayScene extends Phaser.Scene {
     }));
   }
 
+  getScenarioPhase() {
+    return this.endlessActive
+      ? "endless"
+      : this.transitioningToChallenge
+        ? "transition"
+        : this.mode;
+  }
+
+  getObservation() {
+    const currentWave = this.encounterSystem?.getCurrentWave?.() || {
+      wave: 1,
+      label: this.modeDefinition.label,
+      unlocks: [],
+    };
+    const upcomingEvents = (this.encounterSystem?.events || [])
+      .slice(this.encounterSystem.eventIndex || 0, (this.encounterSystem.eventIndex || 0) + 8)
+      .map((event) => ({
+        atMs: Math.round(event.atMs),
+        inMs: Math.max(0, Math.round(event.atMs - this.elapsedMs)),
+        wave: event.wave,
+        row: event.lane,
+        enemyId: event.enemyId,
+        enemyLabel: ENEMY_BY_ID[event.enemyId]?.label || event.enemyId,
+      }));
+    const lanes = Array.from({ length: BOARD_ROWS }, (_, row) => {
+      const plants = this.defenders
+        .filter((defender) => !defender.destroyed && defender.row === row)
+        .sort((left, right) => left.col - right.col)
+        .map((defender) => ({
+          plantId: defender.definition.id,
+          label: defender.definition.label,
+          role: defender.definition.role || "attacker",
+          row,
+          col: defender.col,
+          hp: Math.round(defender.hp),
+          maxHealth: defender.definition.maxHealth,
+          cooldownMs: Math.max(0, Math.round(defender.cooldownMs)),
+        }));
+      const enemies = this.enemies
+        .filter((enemy) => !enemy.destroyed && enemy.lane === row)
+        .sort((left, right) => left.x - right.x)
+        .map((enemy) => ({
+          enemyId: enemy.id,
+          label: enemy.definition.label,
+          row,
+          x: Math.round(enemy.x),
+          hp: Math.round(enemy.hp),
+          maxHealth: enemy.definition.maxHealth,
+          speed: Math.round(enemy.definition.speed),
+          distanceToWall: Math.max(0, Math.round(enemy.x - WALL_X)),
+          distanceToBreach: Math.max(0, Math.round(enemy.x - BREACH_X)),
+          requiredDefendersInLane: enemy.definition.requiredDefendersInLane || 0,
+        }));
+
+      return {
+        row,
+        label: `L${row + 1}`,
+        plants,
+        enemies,
+      };
+    });
+
+    return {
+      schemaVersion: 1,
+      scene: "play",
+      mode: this.mode,
+      scenarioDate: this.modeDefinition.scenarioDate,
+      scenarioTitle: this.modeDefinition.scenarioTitle,
+      scenarioPhase: this.getScenarioPhase(),
+      timeMs: Math.round(this.elapsedMs),
+      survivedMs: Math.round(this.survivedMs),
+      score: Math.round(this.score),
+      resources: this.resources,
+      gardenHP: this.gardenHP,
+      maxGardenHealth: this.getStartingGardenHealth(),
+      wave: currentWave.wave,
+      waveLabel: currentWave.label || this.modeDefinition.label,
+      unlockedEnemyIds: currentWave.unlocks || [],
+      challengeCleared: this.challengeCleared,
+      selectedPlantId: this.selectedPlantId,
+      availablePlantIds: this.getAvailablePlantIds(),
+      plants: this.getAvailablePlantIds().map((plantId) => {
+        const plant = PLANT_DEFINITIONS[plantId];
+        return {
+          plantId,
+          label: plant.label,
+          role: plant.role || "attacker",
+          cost: plant.cost,
+          damage: plant.projectileDamage || 0,
+          cadenceMs: plant.cadenceMs,
+          sapPerPulse: plant.sapPerPulse || 0,
+          maxActive: plant.maxActive || null,
+          affordable: this.resources >= plant.cost && !this.isPlantLimitReached(plantId),
+          limitReached: this.isPlantLimitReached(plantId),
+        };
+      }),
+      board: {
+        rows: BOARD_ROWS,
+        cols: BOARD_COLS,
+        rowBase: 0,
+        colBase: 0,
+      },
+      lanes,
+      upcomingEvents,
+      activeCounts: {
+        plants: this.defenders.filter((defender) => !defender.destroyed).length,
+        enemies: this.enemies.filter((enemy) => !enemy.destroyed).length,
+        projectiles: this.projectiles.filter((projectile) => !projectile.destroyed).length,
+      },
+      status: this.gameEnding
+        ? "resolving"
+        : this.transitioningToChallenge
+          ? "transitioning"
+          : "running",
+    };
+  }
+
   getActivePlantCount(plantId) {
     return this.defenders.reduce(
       (count, defender) =>
@@ -696,10 +821,16 @@ export class PlayScene extends Phaser.Scene {
       return false;
     }
 
+    row = Math.round(Number(row));
+    col = Math.round(Number(col));
     const definition = PLANT_DEFINITIONS[plantId];
     const tileKey = makeTileKey(row, col);
     if (
       !definition ||
+      row < 0 ||
+      row >= BOARD_ROWS ||
+      col < 0 ||
+      col >= BOARD_COLS ||
       this.defendersByTile.has(tileKey) ||
       this.resources < definition.cost ||
       this.isPlantLimitReached(plantId)
@@ -1096,11 +1227,7 @@ export class PlayScene extends Phaser.Scene {
       survivedMs: Math.round(this.survivedMs),
       mode: this.mode,
       scenarioTitle: this.modeDefinition.scenarioTitle,
-      scenarioPhase: this.endlessActive
-        ? "endless"
-        : this.transitioningToChallenge
-          ? "transition"
-          : this.mode,
+      scenarioPhase: this.getScenarioPhase(),
       challengeCleared: this.challengeCleared,
       selectedPlantId: this.selectedPlantId,
       availablePlantIds: this.getAvailablePlantIds(),

@@ -1,0 +1,30 @@
+{
+  "schemaVersion": 1,
+  "id": "2026-04-15-sunroot-canonical",
+  "date": "2026-04-15",
+  "mode": "challenge",
+  "coordinateBase": 0,
+  "description": "Canonical Sunroot Economy replay used to prove the AI-player harness can verify a real winning line.",
+  "expect": {
+    "outcome": "endless-survival",
+    "endlessSurvivalMs": 5000
+  },
+  "actions": [
+    { "atMs": 0, "type": "place", "plantId": "sunrootBloom", "row": 2, "col": 0 },
+    { "atMs": 4000, "type": "place", "plantId": "thornVine", "row": 2, "col": 1 },
+    { "atMs": 10000, "type": "place", "plantId": "thornVine", "row": 2, "col": 2 },
+    { "atMs": 16000, "type": "place", "plantId": "thornVine", "row": 2, "col": 3 },
+    { "atMs": 24000, "type": "place", "plantId": "thornVine", "row": 3, "col": 0 },
+    { "atMs": 30000, "type": "place", "plantId": "thornVine", "row": 4, "col": 0 },
+    { "atMs": 36000, "type": "place", "plantId": "thornVine", "row": 4, "col": 1 },
+    { "atMs": 44000, "type": "place", "plantId": "thornVine", "row": 4, "col": 2 },
+    { "atMs": 52000, "type": "place", "plantId": "thornVine", "row": 0, "col": 0 },
+    { "atMs": 60000, "type": "place", "plantId": "thornVine", "row": 0, "col": 1 },
+    { "atMs": 65000, "type": "place", "plantId": "thornVine", "row": 0, "col": 2 },
+    { "atMs": 72000, "type": "place", "plantId": "thornVine", "row": 1, "col": 0 },
+    { "atMs": 80000, "type": "place", "plantId": "thornVine", "row": 1, "col": 1 },
+    { "atMs": 88000, "type": "place", "plantId": "thornVine", "row": 3, "col": 1 },
+    { "atMs": 95000, "type": "place", "plantId": "thornVine", "row": 2, "col": 4 },
+    { "atMs": 100000, "type": "place", "plantId": "thornVine", "row": 4, "col": 3 }
+  ]
+}
