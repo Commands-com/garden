@@ -39,6 +39,49 @@ function makeTileKey(row, col) {
   return `${row}:${col}`;
 }
 
+// Status-effect helpers. Pure: no scene dependency. Overwrite-refresh on
+// re-application means two ferns chilling the same enemy yield one entry with
+// max-of-magnitudes and latest expiresAtMs (no stacking).
+export function applyStatusEffect(enemy, entry, nowMs) {
+  if (!enemy || !entry || !entry.kind) return;
+  const bag = enemy.statusEffects || (enemy.statusEffects = {});
+  const magnitude = Number(entry.magnitude || 0);
+  const attackMagnitude = Number(entry.attackMagnitude || 0);
+  const expiresAtMs = Number.isFinite(entry.expiresAtMs)
+    ? entry.expiresAtMs
+    : nowMs + Number(entry.durationMs || 0);
+  const existing = bag[entry.kind];
+  if (!existing) {
+    bag[entry.kind] = { kind: entry.kind, magnitude, attackMagnitude, expiresAtMs };
+    return;
+  }
+  existing.magnitude = Math.max(existing.magnitude || 0, magnitude);
+  existing.attackMagnitude = Math.max(existing.attackMagnitude || 0, attackMagnitude);
+  existing.expiresAtMs = Math.max(existing.expiresAtMs || 0, expiresAtMs);
+}
+
+export function tickStatusEffects(enemy, nowMs) {
+  const bag = enemy?.statusEffects;
+  if (!bag) return;
+  for (const kind of Object.keys(bag)) {
+    if (bag[kind].expiresAtMs <= nowMs) {
+      delete bag[kind];
+    }
+  }
+}
+
+export function getEffectiveSpeed(enemy) {
+  const slow = enemy?.statusEffects?.slow;
+  const magnitude = slow?.magnitude || 0;
+  return enemy.definition.speed * Math.max(0, 1 - magnitude);
+}
+
+export function getEffectiveCadence(enemy, baseMs) {
+  const slow = enemy?.statusEffects?.slow;
+  const attackMagnitude = slow?.attackMagnitude || 0;
+  return baseMs / Math.max(0.01, 1 - attackMagnitude);
+}
+
 export class PlayScene extends Phaser.Scene {
   constructor(bootstrap) {
     super("play");
@@ -211,6 +254,12 @@ export class PlayScene extends Phaser.Scene {
     this.hoverTile.setDepth(3);
     this.hoverTile.setVisible(false);
 
+    this.chillZonePreview = this.add.rectangle(0, 0, CELL_WIDTH, CELL_HEIGHT - 10, 0x8fd8ff, 0.14);
+    this.chillZonePreview.setStrokeStyle(2, 0x8fd8ff, 0.7);
+    this.chillZonePreview.setOrigin(0, 0.5);
+    this.chillZonePreview.setDepth(3);
+    this.chillZonePreview.setVisible(false);
+
     this.transitionBanner = this.add.text(ARENA_WIDTH / 2, ARENA_HEIGHT / 2, "", {
       fontFamily: "DM Sans",
       fontSize: "26px",
@@ -381,12 +430,14 @@ export class PlayScene extends Phaser.Scene {
     this.input.on("pointermove", (pointer) => {
       if (this.gameEnding || this.transitioningToChallenge) {
         this.hoverTile.setVisible(false);
+        this.chillZonePreview.setVisible(false);
         return;
       }
 
       const tile = getTileAtPoint(pointer.worldX, pointer.worldY);
       if (!tile) {
         this.hoverTile.setVisible(false);
+        this.chillZonePreview.setVisible(false);
         return;
       }
 
@@ -400,6 +451,16 @@ export class PlayScene extends Phaser.Scene {
       this.hoverTile.setFillStyle(color, occupied ? 0.18 : 0.12);
       this.hoverTile.setStrokeStyle(2, color, 0.95);
       this.hoverTile.setVisible(true);
+
+      if (this.selectedPlantId === 'frostFern' && plant) {
+        const rangeCols = plant.chillRangeCols || 3;
+        const zoneLeft = center.x - CELL_WIDTH / 2;
+        this.chillZonePreview.setPosition(zoneLeft, center.y);
+        this.chillZonePreview.setSize(rangeCols * CELL_WIDTH, CELL_HEIGHT - 10);
+        this.chillZonePreview.setVisible(true);
+      } else {
+        this.chillZonePreview.setVisible(false);
+      }
     });
 
     this.input.on("pointerdown", (pointer) => {
@@ -468,6 +529,7 @@ export class PlayScene extends Phaser.Scene {
     this.awardResources();
     this.encounterSystem.update(stepDelta, this.getActiveEnemyCount());
     this.updateDefenders(stepDelta);
+    this.updateControlPlants(stepDelta);
     this.updateProjectiles(stepDelta);
     this.updateEnemies(stepDelta);
     this.updateEnemyProjectiles(stepDelta);
@@ -498,7 +560,12 @@ export class PlayScene extends Phaser.Scene {
         continue;
       }
 
-      // Support plants generate sap instead of firing projectiles
+      // Control plants are handled by updateControlPlants. Support plants
+      // generate sap instead of firing projectiles.
+      if (defender.definition.role === 'control') {
+        continue;
+      }
+
       if (defender.definition.role === 'support') {
         defender.cooldownMs -= deltaMs;
         if (defender.cooldownMs <= 0) {
@@ -532,6 +599,89 @@ export class PlayScene extends Phaser.Scene {
 
       defender.cooldownMs = defender.definition.cadenceMs;
       this.spawnProjectile(defender);
+    }
+  }
+
+  updateControlPlants(deltaMs) {
+    for (const defender of this.defenders) {
+      if (defender.destroyed) continue;
+      if (defender.definition.role !== 'control') continue;
+
+      defender.cooldownMs -= deltaMs;
+      if (defender.cooldownMs > 0) continue;
+      defender.cooldownMs = defender.definition.cadenceMs;
+
+      const def = defender.definition;
+      const rangeCols = def.chillRangeCols || 3;
+      // Lane zone extends from the fern's own tile toward spawn (higher x).
+      const zoneMinX = defender.x - CELL_WIDTH / 2;
+      const zoneMaxX = zoneMinX + rangeCols * CELL_WIDTH;
+
+      for (const enemy of this.enemies) {
+        if (enemy.destroyed) continue;
+        if (enemy.lane !== defender.row) continue;
+        if (enemy.x < zoneMinX || enemy.x > zoneMaxX) continue;
+
+        applyStatusEffect(
+          enemy,
+          {
+            kind: 'slow',
+            magnitude: def.chillMagnitude,
+            attackMagnitude: def.chillAttackMagnitude,
+            expiresAtMs: this.elapsedMs + def.chillDurationMs,
+          },
+          this.elapsedMs
+        );
+      }
+    }
+  }
+
+  syncSlowVisuals(enemy) {
+    const slow = enemy.statusEffects?.slow;
+    if (slow && !enemy.slowRenderer) {
+      this.restoreEnemyTint(enemy);
+      let emitter = null;
+      try {
+        emitter = this.add.particles(enemy.x, enemy.y, 'frost-particle', {
+          lifespan: 520,
+          speed: { min: 12, max: 36 },
+          scale: { start: 0.45, end: 0 },
+          alpha: { start: 0.8, end: 0 },
+          quantity: 1,
+          frequency: 110,
+        });
+        if (emitter) {
+          emitter.setDepth(5);
+          if (typeof emitter.startFollow === 'function') {
+            emitter.startFollow(enemy.sprite);
+          }
+        }
+      } catch {
+        emitter = null;
+      }
+      enemy.slowRenderer = emitter || { placeholder: true };
+    } else if (!slow && enemy.slowRenderer) {
+      if (enemy.slowRenderer.destroy) {
+        enemy.slowRenderer.destroy();
+      }
+      enemy.slowRenderer = null;
+      this.restoreEnemyTint(enemy);
+    }
+  }
+
+  restoreEnemyTint(enemy) {
+    if (!enemy.sprite?.active) return;
+    if (typeof enemy.sprite.setTintMode === 'function' && Phaser?.TintModes?.MULTIPLY != null) {
+      enemy.sprite.setTintMode(Phaser.TintModes.MULTIPLY);
+    }
+    if (enemy.statusEffects?.slow) {
+      enemy.sprite.setTint(0x8fd8ff);
+      return;
+    }
+    if (enemy.definition.tint != null) {
+      enemy.sprite.setTint(enemy.definition.tint);
+    } else {
+      enemy.sprite.clearTint();
     }
   }
 
@@ -572,6 +722,8 @@ export class PlayScene extends Phaser.Scene {
         continue;
       }
 
+      tickStatusEffects(enemy, this.elapsedMs);
+      this.syncSlowVisuals(enemy);
       this.advanceEnemyAnimation(enemy, deltaMs);
 
       if (enemy.definition.behavior === "sniper") {
@@ -586,12 +738,12 @@ export class PlayScene extends Phaser.Scene {
         enemy.x = Math.max(enemy.x, blocker.x + enemy.definition.contactRange);
 
         if (enemy.attackCooldownMs <= 0) {
-          enemy.attackCooldownMs = enemy.definition.attackCadenceMs;
+          enemy.attackCooldownMs = getEffectiveCadence(enemy, enemy.definition.attackCadenceMs);
           this.damageDefender(blocker, enemy.definition.attackDamage);
         }
       } else {
         enemy.attackCooldownMs = Math.max(0, enemy.attackCooldownMs - deltaMs);
-        enemy.x -= enemy.definition.speed * (deltaMs / 1000);
+        enemy.x -= getEffectiveSpeed(enemy) * (deltaMs / 1000);
 
         if (enemy.x <= BREACH_X) {
           this.resolveBreach(enemy);
@@ -606,7 +758,7 @@ export class PlayScene extends Phaser.Scene {
   updateSniperEnemy(enemy, deltaMs) {
     const def = enemy.definition;
     if (enemy.snipeState === "approach") {
-      enemy.x -= def.speed * (deltaMs / 1000);
+      enemy.x -= getEffectiveSpeed(enemy) * (deltaMs / 1000);
       if (enemy.x <= def.attackAnchorX) {
         enemy.x = def.attackAnchorX;
         enemy.snipeState = "idle";
@@ -618,7 +770,7 @@ export class PlayScene extends Phaser.Scene {
       const target = this.findSniperTarget(enemy);
       if (target) {
         enemy.snipeState = "aim";
-        enemy.aimTimerMs = def.aimDurationMs;
+        enemy.aimTimerMs = getEffectiveCadence(enemy, def.aimDurationMs);
         enemy.targetDefenderId = target.id;
         enemy.targetTileKey = target.tileKey;
         enemy.targetX = target.x;
@@ -652,7 +804,7 @@ export class PlayScene extends Phaser.Scene {
         this.spawnEnemyProjectile(enemy);
         this.clearSniperAimLine(enemy);
         enemy.snipeState = "cooldown";
-        enemy.cooldownMs = def.attackCadenceMs;
+        enemy.cooldownMs = getEffectiveCadence(enemy, def.attackCadenceMs);
       }
       return;
     }
@@ -663,7 +815,7 @@ export class PlayScene extends Phaser.Scene {
         const target = this.findSniperTarget(enemy);
         if (target) {
           enemy.snipeState = "aim";
-          enemy.aimTimerMs = def.aimDurationMs;
+          enemy.aimTimerMs = getEffectiveCadence(enemy, def.aimDurationMs);
           enemy.targetDefenderId = target.id;
           enemy.targetTileKey = target.tileKey;
           enemy.targetX = target.x;
@@ -989,20 +1141,43 @@ export class PlayScene extends Phaser.Scene {
       const plants = this.defenders
         .filter((defender) => !defender.destroyed && defender.row === row)
         .sort((left, right) => left.col - right.col)
-        .map((defender) => ({
-          plantId: defender.definition.id,
-          label: defender.definition.label,
-          role: defender.definition.role || "attacker",
-          row,
-          col: defender.col,
-          hp: Math.round(defender.hp),
-          maxHealth: defender.definition.maxHealth,
-          cooldownMs: Math.max(0, Math.round(defender.cooldownMs)),
-        }));
+        .map((defender) => {
+          const def = defender.definition;
+          const role = def.role || "attacker";
+          const base = {
+            plantId: def.id,
+            label: def.label,
+            role,
+            row,
+            col: defender.col,
+            hp: Math.round(defender.hp),
+            maxHealth: def.maxHealth,
+            cooldownMs: Math.max(0, Math.round(defender.cooldownMs)),
+          };
+          if (role === "control") {
+            base.aoeShape = "lane-zone";
+            base.aoeRangeCols = def.chillRangeCols || 0;
+            base.chillMagnitude = def.chillMagnitude || 0;
+            base.chillAttackMagnitude = def.chillAttackMagnitude || 0;
+            base.chillDurationMs = def.chillDurationMs || 0;
+          }
+          return base;
+        });
       const enemies = this.enemies
         .filter((enemy) => !enemy.destroyed && enemy.lane === row)
         .sort((left, right) => left.x - right.x)
         .map((enemy) => {
+          const baseSpeed = enemy.definition.speed;
+          const statusEffects = {};
+          if (enemy.statusEffects) {
+            for (const [kind, entry] of Object.entries(enemy.statusEffects)) {
+              statusEffects[kind] = {
+                magnitude: entry.magnitude || 0,
+                attackMagnitude: entry.attackMagnitude || 0,
+                remainingMs: Math.max(0, Math.round((entry.expiresAtMs || 0) - this.elapsedMs)),
+              };
+            }
+          }
           const base = {
             enemyId: enemy.id,
             label: enemy.definition.label,
@@ -1010,11 +1185,14 @@ export class PlayScene extends Phaser.Scene {
             x: Math.round(enemy.x),
             hp: Math.round(enemy.hp),
             maxHealth: enemy.definition.maxHealth,
-            speed: Math.round(enemy.definition.speed),
+            speed: Math.round(baseSpeed),
+            baseSpeed: Math.round(baseSpeed),
+            effectiveSpeed: Math.round(getEffectiveSpeed(enemy)),
             distanceToWall: Math.max(0, Math.round(enemy.x - WALL_X)),
             distanceToBreach: Math.max(0, Math.round(enemy.x - BREACH_X)),
             requiredDefendersInLane: enemy.definition.requiredDefendersInLane || 0,
             behavior: enemy.definition.behavior || "walker",
+            statusEffects,
           };
           if (enemy.definition.behavior === "sniper") {
             base.sniper = {
@@ -1267,6 +1445,8 @@ export class PlayScene extends Phaser.Scene {
       targetX: 0,
       targetY: 0,
       aimLine: null,
+      statusEffects: {},
+      slowRenderer: null,
     };
 
     this.applyEnemyAnimationFrame(enemy);
@@ -1282,7 +1462,8 @@ export class PlayScene extends Phaser.Scene {
       return;
     }
 
-    enemy.animationElapsedMs += deltaMs;
+    const slowMagnitude = enemy.statusEffects?.slow?.magnitude || 0;
+    enemy.animationElapsedMs += deltaMs * Math.max(0, 1 - slowMagnitude);
     const frameDuration = enemy.definition.animationFrameDurationMs || 120;
 
     while (enemy.animationElapsedMs >= frameDuration) {
@@ -1415,12 +1596,8 @@ export class PlayScene extends Phaser.Scene {
     enemy.hp -= effectiveDamage;
     enemy.sprite.setTint(0xffffff).setTintMode(Phaser.TintModes.FILL);
     this.time.delayedCall(70, () => {
-      if (!enemy.destroyed && enemy.sprite?.active) {
-        if (enemy.definition.tint != null) {
-          enemy.sprite.setTint(enemy.definition.tint);
-        } else {
-          enemy.sprite.clearTint();
-        }
+      if (!enemy.destroyed) {
+        this.restoreEnemyTint(enemy);
       }
     });
 
@@ -1439,6 +1616,12 @@ export class PlayScene extends Phaser.Scene {
 
     enemy.destroyed = true;
     enemy.sprite.destroy();
+    if (enemy.slowRenderer) {
+      if (enemy.slowRenderer.destroy) {
+        enemy.slowRenderer.destroy();
+      }
+      enemy.slowRenderer = null;
+    }
 
     if (awardScore) {
       this.score += enemy.definition.score;
@@ -1497,6 +1680,12 @@ export class PlayScene extends Phaser.Scene {
       if (enemy.destroyed && enemy.aimLine) {
         enemy.aimLine.destroy();
         enemy.aimLine = null;
+      }
+      if (enemy.destroyed && enemy.slowRenderer) {
+        if (enemy.slowRenderer.destroy) {
+          enemy.slowRenderer.destroy();
+        }
+        enemy.slowRenderer = null;
       }
     }
     this.enemies = this.enemies.filter((enemy) => !enemy.destroyed);

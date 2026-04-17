@@ -1,0 +1,57 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" role="img" aria-labelledby="title desc">
+  <title id="title">Frost Fern control plant</title>
+  <desc id="desc">A cool-blue crystalline fern that emits a lane-zone chill, slowing enemies without dealing damage.</desc>
+  <defs>
+    <radialGradient id="frost-core" cx="50%" cy="45%" r="55%">
+      <stop offset="0%" stop-color="#eaf9ff"/>
+      <stop offset="55%" stop-color="#8fd8ff"/>
+      <stop offset="100%" stop-color="#3d7aa5"/>
+    </radialGradient>
+    <linearGradient id="frond" x1="0" x2="1" y1="0" y2="1">
+      <stop offset="0%" stop-color="#c6ecff"/>
+      <stop offset="100%" stop-color="#4f8cbe"/>
+    </linearGradient>
+    <linearGradient id="stem-frost" x1="0.5" x2="0.5" y1="0" y2="1">
+      <stop offset="0%" stop-color="#5b8aad"/>
+      <stop offset="100%" stop-color="#2a4a68"/>
+    </linearGradient>
+    <linearGradient id="leaf-frost" x1="0" x2="1" y1="0" y2="1">
+      <stop offset="0%" stop-color="#9fd0ef"/>
+      <stop offset="100%" stop-color="#3a6a8e"/>
+    </linearGradient>
+  </defs>
+
+  <!-- ground shadow -->
+  <ellipse cx="64" cy="108" rx="36" ry="12" fill="#0e1d28" opacity=".38"/>
+
+  <!-- roots -->
+  <path d="M56 96 C50 102 46 112 48 120" fill="none" stroke="#274a66" stroke-width="5" stroke-linecap="round"/>
+  <path d="M72 96 C78 102 82 112 80 120" fill="none" stroke="#274a66" stroke-width="5" stroke-linecap="round"/>
+  <path d="M64 98 C64 106 64 114 64 122" fill="none" stroke="#1e3a52" stroke-width="6" stroke-linecap="round"/>
+
+  <!-- stem -->
+  <path d="M64 92 C64 78 64 65 64 52" fill="none" stroke="url(#stem-frost)" stroke-width="8" stroke-linecap="round"/>
+
+  <!-- low fronds -->
+  <path d="M60 80 C46 72 34 76 30 82 C38 86 50 84 60 78 Z" fill="url(#leaf-frost)" stroke="#1b3a54" stroke-width="1.5"/>
+  <path d="M68 72 C82 64 94 68 98 74 C90 78 78 76 68 70 Z" fill="url(#leaf-frost)" stroke="#1b3a54" stroke-width="1.5"/>
+
+  <!-- upper fronds (crystalline fan) -->
+  <path d="M64 52 C50 44 36 36 30 30 C40 36 52 46 60 54 Z" fill="url(#frond)" stroke="#2a5c82" stroke-width="1.5"/>
+  <path d="M64 52 C78 44 92 36 98 30 C88 36 76 46 68 54 Z" fill="url(#frond)" stroke="#2a5c82" stroke-width="1.5"/>
+  <path d="M64 52 C58 38 54 26 52 16 C58 26 62 38 64 50 Z" fill="url(#frond)" stroke="#2a5c82" stroke-width="1.5"/>
+  <path d="M64 52 C70 38 74 26 76 16 C70 26 66 38 64 50 Z" fill="url(#frond)" stroke="#2a5c82" stroke-width="1.5"/>
+  <path d="M64 52 C60 42 58 34 58 26 C62 34 64 42 64 50 Z" fill="url(#frond)" stroke="#2a5c82" stroke-width="1.2" opacity=".85"/>
+  <path d="M64 52 C68 42 70 34 70 26 C66 34 64 42 64 50 Z" fill="url(#frond)" stroke="#2a5c82" stroke-width="1.2" opacity=".85"/>
+
+  <!-- frost core -->
+  <circle cx="64" cy="50" r="12" fill="url(#frost-core)" stroke="#bfe6ff" stroke-width="2"/>
+  <circle cx="64" cy="48" r="5" fill="#f3fbff" opacity=".92"/>
+
+  <!-- tiny frost flakes floating above -->
+  <g fill="#eaf9ff" stroke="#6fa9cf" stroke-width="0.8" opacity=".9">
+    <path d="M40 28 l0 -7 M36.5 24.5 l7 0 M37.5 21.5 l5 5 M42.5 21.5 l-5 5" stroke="#cde9fb" fill="none" stroke-width="1.2"/>
+    <path d="M88 28 l0 -7 M84.5 24.5 l7 0 M85.5 21.5 l5 5 M90.5 21.5 l-5 5" stroke="#cde9fb" fill="none" stroke-width="1.2"/>
+    <path d="M64 14 l0 -6 M61 11 l6 0 M62 8.5 l4 4 M66 8.5 l-4 4" stroke="#cde9fb" fill="none" stroke-width="1"/>
+  </g>
+</svg>

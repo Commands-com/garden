@@ -52,6 +52,24 @@ export const PLANT_DEFINITIONS = {
     displayWidth: 48,
     displayHeight: 48,
   },
+  frostFern: {
+    id: "frostFern",
+    label: "Frost Fern",
+    description:
+      "Chills a 3-column lane zone toward spawn, slowing enemy movement by 40% and attacks by 25% for 2.5s. Does not damage or generate sap.",
+    role: "control",
+    textureKey: "frost-fern",
+    cost: 65,
+    maxHealth: 28,
+    cadenceMs: 400,
+    initialCooldownMs: 200,
+    chillRangeCols: 3,
+    chillMagnitude: 0.4,
+    chillAttackMagnitude: 0.25,
+    chillDurationMs: 2500,
+    displayWidth: 48,
+    displayHeight: 52,
+  },
 };
 
 export const STARTING_PLANT_ID = "thornVine";

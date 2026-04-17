@@ -1,0 +1,143 @@
+const scenario_2026_04_17 = {
+  date: "2026-04-17",
+  title: "Cold Lane",
+  summary:
+    "Rootline Defense's first control plant, Frost Fern, chills a 3-column lane zone so attackers behind it can whittle down slowed enemies — damage and control become two separate levers.",
+  availablePlants: ["thornVine", "brambleSpear", "sunrootBloom", "frostFern"],
+  tutorial: {
+    id: "cold-lane-tutorial",
+    label: "Chill Drill",
+    intro:
+      "Frost Fern does not damage or pay sap. It chills a 3-column lane zone in front of it, slowing enemies by 40% and cutting their attack rate by 25% for 2.5s.",
+    objective:
+      "Wave one teaches holding a single lane with Thorn Vine alone. Wave two introduces Frost Fern so you feel the shift: a chilled Shard Mite gives your Thorn Vine enough time to clear it.",
+    startingResources: 100,
+    resourcePerTick: 25,
+    resourceTickMs: 3000,
+    gardenHealth: 6,
+    passiveScorePerSecond: 5,
+    postClearAction: "start-challenge",
+    briefing: [
+      "Frost Fern has no projectile and no sap pulse. It chills only.",
+      "The chill zone extends three columns from the fern toward the spawn on its own lane.",
+      "Re-chilling an already-slowed enemy refreshes the timer; it does not stack magnitudes.",
+    ],
+    waves: [
+      {
+        wave: 1,
+        label: "Hold the Lane",
+        startAtMs: 0,
+        unlocks: ["briarBeetle"],
+        availablePlants: ["thornVine"],
+        events: [
+          { offsetMs: 4000, lane: 2, enemyId: "briarBeetle" },
+          { offsetMs: 10000, lane: 2, enemyId: "briarBeetle" },
+        ],
+      },
+      {
+        wave: 2,
+        label: "Now It's Too Fast",
+        startAtMs: 16000,
+        unlocks: ["briarBeetle", "shardMite"],
+        availablePlants: ["thornVine", "frostFern"],
+        events: [
+          { offsetMs: 2500, lane: 2, enemyId: "shardMite" },
+          { offsetMs: 7500, lane: 2, enemyId: "shardMite" },
+          { offsetMs: 12000, lane: 2, enemyId: "briarBeetle" },
+        ],
+      },
+    ],
+  },
+  challenge: {
+    id: "cold-lane",
+    label: "Today's Challenge",
+    intro:
+      "April 17 asks you to mix damage and control on a one-HP board. Frost Fern buys time — not kills — so every chill has to land in front of an attacker that can capitalize.",
+    objective:
+      "Survive four scripted waves with a 1 HP wall. Use Frost Fern to gate the fastest enemies (Shard Mite, Glass Ram) in front of Thorn Vine or Bramble Spear, and keep at least one Sunroot Bloom running for sap.",
+    startingResources: 110,
+    resourcePerTick: 18,
+    resourceTickMs: 4000,
+    gardenHealth: 1,
+    passiveScorePerSecond: 6,
+    endlessRewardResources: 120,
+    endlessRewardScore: 220,
+    waves: [
+      {
+        wave: 1,
+        label: "Cold Opening",
+        startAtMs: 0,
+        unlocks: ["briarBeetle", "shardMite"],
+        events: [
+          { offsetMs: 2500, lane: 2, enemyId: "briarBeetle" },
+          { offsetMs: 5500, lane: 1, enemyId: "shardMite" },
+          { offsetMs: 8500, lane: 3, enemyId: "shardMite" },
+          { offsetMs: 12000, lane: 2, enemyId: "briarBeetle" },
+          { offsetMs: 15500, lane: 0, enemyId: "shardMite" },
+          { offsetMs: 18000, lane: 4, enemyId: "briarBeetle" },
+        ],
+      },
+      {
+        wave: 2,
+        label: "Marksman in the Frost",
+        startAtMs: 22000,
+        unlocks: ["briarBeetle", "shardMite", "briarSniper"],
+        events: [
+          { offsetMs: 1500, lane: 2, enemyId: "briarSniper" },
+          { offsetMs: 4500, lane: 0, enemyId: "shardMite" },
+          { offsetMs: 6500, lane: 4, enemyId: "shardMite" },
+          { offsetMs: 9000, lane: 1, enemyId: "briarBeetle" },
+          { offsetMs: 11000, lane: 3, enemyId: "briarBeetle" },
+          { offsetMs: 14000, lane: 2, enemyId: "shardMite" },
+          { offsetMs: 16500, lane: 4, enemyId: "briarSniper" },
+        ],
+      },
+      {
+        wave: 3,
+        label: "Rams at the Door",
+        startAtMs: 44000,
+        unlocks: ["briarBeetle", "shardMite", "glassRam", "briarSniper"],
+        events: [
+          { offsetMs: 1000, lane: 2, enemyId: "glassRam" },
+          { offsetMs: 3000, lane: 0, enemyId: "briarSniper" },
+          { offsetMs: 5500, lane: 4, enemyId: "briarSniper" },
+          { offsetMs: 7500, lane: 1, enemyId: "shardMite" },
+          { offsetMs: 9500, lane: 3, enemyId: "shardMite" },
+          { offsetMs: 11500, lane: 2, enemyId: "briarBeetle" },
+          { offsetMs: 13500, lane: 4, enemyId: "glassRam" },
+          { offsetMs: 16000, lane: 1, enemyId: "briarBeetle" },
+        ],
+      },
+      {
+        wave: 4,
+        label: "Final Freeze",
+        startAtMs: 66000,
+        unlocks: ["briarBeetle", "shardMite", "glassRam", "briarSniper"],
+        events: [
+          { offsetMs: 1000, lane: 2, enemyId: "briarSniper" },
+          { offsetMs: 2500, lane: 0, enemyId: "glassRam" },
+          { offsetMs: 4000, lane: 4, enemyId: "glassRam" },
+          { offsetMs: 6000, lane: 1, enemyId: "shardMite" },
+          { offsetMs: 7500, lane: 3, enemyId: "shardMite" },
+          { offsetMs: 9000, lane: 2, enemyId: "briarBeetle" },
+          { offsetMs: 10500, lane: 0, enemyId: "briarSniper" },
+          { offsetMs: 12500, lane: 4, enemyId: "briarSniper" },
+          { offsetMs: 14500, lane: 2, enemyId: "glassRam" },
+          { offsetMs: 16500, lane: 1, enemyId: "briarBeetle" },
+          { offsetMs: 18000, lane: 3, enemyId: "briarBeetle" },
+        ],
+      },
+    ],
+    endless: {
+      enemyPool: ["briarBeetle", "shardMite", "glassRam"],
+      startingWave: 4,
+      baseCadenceMs: 1750,
+      cadenceFloorMs: 720,
+      cadenceDropPerWave: 120,
+      waveDurationMs: 9000,
+    },
+  },
+};
+
+export { scenario_2026_04_17 };
+export default scenario_2026_04_17;

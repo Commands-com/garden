@@ -1,7 +1,37 @@
 {
   "schemaVersion": 1,
-  "updatedAt": "2026-04-16T21:22:48.040Z",
+  "updatedAt": "2026-04-17T00:00:00.000Z",
   "assets": [
+    {
+      "id": "frost-fern",
+      "type": "sprite",
+      "kind": "sprite",
+      "provider": "repo",
+      "path": "/game/assets/manual/plants/frost-fern.svg",
+      "prompt": "Hand-authored repo asset for the April 17 Frost Fern control plant. Cool-blue crystalline fern that emits a lane-zone chill; no animation.",
+      "generatedAt": "2026-04-17T00:00:00.000Z",
+      "metadata": {
+        "category": "player",
+        "format": "svg",
+        "width": 128,
+        "height": 128
+      }
+    },
+    {
+      "id": "frost-particle",
+      "type": "sprite",
+      "kind": "sprite",
+      "provider": "repo",
+      "path": "/game/assets/manual/particles/frost-particle.svg",
+      "prompt": "Hand-authored frost flake particle for the Frost Fern chill trail emitter; cool-blue six-point snowflake silhouette.",
+      "generatedAt": "2026-04-17T00:00:00.000Z",
+      "metadata": {
+        "category": "particle",
+        "format": "svg",
+        "width": 24,
+        "height": 24
+      }
+    },
     {
       "id": "bramble-spear",
       "type": "sprite",

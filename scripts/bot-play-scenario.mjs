@@ -174,7 +174,7 @@ function allowedPlants(observation, options) {
 }
 
 function isAttacker(plant) {
-  return plant && plant.role !== "support";
+  return plant && plant.role !== "support" && plant.role !== "control";
 }
 
 function isSupport(plant) {
@@ -199,7 +199,9 @@ function supportPlant(observation, options) {
 }
 
 function combatCount(lane) {
-  return (lane?.plants || []).filter((plant) => plant.role !== "support").length;
+  return (lane?.plants || []).filter(
+    (plant) => plant.role !== "support" && plant.role !== "control"
+  ).length;
 }
 
 function hasSupportPlant(observation, plantId) {

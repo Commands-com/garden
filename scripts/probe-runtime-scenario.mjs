@@ -160,7 +160,7 @@ function getAvailablePlantDefinitions(modeDefinition) {
 
 function getAttackingPlantDefinitions(modeDefinition) {
   return getAvailablePlantDefinitions(modeDefinition).filter(
-    (plant) => plant.role !== 'support'
+    (plant) => plant.role !== 'support' && plant.role !== 'control'
   );
 }
 

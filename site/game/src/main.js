@@ -364,10 +364,26 @@ function renderBoardScout(dayDate, assetCatalog) {
                   formatSapPulse(plant.sapPerPulse, true)
                 )
               : false,
-            plant.role !== "support" && typeof plant.projectileDamage === "number"
+            plant.role === "control"
+              ? el(
+                  "span",
+                  { className: "game-scout__badge game-scout__badge--control" },
+                  "Control"
+                )
+              : false,
+            plant.role === "control"
+              ? el(
+                  "span",
+                  { className: "game-scout__card-stat" },
+                  `Slow −${Math.round((plant.chillMagnitude || 0) * 100)}% / ${(
+                    (plant.chillDurationMs || 0) / 1000
+                  ).toFixed(1)}s`
+                )
+              : false,
+            plant.role !== "support" && plant.role !== "control" && typeof plant.projectileDamage === "number"
               ? el("span", { className: "game-scout__card-stat" }, `DMG: ${plant.projectileDamage}`)
               : false,
-            plant.role !== "support" && plant.piercing
+            plant.role !== "support" && plant.role !== "control" && plant.piercing
               ? el("span", { className: "game-scout__badge game-scout__badge--piercing" }, "Piercing")
               : false
           )
@@ -539,6 +555,27 @@ function selectScoutCard(card, type, data, scenario) {
         el("dd", {}, formatCadenceSeconds(data.cadenceMs)),
         el("dt", {}, "Active Limit"),
         el("dd", {}, data.maxActive ? String(data.maxActive) : "None")
+      )
+    );
+  } else if (data.role === "control") {
+    detail.append(
+      el("h4", { className: "game-scout__detail-title" }, data.label),
+      el("p", { className: "game-scout__detail-desc" }, data.description || ""),
+      el(
+        "dl",
+        { className: "game-scout__detail-stats" },
+        el("dt", {}, "Cost"),
+        el("dd", {}, String(data.cost)),
+        el("dt", {}, "AoE"),
+        el("dd", {}, `${data.chillRangeCols || 0}-col lane zone`),
+        el("dt", {}, "Slow"),
+        el("dd", {}, `−${Math.round((data.chillMagnitude || 0) * 100)}% speed`),
+        el("dt", {}, "Attack Slow"),
+        el("dd", {}, `−${Math.round((data.chillAttackMagnitude || 0) * 100)}% attack rate`),
+        el("dt", {}, "Duration"),
+        el("dd", {}, formatCadenceSeconds(data.chillDurationMs)),
+        el("dt", {}, "Notes"),
+        el("dd", {}, "No damage, no sap; refreshes on re-chill (no stack)")
       )
     );
   } else {
