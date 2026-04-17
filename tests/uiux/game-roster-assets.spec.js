@@ -82,6 +82,68 @@ test("April 16 Briar Sniper has manifest-backed enemy art and projectile asset",
   );
 });
 
+test("April 17 Frost Fern and frost particle manifest entries resolve to repo-backed SVG assets", async ({
+  page,
+}) => {
+  await installLocalSiteRoutes(page);
+  await page.goto(getAppUrl("/game/?testMode=1&date=2026-04-17"));
+  await page.waitForFunction(
+    () =>
+      window.__gameTestHooks &&
+      typeof window.__gameTestHooks.getState === "function"
+  );
+
+  const assetState = await page.evaluate(async () => {
+    const assetManifest = await fetch("/game/assets-manifest.json").then((response) =>
+      response.json()
+    );
+    const assets = assetManifest.assets || [];
+    const frostFern = assets.find((asset) => asset.id === "frost-fern");
+    const frostParticle = assets.find((asset) => asset.id === "frost-particle");
+
+    const [fernResponse, particleResponse] = await Promise.all([
+      fetch(frostFern.path),
+      fetch(frostParticle.path),
+    ]);
+
+    return {
+      frostFern,
+      frostParticle,
+      frostFernOk: fernResponse.ok,
+      frostParticleOk: particleResponse.ok,
+      frostFernBody: await fernResponse.text(),
+      frostParticleBody: await particleResponse.text(),
+    };
+  });
+
+  expect(assetState.frostFern).toMatchObject({
+    id: "frost-fern",
+    provider: "repo",
+    path: "/game/assets/manual/plants/frost-fern.svg",
+  });
+  expect(assetState.frostFern.metadata).toMatchObject({
+    category: "player",
+    width: 128,
+    height: 128,
+  });
+
+  expect(assetState.frostParticle).toMatchObject({
+    id: "frost-particle",
+    provider: "repo",
+    path: "/game/assets/manual/particles/frost-particle.svg",
+  });
+  expect(assetState.frostParticle.metadata).toMatchObject({
+    category: "particle",
+    width: 24,
+    height: 24,
+  });
+
+  expect(assetState.frostFernOk).toBe(true);
+  expect(assetState.frostParticleOk).toBe(true);
+  expect(assetState.frostFernBody).toContain("<svg");
+  expect(assetState.frostParticleBody).toContain("<svg");
+});
+
 test("April 15 Sunroot Bloom loads manifest-backed art and expects no projectile", async ({
   page,
 }) => {

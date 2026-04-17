@@ -1,0 +1,68 @@
+{
+  "label": "2026-04-17-chilled-lane",
+  "date": "2026-04-17",
+  "mode": "challenge",
+  "description": "Same opening as the no-control replay, but it adds an early Frost Fern in lane 2 ahead of the center Thorn. Expected to CLEAR because the chilled lane turns Frost Fern into the required control lever for the central ram/sniper pressure window.",
+  "expect": {
+    "outcome": "cleared",
+    "reason": "early-frost-fern-flips-center-lane"
+  },
+  "placements": [
+    {
+      "timeMs": 0,
+      "row": 2,
+      "col": 0,
+      "plantId": "thornVine",
+      "note": "Open with a center Thorn so the first lane-2 beetles are already under fire."
+    },
+    {
+      "timeMs": 0,
+      "row": 4,
+      "col": 0,
+      "plantId": "sunrootBloom",
+      "note": "Early bank away from the center sniper lane so the first pulses arrive before wave 2."
+    },
+    {
+      "timeMs": 8000,
+      "row": 1,
+      "col": 0,
+      "plantId": "thornVine",
+      "note": "Catch the first lane-1 Shard Mite before it slips past the wall column."
+    },
+    {
+      "timeMs": 15000,
+      "row": 3,
+      "col": 0,
+      "plantId": "thornVine",
+      "note": "Mirror the lane-1 answer for the lane-3 Shard Mite."
+    },
+    {
+      "timeMs": 20000,
+      "row": 2,
+      "col": 2,
+      "plantId": "frostFern",
+      "note": "Front-lane Frost Fern added during wave 1 so lane-2 rams and snipers arrive chilled in front of the center guns."
+    },
+    {
+      "timeMs": 25000,
+      "row": 0,
+      "col": 0,
+      "plantId": "thornVine",
+      "note": "Backfill the top lane before the late wave-1 Shard Mite can cross the wall tile."
+    },
+    {
+      "timeMs": 32000,
+      "row": 4,
+      "col": 1,
+      "plantId": "thornVine",
+      "note": "Screen the lane-4 Sunroot before the wave-2 sniper can take it."
+    },
+    {
+      "timeMs": 40000,
+      "row": 2,
+      "col": 3,
+      "plantId": "brambleSpear",
+      "note": "Center-lane piercing follow-up behind the chilled zone for the scripted ram waves."
+    }
+  ]
+}

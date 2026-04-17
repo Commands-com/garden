@@ -1,0 +1,61 @@
+{
+  "label": "2026-04-17-no-control",
+  "date": "2026-04-17",
+  "mode": "challenge",
+  "description": "April 17 opening that covers the side lanes and banks on center-lane damage only. It never places Frost Fern, so lane 2 reaches the ram/sniper pressure with only Thorn Vine + Bramble Spear as combat bodies. Expected to FAIL because the center lane cannot convert the Cold Lane glass-ram timing without the early chill window.",
+  "expect": {
+    "outcome": "gameover",
+    "reason": "center-lane-pressure-outpaces-old-roster"
+  },
+  "placements": [
+    {
+      "timeMs": 0,
+      "row": 2,
+      "col": 0,
+      "plantId": "thornVine",
+      "note": "Open with a center Thorn so the first lane-2 beetles are already under fire."
+    },
+    {
+      "timeMs": 0,
+      "row": 4,
+      "col": 0,
+      "plantId": "sunrootBloom",
+      "note": "Early bank away from the center sniper lane so the first pulses arrive before wave 2."
+    },
+    {
+      "timeMs": 8000,
+      "row": 1,
+      "col": 0,
+      "plantId": "thornVine",
+      "note": "Catch the first lane-1 Shard Mite before it slips past the wall column."
+    },
+    {
+      "timeMs": 15000,
+      "row": 3,
+      "col": 0,
+      "plantId": "thornVine",
+      "note": "Mirror the lane-1 answer for the lane-3 Shard Mite."
+    },
+    {
+      "timeMs": 25000,
+      "row": 0,
+      "col": 0,
+      "plantId": "thornVine",
+      "note": "Backfill the top lane before the late wave-1 Shard Mite can cross the wall tile."
+    },
+    {
+      "timeMs": 32000,
+      "row": 4,
+      "col": 1,
+      "plantId": "thornVine",
+      "note": "Screen the lane-4 Sunroot before the wave-2 sniper can take it."
+    },
+    {
+      "timeMs": 40000,
+      "row": 2,
+      "col": 3,
+      "plantId": "brambleSpear",
+      "note": "Commit to a center-lane piercing follow-up, still with no control plant in the ram lane."
+    }
+  ]
+}
