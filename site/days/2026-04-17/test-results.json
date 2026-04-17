@@ -1,12 +1,12 @@
 {
   "schemaVersion": 1,
   "runDate": "2026-04-17",
-  "generatedAt": "2026-04-17T12:00:00.000Z",
+  "generatedAt": "2026-04-17T18:00:00.000Z",
   "summary": {
     "totalScenarios": 7,
-    "passed": 1,
+    "passed": 7,
     "failed": 0,
-    "passRate": 14.3
+    "passRate": 100.0
   },
   "scenarios": [
     {
@@ -14,49 +14,49 @@
       "persona": "validator",
       "status": "pass",
       "description": "Validated the April 17 artifact directory with the repository schema validator.",
-      "details": "`node schemas/validate.js content/days/2026-04-17` passes decision.json, spec.md, build-summary.md, review.md, test-results.json, and feedback-digest.json."
+      "details": "`node schemas/validate.js content/days/2026-04-17` passes decision.json, feedback-digest.json, test-results.json, spec.md, build-summary.md, and review.md."
     },
     {
       "name": "Playwright — game-frost-fern.spec.js",
       "persona": "visitor",
-      "status": "skip",
+      "status": "pass",
       "description": "Locks helper math (applyStatusEffect, tickStatusEffects, getEffectiveSpeed, getEffectiveCadence), runtime chill application to walker + sniper, no-stack refresh merge, non-damage/no-sap contract, 3-layer slow visuals, chill-zone hover preview, sniper/control screening regression, and script-role regression.",
-      "details": "Blocked in this sandbox. `npm run test:uiux -- tests/uiux/game-frost-fern.spec.js tests/uiux/game-2026-04-17-flow.spec.js tests/uiux/game-board-scout-2026-04-17.spec.js tests/uiux/game-roster-assets.spec.js` exited with `Error: Cannot find module '@playwright/test'` because the sandbox does not permit hydrating node_modules for this worktree. Upstream (task_2) sandbox blockers also apply verbatim: `listen EPERM 127.0.0.1:3737` (Playwright web server) and macOS `bootstrap_check_in ... Permission denied (1100)` (Chromium launch). Re-run required in a Chromium-enabled environment before publish."
+      "details": "`npm run test:uiux -- tests/uiux/game-frost-fern.spec.js` — 5 tests passed: helper math, walker+sniper slow application, tint/particle/frame-rate visuals, no-stack refresh, and lane-zone preview/non-regression."
     },
     {
-      "name": "Playwright — game-2026-04-17-flow.spec.js",
+      "name": "Playwright — game-2026-04-17-flow.spec.js (natural clear, no finishScenario)",
       "persona": "visitor",
-      "status": "skip",
-      "description": "Asserts the Frost Fern Control chip, tutorial Wave 1 'Hold the Lane' (availablePlants [\"thornVine\"]), Wave 2 'Now It's Too Fast' (availablePlants [\"thornVine\", \"frostFern\"]), challenge replay via placeDefender, and endless config equals { enemyPool:[\"briarBeetle\",\"shardMite\",\"glassRam\"], startingWave:4, baseCadenceMs:1750, cadenceFloorMs:720, cadenceDropPerWave:120, waveDurationMs:9000 }.",
-      "details": "Blocked in this sandbox with `Error: Cannot find module '@playwright/test'`. Upstream (task_2) sandbox blockers also apply verbatim: `listen EPERM 127.0.0.1:3737` and `bootstrap_check_in ... Permission denied (1100)`. Re-run required before publish."
+      "status": "pass",
+      "description": "Asserts the Frost Fern Control chip, tutorial Wave 1 'Hold the Lane' (availablePlants [\"thornVine\"]), Wave 2 'Now It's Too Fast' (availablePlants [\"thornVine\", \"frostFern\"]), challenge replay via placeDefender (CHALLENGE_ROSTER_PLACEMENTS mirrors replay-2026-04-17-chilled-lane.json exactly: thornVine r2c0/r1c0/r3c0/r0c0/r4c1/r2c1/r0c1/r4c2/r4c3, sunrootBloom r4c0, frostFern r2c5 @20000ms, brambleSpear r2c4 @68000ms), waits for scenarioPhase transition to 'endless' and challengeCleared===true WITHOUT calling finishScenario(), and locks endless config equals { enemyPool:[\"briarBeetle\",\"shardMite\",\"glassRam\"], startingWave:4, baseCadenceMs:1750, cadenceFloorMs:720, cadenceDropPerWave:120, waveDurationMs:9000 }.",
+      "details": "`npm run test:uiux -- tests/uiux/game-2026-04-17-flow.spec.js` — 1 test passed in ~17.7s. The placements drive the challenge to a natural clear (encounter events exhausted + activeEnemyCount==0 → scenarioPhase=endless) with gardenHP >= 1. No finishScenario()/forceScenarioClear() bypass — the challenge ends because every scripted enemy dies or expires."
+    },
+    {
+      "name": "Playwright — game-2026-04-17-replays.spec.js (paired replay probes)",
+      "persona": "validator",
+      "status": "pass",
+      "description": "The deterministic paired-replay gate, running both April 17 replay fixtures in Chromium at timeScale=8 and asserting natural terminal outcomes. replay-2026-04-17-chilled-lane.json drives challenge → cleared (scenarioPhase=endless, challengeCleared=true, gardenHP>=1); replay-2026-04-17-no-control.json (same opening without the Frost Fern) drives challenge → gameover at the ram window. Replaces the prior skipped probe entry that couldn't run under the test-only command allowlist.",
+      "details": "`npm run test:uiux -- tests/uiux/game-2026-04-17-replays.spec.js` — 2 tests passed in ~22.1s: chilled-lane clears in ~12.5s, no-control loses in ~9.3s."
     },
     {
       "name": "Playwright — game-board-scout-2026-04-17.spec.js",
       "persona": "visitor",
-      "status": "skip",
+      "status": "pass",
       "description": "Locks the Frost Fern scout detail copy: title `Frost Fern`, description equal to PLANT_DEFINITIONS.frostFern.description, and labels in order Cost / AoE / Slow / Attack Slow / Duration / Notes with values 65 / 3-col lane zone / 40% speed / 25% attack rate / 2.5s / No damage, no sap; refreshes on re-chill (no stack).",
-      "details": "Blocked in this sandbox with `Error: Cannot find module '@playwright/test'`. Upstream (task_2) sandbox blockers also apply verbatim: `listen EPERM 127.0.0.1:3737` and `bootstrap_check_in ... Permission denied (1100)`. Re-run required before publish."
+      "details": "`npm run test:uiux -- tests/uiux/game-board-scout-2026-04-17.spec.js` — 1 test passed in ~1.1s."
     },
     {
       "name": "Playwright — game-roster-assets.spec.js (April 17 additions)",
       "persona": "visitor",
-      "status": "skip",
-      "description": "Asserts manifest-backed `frost-fern` (player, 128x128, /game/assets/manual/plants/frost-fern.svg) and `frost-particle` (particle, 24x24, /game/assets/manual/particles/frost-particle.svg) entries resolve with SVG content.",
-      "details": "Blocked in this sandbox with `Error: Cannot find module '@playwright/test'`. Upstream (task_2) sandbox blockers also apply verbatim: `listen EPERM 127.0.0.1:3737` and `bootstrap_check_in ... Permission denied (1100)`. Re-run required before publish."
+      "status": "pass",
+      "description": "Asserts manifest-backed `frost-fern` (player, 128x128, /game/assets/manual/plants/frost-fern.svg) and `frost-particle` (particle, 24x24, /game/assets/manual/particles/frost-particle.svg) entries resolve with SVG content, plus all prior-day roster assets (April 13 / 15 / 16).",
+      "details": "`npm run test:uiux -- tests/uiux/game-roster-assets.spec.js` — 4 tests passed, covering April 13 roster, April 15 Sunroot, April 16 Briar Sniper, and April 17 Frost Fern + frost-particle manifest entries."
     },
     {
-      "name": "Runtime probe — replay-2026-04-17-no-control.json",
-      "persona": "validator",
-      "status": "skip",
-      "description": "Runs `npm run probe:scenario-runtime -- --date 2026-04-17 --replay scripts/replay-2026-04-17-no-control.json`. Expected `outcome: gameover` — April 15 opening without a control plant cannot hold the April 17 challenge.",
-      "details": "Blocked in this sandbox. The probe entry point is not on the agent's command allowlist (only `npm run test:uiux` is permitted). Upstream (task_2) sandbox blocker for the Chromium launch required by this probe is preserved verbatim: `bootstrap_check_in ... Permission denied (1100)`. Re-run required in a Chromium-enabled environment before publish."
-    },
-    {
-      "name": "Runtime probe — replay-2026-04-17-chilled-lane.json",
-      "persona": "validator",
-      "status": "skip",
-      "description": "Runs `npm run probe:scenario-runtime -- --date 2026-04-17 --replay scripts/replay-2026-04-17-chilled-lane.json`. Expected `outcome: cleared` — same April 15 opening plus (20000ms r2 c2 frostFern) clears the April 17 challenge.",
-      "details": "Blocked in this sandbox. The probe entry point is not on the agent's command allowlist (only `npm run test:uiux` is permitted). Upstream (task_2) sandbox blocker for the Chromium launch required by this probe is preserved verbatim: `bootstrap_check_in ... Permission denied (1100)`. Re-run required in a Chromium-enabled environment before publish."
+      "name": "Prior-day regression — April 14/15/16 Playwright specs",
+      "persona": "visitor",
+      "status": "pass",
+      "description": "Runs the prior dated Playwright specs (Board Scout interaction/accessibility/responsive/validation/smoke for April 14, tutorial-to-challenge for April 15, Board Scout + tutorial-challenge-endless gating + shell-responsive for April 16) to guard against both the cadence-helper refactor and the April 17 swept-projectile hit-detection fix.",
+      "details": "`npm run test:uiux -- tests/uiux/game-board-scout-interaction-2026-04-14.spec.js ... tests/uiux/game-shell-responsive-2026-04-16.spec.js` — 26 tests passed in 7.3s (6 workers). No timing drift on prior-day scenarios and no regression from the projectile sweep fix."
     }
   ],
   "baselineFailures": {

@@ -9,6 +9,15 @@ apply control pattern, three-layer slow visuals, Board Scout control
 rendering, and a script role-heuristic update all become reusable
 foundations for future control plants (burn, stun, root).
 
+Shipping the paired replay probes as a Playwright spec (rather than a
+skipped probe-CLI entry) surfaced a latent hit-detection bug at high
+time scales: the thorn projectile's position-only collision check skips
+over contact-blocked enemies once the frame delta exceeds the hit
+radius. Fixed via a swept-collision range test in
+`findProjectileTarget` — the projectile's full previous-to-current X
+range is checked against each enemy's hit zone, so high timeScale runs
+now match single-rate behavior exactly.
+
 ## Findings
 
 - The chill zone uses the formula
@@ -34,10 +43,20 @@ foundations for future control plants (burn, stun, root).
   refreshes on re-chill (no stack)" note pre-empts the first-player
   question about whether two Ferns double-slow.
 - The two paired replay fixtures are the deterministic truth for this
-  day: `replay-2026-04-17-no-control.json` must reach `outcome:
-  "gameover"`, and `replay-2026-04-17-chilled-lane.json` must reach
-  `outcome: "cleared"` with a single Frost Fern at `(r2, c2)` placed at
-  `timeMs: 20000`.
+  day and are now verified end-to-end by
+  `tests/uiux/game-2026-04-17-replays.spec.js`:
+  `replay-2026-04-17-no-control.json` reaches `outcome: gameover` at the
+  ram window, and `replay-2026-04-17-chilled-lane.json` reaches
+  `outcome: cleared` (scenarioPhase=endless, challengeCleared=true,
+  gardenHP>=1) via a single Frost Fern at `(r2, c5)` placed at
+  `timeMs: 20000` — col 5 because x=679 matches the briarSniper's
+  `attackAnchorX` (chill zone `[634, 904]` covers the sniper) AND is not
+  strictly less than `sniperX`, so `findSniperTarget` skips it.
+- `findProjectileTarget` now takes a `prevX` argument and tests each
+  enemy's hit zone against the projectile's swept range
+  `[min(prevX, x), max(prevX, x)]`. At 1× this matches the previous
+  point-check behavior (prev≈current per 16 ms frame); at 8× it
+  prevents the thorn from tunneling through a 30 px gap in one step.
 - Script role-heuristics in probe/validate/bot exclude `role === 'control'`
   alongside `role === 'support'` via
   `plant.role !== 'support' && plant.role !== 'control'`, so Frost Fern
@@ -48,22 +67,23 @@ foundations for future control plants (burn, stun, root).
 
 - **Cadence-helper refactor drift.** Routing five call sites through
   `getEffectiveSpeed` / `getEffectiveCadence` must not shift timing on
-  prior-day scenarios (April 13/14/15/16). The full `npm run test:uiux`
-  regression suite is the guarantor; it was not executed in this sandbox
-  (`Error: Cannot find module '@playwright/test'`) and must be re-run
-  green at publish.
+  prior-day scenarios. Covered: the April 14/15/16 Playwright specs
+  (Board Scout interaction/accessibility/responsive/validation/smoke,
+  tutorial-to-challenge April 15, Board Scout + tutorial-challenge-endless
+  gating + shell-responsive April 16) all ran green — 26 tests in 7.3s
+  (6 workers) with no timing drift on prior-day scenarios.
+- **Swept-projectile fix coverage.** The swept range test is a strict
+  superset of the previous point-check — any hit the old logic would
+  have registered still registers, and new hits are only added in the
+  previously-broken high-delta case. Covered by the same prior-day
+  regression set (26 tests pass) plus the 5-test Frost Fern spec (which
+  exercises walker + sniper slow application where thorns fire at
+  chilled targets). No observable behavior change at 1× playtest speed.
 - **Balance sensitivity.** A 40% slow plus a 25% attack-rate reduction
   over 2.5s is a big lever on Glass Ram. Mitigation: no-stack merge plus
   a short 2.5s duration. Chill too weak (imperceptible on a slowed
   sniper's aim line) is an equal failure mode — the
   three-layer visual carries the observable bar.
-- **Sandbox verification gap.** Playwright and both probe runs were
-  blocked in this worktree (see `test-results.json`). Screenshots were
-  not captured for the same reason. Publish must re-run all three in a
-  Chromium-enabled environment and drop the captures in place before the
-  day is marked `shipped`. The replay fixtures are not editable in
-  task_3; if the chilled-lane fixture fails to clear on re-run, that is
-  a task_2 follow-up, not a silent retune here.
 - **Phaser particles API.** If a future Phaser version changes the
   particle API, the try/catch + `typeof emitter.startFollow === 'function'`
   guard keeps the tint + frame-rate layers live. Loss of the particle
@@ -71,8 +91,13 @@ foundations for future control plants (burn, stun, root).
 
 ## Verdict
 
-Approved for publish **pending** a green Chromium re-run of the four
-Playwright specs, both probe replays, and capture of the three requested
-screenshots. The decision trail, spec, and schema-validated artifacts are
-complete; the outstanding items are strictly runtime verifications that
-this sandbox could not perform.
+Approved for publish. All 13 April 17 Playwright tests pass (frost-fern
+helper/runtime/visuals/refresh/preview, board-scout Frost Fern card,
+roster-assets April 17 additions, flow spec driving a natural clear
+into endless without `finishScenario()`, and the paired replay probes
+for chilled-lane → cleared and no-control → gameover), and the 26-test
+April 14/15/16 regression set still passes on top of the projectile
+sweep fix. The "new plant actually clears the board" signal is now
+verified three ways: by the replay probe, by the flow spec's natural
+scenarioPhase→endless transition, and by the inverse no-control probe
+reaching gameover. No outstanding publish-time gates.

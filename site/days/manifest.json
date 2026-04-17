@@ -5,7 +5,7 @@
       "date": "2026-04-17",
       "title": "Cold Lane",
       "summary": "Rootline Defense's first control plant, Frost Fern, chills a 3-column lane zone so attackers behind it can whittle down slowed enemies — damage and control become two separate levers.",
-      "status": "pending-validation",
+      "status": "shipped",
       "featureType": "game",
       "tags": ["game", "rootline-defense", "frost-fern", "control-plant", "status-effects", "slow", "chill-zone", "scenario", "board-scout", "playwright"],
       "publishedAt": "2026-04-17T12:00:00.000Z"

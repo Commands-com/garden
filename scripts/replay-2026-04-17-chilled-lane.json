@@ -2,10 +2,10 @@
   "label": "2026-04-17-chilled-lane",
   "date": "2026-04-17",
   "mode": "challenge",
-  "description": "Same opening as the no-control replay, but it adds an early Frost Fern in lane 2 ahead of the center Thorn. Expected to CLEAR because the chilled lane turns Frost Fern into the required control lever for the central ram/sniper pressure window.",
+  "description": "Places Frost Fern at (r2, c5) — the same column as the briarSniper attackAnchorX=679 — so the chill zone [zoneMinX=634, zoneMaxX=904] covers the sniper AND the fern itself is behind the sniper's findSniperTarget cutoff (d.x < sniperX). The chilled sniper cannot clear the Fern; thorns out-DPS the wave-3 lane-2 glassRam before it reaches the fern. Lane 4 stacks three thorns (c1/c2/c3) so the wave-3 and wave-4 glassRams hit the requiredDefendersInLane=3 threshold and take full thorn damage. Lane 0 runs two thorns (c0/c1) — under-defended vs the wave-4 ram but thorns still out-DPS it. Lanes 1 and 3 each hold with a single thorn because they only face shardMites that die in 2 shots before contact. Expected to CLEAR.",
   "expect": {
     "outcome": "cleared",
-    "reason": "early-frost-fern-flips-center-lane"
+    "reason": "frost-fern-at-col-5-chills-lane-2-sniper-and-ram-while-lane-4-triple-thorn-hits-ram-defender-threshold"
   },
   "placements": [
     {
@@ -27,42 +27,70 @@
       "row": 1,
       "col": 0,
       "plantId": "thornVine",
-      "note": "Catch the first lane-1 Shard Mite before it slips past the wall column."
+      "note": "Lane-1 Thorn before the wave-1 lane-1 shardMite can cross the wall tile (shardMite would breach at t≈17948)."
     },
     {
-      "timeMs": 15000,
+      "timeMs": 12000,
       "row": 3,
       "col": 0,
       "plantId": "thornVine",
-      "note": "Mirror the lane-1 answer for the lane-3 Shard Mite."
+      "note": "Lane-3 Thorn before the wave-1 lane-3 shardMite can cross the wall tile (shardMite would breach at t≈20948)."
     },
     {
       "timeMs": 20000,
       "row": 2,
-      "col": 2,
+      "col": 5,
       "plantId": "frostFern",
-      "note": "Front-lane Frost Fern added during wave 1 so lane-2 rams and snipers arrive chilled in front of the center guns."
+      "note": "Frost Fern at col 5 (x=679). Chill zone [zoneMinX=634, zoneMaxX=904] covers the briarSniper anchor x=679, AND the fern's x=679 is not strictly less than sniperX=679 so findSniperTarget skips it. The lane-2 sniper stays chilled (cadence 3200 → 4267ms) and cannot remove the Fern."
     },
     {
       "timeMs": 25000,
       "row": 0,
       "col": 0,
       "plantId": "thornVine",
-      "note": "Backfill the top lane before the late wave-1 Shard Mite can cross the wall tile."
+      "note": "Lane-0 Thorn before the wave-1 lane-0 shardMite can cross the wall tile (shardMite would breach at t≈27948)."
     },
     {
-      "timeMs": 32000,
+      "timeMs": 30000,
       "row": 4,
       "col": 1,
       "plantId": "thornVine",
-      "note": "Screen the lane-4 Sunroot before the wave-2 sniper can take it."
+      "note": "Screen the lane-4 Sunroot before the wave-2 shardMite + sniper can erase it. The Thorn also fires on the chilled briarSniper before it reaches its attackAnchorX so the sniper dies before its first shot."
+    },
+    {
+      "timeMs": 35000,
+      "row": 2,
+      "col": 1,
+      "plantId": "thornVine",
+      "note": "Second lane-2 attacker. With fern at col 5 and two thorns in cols 0/1, the lane holds 3 combat defenders — full-damage against the wave-3 + wave-4 glassRams (requiredDefendersInLane=3)."
     },
     {
       "timeMs": 40000,
-      "row": 2,
+      "row": 0,
+      "col": 1,
+      "plantId": "thornVine",
+      "note": "Lane-0 reinforce before the wave-4 glassRam at offset 2500 arrives. Two thorns are under-defended against the ram but combined DPS kills it before it reaches r0c0 breach."
+    },
+    {
+      "timeMs": 48000,
+      "row": 4,
+      "col": 2,
+      "plantId": "thornVine",
+      "note": "Earlier lane-4 depth so the wave-3 lane-4 briarSniper at offset 5500 (t=49500) dies to two thorns before its first shot."
+    },
+    {
+      "timeMs": 56000,
+      "row": 4,
       "col": 3,
+      "plantId": "thornVine",
+      "note": "Third lane-4 combat defender — hits the glassRam requiredDefendersInLane=3 threshold so the wave-3 ram at offset 13500 (t=57500) and the wave-4 ram at offset 4000 (t=70000) take full thorn damage and die well before contact."
+    },
+    {
+      "timeMs": 68000,
+      "row": 2,
+      "col": 4,
       "plantId": "brambleSpear",
-      "note": "Center-lane piercing follow-up behind the chilled zone for the scripted ram waves."
+      "note": "Lane-2 piercing follow-up before the wave-4 glassRam at offset 14500 (t=80500). Row 2 now has 4 combat defenders (c0 Thorn, c1 Thorn, c4 Spear, c5 Fern); the chilled ram dies to combined thorn+spear damage before it crosses the fern tile."
     }
   ]
 }

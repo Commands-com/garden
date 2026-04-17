@@ -40,7 +40,7 @@
       "lens": "explorer"
     }
   ],
-  "summary": "Rootline Defense now has its first control plant. Frost Fern costs 65 sap, deals no damage and generates no sap; it chills a 3-column lane zone in front of it, slowing enemies by 40% and cutting their attack rate by 25% for 2.5s. A reusable, typed status-effect system underpins the slow and opens the archetype for future control plants.",
+  "summary": "Rootline Defense now has its first control plant. Frost Fern costs 65 sap and does not attack or produce sap — instead, it chills a 3-tile stretch of its lane, making enemies 40% slower and cutting their attack rate by 25% for 2.5 seconds. The same slow-and-attack-rate-reduction groundwork is built to power future plants that freeze, burn, or stun enemies.",
   "candidates": [
     {
       "id": "candidate-1",

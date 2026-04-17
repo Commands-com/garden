@@ -35,8 +35,34 @@ function clamp(value, min, max) {
   return Math.max(min, Math.min(max, value));
 }
 
+const SEED_TRAY_PAGE_SIZE = 4;
+const SEED_TRAY_MAX_WIDTH = 640;
+const SEED_TRAY_GAP = 8;
+const SEED_TRAY_HEIGHT = 48;
+
 function makeTileKey(row, col) {
   return `${row}:${col}`;
+}
+
+function fitTextToWidth(textObject, value, maxWidth, startFontSize, minFontSize = 9) {
+  let fontSize = startFontSize;
+  textObject.setText(value);
+  textObject.setFontSize(fontSize);
+
+  while (textObject.width > maxWidth && fontSize > minFontSize) {
+    fontSize -= 1;
+    textObject.setFontSize(fontSize);
+  }
+
+  if (textObject.width <= maxWidth) {
+    return;
+  }
+
+  let truncated = String(value || "");
+  while (truncated.length > 1 && textObject.width > maxWidth) {
+    truncated = truncated.slice(0, -1).trimEnd();
+    textObject.setText(`${truncated}…`);
+  }
 }
 
 // Status-effect helpers. Pure: no scene dependency. Overwrite-refresh on
@@ -151,6 +177,7 @@ export class PlayScene extends Phaser.Scene {
   selectPlant(plantId) {
     if (this.getAvailablePlantIds().includes(plantId)) {
       this.selectedPlantId = plantId;
+      this.revealSelectedPlantInTray();
       this.updateSeedTray();
       this.game.events.emit("plantSelected", this.selectedPlantId);
       this.publishIfNeeded(true);
@@ -192,6 +219,7 @@ export class PlayScene extends Phaser.Scene {
 
     if (!availablePlantIds.includes(this.selectedPlantId)) {
       this.selectedPlantId = fallbackPlantId;
+      this.revealSelectedPlantInTray();
       this.game.events.emit("plantSelected", this.selectedPlantId);
       return true;
     }
@@ -310,7 +338,7 @@ export class PlayScene extends Phaser.Scene {
 
     const barY = ARENA_HEIGHT - 32;
 
-    this.add.rectangle(ARENA_WIDTH / 2, barY, ARENA_WIDTH - 32, 36, 0x08110d, 0.7)
+    this.add.rectangle(ARENA_WIDTH / 2, barY, ARENA_WIDTH - 32, 54, 0x08110d, 0.7)
       .setStrokeStyle(1, 0xdbe8d4, 0.1)
       .setDepth(20);
 
@@ -337,47 +365,184 @@ export class PlayScene extends Phaser.Scene {
   }
 
   createSeedTray(anchorY) {
-    const availablePlantIds = this.getAvailablePlantIds();
-    const slotWidth = availablePlantIds.length >= 4 ? 124 : 142;
-    const slotHeight = 42;
-    const gap = 10;
-    const totalWidth =
-      availablePlantIds.length * slotWidth + Math.max(0, availablePlantIds.length - 1) * gap;
-    const startX = ARENA_WIDTH / 2 - totalWidth / 2 + slotWidth / 2;
+    this.seedTrayAnchorY = anchorY;
+    this.seedTrayPageIndex = 0;
+    this.seedTrayLayoutKey = "";
+    this.seedTrayItems = [];
+    this.seedTrayControls = [];
+    this.ensureSeedTrayLayout();
+  }
 
-    this.seedTrayItems = availablePlantIds.map((plantId, index) => {
+  destroySeedTray() {
+    for (const item of this.seedTrayItems || []) {
+      item.bg?.destroy();
+      item.icon?.destroy();
+      item.keyBadge?.destroy();
+      item.keyLabel?.destroy();
+      item.nameText?.destroy();
+      item.costText?.destroy();
+    }
+
+    for (const control of this.seedTrayControls || []) {
+      control.bg?.destroy();
+      control.text?.destroy();
+    }
+
+    this.seedTrayItems = [];
+    this.seedTrayControls = [];
+  }
+
+  getSeedTrayPageCount(availablePlantIds = this.getAvailablePlantIds()) {
+    return Math.max(1, Math.ceil(availablePlantIds.length / SEED_TRAY_PAGE_SIZE));
+  }
+
+  getVisibleSeedTrayPlantIds(availablePlantIds = this.getAvailablePlantIds()) {
+    const start = this.seedTrayPageIndex * SEED_TRAY_PAGE_SIZE;
+    return availablePlantIds.slice(start, start + SEED_TRAY_PAGE_SIZE);
+  }
+
+  ensureSeedTrayLayout() {
+    if (!Number.isFinite(this.seedTrayAnchorY)) {
+      return;
+    }
+
+    const availablePlantIds = this.getAvailablePlantIds();
+    const pageCount = this.getSeedTrayPageCount(availablePlantIds);
+    this.seedTrayPageIndex = clamp(
+      Number.isFinite(this.seedTrayPageIndex) ? this.seedTrayPageIndex : 0,
+      0,
+      pageCount - 1
+    );
+
+    const layoutKey = `${availablePlantIds.join("|")}::${this.seedTrayPageIndex}`;
+    if (layoutKey === this.seedTrayLayoutKey) {
+      return;
+    }
+
+    this.seedTrayLayoutKey = layoutKey;
+    this.rebuildSeedTray(availablePlantIds);
+  }
+
+  revealSelectedPlantInTray() {
+    const availablePlantIds = this.getAvailablePlantIds();
+    const selectedIndex = availablePlantIds.indexOf(this.selectedPlantId);
+    if (selectedIndex < 0) {
+      return;
+    }
+
+    const targetPage = Math.floor(selectedIndex / SEED_TRAY_PAGE_SIZE);
+    if (targetPage === this.seedTrayPageIndex) {
+      return;
+    }
+
+    this.seedTrayPageIndex = targetPage;
+    this.seedTrayLayoutKey = "";
+    this.ensureSeedTrayLayout();
+  }
+
+  changeSeedTrayPage(delta) {
+    const availablePlantIds = this.getAvailablePlantIds();
+    const pageCount = this.getSeedTrayPageCount(availablePlantIds);
+    const nextPage = clamp((this.seedTrayPageIndex || 0) + delta, 0, pageCount - 1);
+    if (nextPage === this.seedTrayPageIndex) {
+      return;
+    }
+
+    this.seedTrayPageIndex = nextPage;
+    this.seedTrayLayoutKey = "";
+    this.ensureSeedTrayLayout();
+    this.updateSeedTray();
+  }
+
+  createSeedTrayControl(x, y, label, delta) {
+    const bg = this.add.rectangle(x, y, 24, 24, 0x102018, 0.94);
+    bg.setStrokeStyle(1, 0x31503d, 0.88);
+    bg.setDepth(22);
+    bg.setInteractive({ useHandCursor: true });
+    bg.on("pointerdown", () => this.changeSeedTrayPage(delta));
+
+    const text = this.add.text(x, y + 0.5, label, {
+      fontFamily: "DM Sans",
+      fontSize: "14px",
+      fontStyle: "700",
+      color: "#dce8d2",
+    }).setOrigin(0.5).setDepth(23);
+
+    this.seedTrayControls.push({ bg, text, delta });
+  }
+
+  rebuildSeedTray(availablePlantIds = this.getAvailablePlantIds()) {
+    this.destroySeedTray();
+
+    const visiblePlantIds = this.getVisibleSeedTrayPlantIds(availablePlantIds);
+    const visibleCount = visiblePlantIds.length;
+    const hasPagination = availablePlantIds.length > SEED_TRAY_PAGE_SIZE;
+    const controlReserve = hasPagination ? 88 : 0;
+    const slotAreaWidth = SEED_TRAY_MAX_WIDTH - controlReserve;
+    const slotWidth = clamp(
+      Math.floor(
+        (slotAreaWidth - Math.max(0, visibleCount - 1) * SEED_TRAY_GAP) /
+          Math.max(1, visibleCount)
+      ),
+      118,
+      156
+    );
+    const totalWidth =
+      visibleCount * slotWidth + Math.max(0, visibleCount - 1) * SEED_TRAY_GAP;
+    const startX = ARENA_WIDTH / 2 - totalWidth / 2 + slotWidth / 2;
+    const y = this.seedTrayAnchorY;
+
+    if (hasPagination) {
+      this.createSeedTrayControl(startX - slotWidth / 2 - 28, y, "<", -1);
+      this.createSeedTrayControl(
+        startX + totalWidth - slotWidth / 2 + 28,
+        y,
+        ">",
+        1
+      );
+    }
+
+    this.seedTrayItems = visiblePlantIds.map((plantId, pageIndex) => {
       const plant = PLANT_DEFINITIONS[plantId];
-      const x = startX + index * (slotWidth + gap);
-      const y = anchorY;
-      const bg = this.add.rectangle(x, y, slotWidth, slotHeight, 0x102018, 0.94);
+      const absoluteIndex = this.seedTrayPageIndex * SEED_TRAY_PAGE_SIZE + pageIndex;
+      const x = startX + pageIndex * (slotWidth + SEED_TRAY_GAP);
+      const bg = this.add.rectangle(x, y, slotWidth, SEED_TRAY_HEIGHT, 0x102018, 0.94);
       bg.setStrokeStyle(1, 0x31503d, 0.88);
       bg.setDepth(22);
       bg.setInteractive({ useHandCursor: true });
       bg.on("pointerdown", () => this.selectPlant(plantId));
 
-      const icon = this.add.image(x - slotWidth / 2 + 20, y, plant.textureKey);
-      icon.setDisplaySize(26, 26);
+      const leftEdge = x - slotWidth / 2;
+      const keyBadge = this.add.rectangle(leftEdge + 14, y - 14, 18, 16, 0x1c3024, 0.96);
+      keyBadge.setDepth(23);
+
+      const icon = this.add.image(leftEdge + 26, y + 2, plant.textureKey);
+      icon.setDisplaySize(24, 24);
       icon.setDepth(23);
 
-      const keyLabel = this.add.text(x - slotWidth / 2 + 8, y - 11, `${index + 1}`, {
+      const keyLabel = this.add.text(leftEdge + 14, y - 14, `${absoluteIndex + 1}`, {
         fontFamily: "DM Sans",
         fontSize: "10px",
         fontStyle: "700",
         color: "#dce8d2",
-      }).setOrigin(0, 0.5).setDepth(23);
+      }).setOrigin(0.5).setDepth(24);
 
-      const nameText = this.add.text(x - slotWidth / 2 + 40, y - 6, plant.label, {
+      const textLeft = leftEdge + 44;
+      const contentWidth = slotWidth - 54;
+      const nameText = this.add.text(textLeft, y - 11, plant.label, {
         fontFamily: "DM Sans",
         fontSize: "13px",
         fontStyle: "700",
         color: "#f5f0e8",
       }).setOrigin(0, 0.5).setDepth(23);
+      fitTextToWidth(nameText, plant.label, contentWidth, 13, 9);
 
-      const costText = this.add.text(x - slotWidth / 2 + 40, y + 10, `${plant.cost} sap`, {
+      const costText = this.add.text(textLeft, y + 11, `${plant.cost} sap`, {
         fontFamily: "DM Sans",
         fontSize: "11px",
         color: "#c4a35a",
       }).setOrigin(0, 0.5).setDepth(23);
+      fitTextToWidth(costText, `${plant.cost} sap`, contentWidth, 11, 10);
 
       return {
         plantId,
@@ -385,12 +550,14 @@ export class PlayScene extends Phaser.Scene {
         x,
         y,
         width: slotWidth,
-        height: slotHeight,
+        height: SEED_TRAY_HEIGHT,
         bg,
         icon,
+        keyBadge,
         keyLabel,
         nameText,
         costText,
+        contentWidth,
       };
     });
 
@@ -398,6 +565,8 @@ export class PlayScene extends Phaser.Scene {
   }
 
   updateSeedTray() {
+    this.ensureSeedTrayLayout();
+
     if (!Array.isArray(this.seedTrayItems)) {
       return;
     }
@@ -422,7 +591,18 @@ export class PlayScene extends Phaser.Scene {
         limited ? "#d3c4ac" : selected ? "#d8f5ae" : affordable ? "#c4a35a" : "#caa884"
       );
       item.keyLabel.setColor(selected ? "#f7fbf6" : "#bdd0c2");
+      item.keyBadge.setFillStyle(selected ? 0x2d5e3d : affordable ? 0x1c3024 : 0x3a281b, 0.96);
       item.bg.setAlpha(selected ? 1 : affordable ? 0.9 : 0.78);
+    }
+
+    for (const control of this.seedTrayControls || []) {
+      const pageCount = this.getSeedTrayPageCount();
+      const disabled =
+        (control.delta < 0 && this.seedTrayPageIndex <= 0) ||
+        (control.delta > 0 && this.seedTrayPageIndex >= pageCount - 1);
+      control.bg.setAlpha(disabled ? 0.34 : 0.92);
+      control.text.setAlpha(disabled ? 0.4 : 1);
+      control.bg.setStrokeStyle(1, disabled ? 0x31503d : 0x9fdd6b, disabled ? 0.4 : 0.65);
     }
   }
 
@@ -452,7 +632,7 @@ export class PlayScene extends Phaser.Scene {
       this.hoverTile.setStrokeStyle(2, color, 0.95);
       this.hoverTile.setVisible(true);
 
-      if (this.selectedPlantId === 'frostFern' && plant) {
+      if (this.selectedPlantId === 'frostFern' && plant && !occupied && !unavailable) {
         const rangeCols = plant.chillRangeCols || 3;
         const zoneLeft = center.x - CELL_WIDTH / 2;
         this.chillZonePreview.setPosition(zoneLeft, center.y);
@@ -518,10 +698,29 @@ export class PlayScene extends Phaser.Scene {
     const testTimeScale = this.bootstrap.testMode
       ? clamp(Number(this.bootstrap.testTimeScale) || 1, 0.1, 24)
       : 1;
-    const stepDelta = this.bootstrap.testMode
-      ? TEST_MODE_DELTA * testTimeScale
-      : Math.min(Math.max(delta || TEST_MODE_DELTA, 10), 34);
 
+    if (this.bootstrap.testMode && testTimeScale > 1) {
+      // Sub-step the loop so high testTimeScale values (e.g. 8x in probes
+      // and uiux tests) keep projectile/contact physics stable. A single
+      // 133ms step lets fast projectiles teleport past their targets and
+      // oversteers mite contact timings; capping each inner step to
+      // TEST_MODE_DELTA preserves hit detection.
+      const subSteps = Math.max(1, Math.ceil(testTimeScale));
+      const subStepDelta = (TEST_MODE_DELTA * testTimeScale) / subSteps;
+      for (let i = 0; i < subSteps; i += 1) {
+        if (this.gameEnding) return;
+        this.runGameStep(subStepDelta);
+      }
+      return;
+    }
+
+    const stepDelta = this.bootstrap.testMode
+      ? TEST_MODE_DELTA
+      : Math.min(Math.max(delta || TEST_MODE_DELTA, 10), 34);
+    this.runGameStep(stepDelta);
+  }
+
+  runGameStep(stepDelta) {
     this.elapsedMs += stepDelta;
     this.survivedMs += stepDelta;
 
@@ -691,6 +890,7 @@ export class PlayScene extends Phaser.Scene {
         continue;
       }
 
+      const prevX = projectile.x;
       projectile.x += projectile.speed * (deltaMs / 1000);
       projectile.sprite.setPosition(projectile.x, projectile.y);
 
@@ -700,7 +900,7 @@ export class PlayScene extends Phaser.Scene {
         continue;
       }
 
-      const target = this.findProjectileTarget(projectile);
+      const target = this.findProjectileTarget(projectile, prevX);
       if (!target) {
         continue;
       }
@@ -1526,7 +1726,14 @@ export class PlayScene extends Phaser.Scene {
     return enemy.x - blocker.x <= enemy.definition.contactRange ? blocker : null;
   }
 
-  findProjectileTarget(projectile) {
+  findProjectileTarget(projectile, prevX = null) {
+    // Swept collision: consider the full path the projectile travelled this
+    // frame, not just its current position. Without this, high test-mode
+    // time scales (e.g. 8x) step the projectile far enough per frame to
+    // skip over a contact-blocked enemy's hit zone entirely.
+    const sweepStart = prevX != null ? Math.min(prevX, projectile.x) : projectile.x;
+    const sweepEnd = prevX != null ? Math.max(prevX, projectile.x) : projectile.x;
+
     let match = null;
     let closestDistance = Number.POSITIVE_INFINITY;
 
@@ -1540,8 +1747,14 @@ export class PlayScene extends Phaser.Scene {
       }
 
       const hitRadius = projectile.radius + enemy.definition.radius * 0.8;
+      const enemyMin = enemy.x - hitRadius;
+      const enemyMax = enemy.x + hitRadius;
+      if (sweepEnd < enemyMin || sweepStart > enemyMax) {
+        continue;
+      }
+
       const distance = Math.abs(enemy.x - projectile.x);
-      if (distance > hitRadius || distance >= closestDistance) {
+      if (distance >= closestDistance) {
         continue;
       }
 

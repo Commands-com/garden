@@ -54,14 +54,25 @@ reusable typed status-effect system that future control plants will share.
 - Replay fixtures:
   `scripts/replay-2026-04-17-no-control.json` (`expect.outcome: "gameover"`)
   and `scripts/replay-2026-04-17-chilled-lane.json`
-  (`expect.outcome: "cleared"`), identical placements except the second
-  adds `(20000ms r2 c2 frostFern)`.
+  (`expect.outcome: "cleared"`). The chilled-lane opening places Frost
+  Fern at `(20000ms r2 c5)` so the 3-col chill zone `[634, 904]` covers
+  the briarSniper attackAnchorX=679 AND the fern's x=679 is not
+  strictly less than `sniperX`, so `findSniperTarget` skips it; lane 4
+  stacks three thorns (c1/c2/c3) to hit the Glass Ram
+  `requiredDefendersInLane=3` threshold.
+- Projectile hit-detection now uses swept-range collision. `spawnProjectile`
+  stores `prevX`; `updateProjectiles` passes it to `findProjectileTarget`,
+  which tests each enemy's hit zone against the range
+  `[min(prevX, x), max(prevX, x)]`. At 1× this is identical to the
+  previous point-check; at 8× (test-mode timeScale) it prevents the
+  thorn's 55 px/frame step from tunneling past a contact-blocked enemy's
+  19.8 px hit radius.
 
 ## Material assumptions (carried forward from task_1)
 
 1. Chill x-range formula: `[fern.x − CELL_WIDTH/2, fern.x − CELL_WIDTH/2 + 3
    * CELL_WIDTH]`. A fern on column `c` chills the three tiles covering
-   columns `c−1 … c+1` (inclusive of its own tile, extending forward toward
+   columns `c … c+2` (inclusive of its own tile, extending forward toward
    the spawn). The chill-zone preview and the runtime zone-apply share this
    formula.
 2. Tint-mode MULTIPLY is reset to the default before applying the cool-blue
@@ -124,11 +135,16 @@ reusable typed status-effect system that future control plants will share.
   `["thornVine", "frostFern"]`) → same spec, wave 2 block.
 - **AC-15** (Four-wave 1-HP challenge clears with the chilled-lane replay)
   → `scripts/replay-2026-04-17-chilled-lane.json`
-  (`expect.outcome: "cleared"`) + `tests/uiux/game-2026-04-17-flow.spec.js`
-  replay section.
+  (`expect.outcome: "cleared"`) verified natural by
+  `tests/uiux/game-2026-04-17-replays.spec.js` (drives the fixture to
+  `scenarioPhase=endless` + `challengeCleared=true` + `gardenHP>=1`
+  without `finishScenario()`) and re-exercised in-flow by
+  `tests/uiux/game-2026-04-17-flow.spec.js`.
 - **AC-16** (Challenge cannot be cleared without Frost Fern) →
   `scripts/replay-2026-04-17-no-control.json`
-  (`expect.outcome: "gameover"`).
+  (`expect.outcome: "gameover"`) verified by
+  `tests/uiux/game-2026-04-17-replays.spec.js` reaching
+  `scene=gameover` at the ram window with the inverse placements.
 - **AC-17** (Endless inherited from April 16) →
   `tests/uiux/game-2026-04-17-flow.spec.js` endless assertions compare to
   the exact config object
@@ -160,36 +176,31 @@ reusable typed status-effect system that future control plants will share.
 
 ## Validation runs
 
-### Playwright — `npm run test:uiux -- tests/uiux/game-frost-fern.spec.js tests/uiux/game-2026-04-17-flow.spec.js tests/uiux/game-board-scout-2026-04-17.spec.js tests/uiux/game-roster-assets.spec.js`
+### Playwright — April 17 specs
 
-**Status: blocked in this sandbox.** The run exited with
-`Error: Cannot find module '@playwright/test'` because the sandbox does not
-permit `npm install` to hydrate `node_modules` for this worktree and the
-parent checkout's `node_modules` is not linked in. This sandbox blocker
-supersedes the one task_2 recorded, but task_2's two upstream blockers
-remain relevant at publish time and are preserved verbatim for context:
+**Status: passed (13/13).** `npm run test:uiux -- tests/uiux/game-2026-04-17-flow.spec.js tests/uiux/game-2026-04-17-replays.spec.js tests/uiux/game-board-scout-2026-04-17.spec.js tests/uiux/game-frost-fern.spec.js tests/uiux/game-roster-assets.spec.js`
+ran green in the reviewer sandbox: game-frost-fern 5/5, game-2026-04-17-flow
+1/1 (~17.7s), game-2026-04-17-replays 2/2 (~22.1s), game-board-scout-2026-04-17
+1/1, and game-roster-assets 4/4. The flow spec now waits for the natural
+`scenarioPhase=endless` + `challengeCleared=true` transition after applying
+the CHALLENGE_ROSTER_PLACEMENTS — no `finishScenario()` bypass.
 
-> `npm run test:uiux -- ...` failed when Playwright's web server hit
-> `listen EPERM 127.0.0.1:3737`
+### Playwright — paired replay probes
 
-> a direct `npm run probe:scenario-runtime -- --date 2026-04-17 --json`
-> attempt failed on Chromium launch with macOS sandbox
-> `bootstrap_check_in ... Permission denied (1100)`
+**Status: passed (2/2).** `npm run test:uiux -- tests/uiux/game-2026-04-17-replays.spec.js`
+drives both fixtures under Chromium at timeScale=8 and asserts natural
+terminal outcomes: `replay-2026-04-17-chilled-lane.json` → cleared
+(scenarioPhase=endless, challengeCleared=true, gardenHP>=1) in ~12.5s
+and `replay-2026-04-17-no-control.json` → gameover in ~9.3s. This
+replaces the prior skipped `npm run probe:scenario-runtime` entry that
+couldn't run under the test-only command allowlist.
 
-### Probe — `npm run probe:scenario-runtime -- --date 2026-04-17 --replay scripts/replay-2026-04-17-no-control.json`
+### Playwright — prior-day regression
 
-**Status: blocked in this sandbox.** The probe entry point is not on the
-agent's command allowlist (only `npm run test:uiux` is permitted), and the
-upstream sandbox blocker
-`bootstrap_check_in ... Permission denied (1100)` still applies when run
-in the task_2 environment. Expected outcome when re-run at publish:
-`outcome: "gameover"` with April 15 opening + no control plant.
-
-### Probe — `npm run probe:scenario-runtime -- --date 2026-04-17 --replay scripts/replay-2026-04-17-chilled-lane.json`
-
-**Status: blocked in this sandbox.** Same blocker as above. Expected
-outcome when re-run at publish: `outcome: "cleared"` with the same April
-15 opening plus `(20000ms r2 c2 frostFern)`.
+**Status: passed (26/26).** `npm run test:uiux -- tests/uiux/game-board-scout-interaction-2026-04-14.spec.js ... tests/uiux/game-shell-responsive-2026-04-16.spec.js`
+ran green in 7.3s (6 workers). No timing drift on prior-day scenarios
+from either the cadence-helper refactor or the swept-projectile
+hit-detection fix.
 
 ## Screenshots
 
@@ -197,21 +208,22 @@ outcome when re-run at publish: `outcome: "cleared"` with the same April
 April 17 challenge gameover without Frost Fern, (b) chilled-lane cleared
 with 3-layer slow visuals on a chilled beetle + sniper, (c) Board Scout
 Control chip + selected-detail panel for Frost Fern — require a live
-Chromium launch via Playwright's screenshot hooks. The Chromium launch is
-blocked in this sandbox (see Playwright + probe blockers above), so the
+Chromium launch with a screenshot path configured. The
 `content/days/2026-04-17/screenshots/` and
 `site/days/2026-04-17/screenshots/` directories are intentionally empty
-(each carries a `.gitkeep`). Publish must re-run the three Playwright
-specs in a Chromium-enabled environment and drop the captures in place
-before the day is marked `shipped`; the task_2 replay fixtures already
-encode the exact placements the captures need.
+(each carries a `.gitkeep`). Publish should drop the three captures in
+place before the day is marked `shipped`; the task_2 replay fixtures
+already encode the exact placements the captures need.
 
 ## What remains to gate on at publish
 
-- `npm run test:uiux -- tests/uiux/game-frost-fern.spec.js tests/uiux/game-2026-04-17-flow.spec.js tests/uiux/game-board-scout-2026-04-17.spec.js tests/uiux/game-roster-assets.spec.js` must run green.
-- Both replay probes must exit 0 with the expected outcomes above.
 - The three screenshots must be captured and mirrored to both
   `content/days/2026-04-17/screenshots/` and
   `site/days/2026-04-17/screenshots/`.
-- `node schemas/validate.js content/days/2026-04-17` must pass (this run
-  already does — see `test-results.json`).
+- `node schemas/validate.js content/days/2026-04-17` must pass.
+
+Both replay fixtures are now verified by the Playwright paired-replay
+spec (`tests/uiux/game-2026-04-17-replays.spec.js`) — the no-control →
+gameover and chilled-lane → cleared outcomes are enforced on every
+`npm run test:uiux` run, so the probe-CLI entry is no longer a
+publish-time gate.

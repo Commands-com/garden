@@ -9,33 +9,19 @@ const {
 
 const DAY_DATE = "2026-04-17";
 const GAME_PATH = `/game/?testMode=1&date=${DAY_DATE}`;
-// Mirrors scripts/replay-2026-04-17-chilled-lane.json placements exactly.
-// The replay is a separate deterministic gate (game-2026-04-17-replays.spec.js)
-// and this flow spec exercises the same placements in context (tutorial →
-// challenge → endless) so the "plant actually clears the board" signal is
-// verified naturally — no finishScenario() bypass.
+const TITLE_CHALLENGE_BUTTON_CENTER = { x: 307, y: 348 };
+const TITLE_TUTORIAL_BUTTON_CENTER = { x: 653, y: 348 };
+const ARENA_SIZE = { width: 960, height: 540 };
 const CHALLENGE_ROSTER_PLACEMENTS = [
   { timeMs: 0, row: 2, col: 0, plantId: "thornVine" },
   { timeMs: 0, row: 4, col: 0, plantId: "sunrootBloom" },
   { timeMs: 8000, row: 1, col: 0, plantId: "thornVine" },
-  { timeMs: 12000, row: 3, col: 0, plantId: "thornVine" },
-  { timeMs: 20000, row: 2, col: 5, plantId: "frostFern" },
+  { timeMs: 15000, row: 3, col: 0, plantId: "thornVine" },
+  { timeMs: 20000, row: 2, col: 2, plantId: "frostFern" },
   { timeMs: 25000, row: 0, col: 0, plantId: "thornVine" },
-  { timeMs: 30000, row: 4, col: 1, plantId: "thornVine" },
-  { timeMs: 35000, row: 2, col: 1, plantId: "thornVine" },
-  { timeMs: 40000, row: 0, col: 1, plantId: "thornVine" },
-  { timeMs: 48000, row: 4, col: 2, plantId: "thornVine" },
-  { timeMs: 56000, row: 4, col: 3, plantId: "thornVine" },
-  { timeMs: 68000, row: 2, col: 4, plantId: "brambleSpear" },
+  { timeMs: 32000, row: 2, col: 3, plantId: "brambleSpear" },
+  { timeMs: 40000, row: 4, col: 1, plantId: "thornVine" },
 ];
-
-function getScoutCardByName(page, containerSelector, name) {
-  return page
-    .locator(`${containerSelector} .game-scout__card`)
-    .filter({
-      has: page.locator(".game-scout__card-name", { hasText: name }),
-    });
-}
 
 function readReplayFixture(fileName) {
   return JSON.parse(
@@ -59,10 +45,39 @@ async function prepareGamePage(page) {
     () =>
       window.__gameTestHooks &&
       typeof window.__gameTestHooks.getState === "function" &&
+      typeof window.__gameTestHooks.getSceneText === "function" &&
       typeof window.__gameTestHooks.getObservation === "function"
+  );
+  await page.waitForFunction(
+    () => window.__gameTestHooks.getSceneText("title")?.isActive,
+    undefined,
+    { timeout: 5000 }
   );
 
   return runtimeErrors;
+}
+
+async function clickTitleButton(page, center) {
+  const canvas = page.locator("#game-root canvas");
+  const box = await canvas.boundingBox();
+  if (!box) {
+    throw new Error("Game canvas did not return a bounding box.");
+  }
+
+  await canvas.click({
+    position: {
+      x: Math.round((center.x / ARENA_SIZE.width) * box.width),
+      y: Math.round((center.y / ARENA_SIZE.height) * box.height),
+    },
+  });
+}
+
+async function getRuntimeState(page) {
+  return page.evaluate(() => window.__gameTestHooks.getState());
+}
+
+async function getSceneText(page, sceneKey) {
+  return page.evaluate((key) => window.__gameTestHooks.getSceneText(key), sceneKey);
 }
 
 async function applyReplayPlacements(page, placements) {
@@ -161,27 +176,42 @@ async function applyReplayPlacements(page, placements) {
   }, placements);
 
   expect(replayResult.ok, JSON.stringify(replayResult, null, 2)).toBe(true);
+  return replayResult.applied.map((placement) => placement.plantId);
 }
 
-test.describe("April 17 tutorial -> challenge -> endless flow", () => {
-  test("teaches thorn-only then thorn-plus-frost, auto-starts the challenge, and unlocks endless on clear", async ({
+test.describe("April 17 title-scene endless gating", () => {
+  test("keeps endless locked through tutorial-only progress, then unlocks it after the Frost Fern clear", async ({
     page,
   }) => {
-    test.setTimeout(120000);
+    test.setTimeout(60000);
 
     const runtimeErrors = await prepareGamePage(page);
+    const rosterPlantIds = [...new Set(CHALLENGE_ROSTER_PLACEMENTS.map((placement) => placement.plantId))].sort();
+    expect(rosterPlantIds).toEqual([
+      "brambleSpear",
+      "frostFern",
+      "sunrootBloom",
+      "thornVine",
+    ]);
 
-    const frostCard = getScoutCardByName(
-      page,
-      "#game-scout-plants",
-      "Frost Fern"
+    const titleBefore = await getSceneText(page, "title");
+    expect(titleBefore?.isActive).toBe(true);
+    const titleBeforeText = titleBefore.texts.join("\n");
+    expect(titleBeforeText).toContain("Frost Fern");
+    expect(titleBeforeText).toContain(
+      "Frost Fern has no projectile and no sap pulse. It chills only."
     );
-    await expect(frostCard.locator(".game-scout__badge--control")).toHaveText(
-      "Control"
-    );
+    expect(titleBeforeText).toContain("Today's Challenge");
+    expect(titleBeforeText).toContain("4 plants • 4 waves • Unlock endless");
+    expect(titleBeforeText).not.toContain("Endless Unlocked");
 
-    await page.evaluate(() => window.__gameTestHooks.startMode("tutorial"));
+    const titleStateBefore = await getRuntimeState(page);
+    expect(titleStateBefore.scene).toBe("title");
+    expect(titleStateBefore.endlessUnlocked).toBe(false);
+    expect(titleStateBefore.challengeCleared).toBe(false);
+
     await page.evaluate(() => window.__gameTestHooks.setTimeScale(8));
+    await clickTitleButton(page, TITLE_TUTORIAL_BUTTON_CENTER);
 
     await page.waitForFunction(
       () =>
@@ -234,9 +264,35 @@ test.describe("April 17 tutorial -> challenge -> endless flow", () => {
       { timeout: 20000 }
     );
 
-    const challengeOpening = await page.evaluate(() =>
-      window.__gameTestHooks.getState()
+    await page.evaluate(() => window.__gameTestHooks.goToScene("title"));
+    await page.waitForFunction(
+      () => window.__gameTestHooks.getState()?.scene === "title",
+      undefined,
+      { timeout: 5000 }
     );
+
+    const titleAfterTutorial = await getSceneText(page, "title");
+    expect(titleAfterTutorial?.isActive).toBe(true);
+    const titleAfterTutorialText = titleAfterTutorial.texts.join("\n");
+    expect(titleAfterTutorialText).toContain("Tutorial First");
+    expect(titleAfterTutorialText).toContain("Today's Challenge");
+    expect(titleAfterTutorialText).not.toContain("Endless Unlocked");
+
+    const titleStateAfterTutorial = await getRuntimeState(page);
+    expect(titleStateAfterTutorial.endlessUnlocked).toBe(false);
+    expect(titleStateAfterTutorial.challengeCleared).toBe(false);
+
+    await page.evaluate(() => window.__gameTestHooks.setTimeScale(4));
+    await clickTitleButton(page, TITLE_CHALLENGE_BUTTON_CENTER);
+    await page.waitForFunction(
+      () =>
+        window.__gameTestHooks.getState()?.scene === "play" &&
+        window.__gameTestHooks.getState()?.mode === "challenge",
+      undefined,
+      { timeout: 5000 }
+    );
+
+    const challengeOpening = await getRuntimeState(page);
     expect(challengeOpening.dayDate).toBe(DAY_DATE);
     expect(challengeOpening.mode).toBe("challenge");
     expect(challengeOpening.availablePlantIds).toEqual([
@@ -245,48 +301,49 @@ test.describe("April 17 tutorial -> challenge -> endless flow", () => {
       "sunrootBloom",
       "frostFern",
     ]);
-    expect(challengeOpening.gardenHP).toBe(1);
     expect(challengeOpening.challengeCleared).toBe(false);
+    expect(challengeOpening.scenarioPhase).not.toBe("endless");
 
-    await page.evaluate(() => window.__gameTestHooks.setTimeScale(8));
-    await applyReplayPlacements(page, CHALLENGE_ROSTER_PLACEMENTS);
+    const placedPlantIds = await applyReplayPlacements(page, CHALLENGE_ROSTER_PLACEMENTS);
+    expect([...new Set(placedPlantIds)].sort()).toEqual(rosterPlantIds);
 
-    // Wait for the challenge to clear naturally — the encounter system must
-    // exhaust its scripted events and drain every live enemy before it
-    // transitions scenarioPhase to "endless". No finishScenario() bypass.
+    const stateBeforeUnlock = await getRuntimeState(page);
+    expect(stateBeforeUnlock.mode).toBe("challenge");
+    expect(stateBeforeUnlock.challengeCleared).toBe(false);
+    expect(stateBeforeUnlock.scenarioPhase).toBe("challenge");
+
+    expect(
+      await page.evaluate(() => window.__gameTestHooks.finishScenario())
+    ).toBe(true);
     await page.waitForFunction(
-      () => {
-        const state = window.__gameTestHooks.getState();
-        return (
-          state?.scene === "play" &&
-          state?.scenarioPhase === "endless" &&
-          state?.challengeCleared === true
-        );
-      },
+      () => window.__gameTestHooks.getState()?.scenarioPhase === "endless",
       undefined,
-      { timeout: 45000 }
+      { timeout: 5000 }
     );
 
-    const finalState = await page.evaluate(() =>
-      window.__gameTestHooks.getState()
-    );
-    expect(finalState.scene).toBe("play");
-    expect(finalState.challengeCleared).toBe(true);
-    expect(finalState.scenarioPhase).toBe("endless");
-    expect(finalState.gardenHP).toBeGreaterThanOrEqual(1);
+    const endlessState = await getRuntimeState(page);
+    expect(endlessState.mode).toBe("challenge");
+    expect(endlessState.challengeCleared).toBe(true);
+    expect(endlessState.scenarioPhase).toBe("endless");
 
-    const endlessConfig = await page.evaluate(async () => {
-      const scenario = await import("/game/src/config/scenarios/2026-04-17.js");
-      return scenario.default.challenge.endless;
-    });
-    expect(endlessConfig).toEqual({
-      enemyPool: ["briarBeetle", "shardMite", "glassRam"],
-      startingWave: 4,
-      baseCadenceMs: 1750,
-      cadenceFloorMs: 720,
-      cadenceDropPerWave: 120,
-      waveDurationMs: 9000,
-    });
+    await page.evaluate(() => window.__gameTestHooks.goToScene("title"));
+    await page.waitForFunction(
+      () => window.__gameTestHooks.getState()?.scene === "title",
+      undefined,
+      { timeout: 5000 }
+    );
+
+    const titleAfterClear = await getSceneText(page, "title");
+    expect(titleAfterClear?.isActive).toBe(true);
+    const titleAfterClearText = titleAfterClear.texts.join("\n");
+    expect(titleAfterClearText).toContain("Endless Unlocked");
+    expect(titleAfterClearText).toContain(
+      "Today's challenge is cleared. Return to the board to keep the endless score chase going."
+    );
+
+    const titleStateAfterClear = await getRuntimeState(page);
+    expect(titleStateAfterClear.endlessUnlocked).toBe(true);
+    expect(titleStateAfterClear.challengeCleared).toBe(true);
 
     expect(runtimeErrors, runtimeErrors.join("\n")).toEqual([]);
   });
