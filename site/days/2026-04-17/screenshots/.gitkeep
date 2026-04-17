@@ -1,0 +1,11 @@
+# Placeholder — intentionally empty.
+#
+# The three required captures (gameover without Frost Fern, chilled-lane
+# cleared with Frost Fern, Board Scout Control chip + detail panel) could
+# not be rendered in this sandbox because Chromium launch was blocked. See
+# site/days/2026-04-17/build-summary.md "Screenshots" and
+# site/days/2026-04-17/test-results.json for the blocker strings.
+#
+# Re-run the April 17 Playwright specs in a Chromium-enabled environment
+# to produce the captures; they must live alongside this file and mirror
+# from content/days/2026-04-17/screenshots/ before the day is marked shipped.

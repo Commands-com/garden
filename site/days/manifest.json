@@ -2,6 +2,15 @@
   "schemaVersion": 1,
   "days": [
     {
+      "date": "2026-04-17",
+      "title": "Cold Lane",
+      "summary": "Rootline Defense's first control plant, Frost Fern, chills a 3-column lane zone so attackers behind it can whittle down slowed enemies — damage and control become two separate levers.",
+      "status": "pending-validation",
+      "featureType": "game",
+      "tags": ["game", "rootline-defense", "frost-fern", "control-plant", "status-effects", "slow", "chill-zone", "scenario", "board-scout", "playwright"],
+      "publishedAt": "2026-04-17T12:00:00.000Z"
+    },
+    {
       "date": "2026-04-16",
       "title": "Briar Sniper: First Ranged Enemy for Rootline Defense",
       "summary": "Rootline Defense now ships its first ranged enemy. Briar Sniper stops inside the board, aims at a chosen defender for ~0.7s, then fires a thorn bolt that only hits that defender's tile. Plant an attacker between the sniper and its target to screen the shot — support plants don't screen.",

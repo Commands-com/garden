@@ -1,0 +1,325 @@
+{
+  "schemaVersion": 2,
+  "runDate": "2026-04-17",
+  "generatedAt": "2026-04-17T12:00:00Z",
+  "scoringDimensions": [
+    { "id": "compoundingValue", "label": "Compounding Value" },
+    { "id": "usefulnessClarity", "label": "Usefulness & Clarity" },
+    { "id": "noveltySurprise", "label": "Novelty & Surprise" },
+    { "id": "feasibility", "label": "Feasibility" },
+    { "id": "legibility", "label": "Legibility" },
+    { "id": "continuity", "label": "Continuity" },
+    { "id": "shareability", "label": "Shareability" }
+  ],
+  "judgePanel": [
+    {
+      "agentId": "explore_explorer_0",
+      "displayName": "GPT (Visitor)",
+      "conceptKey": "openai",
+      "modelFamily": "gpt",
+      "provider": "codex_cli",
+      "model": "gpt-5.4",
+      "lens": "visitor"
+    },
+    {
+      "agentId": "explore_explorer_1",
+      "displayName": "Claude (Gardener)",
+      "conceptKey": "claude",
+      "modelFamily": "claude",
+      "provider": "claude",
+      "model": "opus",
+      "lens": "gardener"
+    },
+    {
+      "agentId": "explore_explorer_2",
+      "displayName": "Gemini (Explorer)",
+      "conceptKey": "gemini",
+      "modelFamily": "gemini",
+      "provider": "gemini_cli",
+      "model": "gemini-3.1-pro-preview",
+      "lens": "explorer"
+    }
+  ],
+  "summary": "Rootline Defense now has its first control plant. Frost Fern costs 65 sap, deals no damage and generates no sap; it chills a 3-column lane zone in front of it, slowing enemies by 40% and cutting their attack rate by 25% for 2.5s. A reusable, typed status-effect system underpins the slow and opens the archetype for future control plants.",
+  "candidates": [
+    {
+      "id": "candidate-1",
+      "title": "Frost Fern — First Control Plant and Reusable Status-Effect System",
+      "summary": "Adds Frost Fern as a non-damaging, non-sap control plant that chills a 3-column lane zone for 2.5s; ships a reusable status-effect system on enemies; routes move/attack cadence through effective-speed/cadence helpers; adds three-layer slow visuals, a chill-zone hover preview, a Board Scout Control chip with a six-field detail panel, and the April 17 Cold Lane scenario with a two-wave tutorial, a four-wave 1-HP challenge, and an April 16 endless inheritance.",
+      "averageScore": 8.9,
+      "reviewCount": 3,
+      "rank": 1,
+      "dimensionAverages": {
+        "compoundingValue": { "label": "Compounding Value", "average": 9.3, "reviewCount": 3 },
+        "usefulnessClarity": { "label": "Usefulness & Clarity", "average": 8.7, "reviewCount": 3 },
+        "noveltySurprise": { "label": "Novelty & Surprise", "average": 9.0, "reviewCount": 3 },
+        "feasibility": { "label": "Feasibility", "average": 8.3, "reviewCount": 3 },
+        "legibility": { "label": "Legibility", "average": 9.0, "reviewCount": 3 },
+        "continuity": { "label": "Continuity", "average": 9.0, "reviewCount": 3 },
+        "shareability": { "label": "Shareability", "average": 9.0, "reviewCount": 3 }
+      },
+      "reviewerBreakdown": [
+        {
+          "reviewer": {
+            "agentId": "explore_explorer_0",
+            "displayName": "GPT (Visitor)",
+            "modelFamily": "gpt",
+            "lens": "visitor"
+          },
+          "overallScore": 8.7,
+          "dimensionScores": {
+            "compoundingValue": 9,
+            "usefulnessClarity": 9,
+            "noveltySurprise": 9,
+            "feasibility": 8,
+            "legibility": 9,
+            "continuity": 9,
+            "shareability": 9
+          },
+          "keep": [
+            "Control is a third first-class role alongside attacker and support — the game now has three distinct plant verbs.",
+            "Chill is observable: cool-blue tint, a following frost-particle emitter, and a visibly slower walk animation on chilled enemies.",
+            "Board Scout's six-field detail panel (Cost / AoE / Slow / Attack Slow / Duration / Notes) spells out the mechanic before the player spends sap."
+          ],
+          "mustChange": [
+            "Playwright must lock the no-stack refresh rule so two Frost Ferns do not silently double-slow."
+          ],
+          "risks": [
+            "The 40% speed + 25% attack-rate slow is a big lever on Glass Ram; tuning drift could make rams trivial."
+          ]
+        },
+        {
+          "reviewer": {
+            "agentId": "explore_explorer_1",
+            "displayName": "Claude (Gardener)",
+            "modelFamily": "claude",
+            "lens": "gardener"
+          },
+          "overallScore": 9.1,
+          "dimensionScores": {
+            "compoundingValue": 10,
+            "usefulnessClarity": 8,
+            "noveltySurprise": 9,
+            "feasibility": 9,
+            "legibility": 9,
+            "continuity": 9,
+            "shareability": 9
+          },
+          "keep": [
+            "The typed status-effect map + effective-speed/cadence helpers are the reusable foundation future control plants (burn, stun, root) need.",
+            "Routing walker move, walker contact cadence, and the full sniper FSM through the helpers makes slow composable rather than one-off.",
+            "The scenario teaches Frost Fern in a two-wave tutorial: Wave 1 proves Thorn Vine alone cannot hold, Wave 2 introduces Frost Fern so the shift is felt."
+          ],
+          "mustChange": [
+            "The script role-heuristics in probe/validate/bot must exclude control alongside support so Frost Fern is never selected as the primary attacker."
+          ],
+          "risks": [
+            "Cadence-helper refactor drift: five call sites must keep prior-day scenario timing intact — regression specs carry the weight."
+          ]
+        },
+        {
+          "reviewer": {
+            "agentId": "explore_explorer_2",
+            "displayName": "Gemini (Explorer)",
+            "modelFamily": "gemini",
+            "lens": "explorer"
+          },
+          "overallScore": 9.0,
+          "dimensionScores": {
+            "compoundingValue": 9,
+            "usefulnessClarity": 9,
+            "noveltySurprise": 9,
+            "feasibility": 8,
+            "legibility": 9,
+            "continuity": 9,
+            "shareability": 9
+          },
+          "keep": [
+            "The chill-zone hover preview turns an invisible AoE into a tile-accurate rectangle before commit.",
+            "Manifest-backed SVG art for both frost-fern and frost-particle keeps the daily screenshot crisp and asset-traceable.",
+            "Two paired replay fixtures (no-control → gameover, chilled-lane → cleared) give the runtime probe a deterministic must-not-regress signal."
+          ],
+          "mustChange": [
+            "The frost-particle emitter must be guarded by typeof emitter.startFollow === 'function' and try/catch so older Phaser versions fall back to the tint + frame-rate layers."
+          ],
+          "risks": [
+            "Chill too weak is as dangerous as chill too strong: if a slowed sniper's aim line barely changes, the mechanic fails the observable bar."
+          ]
+        }
+      ],
+      "keep": [
+        "Ship a real control plant with a reusable, typed status-effect system that future burn/stun/root plants will share.",
+        "Teach the role in a two-wave tutorial (Hold the Lane → Now It's Too Fast) before the 1-HP challenge.",
+        "Add a chill-zone hover preview, a Board Scout Control chip, and a six-field detail panel so the mechanic is visible before commit."
+      ],
+      "mustChange": [
+        "Helpers applyStatusEffect/tickStatusEffects/getEffectiveSpeed/getEffectiveCadence must be exported from play.js so Playwright can lock the math without scene state.",
+        "updateControlPlants must apply chill as a zone (x in [fern.x − CELL_WIDTH/2, fern.x − CELL_WIDTH/2 + 3*CELL_WIDTH]) rather than per-enemy overlap probing.",
+        "Script role-heuristics in probe/validate/bot must exclude role === 'control' alongside role === 'support' from primary-attacker selection."
+      ],
+      "risks": [
+        "Balance drift on chill magnitude could make Glass Ram trivial or leave chilled snipers indistinguishable from unchilled ones.",
+        "Cadence-helper refactor must not shift prior-day scenario timing — April 13/14/15/16 regression coverage is required before publish."
+      ],
+      "feedbackReferences": [
+        "Players asked for more plant roles beyond attacker/support; control is the third first-class role.",
+        "Board Scout feedback pushed for observable pre-run mechanic copy, now extended with a Control chip and a six-field detail panel."
+      ]
+    },
+    {
+      "id": "candidate-2",
+      "title": "Second Ranged Enemy: Thorn Mortar",
+      "summary": "Adds a second ranged enemy that lobs a slow arcing projectile instead of a straight bolt. Deepens ranged threat but reuses the sniper archetype without introducing a plant role.",
+      "averageScore": 7.6,
+      "reviewCount": 3,
+      "rank": 2,
+      "dimensionAverages": {
+        "compoundingValue": { "label": "Compounding Value", "average": 7.7, "reviewCount": 3 },
+        "usefulnessClarity": { "label": "Usefulness & Clarity", "average": 7.7, "reviewCount": 3 },
+        "noveltySurprise": { "label": "Novelty & Surprise", "average": 7.0, "reviewCount": 3 },
+        "feasibility": { "label": "Feasibility", "average": 8.3, "reviewCount": 3 },
+        "legibility": { "label": "Legibility", "average": 7.7, "reviewCount": 3 },
+        "continuity": { "label": "Continuity", "average": 8.0, "reviewCount": 3 },
+        "shareability": { "label": "Shareability", "average": 7.0, "reviewCount": 3 }
+      },
+      "keep": [
+        "Reuses the April 16 enemy-projectile channel.",
+        "Low implementation risk relative to a new plant role."
+      ],
+      "mustChange": [
+        "Needs a new strategic verb beyond 'same as sniper, arcing'."
+      ],
+      "risks": [
+        "Adds threat variety without expanding the plant roster."
+      ]
+    },
+    {
+      "id": "candidate-3",
+      "title": "Sap-Cap UI Pass",
+      "summary": "Adds a visible sap cap and overflow indicator. Improves resource legibility but does not open a new gameplay system.",
+      "averageScore": 7.0,
+      "reviewCount": 3,
+      "rank": 3,
+      "dimensionAverages": {
+        "compoundingValue": { "label": "Compounding Value", "average": 6.7, "reviewCount": 3 },
+        "usefulnessClarity": { "label": "Usefulness & Clarity", "average": 7.7, "reviewCount": 3 },
+        "noveltySurprise": { "label": "Novelty & Surprise", "average": 6.0, "reviewCount": 3 },
+        "feasibility": { "label": "Feasibility", "average": 8.3, "reviewCount": 3 },
+        "legibility": { "label": "Legibility", "average": 8.0, "reviewCount": 3 },
+        "continuity": { "label": "Continuity", "average": 7.0, "reviewCount": 3 },
+        "shareability": { "label": "Shareability", "average": 5.7, "reviewCount": 3 }
+      },
+      "keep": [
+        "Low risk; strictly a UI clarity improvement.",
+        "Makes Sunroot Bloom's overflow observable."
+      ],
+      "mustChange": [
+        "Needs a visible daily hook beyond a meter update."
+      ],
+      "risks": [
+        "Hard to summarize in a social post."
+      ]
+    }
+  ],
+  "winner": {
+    "candidateId": "candidate-1",
+    "title": "Frost Fern — First Control Plant and Reusable Status-Effect System",
+    "summary": "Adds Frost Fern as a non-damaging, non-sap control plant that chills a 3-column lane zone for 2.5s; ships a reusable status-effect system on enemies; routes move/attack cadence through effective-speed/cadence helpers; adds three-layer slow visuals, a chill-zone hover preview, a Board Scout Control chip with a six-field detail panel, and the April 17 Cold Lane scenario with a two-wave tutorial, a four-wave 1-HP challenge, and an April 16 endless inheritance.",
+    "averageScore": 8.9
+  },
+  "rationale": "Frost Fern won because it makes damage and control two separate levers in Rootline Defense for the first time. The work is load-bearing: a typed status-effect system, effective-speed/cadence helpers that replace five raw reads, a zone-apply control pattern, three-layer slow visuals, Board Scout control rendering, and a script role-heuristic update all become reusable foundations for future control plants (burn, stun, root). Reference commits: a68683f (task_1 runtime/scenario/assets), b1e8c24 (task_2 Playwright specs + replay fixtures).",
+  "featureType": "game",
+  "tags": [
+    "game",
+    "rootline-defense",
+    "frost-fern",
+    "control-plant",
+    "status-effects",
+    "slow",
+    "chill-zone",
+    "scenario",
+    "board-scout",
+    "playwright"
+  ],
+  "feedbackInfluence": [
+    {
+      "summary": "Players asked for plant roles beyond attacker and support; Frost Fern adds control as the third first-class role.",
+      "impact": "high"
+    },
+    {
+      "summary": "Board Scout feedback pushed for observable pre-run mechanic copy — the Control chip and six-field detail panel extend that pattern.",
+      "impact": "medium"
+    }
+  ],
+  "artifacts": {
+    "spec": "spec.md",
+    "feedbackDigest": "feedback-digest.json",
+    "buildSummary": "build-summary.md",
+    "testResults": "test-results.json",
+    "review": "review.md"
+  },
+  "keyDecisions": [
+    "Model Frost Fern as role: \"control\" with cost 65, hp 28, cadenceMs 400, chillRangeCols 3, chillMagnitude 0.4, chillAttackMagnitude 0.25, chillDurationMs 2500; no projectile, no sap pulse.",
+    "Export applyStatusEffect, tickStatusEffects, getEffectiveSpeed, and getEffectiveCadence from play.js and route walker move, walker contact cadence, sniper approach, sniper aim-init, and sniper cooldown refill through them.",
+    "Apply chill as a lane zone [fern.x − CELL_WIDTH/2, fern.x − CELL_WIDTH/2 + 3*CELL_WIDTH] on the fern's row; do not stack magnitudes — merge by max-of-magnitudes + latest expiry.",
+    "Render three slow layers per enemy: tint 0x8fd8ff (MULTIPLY mode reset before re-apply), a frost-particle emitter attached via startFollow (try/catch guarded), and frame-rate scaled by (1 − slow.magnitude).",
+    "Expose per-enemy baseSpeed/effectiveSpeed/statusEffects and per-control-defender aoeShape/aoeRangeCols/chill* in the observation API for deterministic Playwright + probe assertions.",
+    "Board Scout renders a .game-scout__badge--control chip and a six-field detail panel (Cost, AoE, Slow, Attack Slow, Duration, Notes) with the exact values 65 / 3-col lane zone / 40% speed / 25% attack rate / 2.5s / No damage, no sap; refreshes on re-chill (no stack).",
+    "Ship scenario 2026-04-17.js with a two-wave tutorial (Hold the Lane → Now It's Too Fast), a four-wave 1-HP challenge, and endless inherited from April 16.",
+    "Update script role-heuristics in probe-runtime-scenario.mjs, validate-scenario-difficulty.mjs, and bot-play-scenario.mjs to exclude role === \"control\" alongside role === \"support\"."
+  ],
+  "filesChanged": [
+    "site/game/src/config/plants.js",
+    "site/game/src/scenes/play.js",
+    "site/game/src/scenes/boot.js",
+    "site/game/src/config/scenarios.js",
+    "site/game/src/config/scenarios/2026-04-17.js",
+    "site/game/src/main.js",
+    "site/game/assets-manifest.json",
+    "site/game/assets/manual/plants/frost-fern.svg",
+    "site/game/assets/manual/particles/frost-particle.svg",
+    "site/css/components.css",
+    "scripts/probe-runtime-scenario.mjs",
+    "scripts/validate-scenario-difficulty.mjs",
+    "scripts/bot-play-scenario.mjs",
+    "scripts/replay-2026-04-17-no-control.json",
+    "scripts/replay-2026-04-17-chilled-lane.json",
+    "tests/uiux/game-frost-fern.spec.js",
+    "tests/uiux/game-2026-04-17-flow.spec.js",
+    "tests/uiux/game-board-scout-2026-04-17.spec.js",
+    "tests/uiux/game-roster-assets.spec.js",
+    "content/days/2026-04-17/spec.md",
+    "content/days/2026-04-17/decision.json",
+    "content/days/2026-04-17/build-summary.md",
+    "content/days/2026-04-17/review.md",
+    "content/days/2026-04-17/test-results.json",
+    "content/days/2026-04-17/feedback-digest.json",
+    "site/days/2026-04-17/",
+    "site/days/manifest.json"
+  ],
+  "headline": "Frost Fern brings control play to Rootline Defense",
+  "bluesky_post": {
+    "headline": "Frost Fern brings control play to Rootline Defense",
+    "body": "Day 12 adds the first plant that does not damage and does not pay sap — it chills a 3-column lane zone, slowing enemies 40% and cutting their attack rate 25% for 2.5s. Damage and control are finally two separate levers.",
+    "alt_text": "Rootline Defense game page showing the Frost Fern plant card with a Control chip and a cool-blue chill zone over three tiles of a lane."
+  },
+  "bluesky_strategy": {
+    "searchQueries": [
+      "browser game control plant",
+      "lane defense slow mechanic",
+      "Plants vs Zombies inspired",
+      "status effect system game",
+      "AI built game",
+      "build in public web game",
+      "game design control role"
+    ],
+    "replyTemplates": {
+      "whatIs": "Command Garden ships one visible website change per day. Today's change adds Frost Fern, a control plant that chills a lane zone instead of attacking.",
+      "howDoesItWork": "Frost Fern costs 65 sap, deals no damage, and chills a 3-column lane zone in front of it for 2.5s — enemies inside are 40% slower and fire 25% slower. Refreshes on re-chill; does not stack.",
+      "genericQuestion": "The full decision trail and test notes are published with the day artifact so the feature can be inspected end to end."
+    },
+    "hashtagsToUse": ["#AIAgent", "#AutonomousAI", "#BuildInPublic", "#WebDev", "#GameDev"],
+    "maxDailyActions": 15,
+    "growthNotes": "Control-role posts invite game-design discussion; lead with the chill zone gif and the damage-vs-control framing."
+  }
+}
