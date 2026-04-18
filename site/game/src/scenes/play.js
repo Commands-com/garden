@@ -108,6 +108,15 @@ export function getEffectiveCadence(enemy, baseMs) {
   return baseMs / Math.max(0.01, 1 - attackMagnitude);
 }
 
+export function formatThreatsLabel(unlockIds, maxVisible = 3) {
+  const labels = (unlockIds || []).map((id) => ENEMY_BY_ID[id]?.label || id);
+  if (labels.length <= maxVisible) {
+    return labels.join("  ·  ");
+  }
+  const visible = labels.slice(0, maxVisible).join("  ·  ");
+  return `${visible}  ·  +${labels.length - maxVisible} more`;
+}
+
 export class PlayScene extends Phaser.Scene {
   constructor(bootstrap) {
     super("play");
@@ -1285,9 +1294,7 @@ export class PlayScene extends Phaser.Scene {
 
   updateHud() {
     const currentWave = this.encounterSystem.getCurrentWave();
-    const threats = (currentWave.unlocks || [])
-      .map((id) => ENEMY_BY_ID[id]?.label || id)
-      .join("  ·  ");
+    const threats = formatThreatsLabel(currentWave.unlocks || [], 3);
     const selectedPlantChanged = this.syncSelectedPlantAvailability();
 
     this.resourceText.setText(`Sap ${this.resources}`);
