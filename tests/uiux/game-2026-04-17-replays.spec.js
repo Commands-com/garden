@@ -287,7 +287,7 @@ test.describe("April 17 replay probes (natural outcomes)", () => {
     expect(runtimeErrors, runtimeErrors.join("\n")).toEqual([]);
   });
 
-  test("replay-2026-04-17-no-control.json loses at the ram window", async ({
+  test("replay-2026-04-17-no-control.json loses before clear without Frost control", async ({
     page,
   }) => {
     test.setTimeout(120000);

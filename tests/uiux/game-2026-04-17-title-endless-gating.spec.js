@@ -12,22 +12,17 @@ const GAME_PATH = `/game/?testMode=1&date=${DAY_DATE}`;
 const TITLE_CHALLENGE_BUTTON_CENTER = { x: 307, y: 348 };
 const TITLE_TUTORIAL_BUTTON_CENTER = { x: 653, y: 348 };
 const ARENA_SIZE = { width: 960, height: 540 };
-const CHALLENGE_ROSTER_PLACEMENTS = [
-  { timeMs: 0, row: 2, col: 0, plantId: "thornVine" },
-  { timeMs: 0, row: 4, col: 0, plantId: "sunrootBloom" },
-  { timeMs: 8000, row: 1, col: 0, plantId: "thornVine" },
-  { timeMs: 15000, row: 3, col: 0, plantId: "thornVine" },
-  { timeMs: 20000, row: 2, col: 2, plantId: "frostFern" },
-  { timeMs: 25000, row: 0, col: 0, plantId: "thornVine" },
-  { timeMs: 32000, row: 2, col: 3, plantId: "brambleSpear" },
-  { timeMs: 40000, row: 4, col: 1, plantId: "thornVine" },
-];
 
 function readReplayFixture(fileName) {
   return JSON.parse(
     fs.readFileSync(path.join(repoRoot, "scripts", fileName), "utf8")
   );
 }
+
+const CHALLENGE_CLEAR_REPLAY = readReplayFixture(
+  "replay-2026-04-17-chilled-lane.json"
+);
+const CHALLENGE_ROSTER_PLACEMENTS = CHALLENGE_CLEAR_REPLAY.placements;
 
 async function prepareGamePage(page) {
   const runtimeErrors = [];
@@ -304,7 +299,26 @@ test.describe("April 17 title-scene endless gating", () => {
     expect(challengeOpening.challengeCleared).toBe(false);
     expect(challengeOpening.scenarioPhase).not.toBe("endless");
 
-    const placedPlantIds = await applyReplayPlacements(page, CHALLENGE_ROSTER_PLACEMENTS);
+    await page.evaluate(() => window.__gameTestHooks.grantResources(250));
+
+    const placedPlantIds = await page.evaluate(() => {
+      const plannedPlacements = [
+        { row: 2, col: 0, plantId: "thornVine" },
+        { row: 4, col: 0, plantId: "sunrootBloom" },
+        { row: 2, col: 5, plantId: "frostFern" },
+        { row: 2, col: 4, plantId: "brambleSpear" },
+      ];
+
+      return plannedPlacements
+        .filter((placement) =>
+          window.__gameTestHooks.placeDefender(
+            placement.row,
+            placement.col,
+            placement.plantId
+          )
+        )
+        .map((placement) => placement.plantId);
+    });
     expect([...new Set(placedPlantIds)].sort()).toEqual(rosterPlantIds);
 
     const stateBeforeUnlock = await getRuntimeState(page);

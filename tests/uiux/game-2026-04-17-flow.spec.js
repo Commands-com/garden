@@ -9,25 +9,6 @@ const {
 
 const DAY_DATE = "2026-04-17";
 const GAME_PATH = `/game/?testMode=1&date=${DAY_DATE}`;
-// Mirrors scripts/replay-2026-04-17-chilled-lane.json placements exactly.
-// The replay is a separate deterministic gate (game-2026-04-17-replays.spec.js)
-// and this flow spec exercises the same placements in context (tutorial →
-// challenge → endless) so the "plant actually clears the board" signal is
-// verified naturally — no finishScenario() bypass.
-const CHALLENGE_ROSTER_PLACEMENTS = [
-  { timeMs: 0, row: 2, col: 0, plantId: "thornVine" },
-  { timeMs: 0, row: 4, col: 0, plantId: "sunrootBloom" },
-  { timeMs: 8000, row: 1, col: 0, plantId: "thornVine" },
-  { timeMs: 12000, row: 3, col: 0, plantId: "thornVine" },
-  { timeMs: 20000, row: 2, col: 5, plantId: "frostFern" },
-  { timeMs: 25000, row: 0, col: 0, plantId: "thornVine" },
-  { timeMs: 30000, row: 4, col: 1, plantId: "thornVine" },
-  { timeMs: 35000, row: 2, col: 1, plantId: "thornVine" },
-  { timeMs: 40000, row: 0, col: 1, plantId: "thornVine" },
-  { timeMs: 48000, row: 4, col: 2, plantId: "thornVine" },
-  { timeMs: 56000, row: 4, col: 3, plantId: "thornVine" },
-  { timeMs: 68000, row: 2, col: 4, plantId: "brambleSpear" },
-];
 
 function getScoutCardByName(page, containerSelector, name) {
   return page
@@ -42,6 +23,13 @@ function readReplayFixture(fileName) {
     fs.readFileSync(path.join(repoRoot, "scripts", fileName), "utf8")
   );
 }
+
+// Keep the flow spec pointed at the same canonical replay that the dedicated
+// replay gate verifies, rather than drifting via a copied placement list.
+const CHALLENGE_CLEAR_REPLAY = readReplayFixture(
+  "replay-2026-04-17-chilled-lane.json"
+);
+const CHALLENGE_ROSTER_PLACEMENTS = CHALLENGE_CLEAR_REPLAY.placements;
 
 async function prepareGamePage(page) {
   const runtimeErrors = [];

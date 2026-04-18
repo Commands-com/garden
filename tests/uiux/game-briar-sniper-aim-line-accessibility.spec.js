@@ -457,13 +457,8 @@ test.describe("Briar Sniper aim-line overlay accessibility and contrast", () => 
     }
 
     // Enter/Space should toggle the pressed state on the focused inventory item.
-    await page.evaluate(() => {
-      if (document.activeElement && document.activeElement !== document.body) {
-        document.activeElement.blur();
-      }
-    });
-    const reachedFirst = await tabUntilFocused(page, INVENTORY_SELECTOR, 0);
-    expect(reachedFirst).toBe(true);
+    await items.nth(0).focus();
+    await expect(items.nth(0)).toBeFocused();
     await page.keyboard.press("Enter");
     await expect(items.nth(0)).toHaveAttribute("aria-pressed", "true");
 

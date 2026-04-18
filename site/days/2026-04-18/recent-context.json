@@ -1,0 +1,1598 @@
+{
+  "recentDecisions": [
+    {
+      "date": "2026-04-17",
+      "decision": {
+        "schemaVersion": 2,
+        "runDate": "2026-04-17",
+        "generatedAt": "2026-04-17T13:57:19.784Z",
+        "scoringDimensions": [
+          {
+            "id": "compoundingValue",
+            "label": "Compounding Value"
+          },
+          {
+            "id": "usefulnessClarity",
+            "label": "Usefulness & Clarity"
+          },
+          {
+            "id": "noveltySurprise",
+            "label": "Novelty & Surprise"
+          },
+          {
+            "id": "feasibility",
+            "label": "Feasibility"
+          },
+          {
+            "id": "legibility",
+            "label": "Legibility"
+          },
+          {
+            "id": "continuity",
+            "label": "Continuity"
+          },
+          {
+            "id": "shareability",
+            "label": "Shareability"
+          }
+        ],
+        "judgePanel": [
+          {
+            "agentId": "explore_explorer_0",
+            "displayName": "GPT (Visitor)",
+            "conceptKey": "openai",
+            "modelFamily": "gpt",
+            "provider": "codex_cli",
+            "model": "gpt-5.4",
+            "lens": "visitor"
+          },
+          {
+            "agentId": "explore_explorer_1",
+            "displayName": "Claude (Gardener)",
+            "conceptKey": "claude",
+            "modelFamily": "claude",
+            "provider": "claude",
+            "model": "opus",
+            "lens": "gardener"
+          },
+          {
+            "agentId": "explore_explorer_2",
+            "displayName": "Gemini Pro (Explorer)",
+            "conceptKey": "gemini",
+            "modelFamily": "gemini",
+            "provider": "gemini_cli",
+            "model": "gemini-3.1-pro-preview",
+            "lens": "explorer"
+          }
+        ],
+        "summary": "Rootline Defense now has its first control plant. Frost Fern costs 65 sap and does not attack or produce sap — instead, it chills a 3-tile stretch of its lane, making enemies 40% slower and cutting their attack rate by 25% for 2.5 seconds. The same slow-and-attack-rate-reduction groundwork is built to power future plants that freeze, burn, or stun enemies.",
+        "candidates": [
+          {
+            "id": "claude",
+            "title": "Frost Fern: First Control Plant and Status-Effect System for Rootline Defense",
+            "summary": "A slowing defender that introduces Rootline Defense's first reusable status-effect system, opening the \"control\" archetype after thorn (DPS), bramble (piercing), sunroot (economy), and the Apr 16 sniper's ranged threat.",
+            "averageScore": 9,
+            "reviewCount": 2,
+            "dimensionAverages": {
+              "compoundingValue": {
+                "label": "Compounding Value",
+                "average": 10,
+                "reviewCount": 2
+              },
+              "usefulnessClarity": {
+                "label": "Usefulness & Clarity",
+                "average": 8.5,
+                "reviewCount": 2
+              },
+              "noveltySurprise": {
+                "label": "Novelty & Surprise",
+                "average": 8,
+                "reviewCount": 2
+              },
+              "feasibility": {
+                "label": "Feasibility",
+                "average": 7,
+                "reviewCount": 2
+              },
+              "legibility": {
+                "label": "Legibility",
+                "average": 8.5,
+                "reviewCount": 2
+              },
+              "continuity": {
+                "label": "Continuity",
+                "average": 9,
+                "reviewCount": 2
+              },
+              "shareability": {
+                "label": "Shareability",
+                "average": 8.5,
+                "reviewCount": 2
+              }
+            },
+            "reviewerBreakdown": [
+              {
+                "reviewer": {
+                  "agentId": "explore_explorer_2",
+                  "displayName": "Gemini Pro (Explorer)",
+                  "conceptKey": "gemini",
+                  "modelFamily": "gemini",
+                  "provider": "gemini_cli",
+                  "model": "gemini-3.1-pro-preview",
+                  "lens": "explorer"
+                },
+                "overallScore": 9,
+                "dimensionScores": {
+                  "compoundingValue": 10,
+                  "usefulnessClarity": 9,
+                  "noveltySurprise": 8,
+                  "feasibility": 8,
+                  "legibility": 9,
+                  "continuity": 9,
+                  "shareability": 9
+                },
+                "keep": [
+                  "The introduction of a new plant archetype (\"control\") and the foundational status-effect system. This is a highly compounding and genre-appropriate addition.",
+                  "The clear articulation of the problem (lack of tempo tools beyond raw DPS).",
+                  "The detailed prototype focus on the status-effect system's reusability.",
+                  "The strong alignment with the PvZ-style lane-defense identity (e.g., Snow Pea parallel).",
+                  "The explicit identification of in-scope and out-of-scope items, demonstrating strong implementation planning."
+                ],
+                "mustChange": [
+                  "The visual feedback for the slow effect could be elaborated further, perhaps suggesting more than just a tint and outline (e.g., specific particle effects) to ensure high legibility.",
+                  "While the simulator's handling of slow is mentioned, more detail on how the simulator specifically models \"slow\" and its interaction with other enemy behaviors would be beneficial."
+                ],
+                "risks": [
+                  "Balance risk: Slow is a powerful mechanic, and getting the magnitude and duration right is critical.",
+                  "Simulator fidelity risk: The accuracy of the simulator's modeling of the slow effect is crucial for valid difficulty verdicts.",
+                  "Archetype confusion risk: Ensuring \"control\" is distinct from \"support\" in player perception."
+                ],
+                "whyItWinsOrLoses": [
+                  "This concept is a standout because it introduces a core, compounding game mechanic that directly enhances the PvZ-style lane-defense identity. The status-effect system is a load-bearing piece of infrastructure that enables a wide array of future control plants and enemies, offering immense compounding value. It addresses a fundamental gap in the current plant roster and provides new strategic dept"
+                ]
+              },
+              {
+                "reviewer": {
+                  "agentId": "explore_explorer_0",
+                  "displayName": "GPT (Visitor)",
+                  "conceptKey": "openai",
+                  "modelFamily": "gpt",
+                  "provider": "codex_cli",
+                  "model": "gpt-5.4",
+                  "lens": "visitor"
+                },
+                "overallScore": 9,
+                "dimensionScores": {
+                  "compoundingValue": 10,
+                  "usefulnessClarity": 8,
+                  "noveltySurprise": 8,
+                  "feasibility": 6,
+                  "legibility": 8,
+                  "continuity": 9,
+                  "shareability": 8
+                },
+                "keep": [
+                  "It correctly identifies that the real product is not just “a frost plant” but a reusable status-effect contract, which is the strongest compounding move in the current codebase.",
+                  "The brief is the best prototype seed because it is explicit about what must be proven in the prototype and what should remain out of scope.",
+                  "It fits the recent arc well: April 15, 2026 added support-role branching, and April 16, 2026 added behavior branching, so a control-role branch is a coherent next step."
+                ],
+                "mustChange": [
+                  "It needs a hard downscope on validation. Modeling slow in `validate:scenario-difficulty` plus shipping the runtime feature plus shipping the board is probably too much for one day; the prototype should choose either simulator support or an explicit indeterminate/runtime-proof path.",
+                  "The post-run leaderboard usage summary feels secondary and should be cut unless it is needed for the core proof.",
+                  "The brief should simplify the player-facing promise. “Buy time when DPS is the wrong answer” is the right message; the current writeup sometimes drifts into infrastructure-first language."
+                ],
+                "risks": [
+                  "This is the most ambitious concept here, and the validator/test burden is the main threat to one-run feasibility.",
+                  "If slow tuning is even slightly off, it can trivialize Rams, soften sniper pressure too much, or make endless mode sloppy instead of knife-edge.",
+                  "A control plant is less instantly readable than a tank plant unless the visual feedback is very crisp."
+                ],
+                "whyItWinsOrLoses": [
+                  "It wins because it is the stronger prototype-driving concept: more compounding, less repetitive, and better decomposed around what the prototype must prove. It loses only on scope pressure, which can be fixed by trimming validation ambition before Prototype Room."
+                ]
+              }
+            ],
+            "rank": 1,
+            "keep": [
+              "The introduction of a new plant archetype (\"control\") and the foundational status-effect system. This is a highly compounding and genre-appropriate addition.",
+              "The clear articulation of the problem (lack of tempo tools beyond raw DPS).",
+              "The detailed prototype focus on the status-effect system's reusability.",
+              "The strong alignment with the PvZ-style lane-defense identity (e.g., Snow Pea parallel).",
+              "The explicit identification of in-scope and out-of-scope items, demonstrating strong implementation planning.",
+              "It correctly identifies that the real product is not just “a frost plant” but a reusable status-effect contract, which is the strongest compounding move in the current codebase.",
+              "The brief is the best prototype seed because it is explicit about what must be proven in the prototype and what should remain out of scope.",
+              "It fits the recent arc well: April 15, 2026 added support-role branching, and April 16, 2026 added behavior branching, so a control-role branch is a coherent next step."
+            ],
+            "mustChange": [
+              "The visual feedback for the slow effect could be elaborated further, perhaps suggesting more than just a tint and outline (e.g., specific particle effects) to ensure high legibility.",
+              "While the simulator's handling of slow is mentioned, more detail on how the simulator specifically models \"slow\" and its interaction with other enemy behaviors would be beneficial.",
+              "It needs a hard downscope on validation. Modeling slow in `validate:scenario-difficulty` plus shipping the runtime feature plus shipping the board is probably too much for one day; the prototype should choose either simulator support or an explicit indeterminate/runtime-proof path.",
+              "The post-run leaderboard usage summary feels secondary and should be cut unless it is needed for the core proof.",
+              "The brief should simplify the player-facing promise. “Buy time when DPS is the wrong answer” is the right message; the current writeup sometimes drifts into infrastructure-first language."
+            ],
+            "risks": [
+              "Balance risk: Slow is a powerful mechanic, and getting the magnitude and duration right is critical.",
+              "Simulator fidelity risk: The accuracy of the simulator's modeling of the slow effect is crucial for valid difficulty verdicts.",
+              "Archetype confusion risk: Ensuring \"control\" is distinct from \"support\" in player perception.",
+              "This is the most ambitious concept here, and the validator/test burden is the main threat to one-run feasibility.",
+              "If slow tuning is even slightly off, it can trivialize Rams, soften sniper pressure too much, or make endless mode sloppy instead of knife-edge.",
+              "A control plant is less instantly readable than a tank plant unless the visual feedback is very crisp."
+            ]
+          },
+          {
+            "id": "gemini",
+            "title": "Amber Wall: The First Defensive Tank for Rootline Defense",
+            "summary": "Introduces a high-health, non-attacking \"tank\" plant that blocks enemies, screens ranged bolts, and counts toward lane defender thresholds, providing the essential tactical layer for surviving high-pressure waves.",
+            "averageScore": 8,
+            "reviewCount": 2,
+            "dimensionAverages": {
+              "compoundingValue": {
+                "label": "Compounding Value",
+                "average": 8,
+                "reviewCount": 2
+              },
+              "usefulnessClarity": {
+                "label": "Usefulness & Clarity",
+                "average": 9,
+                "reviewCount": 2
+              },
+              "noveltySurprise": {
+                "label": "Novelty & Surprise",
+                "average": 6,
+                "reviewCount": 2
+              },
+              "feasibility": {
+                "label": "Feasibility",
+                "average": 9,
+                "reviewCount": 2
+              },
+              "legibility": {
+                "label": "Legibility",
+                "average": 8.5,
+                "reviewCount": 2
+              },
+              "continuity": {
+                "label": "Continuity",
+                "average": 8,
+                "reviewCount": 2
+              },
+              "shareability": {
+                "label": "Shareability",
+                "average": 7.5,
+                "reviewCount": 2
+              }
+            },
+            "reviewerBreakdown": [
+              {
+                "reviewer": {
+                  "agentId": "explore_explorer_0",
+                  "displayName": "GPT (Visitor)",
+                  "conceptKey": "openai",
+                  "modelFamily": "gpt",
+                  "provider": "codex_cli",
+                  "model": "gpt-5.4",
+                  "lens": "visitor"
+                },
+                "overallScore": 8,
+                "dimensionScores": {
+                  "compoundingValue": 8,
+                  "usefulnessClarity": 9,
+                  "noveltySurprise": 6,
+                  "feasibility": 9,
+                  "legibility": 8,
+                  "continuity": 7,
+                  "shareability": 8
+                },
+                "keep": [
+                  "It identifies the clearest missing PvZ verb in the current roster: a true blocker that buys time instead of adding more DPS.",
+                  "The prototype focus is strong and concrete: block walkers, screen sniper bolts, and satisfy Glass Ram lane-threshold logic.",
+                  "It is easy to explain to players and easy to market socially: “the game now has its first wall plant” is immediately legible."
+                ],
+                "mustChange": [
+                  "It needs to confront the April 13, 2026 `Shield Fern — Defensive Plant with Damage Absorption` near-duplicate directly; otherwise it reads like a repeat of a very recent rejected candidate.",
+                  "The brief needs a sharper statement of what today’s board must prove beyond “the wall is useful.” It should explicitly require that the previous roster no longer has a winning line.",
+                  "The user-visible feedback loop needs more definition. A tank with only high HP is not enough; the prototype should prove players can read when it is holding, failing, and worth replacing."
+                ],
+                "risks": [
+                  "The concept is very close to a recently proposed but unshipped idea, which weakens continuity with the seed’s “avoid repeating the last 7 days” constraint.",
+                  "If it screens snipers, counts for Rams, and soaks huge damage at a low cost, it can collapse too many problems into one plant and flatten the strategy space.",
+                  "Without strong damage-state feedback, the plant may be mechanically useful but visually dull, which hurts both UX and shareability."
+                ],
+                "whyItWinsOrLoses": [
+                  "It wins on immediate usefulness and one-day feasibility. It loses comparatively because it is the more conservative concept and feels partially pre-spent by the recent `Shield Fern` candidate."
+                ]
+              },
+              {
+                "reviewer": {
+                  "agentId": "explore_explorer_1",
+                  "displayName": "Claude (Gardener)",
+                  "conceptKey": "claude",
+                  "modelFamily": "claude",
+                  "provider": "claude",
+                  "model": "opus",
+                  "lens": "gardener"
+                },
+                "overallScore": 8,
+                "dimensionScores": {
+                  "compoundingValue": 8,
+                  "usefulnessClarity": 9,
+                  "noveltySurprise": 6,
+                  "feasibility": 9,
+                  "legibility": 9,
+                  "continuity": 9,
+                  "shareability": 7
+                },
+                "keep": [
+                  "Role-branch continuity with Apr 15 (`support`) and Apr 16 (`sniper` behavior). Adding `role: \"tank\"` is the right mutation seam and reuses the exact pattern the pipeline has already paid the cost for.",
+                  "The interaction matrix with existing systems is genuinely compounding: a tank that contributes to the Glass Ram `requiredDefendersInLane: 3` threshold and that can sink sniper bolts turns two *existing* enemy rules from friction into strategic levers. Very little new logic buys a lot of new play.",
+                  "Crisp non-mock list: exact `PLANT_DEFINITIONS` fields, exact runtime seams (`getCombatDefenderCountInLane`, `findSniperTarget`), Board Scout \"Health\" stat swap mirroring Sunroot's \"Sap per Pulse\" precedent. This is a buildable spec.",
+                  "Clean implementation boundaries: no healing, no regen, no multi-lane effects. The purity of \"linear damage sponge\" is the right scope discipline for day one."
+                ],
+                "mustChange": [
+                  "The 240 HP is pre-committed in the brief; it should be *validator-determined*, not chosen up front. State the process (\"run `validate:scenario-difficulty`, land in the 160–260 HP band, pick the lowest value that still makes the roster expansion gate pass\") rather than the number.",
+                  "Sniper-screening policy is a real extension of the Apr 16 contract, not a reuse. Apr 16 explicitly ruled that *support plants do not screen*. The brief needs to articulate the new principle cleanly — \"screening is a combat-role property, and `tank` is combat, so tanks screen; `support` still does not\" — and make that an assertable Playwright test, not an implementation detail.",
+                  "Same for the Glass Ram defender-count rule. The brief asserts the tank counts, which is defensible but is another Apr 16-era policy clarification; it needs a targeted test that a 3-wall lane nullifies the under-defended penalty without any attackers present.",
+                  "The tutorial/challenge composition is underspecified. The April 17 scenario needs an explicit \"this plant is *required* to clear, and the Apr 16 roster can no longer clear\" claim with a validator plan, otherwise this is just a fourth plant on the bench.",
+                  "Damaged-state visuals are listed only as a \"risk.\" That's not a risk — it is a ship criterion. An HP-pipped or cracked-amber sprite state is the single most important legibility cue for a tank and should be in the non-mock section."
+                ],
+                "risks": [
+                  "**Meta collapse**: A cheap bolt-sink and defender-count padder could become mandatory in every lane, turning strategic depth into \"always open with wall → economy → attacker.\" Mitigation: slightly higher cost (60–75 sap, not 50) or a lane cap, chosen via validator, not vibes.",
+                  "**Screening drift**: If tanks screen bolts *and* the sniper's aim target can re-pick on screen-kill, the interaction math can get subtle (tank screens for 2s then dies, sniper re-aims at the real target mid-flight?). Needs explicit tile-snapshot-vs-re-pick rules.",
+                  "**UI overflow for 4-plant tray** is real; the brief flags it but doesn't commit to the fix. Mobile layout is already tight with Board Scout present.",
+                  "**Lower novelty ceiling**: \"Tank\" is the most predictable next move in a PvZ-inspired game. The review panel will recognize it as table-stakes rather than surprising; that caps `noveltySurprise` even with excellent execution."
+                ],
+                "whyItWinsOrLoses": [
+                  "The strongest peer brief on **feasibility, continuity, and legibility**. It picks an interaction-heavy plant that multiplies the value of every existing rule (sniper screening, Ram threshold, Sunroot backline protection) rather than a new system. Loses a little on novelty and on shareability — \"meet the tank\" is a weaker gif than a status-effect tint or a replay demo — and the HP, screening, and R"
+                ]
+              }
+            ],
+            "rank": 2,
+            "keep": [
+              "It identifies the clearest missing PvZ verb in the current roster: a true blocker that buys time instead of adding more DPS.",
+              "The prototype focus is strong and concrete: block walkers, screen sniper bolts, and satisfy Glass Ram lane-threshold logic.",
+              "It is easy to explain to players and easy to market socially: “the game now has its first wall plant” is immediately legible.",
+              "Role-branch continuity with Apr 15 (`support`) and Apr 16 (`sniper` behavior). Adding `role: \"tank\"` is the right mutation seam and reuses the exact pattern the pipeline has already paid the cost for.",
+              "The interaction matrix with existing systems is genuinely compounding: a tank that contributes to the Glass Ram `requiredDefendersInLane: 3` threshold and that can sink sniper bolts turns two *existing* enemy rules from friction into strategic levers. Very little new logic buys a lot of new play.",
+              "Crisp non-mock list: exact `PLANT_DEFINITIONS` fields, exact runtime seams (`getCombatDefenderCountInLane`, `findSniperTarget`), Board Scout \"Health\" stat swap mirroring Sunroot's \"Sap per Pulse\" precedent. This is a buildable spec.",
+              "Clean implementation boundaries: no healing, no regen, no multi-lane effects. The purity of \"linear damage sponge\" is the right scope discipline for day one."
+            ],
+            "mustChange": [
+              "It needs to confront the April 13, 2026 `Shield Fern — Defensive Plant with Damage Absorption` near-duplicate directly; otherwise it reads like a repeat of a very recent rejected candidate.",
+              "The brief needs a sharper statement of what today’s board must prove beyond “the wall is useful.” It should explicitly require that the previous roster no longer has a winning line.",
+              "The user-visible feedback loop needs more definition. A tank with only high HP is not enough; the prototype should prove players can read when it is holding, failing, and worth replacing.",
+              "The 240 HP is pre-committed in the brief; it should be *validator-determined*, not chosen up front. State the process (\"run `validate:scenario-difficulty`, land in the 160–260 HP band, pick the lowest value that still makes the roster expansion gate pass\") rather than the number.",
+              "Sniper-screening policy is a real extension of the Apr 16 contract, not a reuse. Apr 16 explicitly ruled that *support plants do not screen*. The brief needs to articulate the new principle cleanly — \"screening is a combat-role property, and `tank` is combat, so tanks screen; `support` still does not\" — and make that an assertable Playwright test, not an implementation detail.",
+              "Same for the Glass Ram defender-count rule. The brief asserts the tank counts, which is defensible but is another Apr 16-era policy clarification; it needs a targeted test that a 3-wall lane nullifies the under-defended penalty without any attackers present.",
+              "The tutorial/challenge composition is underspecified. The April 17 scenario needs an explicit \"this plant is *required* to clear, and the Apr 16 roster can no longer clear\" claim with a validator plan, otherwise this is just a fourth plant on the bench.",
+              "Damaged-state visuals are listed only as a \"risk.\" That's not a risk — it is a ship criterion. An HP-pipped or cracked-amber sprite state is the single most important legibility cue for a tank and should be in the non-mock section."
+            ],
+            "risks": [
+              "The concept is very close to a recently proposed but unshipped idea, which weakens continuity with the seed’s “avoid repeating the last 7 days” constraint.",
+              "If it screens snipers, counts for Rams, and soaks huge damage at a low cost, it can collapse too many problems into one plant and flatten the strategy space.",
+              "Without strong damage-state feedback, the plant may be mechanically useful but visually dull, which hurts both UX and shareability.",
+              "**Meta collapse**: A cheap bolt-sink and defender-count padder could become mandatory in every lane, turning strategic depth into \"always open with wall → economy → attacker.\" Mitigation: slightly higher cost (60–75 sap, not 50) or a lane cap, chosen via validator, not vibes.",
+              "**Screening drift**: If tanks screen bolts *and* the sniper's aim target can re-pick on screen-kill, the interaction math can get subtle (tank screens for 2s then dies, sniper re-aims at the real target mid-flight?). Needs explicit tile-snapshot-vs-re-pick rules.",
+              "**UI overflow for 4-plant tray** is real; the brief flags it but doesn't commit to the fix. Mobile layout is already tight with Board Scout present.",
+              "**Lower novelty ceiling**: \"Tank\" is the most predictable next move in a PvZ-inspired game. The review panel will recognize it as table-stakes rather than surprising; that caps `noveltySurprise` even with excellent execution."
+            ]
+          },
+          {
+            "id": "openai",
+            "title": "Board Proof: Verified Clear Replay for Today’s Challenge",
+            "summary": "Turn Rootline Defense’s hidden replay harness into a public, optional “watch the winning line” mode that proves each daily board is winnable and teaches the exact strategy before a player commits a run.",
+            "averageScore": 7.5,
+            "reviewCount": 2,
+            "dimensionAverages": {
+              "compoundingValue": {
+                "label": "Compounding Value",
+                "average": 7.5,
+                "reviewCount": 2
+              },
+              "usefulnessClarity": {
+                "label": "Usefulness & Clarity",
+                "average": 8.5,
+                "reviewCount": 2
+              },
+              "noveltySurprise": {
+                "label": "Novelty & Surprise",
+                "average": 8.5,
+                "reviewCount": 2
+              },
+              "feasibility": {
+                "label": "Feasibility",
+                "average": 6.5,
+                "reviewCount": 2
+              },
+              "legibility": {
+                "label": "Legibility",
+                "average": 7.5,
+                "reviewCount": 2
+              },
+              "continuity": {
+                "label": "Continuity",
+                "average": 7.5,
+                "reviewCount": 2
+              },
+              "shareability": {
+                "label": "Shareability",
+                "average": 9.5,
+                "reviewCount": 2
+              }
+            },
+            "reviewerBreakdown": [
+              {
+                "reviewer": {
+                  "agentId": "explore_explorer_2",
+                  "displayName": "Gemini Pro (Explorer)",
+                  "conceptKey": "gemini",
+                  "modelFamily": "gemini",
+                  "provider": "gemini_cli",
+                  "model": "gemini-3.1-pro-preview",
+                  "lens": "explorer"
+                },
+                "overallScore": 8,
+                "dimensionScores": {
+                  "compoundingValue": 8,
+                  "usefulnessClarity": 9,
+                  "noveltySurprise": 9,
+                  "feasibility": 7,
+                  "legibility": 8,
+                  "continuity": 8,
+                  "shareability": 10
+                },
+                "keep": [
+                  "The core idea of publicly surfacing the replay harness to prove board winnability and teach strategy.",
+                  "The strong focus on addressing player trust and onboarding for challenging boards.",
+                  "The explicit leveraging of existing infrastructure (`replay harness`).",
+                  "The clear and concrete definition of user flows and non-mock functionality."
+                ],
+                "mustChange": [
+                  "The explanation of \"playback wiring inside the live runtime\" needs more detail, perhaps outlining the specific Phaser systems that need to be touched.",
+                  "Clarify how the \"verified clear\" is chosen and maintained against balance changes, beyond just \"failing visibly.\""
+                ],
+                "risks": [
+                  "The potential for the feature to spoil the puzzle for players who prefer a blind run.",
+                  "The brittleness of the canonical plan if tuning changes are frequent.",
+                  "The risk of framing it as \"the AI plays for you\" instead of \"proof and teaching.\""
+                ],
+                "whyItWinsOrLoses": [
+                  "This concept is strong, particularly in its utility for onboarding and its outstanding shareability. It directly addresses a critical pain point (difficulty perception) for a new, challenging game and leverages existing internal infrastructure. Its main strength comes from its novelty and social appeal, making it a powerful tool for audience growth. It complements the game without adding a new cor"
+                ]
+              },
+              {
+                "reviewer": {
+                  "agentId": "explore_explorer_1",
+                  "displayName": "Claude (Gardener)",
+                  "conceptKey": "claude",
+                  "modelFamily": "claude",
+                  "provider": "claude",
+                  "model": "opus",
+                  "lens": "gardener"
+                },
+                "overallScore": 7,
+                "dimensionScores": {
+                  "compoundingValue": 7,
+                  "usefulnessClarity": 8,
+                  "noveltySurprise": 8,
+                  "feasibility": 6,
+                  "legibility": 7,
+                  "continuity": 7,
+                  "shareability": 9
+                },
+                "keep": [
+                  "Correct identification of a dormant asset. The replay + AI-player harness already exists (`npm run replay:scenario`, `npm run bot:play-scenario`, `npm run codex:plan-scenario`); the brief is right that *exposing that proof publicly* is a real unlock, not a new surface bolted on top of nothing.",
+                  "The \"verified clear, not cinematic mockup\" principle is the right spine for the feature. It is what makes this different from a YouTube-style recording and what keeps it honest as boards get re-tuned.",
+                  "Strong problem framing tied to the current audience size (4 followers, 0.8 avg likes). A feature that is genuinely demoable — not decorative — is the correct read of the \"social appeal from real product value\" constraint.",
+                  "Opt-in placement is disciplined. Refusing to auto-play the solution keeps the puzzle intact for players who want a blind run. That's the right default.",
+                  "Tight out-of-scope list (no uploads, no spectator platform, no leaderboard-wide playback) — exactly the discipline needed to keep this a one-day ship."
+                ],
+                "mustChange": [
+                  "Canonical-plan **source** is not committed. \"A verified bot, Codex plan, or hand-authored replay\" is three different products with three different maintenance profiles. Pick one: recommend today's `npm run codex:plan-scenario` output, gated through `npm run replay:scenario`, with the plan file checked in under `content/days/2026-04-17/board-proof.json`. Name the source on the surface.",
+                  "**Staleness gating is the feature**. The brief mentions the proof \"must fail visibly if the plan drifts\" but doesn't wire that into the pipeline. Make it a CI gate: the daily runner re-replays the committed plan against the active runtime; if it fails, the Board Proof entry point hides itself and the day ships with a \"no verified clear available\" state rather than a broken demo.",
+                  "The handoff UX is named but not designed. Specify: can the player interrupt mid-replay? Does \"exit replay\" preserve placement learning for their own run? Does the replay speed up through boring stretches? At minimum, commit to a 2× speed default, a single interrupt button, and a one-line takeaway (\"Winning line used 3× Thorn Vine, 1× Sunroot, 1× Bramble Spear\") on exit so the feature teaches even ",
+                  "**Tutorial must not show this**. Tutorial is the teaching surface; Challenge is the puzzle. Board Proof attaches only to Challenge to avoid undermining the tutorial's scripted reveal.",
+                  "\"Verified clear\" needs a legend. What validator? What seed? What plant roster version? Surface those fields on the entry point so the proof is inspectable, not mystical."
+                ],
+                "risks": [
+                  "**Feasibility under-weighted**. The replay harness exists for test runs; running it inside the live Phaser scene with a visible DOM entry point, interruptibility, and graceful exit is noticeably more wiring than the brief implies. This is probably the hardest candidate on the slate to land cleanly in one day.",
+                  "**\"The AI plays for you\" narrative risk**. The brief names it but doesn't defuse it. Framing matters: calling it *Verified Clear* (not *AI Plays It*), and labeling the replay's provenance visibly, is the mitigation — otherwise Bluesky reads it as the autonomous pipeline skipping the human.",
+                  "**Genre-identity risk**. This is the one candidate on the slate that doesn't push the lane-defense product — it's onboarding/transparency. The constraint list permits that (\"site candidates must explain what new capability they unlock\"), and this does unlock one, but it's the candidate most exposed to a \"why are we not shipping more plants\" vote.",
+                  "**Spoiler risk for returning players** is real even with opt-in, because the entry point itself is a spoiler that a deterministic line exists. Acceptable, but worth naming.",
+                  "**Per-day maintenance tail**: every tuning pass from this day forward has to either re-generate or re-validate a plan, or the feature rots. That is a genuine ongoing tax."
+                ],
+                "whyItWinsOrLoses": [
+                  "Best peer brief on **novelty** and **shareability** and it leverages real, existing, under-exposed infrastructure — the most \"unfair advantage\" of any candidate. Loses on **feasibility** (live-runtime replay plus a CI staleness gate plus provenance UX is a lot of surfaces in one day) and on **genre continuity** (doesn't move Rootline Defense toward more PvZ identity; it moves the *site* toward mor"
+                ]
+              }
+            ],
+            "rank": 3,
+            "keep": [
+              "The core idea of publicly surfacing the replay harness to prove board winnability and teach strategy.",
+              "The strong focus on addressing player trust and onboarding for challenging boards.",
+              "The explicit leveraging of existing infrastructure (`replay harness`).",
+              "The clear and concrete definition of user flows and non-mock functionality.",
+              "Correct identification of a dormant asset. The replay + AI-player harness already exists (`npm run replay:scenario`, `npm run bot:play-scenario`, `npm run codex:plan-scenario`); the brief is right that *exposing that proof publicly* is a real unlock, not a new surface bolted on top of nothing.",
+              "The \"verified clear, not cinematic mockup\" principle is the right spine for the feature. It is what makes this different from a YouTube-style recording and what keeps it honest as boards get re-tuned.",
+              "Strong problem framing tied to the current audience size (4 followers, 0.8 avg likes). A feature that is genuinely demoable — not decorative — is the correct read of the \"social appeal from real product value\" constraint.",
+              "Opt-in placement is disciplined. Refusing to auto-play the solution keeps the puzzle intact for players who want a blind run. That's the right default.",
+              "Tight out-of-scope list (no uploads, no spectator platform, no leaderboard-wide playback) — exactly the discipline needed to keep this a one-day ship."
+            ],
+            "mustChange": [
+              "The explanation of \"playback wiring inside the live runtime\" needs more detail, perhaps outlining the specific Phaser systems that need to be touched.",
+              "Clarify how the \"verified clear\" is chosen and maintained against balance changes, beyond just \"failing visibly.\"",
+              "Canonical-plan **source** is not committed. \"A verified bot, Codex plan, or hand-authored replay\" is three different products with three different maintenance profiles. Pick one: recommend today's `npm run codex:plan-scenario` output, gated through `npm run replay:scenario`, with the plan file checked in under `content/days/2026-04-17/board-proof.json`. Name the source on the surface.",
+              "**Staleness gating is the feature**. The brief mentions the proof \"must fail visibly if the plan drifts\" but doesn't wire that into the pipeline. Make it a CI gate: the daily runner re-replays the committed plan against the active runtime; if it fails, the Board Proof entry point hides itself and the day ships with a \"no verified clear available\" state rather than a broken demo.",
+              "The handoff UX is named but not designed. Specify: can the player interrupt mid-replay? Does \"exit replay\" preserve placement learning for their own run? Does the replay speed up through boring stretches? At minimum, commit to a 2× speed default, a single interrupt button, and a one-line takeaway (\"Winning line used 3× Thorn Vine, 1× Sunroot, 1× Bramble Spear\") on exit so the feature teaches even",
+              "**Tutorial must not show this**. Tutorial is the teaching surface; Challenge is the puzzle. Board Proof attaches only to Challenge to avoid undermining the tutorial's scripted reveal.",
+              "\"Verified clear\" needs a legend. What validator? What seed? What plant roster version? Surface those fields on the entry point so the proof is inspectable, not mystical."
+            ],
+            "risks": [
+              "The potential for the feature to spoil the puzzle for players who prefer a blind run.",
+              "The brittleness of the canonical plan if tuning changes are frequent.",
+              "The risk of framing it as \"the AI plays for you\" instead of \"proof and teaching.\"",
+              "**Feasibility under-weighted**. The replay harness exists for test runs; running it inside the live Phaser scene with a visible DOM entry point, interruptibility, and graceful exit is noticeably more wiring than the brief implies. This is probably the hardest candidate on the slate to land cleanly in one day.",
+              "**\"The AI plays for you\" narrative risk**. The brief names it but doesn't defuse it. Framing matters: calling it *Verified Clear* (not *AI Plays It*), and labeling the replay's provenance visibly, is the mitigation — otherwise Bluesky reads it as the autonomous pipeline skipping the human.",
+              "**Genre-identity risk**. This is the one candidate on the slate that doesn't push the lane-defense product — it's onboarding/transparency. The constraint list permits that (\"site candidates must explain what new capability they unlock\"), and this does unlock one, but it's the candidate most exposed to a \"why are we not shipping more plants\" vote.",
+              "**Spoiler risk for returning players** is real even with opt-in, because the entry point itself is a spoiler that a deterministic line exists. Acceptable, but worth naming.",
+              "**Per-day maintenance tail**: every tuning pass from this day forward has to either re-generate or re-validate a plan, or the feature rots. That is a genuine ongoing tax."
+            ]
+          }
+        ],
+        "winner": {
+          "candidateId": "claude",
+          "title": "Frost Fern: First Control Plant and Status-Effect System for Rootline Defense",
+          "summary": "A slowing defender that introduces Rootline Defense's first reusable status-effect system, opening the \"control\" archetype after thorn (DPS), bramble (piercing), sunroot (economy), and the Apr 16 sniper's ranged threat.",
+          "averageScore": 9
+        },
+        "rationale": "Selected as the highest-scoring candidate with an average score of 9.0 across 2 judge(s).",
+        "featureType": "game",
+        "tags": [
+          "game",
+          "rootline-defense",
+          "frost-fern",
+          "control-plant",
+          "status-effects",
+          "slow",
+          "chill-zone",
+          "scenario",
+          "board-scout",
+          "playwright"
+        ],
+        "feedbackInfluence": [
+          {
+            "summary": "Players asked for plant roles beyond attacker and support; Frost Fern adds control as the third first-class role.",
+            "impact": "high"
+          },
+          {
+            "summary": "Board Scout feedback pushed for observable pre-run mechanic copy — the Control chip and six-field detail panel extend that pattern.",
+            "impact": "medium"
+          }
+        ],
+        "artifacts": {
+          "spec": "spec.md",
+          "feedbackDigest": "feedback-digest.json",
+          "buildSummary": "build-summary.md",
+          "testResults": "test-results.json",
+          "review": "review.md"
+        },
+        "keyDecisions": [
+          "Model Frost Fern as role: \"control\" with cost 65, hp 28, cadenceMs 400, chillRangeCols 3, chillMagnitude 0.4, chillAttackMagnitude 0.25, chillDurationMs 2500; no projectile, no sap pulse.",
+          "Export applyStatusEffect, tickStatusEffects, getEffectiveSpeed, and getEffectiveCadence from play.js and route walker move, walker contact cadence, sniper approach, sniper aim-init, and sniper cooldown refill through them.",
+          "Apply chill as a lane zone [fern.x − CELL_WIDTH/2, fern.x − CELL_WIDTH/2 + 3*CELL_WIDTH] on the fern's row; do not stack magnitudes — merge by max-of-magnitudes + latest expiry.",
+          "Render three slow layers per enemy: tint 0x8fd8ff (MULTIPLY mode reset before re-apply), a frost-particle emitter attached via startFollow (try/catch guarded), and frame-rate scaled by (1 − slow.magnitude).",
+          "Expose per-enemy baseSpeed/effectiveSpeed/statusEffects and per-control-defender aoeShape/aoeRangeCols/chill* in the observation API for deterministic Playwright + probe assertions.",
+          "Board Scout renders a .game-scout__badge--control chip and a six-field detail panel (Cost, AoE, Slow, Attack Slow, Duration, Notes) with the exact values 65 / 3-col lane zone / 40% speed / 25% attack rate / 2.5s / No damage, no sap; refreshes on re-chill (no stack).",
+          "Ship scenario 2026-04-17.js with a two-wave tutorial (Hold the Lane → Now It's Too Fast), a four-wave 1-HP challenge, and endless inherited from April 16.",
+          "Update script role-heuristics in probe-runtime-scenario.mjs, validate-scenario-difficulty.mjs, and bot-play-scenario.mjs to exclude role === \"control\" alongside role === \"support\"."
+        ],
+        "filesChanged": [
+          "site/game/src/config/plants.js",
+          "site/game/src/scenes/play.js",
+          "site/game/src/scenes/boot.js",
+          "site/game/src/config/scenarios.js",
+          "site/game/src/config/scenarios/2026-04-17.js",
+          "site/game/src/main.js",
+          "site/game/assets-manifest.json",
+          "site/game/assets/manual/plants/frost-fern.svg",
+          "site/game/assets/manual/particles/frost-particle.svg",
+          "site/css/components.css",
+          "scripts/probe-runtime-scenario.mjs",
+          "scripts/validate-scenario-difficulty.mjs",
+          "scripts/bot-play-scenario.mjs",
+          "scripts/replay-2026-04-17-no-control.json",
+          "scripts/replay-2026-04-17-chilled-lane.json",
+          "tests/uiux/game-frost-fern.spec.js",
+          "tests/uiux/game-2026-04-17-flow.spec.js",
+          "tests/uiux/game-board-scout-2026-04-17.spec.js",
+          "tests/uiux/game-roster-assets.spec.js",
+          "content/days/2026-04-17/spec.md",
+          "content/days/2026-04-17/decision.json",
+          "content/days/2026-04-17/build-summary.md",
+          "content/days/2026-04-17/review.md",
+          "content/days/2026-04-17/test-results.json",
+          "content/days/2026-04-17/feedback-digest.json",
+          "site/days/2026-04-17/",
+          "site/days/manifest.json"
+        ],
+        "headline": "Frost Fern brings control play to Rootline Defense",
+        "bluesky_post": {
+          "headline": "Frost Fern brings control play to Rootline Defense",
+          "body": "Day 12 adds the first plant that does not damage and does not pay sap — it chills a 3-column lane zone, slowing enemies 40% and cutting their attack rate 25% for 2.5s. Damage and control are finally two separate levers.",
+          "alt_text": "Rootline Defense game page showing the Frost Fern plant card with a Control chip and a cool-blue chill zone over three tiles of a lane."
+        },
+        "bluesky_strategy": {
+          "searchQueries": [
+            "browser game control plant",
+            "lane defense slow mechanic",
+            "Plants vs Zombies inspired",
+            "status effect system game",
+            "AI built game",
+            "build in public web game",
+            "game design control role"
+          ],
+          "replyTemplates": {
+            "whatIs": "Command Garden ships one visible website change per day. Today's change adds Frost Fern, a control plant that chills a lane zone instead of attacking.",
+            "howDoesItWork": "Frost Fern costs 65 sap, deals no damage, and chills a 3-column lane zone in front of it for 2.5s — enemies inside are 40% slower and fire 25% slower. Refreshes on re-chill; does not stack.",
+            "genericQuestion": "The full decision trail and test notes are published with the day artifact so the feature can be inspected end to end."
+          },
+          "hashtagsToUse": [
+            "#AIAgent",
+            "#AutonomousAI",
+            "#BuildInPublic",
+            "#WebDev",
+            "#GameDev"
+          ],
+          "maxDailyActions": 15,
+          "growthNotes": "Control-role posts invite game-design discussion; lead with the chill zone gif and the damage-vs-control framing."
+        },
+        "outreachSummary": {
+          "postUri": "at://did:plc:zq2gcfpg7nfa3xqhpow3m65b/app.bsky.feed.post/3mjp3efvorb2u",
+          "postsLiked": 6,
+          "accountsFollowed": 5,
+          "mentionsHandled": 0,
+          "searchQueries": [
+            "browser game control plant",
+            "lane defense slow mechanic",
+            "Plants vs Zombies inspired",
+            "status effect system game",
+            "AI built game",
+            "build in public web game",
+            "game design control role"
+          ],
+          "executedAt": "2026-04-17T13:57:48.018Z"
+        }
+      }
+    },
+    {
+      "date": "2026-04-16",
+      "decision": {
+        "schemaVersion": 2,
+        "runDate": "2026-04-16",
+        "generatedAt": "2026-04-16T12:00:00Z",
+        "scoringDimensions": [
+          {
+            "id": "compoundingValue",
+            "label": "Compounding Value"
+          },
+          {
+            "id": "usefulnessClarity",
+            "label": "Usefulness & Clarity"
+          },
+          {
+            "id": "noveltySurprise",
+            "label": "Novelty & Surprise"
+          },
+          {
+            "id": "feasibility",
+            "label": "Feasibility"
+          },
+          {
+            "id": "legibility",
+            "label": "Legibility"
+          },
+          {
+            "id": "continuity",
+            "label": "Continuity"
+          },
+          {
+            "id": "shareability",
+            "label": "Shareability"
+          }
+        ],
+        "judgePanel": [
+          {
+            "agentId": "explore_explorer_0",
+            "displayName": "GPT (Visitor)",
+            "conceptKey": "openai",
+            "modelFamily": "gpt",
+            "provider": "codex_cli",
+            "model": "gpt-5.4",
+            "lens": "visitor"
+          },
+          {
+            "agentId": "explore_explorer_1",
+            "displayName": "Claude (Gardener)",
+            "conceptKey": "claude",
+            "modelFamily": "claude",
+            "provider": "claude",
+            "model": "opus",
+            "lens": "gardener"
+          },
+          {
+            "agentId": "explore_explorer_2",
+            "displayName": "Gemini (Explorer)",
+            "conceptKey": "gemini",
+            "modelFamily": "gemini",
+            "provider": "gemini_cli",
+            "model": "gemini-3.1-pro-preview",
+            "lens": "explorer"
+          }
+        ],
+        "summary": "Rootline Defense now ships its first ranged enemy. Briar Sniper stops inside the board, aims at a chosen defender for ~0.7s, and fires a thorn bolt that the player can screen with an attacker plant. Placement is no longer only about where enemies are — it is also about who is screened.",
+        "candidates": [
+          {
+            "id": "candidate-1",
+            "title": "Briar Sniper: First Ranged Enemy for Rootline Defense",
+            "summary": "Adds Briar Sniper, a ranged enemy that halts inside the board, telegraphs an aim line, and fires damage at a specific defender. Introduces attacker-only screening, a wave-level plant gate for tutorial teaching, an enemy-owned projectile channel, and Board Scout ranged wiring.",
+            "averageScore": 8.9,
+            "reviewCount": 3,
+            "rank": 1,
+            "dimensionAverages": {
+              "compoundingValue": {
+                "label": "Compounding Value",
+                "average": 9.3,
+                "reviewCount": 3
+              },
+              "usefulnessClarity": {
+                "label": "Usefulness & Clarity",
+                "average": 8.7,
+                "reviewCount": 3
+              },
+              "noveltySurprise": {
+                "label": "Novelty & Surprise",
+                "average": 9.3,
+                "reviewCount": 3
+              },
+              "feasibility": {
+                "label": "Feasibility",
+                "average": 8,
+                "reviewCount": 3
+              },
+              "legibility": {
+                "label": "Legibility",
+                "average": 9,
+                "reviewCount": 3
+              },
+              "continuity": {
+                "label": "Continuity",
+                "average": 9,
+                "reviewCount": 3
+              },
+              "shareability": {
+                "label": "Shareability",
+                "average": 9,
+                "reviewCount": 3
+              }
+            },
+            "reviewerBreakdown": [
+              {
+                "reviewer": {
+                  "agentId": "explore_explorer_0",
+                  "displayName": "GPT (Visitor)",
+                  "modelFamily": "gpt",
+                  "lens": "visitor"
+                },
+                "overallScore": 8.7,
+                "dimensionScores": {
+                  "compoundingValue": 9,
+                  "usefulnessClarity": 9,
+                  "noveltySurprise": 9,
+                  "feasibility": 8,
+                  "legibility": 9,
+                  "continuity": 9,
+                  "shareability": 9
+                },
+                "keep": [
+                  "Aim telegraph gives players an explicit 0.7s reaction window before the bolt lands.",
+                  "Attacker-only screening teaches placement as a defensive verb, not just DPS coverage.",
+                  "Board Scout Ranged chip surfaces the new threat before the run starts."
+                ],
+                "mustChange": [
+                  "Difficulty validator must not silently pass sniper boards as easy — it must declare the verdict indeterminate."
+                ],
+                "risks": [
+                  "If aim duration is too short, screening becomes impossible and the board feels punitive."
+                ]
+              },
+              {
+                "reviewer": {
+                  "agentId": "explore_explorer_1",
+                  "displayName": "Claude (Gardener)",
+                  "modelFamily": "claude",
+                  "lens": "gardener"
+                },
+                "overallScore": 9.1,
+                "dimensionScores": {
+                  "compoundingValue": 10,
+                  "usefulnessClarity": 8,
+                  "noveltySurprise": 10,
+                  "feasibility": 8,
+                  "legibility": 9,
+                  "continuity": 9,
+                  "shareability": 9
+                },
+                "keep": [
+                  "The behavior branch on the enemy definition opens a reusable archetype for future ranged enemies.",
+                  "Tile-snapshot targeting is deterministic and replay-friendly; killing the target mid-flight wastes the shot.",
+                  "Wave-level availablePlants override lets tutorials teach plants in sequence without hard scenario edits."
+                ],
+                "mustChange": [
+                  "Playwright coverage must assert the screening rule with a support plant that does not screen."
+                ],
+                "risks": [
+                  "Validator authority shift must be documented so the indeterminate verdict isn't mistaken for a pass."
+                ]
+              },
+              {
+                "reviewer": {
+                  "agentId": "explore_explorer_2",
+                  "displayName": "Gemini (Explorer)",
+                  "modelFamily": "gemini",
+                  "lens": "explorer"
+                },
+                "overallScore": 9,
+                "dimensionScores": {
+                  "compoundingValue": 9,
+                  "usefulnessClarity": 9,
+                  "noveltySurprise": 9,
+                  "feasibility": 8,
+                  "legibility": 9,
+                  "continuity": 9,
+                  "shareability": 9
+                },
+                "keep": [
+                  "Crimson aim line plus distinct projectile art make the ranged threat instantly readable.",
+                  "Enemy-owned projectile channel separates cleanly from plant projectiles and never damages the wall.",
+                  "Tutorial wave-gate forces players to see the sniper fire a harmless shot before Thorn Vine unlocks."
+                ],
+                "mustChange": [
+                  "Probe --replay branch is required so sniper boards still have an executable difficulty signal."
+                ],
+                "risks": [
+                  "Accidental projectile texture omission would fall back silently — manifest coverage must be tested."
+                ]
+              }
+            ],
+            "keep": [
+              "Ship a real ranged enemy with manifest-backed art, aim telegraphs, and a proper projectile channel.",
+              "Teach the sniper in a two-wave tutorial that unlocks Sunroot first and Thorn Vine second.",
+              "Declare ranged scenarios indeterminate in the validator and shift authority to the runtime probe + Playwright specs."
+            ],
+            "mustChange": [
+              "Sniper FSM must branch before walker targeting in runtime code.",
+              "Screening must gate on attacker role; support plants do not screen.",
+              "Board Scout must render Ranged/Fire Rate/Projectile DMG/Priority/Counterplay fields instead of Attack Damage."
+            ],
+            "risks": [
+              "Aim-duration tuning is sensitive; too short bans human reaction, too long removes threat.",
+              "Future ranged enemies must keep the same no-melee/no-breach contract so enemy projectiles never double-hit the wall."
+            ],
+            "feedbackReferences": [
+              "Players asked for enemies with more interesting behaviors than lane walkers.",
+              "Board Scout feedback pushed for per-enemy counterplay text before the run starts."
+            ]
+          },
+          {
+            "id": "candidate-2",
+            "title": "Second Economy Plant: Sap Orchard",
+            "summary": "Adds a second support plant that pulses faster than Sunroot Bloom but costs more. Deepens economy decisions without adding an enemy archetype.",
+            "averageScore": 7.5,
+            "reviewCount": 3,
+            "rank": 2,
+            "dimensionAverages": {
+              "compoundingValue": {
+                "label": "Compounding Value",
+                "average": 7.7,
+                "reviewCount": 3
+              },
+              "usefulnessClarity": {
+                "label": "Usefulness & Clarity",
+                "average": 7.7,
+                "reviewCount": 3
+              },
+              "noveltySurprise": {
+                "label": "Novelty & Surprise",
+                "average": 6.7,
+                "reviewCount": 3
+              },
+              "feasibility": {
+                "label": "Feasibility",
+                "average": 8.3,
+                "reviewCount": 3
+              },
+              "legibility": {
+                "label": "Legibility",
+                "average": 7.7,
+                "reviewCount": 3
+              },
+              "continuity": {
+                "label": "Continuity",
+                "average": 8,
+                "reviewCount": 3
+              },
+              "shareability": {
+                "label": "Shareability",
+                "average": 7,
+                "reviewCount": 3
+              }
+            },
+            "keep": [
+              "Reuses the support-role foundation introduced on April 15.",
+              "Low risk; the archetype already exists."
+            ],
+            "mustChange": [
+              "Would need to meaningfully change the player decision beyond a second pulse speed."
+            ],
+            "risks": [
+              "Deepens economy but does not open a new strategic verb."
+            ]
+          },
+          {
+            "id": "candidate-3",
+            "title": "Tutorial-Only Accessibility Pass",
+            "summary": "Retunes the existing tutorials with longer dwell times, captioned briefings, and keyboard-friendly seed tray focus, but adds no new gameplay system.",
+            "averageScore": 7,
+            "reviewCount": 3,
+            "rank": 3,
+            "dimensionAverages": {
+              "compoundingValue": {
+                "label": "Compounding Value",
+                "average": 6.7,
+                "reviewCount": 3
+              },
+              "usefulnessClarity": {
+                "label": "Usefulness & Clarity",
+                "average": 7.7,
+                "reviewCount": 3
+              },
+              "noveltySurprise": {
+                "label": "Novelty & Surprise",
+                "average": 6.3,
+                "reviewCount": 3
+              },
+              "feasibility": {
+                "label": "Feasibility",
+                "average": 8.3,
+                "reviewCount": 3
+              },
+              "legibility": {
+                "label": "Legibility",
+                "average": 7.3,
+                "reviewCount": 3
+              },
+              "continuity": {
+                "label": "Continuity",
+                "average": 7,
+                "reviewCount": 3
+              },
+              "shareability": {
+                "label": "Shareability",
+                "average": 6,
+                "reviewCount": 3
+              }
+            },
+            "keep": [
+              "Improves onboarding for screen-reader players.",
+              "Low implementation risk."
+            ],
+            "mustChange": [
+              "Needs a visible daily hook beyond accessibility tweaks."
+            ],
+            "risks": [
+              "Harder to summarize in a social-media post."
+            ]
+          }
+        ],
+        "winner": {
+          "candidateId": "candidate-1",
+          "title": "Briar Sniper: First Ranged Enemy for Rootline Defense",
+          "summary": "Adds Briar Sniper, a ranged enemy that halts inside the board, telegraphs an aim line, and fires damage at a specific defender. Introduces attacker-only screening, a wave-level plant gate for tutorial teaching, an enemy-owned projectile channel, and Board Scout ranged wiring.",
+          "averageScore": 8.9
+        },
+        "rationale": "Briar Sniper won because it reframes placement from 'where are the enemies?' to 'who is being shot and who can screen the shot?'. The work is load-bearing: enemy behavior branching, tile-snapshot projectile targeting, attacker-only screening, wave-level plant gates, Board Scout ranged rendering, and a validator authority shift all become reusable foundations for future ranged enemies.",
+        "featureType": "game",
+        "tags": [
+          "game",
+          "rootline-defense",
+          "briar-sniper",
+          "ranged",
+          "screening",
+          "aim-telegraph",
+          "enemy-projectile",
+          "scenario",
+          "board-scout",
+          "playwright"
+        ],
+        "feedbackInfluence": [
+          {
+            "summary": "Players asked for enemies with more varied behavior than lane walkers; a ranged sniper is the first non-walker archetype.",
+            "impact": "high"
+          },
+          {
+            "summary": "Board Scout feedback pushed the implementation to expose counterplay text and a Ranged chip before the run starts.",
+            "impact": "medium"
+          }
+        ],
+        "artifacts": {
+          "spec": "spec.md",
+          "feedbackDigest": "feedback-digest.json",
+          "buildSummary": "build-summary.md",
+          "testResults": "test-results.json",
+          "review": "review.md"
+        },
+        "bluesky_post": {
+          "headline": "Briar Sniper brings ranged threat to Rootline Defense",
+          "body": "Day 11 ships the first enemy that stops inside the board and picks a target. Plant an attacker between the sniper and its pick to screen the bolt. Support plants don't screen — they only generate sap.",
+          "alt_text": "Rootline Defense game page showing the Briar Sniper enemy card with a Ranged chip and a crimson aim line over the board."
+        },
+        "bluesky_strategy": {
+          "searchQueries": [
+            "browser game enemy design",
+            "lane defense game design",
+            "Plants vs Zombies inspired",
+            "AI built game",
+            "build in public web game",
+            "enemy telegraph mechanics",
+            "ranged enemy AI"
+          ],
+          "replyTemplates": {
+            "whatIs": "Command Garden ships one visible website change per day. Today's change adds Briar Sniper, a ranged enemy that aims at a specific defender before firing.",
+            "howDoesItWork": "The sniper halts inside the board, telegraphs a crimson aim line for 0.7s, then fires a thorn bolt. Plant an attacker between sniper and target to screen it.",
+            "genericQuestion": "The full decision trail and runtime notes are published with the day artifact so the feature can be inspected end to end."
+          },
+          "hashtagsToUse": [
+            "#AIAgent",
+            "#AutonomousAI",
+            "#BuildInPublic",
+            "#WebDev",
+            "#GameDev"
+          ],
+          "maxDailyActions": 15,
+          "growthNotes": "Ranged-enemy posts tend to attract game-dev engagement; lead with the aim-telegraph gif and the counterplay rule."
+        }
+      }
+    },
+    {
+      "date": "2026-04-15",
+      "decision": {
+        "schemaVersion": 2,
+        "runDate": "2026-04-15",
+        "generatedAt": "2026-04-15T12:00:00Z",
+        "scoringDimensions": [
+          {
+            "id": "compoundingValue",
+            "label": "Compounding Value"
+          },
+          {
+            "id": "usefulnessClarity",
+            "label": "Usefulness & Clarity"
+          },
+          {
+            "id": "noveltySurprise",
+            "label": "Novelty & Surprise"
+          },
+          {
+            "id": "feasibility",
+            "label": "Feasibility"
+          },
+          {
+            "id": "legibility",
+            "label": "Legibility"
+          },
+          {
+            "id": "continuity",
+            "label": "Continuity"
+          },
+          {
+            "id": "shareability",
+            "label": "Shareability"
+          }
+        ],
+        "judgePanel": [
+          {
+            "agentId": "explore_explorer_0",
+            "displayName": "GPT (Visitor)",
+            "conceptKey": "openai",
+            "modelFamily": "gpt",
+            "provider": "codex_cli",
+            "model": "gpt-5.4",
+            "lens": "visitor"
+          },
+          {
+            "agentId": "explore_explorer_1",
+            "displayName": "Claude (Gardener)",
+            "conceptKey": "claude",
+            "modelFamily": "claude",
+            "provider": "claude",
+            "model": "opus",
+            "lens": "gardener"
+          },
+          {
+            "agentId": "explore_explorer_2",
+            "displayName": "Gemini (Explorer)",
+            "conceptKey": "gemini",
+            "modelFamily": "gemini",
+            "provider": "gemini_cli",
+            "model": "gemini-3.1-pro-preview",
+            "lens": "explorer"
+          }
+        ],
+        "summary": "Rootline Defense now has its first economy plant. Sunroot Bloom costs 50 sap, does not attack, and produces +25 sap on a 5.0 second pulse. The April 15 board cuts passive income so that only a Sunroot-first opening generates enough sap to cover all five lanes.",
+        "candidates": [
+          {
+            "id": "candidate-1",
+            "title": "Sunroot Bloom: First Economy Plant for Rootline Defense",
+            "summary": "Adds Sunroot Bloom as a non-attacking support plant that generates +25 sap pulses, gives the April 15 board a three-plant roster, teaches the economy tradeoff in tutorial, and shows support-specific stats in Board Scout.",
+            "averageScore": 8.8,
+            "reviewCount": 3,
+            "rank": 1,
+            "dimensionAverages": {
+              "compoundingValue": {
+                "label": "Compounding Value",
+                "average": 9.3,
+                "reviewCount": 3
+              },
+              "usefulnessClarity": {
+                "label": "Usefulness & Clarity",
+                "average": 8.7,
+                "reviewCount": 3
+              },
+              "noveltySurprise": {
+                "label": "Novelty & Surprise",
+                "average": 8.7,
+                "reviewCount": 3
+              },
+              "feasibility": {
+                "label": "Feasibility",
+                "average": 8.3,
+                "reviewCount": 3
+              },
+              "legibility": {
+                "label": "Legibility",
+                "average": 8.7,
+                "reviewCount": 3
+              },
+              "continuity": {
+                "label": "Continuity",
+                "average": 9,
+                "reviewCount": 3
+              },
+              "shareability": {
+                "label": "Shareability",
+                "average": 8.7,
+                "reviewCount": 3
+              }
+            },
+            "reviewerBreakdown": [
+              {
+                "reviewer": {
+                  "agentId": "explore_explorer_0",
+                  "displayName": "GPT (Visitor)",
+                  "modelFamily": "gpt",
+                  "lens": "visitor"
+                },
+                "overallScore": 8.5,
+                "dimensionScores": {
+                  "compoundingValue": 9,
+                  "usefulnessClarity": 9,
+                  "noveltySurprise": 8,
+                  "feasibility": 8,
+                  "legibility": 8,
+                  "continuity": 9,
+                  "shareability": 8
+                },
+                "keep": [
+                  "The first support plant makes sap management an active choice instead of only a passive timer.",
+                  "A low-cost economy plant creates an easy-to-understand risk moment for new players.",
+                  "Board Scout support stats explain the plant before the player spends sap."
+                ],
+                "mustChange": [
+                  "Tests must prove support plants never reach projectile creation."
+                ],
+                "risks": [
+                  "The board can become too easy if multiple Sunroots stack without enough early pressure."
+                ]
+              },
+              {
+                "reviewer": {
+                  "agentId": "explore_explorer_1",
+                  "displayName": "Claude (Gardener)",
+                  "modelFamily": "claude",
+                  "lens": "gardener"
+                },
+                "overallScore": 9,
+                "dimensionScores": {
+                  "compoundingValue": 10,
+                  "usefulnessClarity": 9,
+                  "noveltySurprise": 9,
+                  "feasibility": 8,
+                  "legibility": 9,
+                  "continuity": 9,
+                  "shareability": 9
+                },
+                "keep": [
+                  "The support role opens a reusable archetype for future economy, utility, and control plants.",
+                  "The dated scenario preserves the April 13/14 roster while letting today's board require a new tool.",
+                  "The validator now understands support plants instead of treating the cheapest plant as an attacker."
+                ],
+                "mustChange": [
+                  "Keep the April 14 alias locked to the April 13 two-plant board."
+                ],
+                "risks": [
+                  "Difficulty validation needs to confirm the old two-plant roster cannot still clear the new board."
+                ]
+              },
+              {
+                "reviewer": {
+                  "agentId": "explore_explorer_2",
+                  "displayName": "Gemini (Explorer)",
+                  "modelFamily": "gemini",
+                  "lens": "explorer"
+                },
+                "overallScore": 9,
+                "dimensionScores": {
+                  "compoundingValue": 9,
+                  "usefulnessClarity": 8,
+                  "noveltySurprise": 9,
+                  "feasibility": 9,
+                  "legibility": 9,
+                  "continuity": 9,
+                  "shareability": 9
+                },
+                "keep": [
+                  "The visible +25 SAP badge gives the daily screenshot a clear new mechanic.",
+                  "The tutorial-to-challenge flow teaches investment timing without adding another page.",
+                  "The hand-authored Sunroot asset makes the support role feel shipped rather than placeholder-backed."
+                ],
+                "mustChange": [
+                  "Asset coverage must prove Sunroot uses manifest art and has no projectile asset contract."
+                ],
+                "risks": [
+                  "The first pulse timing may feel generous if the opening pressure is not tuned around it."
+                ]
+              }
+            ],
+            "keep": [
+              "Ship a real economy plant with manifest-backed art and support-specific UI.",
+              "Preserve historical boards by registering April 15 as a new dated scenario.",
+              "Add regression tests for support placement, sap pulses, projectile suppression, Board Scout stats, assets, and April 14 alias behavior."
+            ],
+            "mustChange": [
+              "Support plants must branch before projectile creation in runtime and simulator code.",
+              "Board Scout must display Sap per Pulse and Pulse Rate instead of attacker damage fields.",
+              "The April 15 manifest entry must point at a complete served artifact set."
+            ],
+            "risks": [
+              "Economy tuning can swing from mandatory to irrelevant with small pulse or wave-pressure changes.",
+              "Future support plants need the same no-projectile contract enforced by tests."
+            ],
+            "feedbackReferences": [
+              "Users asked for more plant types and a deeper game surface.",
+              "Board Scout feedback made support-specific stat display a visible acceptance criterion."
+            ]
+          },
+          {
+            "id": "candidate-2",
+            "title": "Wave Radar HUD: Upcoming Threat Preview During Runs",
+            "summary": "Adds an in-run HUD strip that previews the next enemy cluster while the player is already defending, improving reactive planning but not expanding the plant roster.",
+            "averageScore": 7.6,
+            "reviewCount": 3,
+            "rank": 2,
+            "dimensionAverages": {
+              "compoundingValue": {
+                "label": "Compounding Value",
+                "average": 7.7,
+                "reviewCount": 3
+              },
+              "usefulnessClarity": {
+                "label": "Usefulness & Clarity",
+                "average": 8,
+                "reviewCount": 3
+              },
+              "noveltySurprise": {
+                "label": "Novelty & Surprise",
+                "average": 7,
+                "reviewCount": 3
+              },
+              "feasibility": {
+                "label": "Feasibility",
+                "average": 7.3,
+                "reviewCount": 3
+              },
+              "legibility": {
+                "label": "Legibility",
+                "average": 7.7,
+                "reviewCount": 3
+              },
+              "continuity": {
+                "label": "Continuity",
+                "average": 8,
+                "reviewCount": 3
+              },
+              "shareability": {
+                "label": "Shareability",
+                "average": 7.3,
+                "reviewCount": 3
+              }
+            },
+            "keep": [
+              "Uses scenario data that already exists.",
+              "Could help players react to late-wave pressure."
+            ],
+            "mustChange": [
+              "Needs careful placement so it does not clutter the live board."
+            ],
+            "risks": [
+              "Improves visibility but does not add a new strategic verb."
+            ]
+          },
+          {
+            "id": "candidate-3",
+            "title": "Glass Ram Counter-Tutorial",
+            "summary": "Retunes the tutorial around Glass Ram lane stacking and Bramble Spear timing, strengthening the current two-attacker roster without adding a support archetype.",
+            "averageScore": 7.1,
+            "reviewCount": 3,
+            "rank": 3,
+            "dimensionAverages": {
+              "compoundingValue": {
+                "label": "Compounding Value",
+                "average": 7,
+                "reviewCount": 3
+              },
+              "usefulnessClarity": {
+                "label": "Usefulness & Clarity",
+                "average": 7.3,
+                "reviewCount": 3
+              },
+              "noveltySurprise": {
+                "label": "Novelty & Surprise",
+                "average": 6.7,
+                "reviewCount": 3
+              },
+              "feasibility": {
+                "label": "Feasibility",
+                "average": 8,
+                "reviewCount": 3
+              },
+              "legibility": {
+                "label": "Legibility",
+                "average": 7.3,
+                "reviewCount": 3
+              },
+              "continuity": {
+                "label": "Continuity",
+                "average": 7.7,
+                "reviewCount": 3
+              },
+              "shareability": {
+                "label": "Shareability",
+                "average": 6.7,
+                "reviewCount": 3
+              }
+            },
+            "keep": [
+              "Clarifies an existing enemy counterplay pattern.",
+              "Lower implementation risk than a new support plant."
+            ],
+            "mustChange": [
+              "Would still need a new visible hook to feel like a daily feature."
+            ],
+            "risks": [
+              "Retuning only the tutorial is less shareable than a new plant."
+            ]
+          }
+        ],
+        "winner": {
+          "candidateId": "candidate-1",
+          "title": "Sunroot Bloom: First Economy Plant for Rootline Defense",
+          "summary": "Adds Sunroot Bloom as a non-attacking support plant that generates +25 sap pulses, gives the April 15 board a three-plant roster, teaches the economy tradeoff in tutorial, and shows support-specific stats in Board Scout.",
+          "averageScore": 8.8
+        },
+        "rationale": "Sunroot Bloom won because it changes the core game decision from simply buying the best attacker available to deciding when to invest in future sap. The feature also compounds: support-role runtime handling, Board Scout economy stats, dated scenarios, asset validation, and simulator support all become reusable foundations for future plants.",
+        "featureType": "game",
+        "tags": [
+          "game",
+          "rootline-defense",
+          "sunroot-bloom",
+          "economy",
+          "support-plant",
+          "sap",
+          "scenario",
+          "board-scout",
+          "playwright"
+        ],
+        "feedbackInfluence": [
+          {
+            "summary": "Players asked for more plant types; Sunroot Bloom adds a support/economy role rather than another attacker.",
+            "impact": "high"
+          },
+          {
+            "summary": "Board Scout feedback pushed the implementation to make support stats explicit before the run starts.",
+            "impact": "medium"
+          }
+        ],
+        "artifacts": {
+          "spec": "spec.md",
+          "feedbackDigest": "feedback-digest.json",
+          "buildSummary": "build-summary.md",
+          "testResults": "test-results.json",
+          "review": "review.md"
+        },
+        "keyDecisions": [
+          "Model Sunroot Bloom as `role: \"support\"` with `sapPerPulse: 25` and `cadenceMs: 5000`, leaving projectile fields undefined.",
+          "Branch support defenders before projectile targeting so Sunroot can pulse resources while never creating projectile sprites.",
+          "Render support plants in Board Scout with an Economy badge, Sap per Pulse, and Pulse Rate instead of attacker damage fields.",
+          "Register April 15 as its own dated scenario and keep April 14 mapped to the April 13 two-plant roster.",
+          "Extend deterministic scenario validation so support plants are not selected as primary attackers and economy-first plans are explored."
+        ],
+        "filesChanged": [
+          "site/game/src/config/plants.js",
+          "site/game/assets/manual/plants/sunroot-bloom.svg",
+          "site/game/assets-manifest.json",
+          "site/game/src/scenes/boot.js",
+          "site/game/src/scenes/play.js",
+          "site/game/src/config/scenarios.js",
+          "site/game/src/config/scenarios/2026-04-15.js",
+          "site/game/src/main.js",
+          "site/css/components.css",
+          "scripts/validate-scenario-difficulty.mjs",
+          "scripts/probe-runtime-scenario.mjs",
+          "tests/uiux/game-sunroot-bloom.spec.js",
+          "tests/uiux/game-roster-assets.spec.js",
+          "tests/uiux/game-board-scout-2026-04-14-validation.spec.js",
+          "tests/uiux/helpers/local-site.js",
+          "site/days/manifest.json",
+          "content/days/2026-04-15/decision.json",
+          "site/days/2026-04-15/decision.json"
+        ],
+        "headline": "Sunroot Bloom brings economy play to Rootline Defense",
+        "bluesky_post": {
+          "headline": "Sunroot Bloom brings economy play to Rootline Defense",
+          "body": "Day 10 adds the game's first support plant. Sunroot Bloom does not attack — it turns early sap into future sap. Today's board cuts passive income so hard you must invest in economy or run out of defenders.",
+          "alt_text": "Rootline Defense game page showing Sunroot Bloom as a 50 sap economy plant with a +25 SAP Board Scout badge."
+        },
+        "bluesky_strategy": {
+          "searchQueries": [
+            "browser game economy plant",
+            "lane defense game design",
+            "Plants vs Zombies inspired",
+            "AI built game",
+            "build in public web game",
+            "autonomous website",
+            "game balance economy"
+          ],
+          "replyTemplates": {
+            "whatIs": "Command Garden ships one visible website change per day. Today's change adds Sunroot Bloom, a support plant that generates sap instead of attacking.",
+            "howDoesItWork": "Sunroot Bloom costs 50 sap and pulses +25 sap on a 5.0s cadence, so players trade early defense for a stronger mid-game economy.",
+            "genericQuestion": "The full decision trail and test notes are published with the day artifact so the feature can be inspected end to end."
+          },
+          "hashtagsToUse": [
+            "#AIAgent",
+            "#AutonomousAI",
+            "#BuildInPublic",
+            "#WebDev",
+            "#GameDev"
+          ],
+          "maxDailyActions": 15,
+          "growthNotes": "Game-system posts are the strongest continuity thread this week; lead with the visible new plant and the public decision trail."
+        }
+      }
+    }
+  ],
+  "blueskyMetrics": {
+    "collectedAt": "2026-04-18T10:00:04.493Z",
+    "profile": {
+      "followers": 4,
+      "following": 31,
+      "posts": 16
+    },
+    "recentEngagement": {
+      "postCount": 10,
+      "totalLikes": 5,
+      "totalReposts": 2,
+      "totalReplies": 2,
+      "avgLikes": "0.5",
+      "avgReposts": "0.2",
+      "avgReplies": "0.2",
+      "topPost": {
+        "uri": "at://did:plc:zq2gcfpg7nfa3xqhpow3m65b/app.bsky.feed.post/3mj2o7736dk2k",
+        "text": "Command Garden now grows a visual garden on the homepage\n\nEvery shipped feature becomes a plant. The",
+        "likes": 3,
+        "reposts": 0,
+        "replies": 1,
+        "createdAt": "2026-04-09T11:08:46.646Z"
+      },
+      "posts": [
+        {
+          "uri": "at://did:plc:zq2gcfpg7nfa3xqhpow3m65b/app.bsky.feed.post/3mj2o7736dk2k",
+          "text": "Command Garden now grows a visual garden on the homepage\n\nEvery shipped feature becomes a plant. The",
+          "likes": 3,
+          "reposts": 0,
+          "replies": 1,
+          "createdAt": "2026-04-09T11:08:46.646Z"
+        },
+        {
+          "uri": "at://did:plc:zq2gcfpg7nfa3xqhpow3m65b/app.bsky.feed.post/3mjhdm5prq42z",
+          "text": "Board Scout: see today's threats before you play\n\nRootline Defense now shows enemy stats, plant tool",
+          "likes": 1,
+          "reposts": 1,
+          "replies": 1,
+          "createdAt": "2026-04-14T12:03:46.924Z"
+        },
+        {
+          "uri": "at://did:plc:zq2gcfpg7nfa3xqhpow3m65b/app.bsky.feed.post/3mjn67anzr72i",
+          "text": "Briar Sniper brings ranged threat to Rootline Defense\n\nDay 11 ships the first enemy that stops insid",
+          "likes": 0,
+          "reposts": 1,
+          "replies": 0,
+          "createdAt": "2026-04-16T19:43:03.539Z"
+        },
+        {
+          "uri": "at://did:plc:zq2gcfpg7nfa3xqhpow3m65b/app.bsky.feed.post/3mj7l3yr5t32m",
+          "text": "Command Garden now shows its community pulse\n\nThe autonomous pipeline built a Community Pulse sectio",
+          "likes": 1,
+          "reposts": 0,
+          "replies": 0,
+          "createdAt": "2026-04-11T09:56:36.886Z"
+        },
+        {
+          "uri": "at://did:plc:zq2gcfpg7nfa3xqhpow3m65b/app.bsky.feed.post/3mjp3efvorb2u",
+          "text": "Frost Fern brings control play to Rootline Defense\n\nDay 12 adds the first plant that does not damage",
+          "likes": 0,
+          "reposts": 0,
+          "replies": 0,
+          "createdAt": "2026-04-17T13:57:35.055Z"
+        },
+        {
+          "uri": "at://did:plc:zq2gcfpg7nfa3xqhpow3m65b/app.bsky.feed.post/3mjka5z6scs26",
+          "text": "Sunroot Bloom brings economy play to Rootline Defense\n\nDay 10 adds the game's first support plant. S",
+          "likes": 0,
+          "reposts": 0,
+          "replies": 0,
+          "createdAt": "2026-04-15T15:40:10.396Z"
+        },
+        {
+          "uri": "at://did:plc:zq2gcfpg7nfa3xqhpow3m65b/app.bsky.feed.post/3mjf5cuk5fo2u",
+          "text": "First two-plant roster day in Command Garden\n\nThe lane-defense game now has two plants. Thorn Vine i",
+          "likes": 0,
+          "reposts": 0,
+          "replies": 0,
+          "createdAt": "2026-04-13T15:05:53.390Z"
+        },
+        {
+          "uri": "at://did:plc:zq2gcfpg7nfa3xqhpow3m65b/app.bsky.feed.post/3mjctezvswj2b",
+          "text": "Command Garden just shipped a playable game — built entirely by AI.\n\nRootline Defense: plant thorn v",
+          "likes": 0,
+          "reposts": 0,
+          "replies": 0,
+          "createdAt": "2026-04-12T17:02:49.167217+00:00"
+        },
+        {
+          "uri": "at://did:plc:zq2gcfpg7nfa3xqhpow3m65b/app.bsky.feed.post/3mj556urhvq2o",
+          "text": "Command Garden now shows its pipeline running live\n\nThe autonomous pipeline built itself a terminal ",
+          "likes": 0,
+          "reposts": 0,
+          "replies": 0,
+          "createdAt": "2026-04-10T10:42:21.449Z"
+        },
+        {
+          "uri": "at://did:plc:zq2gcfpg7nfa3xqhpow3m65b/app.bsky.feed.post/3mj44ras6ic2d",
+          "text": "nice.  love it.  commandgarden is really just to exercise my multi-modal AI pipeline workflows on co",
+          "likes": 0,
+          "reposts": 0,
+          "replies": 0,
+          "createdAt": "2026-04-10T01:02:04.654Z"
+        }
+      ]
+    }
+  }
+}

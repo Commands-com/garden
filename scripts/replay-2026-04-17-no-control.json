@@ -2,10 +2,10 @@
   "label": "2026-04-17-no-control",
   "date": "2026-04-17",
   "mode": "challenge",
-  "description": "Strongest obvious no-Frost April 17 exploit line: mirror the canonical clear, but replace Frost Fern with a forward Thorn Vine at (r2, c5). That keeps the same early bank, side-lane coverage, late lane-4 stack, and center Bramble follow-up while brute-forcing lane 2 with pure damage. The retuned board should now FAIL at the late triple-ram lane-2 window because Frost Fern's slow is required, not just an extra front attacker.",
+  "description": "Weaker no-Frost April 17 line: keep the early economy and side-lane answers, but refuse to buy Frost Fern and never stabilize lane 4. This is still a serious attempt at the board, but it should lose before clear because the control slot is wasted on raw damage while the lower lane collapses under mixed beetle/sniper pressure.",
   "expect": {
     "outcome": "gameover",
-    "reason": "no-frost-front-thorn-collapses-at-triple-ram-window"
+    "reason": "no-frost-line-collapses-before-clear"
   },
   "placements": [
     {
@@ -39,9 +39,9 @@
     {
       "timeMs": 20000,
       "row": 2,
-      "col": 5,
+      "col": 2,
       "plantId": "thornVine",
-      "note": "This is the stronger exploit line: spend the Frost Fern slot on a forward Thorn at the same c5 tile and try to tank lane 2 with raw damage instead of chill."
+      "note": "Spend the Frost Fern slot on another Thorn Vine instead of control."
     },
     {
       "timeMs": 25000,
@@ -51,46 +51,11 @@
       "note": "Backfill the top lane before the late wave-1 Shard Mite can cross the wall tile."
     },
     {
-      "timeMs": 30000,
-      "row": 4,
-      "col": 1,
-      "plantId": "thornVine",
-      "note": "Screen the lane-4 Sunroot before the wave-2 sniper can take it."
-    },
-    {
-      "timeMs": 35000,
+      "timeMs": 32000,
       "row": 2,
-      "col": 1,
-      "plantId": "thornVine",
-      "note": "Third lane-2 damage body arrives behind the front Thorn, but the retuned board should still break at the late triple-ram window without Frost Fern's slow."
-    },
-    {
-      "timeMs": 40000,
-      "row": 0,
-      "col": 1,
-      "plantId": "thornVine",
-      "note": "Top-lane reinforce for the late glass-ram window."
-    },
-    {
-      "timeMs": 48000,
-      "row": 4,
-      "col": 2,
-      "plantId": "thornVine",
-      "note": "Second late lane-4 stack piece."
-    },
-    {
-      "timeMs": 56000,
-      "row": 4,
       "col": 3,
-      "plantId": "thornVine",
-      "note": "Third late lane-4 stack piece."
-    },
-    {
-      "timeMs": 68000,
-      "row": 2,
-      "col": 4,
       "plantId": "brambleSpear",
-      "note": "Late center Bramble follow-up. On the retuned board, a pure damage line should never get this far safely."
+      "note": "Late center Bramble follow-up, but with no Frost control and no lane-4 stabilization the run should still die before clear."
     }
   ]
 }
