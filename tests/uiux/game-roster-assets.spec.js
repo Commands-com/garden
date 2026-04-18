@@ -173,16 +173,17 @@ test("April 18 Thornwing Moth has manifest-backed enemy art", async ({
 
   expect(assetState.thornwing).toMatchObject({
     id: "thornwing-moth",
-    provider: "repo",
-    path: "/game/assets/manual/enemies/thornwing-moth.svg",
+    kind: "animation",
+    path: "/game/assets/generated/animations/thornwing-moth.png",
   });
   expect(assetState.thornwing.metadata).toMatchObject({
     category: "enemy",
-    width: 128,
-    height: 128,
+    phaser: {
+      frameWidth: 48,
+      frameHeight: 48,
+    },
   });
   expect(assetState.ok).toBe(true);
-  expect(assetState.body).toContain("<svg");
 });
 
 test("April 15 Sunroot Bloom loads manifest-backed art and expects no projectile", async ({

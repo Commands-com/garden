@@ -2,12 +2,42 @@
   "schemaVersion": 1,
   "days": [
     {
+      "date": "2026-04-18",
+      "title": "Thornwing Moth — First Flying Enemy and `behavior: \"flying\"` Branch",
+      "summary": "Adds Thornwing Moth as the first flying enemy, introduces a reusable `behavior: \"flying\"` branch, ships projectile-level anti-air gating via `canHitFlying`, extends Board Scout and observation exports for flying/anti-air data, and publishes the April 18 Wings Over the Garden tutorial/challenge where Thornwings only occupy lanes 1 and 3.",
+      "status": "shipped",
+      "featureType": "game",
+      "tags": [
+        "game",
+        "rootline-defense",
+        "thornwing-moth",
+        "flying-enemy",
+        "anti-air",
+        "behavior-flying",
+        "board-scout",
+        "scenario",
+        "playwright"
+      ],
+      "publishedAt": "2026-04-18T14:23:20.888Z"
+    },
+    {
       "date": "2026-04-17",
       "title": "Cold Lane",
       "summary": "Rootline Defense's first control plant, Frost Fern, chills a 3-column lane zone so attackers behind it can whittle down slowed enemies — damage and control become two separate levers.",
       "status": "shipped",
       "featureType": "game",
-      "tags": ["game", "rootline-defense", "frost-fern", "control-plant", "status-effects", "slow", "chill-zone", "scenario", "board-scout", "playwright"],
+      "tags": [
+        "game",
+        "rootline-defense",
+        "frost-fern",
+        "control-plant",
+        "status-effects",
+        "slow",
+        "chill-zone",
+        "scenario",
+        "board-scout",
+        "playwright"
+      ],
       "publishedAt": "2026-04-17T12:00:00.000Z"
     },
     {
@@ -16,7 +46,18 @@
       "summary": "Rootline Defense now ships its first ranged enemy. Briar Sniper stops inside the board, aims at a chosen defender for ~0.7s, then fires a thorn bolt that only hits that defender's tile. Plant an attacker between the sniper and its target to screen the shot — support plants don't screen.",
       "status": "pending-validation",
       "featureType": "game",
-      "tags": ["game", "rootline-defense", "briar-sniper", "ranged", "screening", "aim-telegraph", "enemy-projectile", "scenario", "board-scout", "playwright"],
+      "tags": [
+        "game",
+        "rootline-defense",
+        "briar-sniper",
+        "ranged",
+        "screening",
+        "aim-telegraph",
+        "enemy-projectile",
+        "scenario",
+        "board-scout",
+        "playwright"
+      ],
       "publishedAt": "2026-04-16T12:00:00.000Z"
     },
     {
@@ -25,7 +66,16 @@
       "summary": "Rootline Defense now has its first economy plant. Sunroot Bloom costs 50 sap, does not attack, and produces +25 sap pulses. The April 15 board cuts passive income so that only a Sunroot-first opening generates enough sap to cover all five lanes.",
       "status": "pending-validation",
       "featureType": "game",
-      "tags": ["game", "rootline-defense", "sunroot-bloom", "economy", "support-plant", "sap", "scenario", "board-scout"],
+      "tags": [
+        "game",
+        "rootline-defense",
+        "sunroot-bloom",
+        "economy",
+        "support-plant",
+        "sap",
+        "scenario",
+        "board-scout"
+      ],
       "publishedAt": "2026-04-15T12:00:00.000Z"
     },
     {
@@ -34,7 +84,16 @@
       "summary": "The game page now shows you what enemies, plants, and waves are in today's board before you start playing. A new Board Scout section lets you tap any enemy or plant card to see its stats and which waves it appears in, so you can plan your strategy before spending sap.",
       "status": "shipped",
       "featureType": "game",
-      "tags": ["game", "board-scout", "onboarding", "scenario-data", "roster", "waves", "planning", "ui"],
+      "tags": [
+        "game",
+        "board-scout",
+        "onboarding",
+        "scenario-data",
+        "roster",
+        "waves",
+        "planning",
+        "ui"
+      ],
       "publishedAt": "2026-04-14T10:48:55.000Z"
     },
     {
@@ -43,7 +102,14 @@
       "summary": "The lane-defense game now offers two plants. Players choose between cheap, steady Thorn Vine and expensive, piercing Bramble Spear — learning when each tool is the right answer across a tutorial and a tighter challenge board.",
       "status": "shipped",
       "featureType": "game",
-      "tags": ["game", "roster", "plants", "piercing", "bramble-spear", "two-plant"],
+      "tags": [
+        "game",
+        "roster",
+        "plants",
+        "piercing",
+        "bramble-spear",
+        "two-plant"
+      ],
       "publishedAt": "2026-04-13T09:30:00.000Z"
     },
     {
@@ -52,7 +118,13 @@
       "summary": "A compact Scoreboard section on the homepage that visualizes how the AI judges scored today's winning candidate across the seven scoring dimensions, making judge disagreement visible at a glance.",
       "status": "shipped",
       "featureType": "interaction",
-      "tags": ["homepage", "scoreboard", "transparency", "judges", "visualization"],
+      "tags": [
+        "homepage",
+        "scoreboard",
+        "transparency",
+        "judges",
+        "visualization"
+      ],
       "publishedAt": "2026-04-12T09:30:00.000Z"
     },
     {
@@ -61,13 +133,18 @@
       "summary": "A new 'Community Pulse' section on the homepage showing which features got the most love from the community over the last week.",
       "status": "shipped",
       "featureType": "interaction",
-      "tags": ["homepage", "community", "reactions", "engagement"],
+      "tags": [
+        "homepage",
+        "community",
+        "reactions",
+        "engagement"
+      ],
       "publishedAt": "2026-04-11T09:35:00.000Z"
     },
     {
       "date": "2026-04-10",
       "title": "The homepage now shows the latest pipeline run as a retro terminal",
-      "summary": "Added a terminal-style panel to the homepage that shows what the latest automated update built, tested, and shipped \u2014 in a few lines of styled command output.",
+      "summary": "Added a terminal-style panel to the homepage that shows what the latest automated update built, tested, and shipped — in a few lines of styled command output.",
       "status": "shipped",
       "featureType": "interaction",
       "tags": [
@@ -89,7 +166,7 @@
       "date": "2026-04-08",
       "status": "shipped",
       "title": "Inline Spec Viewer on Day Detail Pages",
-      "summary": "Collapsible technical specification section on day detail pages \u2014 read the full spec inline without downloading."
+      "summary": "Collapsible technical specification section on day detail pages — read the full spec inline without downloading."
     },
     {
       "date": "2026-04-07",

@@ -78,6 +78,8 @@ export const ENEMY_DEFINITIONS = [
     tint: null,
     displayWidth: 64,
     displayHeight: 64,
+    animationFrames: [12, 13, 14, 15],
+    animationFrameDurationMs: 90,
   },
   {
     id: "glassRam",

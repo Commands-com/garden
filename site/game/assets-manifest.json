@@ -1,52 +1,7 @@
 {
   "schemaVersion": 1,
-  "updatedAt": "2026-04-18T00:00:00.000Z",
+  "updatedAt": "2026-04-18T14:35:45.495Z",
   "assets": [
-    {
-      "id": "thornwing-moth",
-      "type": "sprite",
-      "kind": "sprite",
-      "provider": "repo",
-      "path": "/game/assets/manual/enemies/thornwing-moth.svg",
-      "prompt": "Hand-authored repo asset for the April 18 Thornwing Moth flying enemy. Static leftward-facing moth with thorn-tipped wings and amber eyespots so altitude and threat read clearly even when asset generation times out.",
-      "generatedAt": "2026-04-18T00:00:00.000Z",
-      "metadata": {
-        "category": "enemy",
-        "format": "svg",
-        "width": 128,
-        "height": 128
-      }
-    },
-    {
-      "id": "frost-fern",
-      "type": "sprite",
-      "kind": "sprite",
-      "provider": "repo",
-      "path": "/game/assets/manual/plants/frost-fern.svg",
-      "prompt": "Hand-authored repo asset for the April 17 Frost Fern control plant. Cool-blue crystalline fern that emits a lane-zone chill; no animation.",
-      "generatedAt": "2026-04-17T00:00:00.000Z",
-      "metadata": {
-        "category": "player",
-        "format": "svg",
-        "width": 128,
-        "height": 128
-      }
-    },
-    {
-      "id": "frost-particle",
-      "type": "sprite",
-      "kind": "sprite",
-      "provider": "repo",
-      "path": "/game/assets/manual/particles/frost-particle.svg",
-      "prompt": "Hand-authored frost flake particle for the Frost Fern chill trail emitter; cool-blue six-point snowflake silhouette.",
-      "generatedAt": "2026-04-17T00:00:00.000Z",
-      "metadata": {
-        "category": "particle",
-        "format": "svg",
-        "width": 24,
-        "height": 24
-      }
-    },
     {
       "id": "bramble-spear",
       "type": "sprite",
@@ -182,6 +137,36 @@
         "duration": 1.5,
         "kind": "sfx",
         "category": "ui"
+      }
+    },
+    {
+      "id": "frost-fern",
+      "type": "sprite",
+      "kind": "sprite",
+      "provider": "repo",
+      "path": "/game/assets/manual/plants/frost-fern.svg",
+      "prompt": "Hand-authored repo asset for the April 17 Frost Fern control plant. Cool-blue crystalline fern that emits a lane-zone chill; no animation.",
+      "generatedAt": "2026-04-17T00:00:00.000Z",
+      "metadata": {
+        "category": "player",
+        "format": "svg",
+        "width": 128,
+        "height": 128
+      }
+    },
+    {
+      "id": "frost-particle",
+      "type": "sprite",
+      "kind": "sprite",
+      "provider": "repo",
+      "path": "/game/assets/manual/particles/frost-particle.svg",
+      "prompt": "Hand-authored frost flake particle for the Frost Fern chill trail emitter; cool-blue six-point snowflake silhouette.",
+      "generatedAt": "2026-04-17T00:00:00.000Z",
+      "metadata": {
+        "category": "particle",
+        "format": "svg",
+        "width": 24,
+        "height": 24
       }
     },
     {
@@ -336,6 +321,29 @@
         "style": "topdown_asset",
         "width": 384,
         "height": 384
+      }
+    },
+    {
+      "id": "thornwing-moth",
+      "type": "sprite",
+      "kind": "animation",
+      "provider": "replicate",
+      "path": "/game/assets/generated/animations/thornwing-moth.png",
+      "prompt": "Create an animated enemy sprite of thornwing moth flying leftward with thorn-tipped wings, amber eyespots, and a thorn-edged abdomen; hostile lane-pushing creature for a top-down lane-defense game, readable attack silhouette, visually distinct body shape, premium indie-game finish. hostile lane-pushing creature for a top-down lane-defense game, readable attack silhouette, visually distinct body shape, premium indie-game finish. Render a cohesive low-framerate gameplay animation with consistent character volume, palette, and positioning across frames. Use the rd-animation style walking_and_idle. Each frame must keep the same subject identity, palette, and camera angle while showing one coherent gameplay action. Target frame size 48x48. No text, labels, borders, UI panels, or background scene dressing. modern polished pixel art, crisp readable silhouettes, consistent shading, and strong gameplay clarity. avoid muddy low-contrast frames, avoid random pose drift, avoid noisy background detail, avoid deliberately primitive 8-bit nostalgia.",
+      "generatedAt": "2026-04-18T14:35:45.481Z",
+      "metadata": {
+        "predictionId": "rjvbyhaw11rmr0cxm429bzdtar",
+        "modelVersion": "2e4eabbc836578423e151ba27352a1d8a566c6f1186c0da3ddf66c54deacf28b",
+        "model": "rd-animation",
+        "category": "enemy",
+        "style": "walking_and_idle",
+        "width": 48,
+        "height": 48,
+        "returnSpritesheet": true,
+        "phaser": {
+          "frameWidth": 48,
+          "frameHeight": 48
+        }
       }
     }
   ]
