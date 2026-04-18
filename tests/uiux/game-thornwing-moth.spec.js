@@ -437,8 +437,11 @@ test.describe("Thornwing Moth flying contract", () => {
     });
 
     await page.waitForFunction(
-      () => window.__gameTestHooks.getState()?.scene === "gameover",
-      undefined,
+      (startingHp) => {
+        const state = window.__gameTestHooks.getState();
+        return state?.gardenHP === startingHp - 1 || state?.scene === "gameover";
+      },
+      passOverSnapshot.gardenHP,
       { timeout: 15000 }
     );
 
@@ -449,9 +452,7 @@ test.describe("Thornwing Moth flying contract", () => {
     expect(passOverSnapshot.moth.flying).toBe(true);
     expect(passOverSnapshot.moth.altitude).toBe(34);
     expect(passOverSnapshot.moth.x).toBeGreaterThan(passOverSnapshot.breachX);
-    expect(passOverSnapshot.gardenHP).toBe(1);
-    expect(finalState.gardenHP).toBe(0);
-    expect(finalState.scene).toBe("gameover");
+    expect(finalState.gardenHP).toBe(passOverSnapshot.gardenHP - 1);
     expect(runtimeErrors, runtimeErrors.join("\n")).toEqual([]);
   });
 });

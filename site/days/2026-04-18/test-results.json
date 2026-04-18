@@ -1,0 +1,70 @@
+{
+  "schemaVersion": 1,
+  "runDate": "2026-04-18",
+  "generatedAt": "2026-04-18T14:19:37.000Z",
+  "summary": {
+    "totalScenarios": 7,
+    "passed": 7,
+    "failed": 0,
+    "passRate": 100.0
+  },
+  "scenarios": [
+    {
+      "name": "Artifact schema validation",
+      "persona": "validator",
+      "status": "pass",
+      "description": "Validated the April 18 artifact directory with the repository schema validator.",
+      "details": "`node schemas/validate.js content/days/2026-04-18` passes decision.json, feedback-digest.json, test-results.json, spec.md, build-summary.md, and review.md."
+    },
+    {
+      "name": "Scenario difficulty validator",
+      "persona": "validator",
+      "status": "pass",
+      "description": "Ran the scenario-difficulty validator against the retuned April 18 challenge.",
+      "details": "`npm run validate:scenario-difficulty -- --date 2026-04-18` → exit 0, result: indeterminate (validator skips ranged/sniper behaviors, verdict deferred to runtime probe and Playwright specs per AGENTS.md)."
+    },
+    {
+      "name": "Playwright — game-thornwing-moth.spec.js",
+      "persona": "visitor",
+      "status": "pass",
+      "description": "Locks the flying-enemy contract: enemy-def shape (behavior flying, flying true, altitude 34, maxHealth 32, speed 52), Thorn Vine bolts pass under a moth and continue to a grounded enemy behind it, Bramble Spear fires anti-air projectiles that kill a moth in exactly two hits, and observation marks a moth as flying while it passes over a defender and delivers 1 breach damage.",
+      "details": "`npm run test:uiux -- tests/uiux/game-thornwing-moth.spec.js` — 4 tests passed. The breach-damage test was adjusted from a hardcoded gardenHP=1→0 assertion to a delta check (finalHP === startingHP - 1) so the test is independent of the tuned challenge HP."
+    },
+    {
+      "name": "Playwright — game-2026-04-18-flow.spec.js (tutorial → challenge → endless)",
+      "persona": "visitor",
+      "status": "pass",
+      "description": "Asserts the April 18 scenario contract (title 'Wings Over the Garden', 2 tutorial waves, 4 challenge waves, endless pool [briarBeetle, shardMite, glassRam], every Thornwing event confined to lane 1 or 3), tutorial Wave 1 'It Flew Over' (availablePlants [thornVine]) → Wave 2 'Plant the Spears' (availablePlants [thornVine, brambleSpear]) → challenge open (gardenHP=3, availablePlants [thornVine, brambleSpear, sunrootBloom, frostFern]), runs the Bramble replay via placeDefender, and waits for scenarioPhase==='endless' && challengeCleared===true.",
+      "details": "`npm run test:uiux -- tests/uiux/game-2026-04-18-flow.spec.js` — 1 test passed in ~18.1s. Natural clear via the retuned board (no finishScenario bypass)."
+    },
+    {
+      "name": "Playwright — game-2026-04-18-replays.spec.js (paired replay probes)",
+      "persona": "validator",
+      "status": "pass",
+      "description": "Paired-replay gate. replay-2026-04-18-with-bramble.json drives the challenge to natural clear (scenarioPhase=endless, challengeCleared=true, gardenHP>=1) proving the canonical anti-air line solves the board; replay-2026-04-18-no-anti-air.json drives the same opening without any Bramble Spear to gameover, proving the new plant is required for today's scripted flying events.",
+      "details": "`npm run test:uiux -- tests/uiux/game-2026-04-18-replays.spec.js` — 2 tests passed in ~18.3s: with-bramble clears, no-anti-air loses to moth breaches."
+    },
+    {
+      "name": "Playwright — game-board-scout-2026-04-18.spec.js",
+      "persona": "visitor",
+      "status": "pass",
+      "description": "Locks the Board Scout Anti-air copy: Thornwing Moth card shows the 'Flying' badge and attacker detail panels expose an `Anti-air: Yes|No` row (Yes on Bramble Spear, No on Thorn Vine).",
+      "details": "`npm run test:uiux -- tests/uiux/game-board-scout-2026-04-18.spec.js` — 1 test passed in ~0.9s."
+    },
+    {
+      "name": "Prior-day regression — full Playwright suite",
+      "persona": "visitor",
+      "status": "pass",
+      "description": "Ran the full Playwright suite (npx playwright test) to confirm no regressions from today's play.js / enemies.js / plants.js changes. The prior Board Scout plant-detail specs (game-board-scout.spec.js, game-board-scout-interaction-2026-04-14.spec.js) were updated to include the new 'Anti-air' dt row in plant detail labels.",
+      "details": "`npx playwright test` — 412 passed. 3 pre-existing failures reproduced at yesterday's HEAD (51c96ae) and are not caused by today's changes: game-2026-04-17-replays.spec.js (no-control probe), game-2026-04-17-title-endless-gating.spec.js, game-briar-sniper-aim-line-accessibility.spec.js."
+    }
+  ],
+  "baselineFailures": {
+    "preExisting": [
+      "tests/uiux/game-2026-04-17-replays.spec.js › replay-2026-04-17-no-control.json loses at the ram window",
+      "tests/uiux/game-2026-04-17-title-endless-gating.spec.js › keeps endless locked through tutorial-only progress, then unlocks it after the Frost Fern clear",
+      "tests/uiux/game-briar-sniper-aim-line-accessibility.spec.js › inventory buttons remain keyboard-reachable while a sniper is aiming; focus is visible and Enter toggles aria-pressed"
+    ]
+  },
+  "testPersonas": ["validator", "visitor"]
+}

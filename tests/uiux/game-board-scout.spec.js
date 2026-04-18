@@ -180,6 +180,7 @@ test.describe("Board Scout rail", () => {
     await expect(detail.locator(".game-scout__detail-stats dt")).toHaveText([
       "Cost",
       "Piercing",
+      "Anti-air",
       "Fire Rate",
       "Damage",
     ]);

@@ -110,6 +110,7 @@ test.describe("Board Scout card selection, detail panel, and collapse toggle (20
     await expect(detail.locator(".game-scout__detail-stats dt")).toHaveText([
       "Cost",
       "Piercing",
+      "Anti-air",
       "Fire Rate",
       "Damage",
     ]);

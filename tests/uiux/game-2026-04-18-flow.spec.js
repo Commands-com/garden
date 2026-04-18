@@ -264,7 +264,7 @@ test.describe("April 18 tutorial -> challenge -> endless flow", () => {
       "sunrootBloom",
       "frostFern",
     ]);
-    expect(challengeOpening.gardenHP).toBe(1);
+    expect(challengeOpening.gardenHP).toBe(3);
     expect(challengeOpening.challengeCleared).toBe(false);
 
     await page.evaluate(() => window.__gameTestHooks.setTimeScale(8));
