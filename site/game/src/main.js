@@ -324,6 +324,13 @@ function renderBoardScout(dayDate, assetCatalog) {
                   { className: "game-scout__badge game-scout__badge--ranged" },
                   "Ranged"
                 )
+              : false,
+            enemy.behavior === "flying" || enemy.flying === true
+              ? el(
+                  "span",
+                  { className: "game-scout__badge game-scout__badge--flying" },
+                  "Flying"
+                )
               : false
           )
         )
@@ -589,6 +596,8 @@ function selectScoutCard(card, type, data, scenario) {
         el("dd", {}, String(data.cost)),
         el("dt", {}, "Piercing"),
         el("dd", {}, data.piercing ? "Yes" : "No"),
+        el("dt", {}, "Anti-air"),
+        el("dd", {}, data.canHitFlying === true ? "Yes" : "No"),
         el("dt", {}, "Fire Rate"),
         el("dd", {}, `${data.cadenceMs}ms`),
         el("dt", {}, "Damage"),

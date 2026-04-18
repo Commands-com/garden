@@ -1,7 +1,22 @@
 {
   "schemaVersion": 1,
-  "updatedAt": "2026-04-17T00:00:00.000Z",
+  "updatedAt": "2026-04-18T00:00:00.000Z",
   "assets": [
+    {
+      "id": "thornwing-moth",
+      "type": "sprite",
+      "kind": "sprite",
+      "provider": "repo",
+      "path": "/game/assets/manual/enemies/thornwing-moth.svg",
+      "prompt": "Hand-authored repo asset for the April 18 Thornwing Moth flying enemy. Static leftward-facing moth with thorn-tipped wings and amber eyespots so altitude and threat read clearly even when asset generation times out.",
+      "generatedAt": "2026-04-18T00:00:00.000Z",
+      "metadata": {
+        "category": "enemy",
+        "format": "svg",
+        "width": 128,
+        "height": 128
+      }
+    },
     {
       "id": "frost-fern",
       "type": "sprite",

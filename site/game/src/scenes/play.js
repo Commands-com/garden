@@ -932,6 +932,16 @@ export class PlayScene extends Phaser.Scene {
         continue;
       }
 
+      if (enemy.definition.behavior === "flying") {
+        this.updateFlyingEnemy(enemy, deltaMs);
+        if (enemy.destroyed) continue;
+        const altitude = enemy.altitude || enemy.definition.altitude || 0;
+        const bob = Math.sin(this.elapsedMs / 320) * 3;
+        enemy.sprite.setPosition(enemy.x, enemy.y - altitude + bob);
+        this.renderFlyingShadow(enemy);
+        continue;
+      }
+
       const blocker = this.getBlockingDefender(enemy);
       if (blocker) {
         enemy.attackCooldownMs -= deltaMs;
@@ -1028,6 +1038,24 @@ export class PlayScene extends Phaser.Scene {
         }
       }
     }
+  }
+
+  updateFlyingEnemy(enemy, deltaMs) {
+    enemy.x -= getEffectiveSpeed(enemy) * (deltaMs / 1000);
+    if (enemy.x <= BREACH_X) {
+      this.resolveBreach(enemy);
+    }
+  }
+
+  renderFlyingShadow(enemy) {
+    if (!enemy.shadow) {
+      enemy.shadow = this.add.graphics();
+      enemy.shadow.setDepth(5);
+    }
+    const g = enemy.shadow;
+    g.clear();
+    g.fillStyle(0x000000, 0.32);
+    g.fillEllipse(enemy.x, enemy.y + 6, 28, 8);
   }
 
   getDefenderById(defenderId) {
@@ -1392,8 +1420,12 @@ export class PlayScene extends Phaser.Scene {
             distanceToBreach: Math.max(0, Math.round(enemy.x - BREACH_X)),
             requiredDefendersInLane: enemy.definition.requiredDefendersInLane || 0,
             behavior: enemy.definition.behavior || "walker",
+            flying: enemy.definition.flying === true,
             statusEffects,
           };
+          if (enemy.definition.flying === true) {
+            base.altitude = enemy.altitude || enemy.definition.altitude || 0;
+          }
           if (enemy.definition.behavior === "sniper") {
             base.sniper = {
               snipeState: enemy.snipeState,
@@ -1456,6 +1488,16 @@ export class PlayScene extends Phaser.Scene {
       },
       lanes,
       upcomingEvents,
+      projectiles: this.projectiles
+        .filter((projectile) => !projectile.destroyed)
+        .map((projectile) => ({
+          lane: projectile.lane,
+          x: Math.round(projectile.x),
+          y: Math.round(projectile.y),
+          damage: projectile.damage,
+          piercing: projectile.piercing === true,
+          canHitFlying: projectile.canHitFlying === true,
+        })),
       enemyProjectiles: this.enemyProjectiles
         .filter((projectile) => !projectile.destroyed)
         .map((projectile) => ({
@@ -1565,6 +1607,7 @@ export class PlayScene extends Phaser.Scene {
 
     const plantDef = defender.definition;
     const piercing = plantDef.piercing || false;
+    const canHitFlying = plantDef.canHitFlying === true;
 
     this.projectiles.push({
       lane: defender.row,
@@ -1574,6 +1617,7 @@ export class PlayScene extends Phaser.Scene {
       speed: plantDef.projectileSpeed,
       radius: plantDef.projectileRadius,
       piercing,
+      canHitFlying,
       hitEnemies: piercing ? new Set() : null,
       sprite,
       destroyed: false,
@@ -1633,7 +1677,7 @@ export class PlayScene extends Phaser.Scene {
         speed: definition.speed * speedScale,
       },
       sprite,
-      attackCooldownMs: definition.attackCadenceMs,
+      attackCooldownMs: definition.attackCadenceMs || 0,
       animationFrameIndex: 0,
       animationElapsedMs: 0,
       destroyed: false,
@@ -1647,7 +1691,14 @@ export class PlayScene extends Phaser.Scene {
       aimLine: null,
       statusEffects: {},
       slowRenderer: null,
+      altitude: definition.behavior === "flying" ? definition.altitude || 0 : 0,
+      bobPhaseMs: 0,
+      shadow: null,
     };
+
+    if (definition.behavior === "flying") {
+      sprite.setPosition(enemy.x, enemy.y - enemy.altitude);
+    }
 
     this.applyEnemyAnimationFrame(enemy);
     this.enemies.push(enemy);
@@ -1707,6 +1758,10 @@ export class PlayScene extends Phaser.Scene {
   }
 
   getBlockingDefender(enemy) {
+    if (enemy.definition.flying === true) {
+      return null;
+    }
+
     let blocker = null;
 
     for (const defender of this.defenders) {
@@ -1739,6 +1794,10 @@ export class PlayScene extends Phaser.Scene {
 
     for (const enemy of this.enemies) {
       if (enemy.destroyed || enemy.lane !== projectile.lane) {
+        continue;
+      }
+
+      if (enemy.definition.flying === true && !projectile.canHitFlying) {
         continue;
       }
 
@@ -1834,6 +1893,10 @@ export class PlayScene extends Phaser.Scene {
         enemy.slowRenderer.destroy();
       }
       enemy.slowRenderer = null;
+    }
+    if (enemy.shadow) {
+      enemy.shadow.destroy();
+      enemy.shadow = null;
     }
 
     if (awardScore) {

@@ -32,6 +32,7 @@ export const PLANT_DEFINITIONS = {
     projectileDamage: 22,
     projectileRadius: 6,
     piercing: true,
+    canHitFlying: true,
     projectileTextureKey: "bramble-spear-projectile",
     displayWidth: 48,
     displayHeight: 52,

@@ -135,7 +135,9 @@ export class BootScene extends Phaser.Scene {
           ? enemy.tint
           : enemy.behavior === "sniper"
             ? 0x8f2d4a
-            : 0x633b2a;
+            : enemy.behavior === "flying"
+              ? 0x7a4ab8
+              : 0x633b2a;
         createCircleTexture(this, enemy.textureKey, enemy.radius, fallbackTint);
       }
 
