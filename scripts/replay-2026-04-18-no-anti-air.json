@@ -1,0 +1,54 @@
+{
+  "label": "2026-04-18-no-anti-air",
+  "date": "2026-04-18",
+  "mode": "challenge",
+  "description": "Mirror the intended April 18 board shape but refuse to spend on Bramble Spear. Thorn Vines cover lanes 1 and 3 as if they were normal ground lanes; Thornwing Moth should ignore that coverage, breach the 1 HP wall, and end the run before the grounded line matters.",
+  "expect": {
+    "outcome": "gameover",
+    "reason": "thornwing-moths-breach-when-the-player-never-buys-anti-air"
+  },
+  "placements": [
+    {
+      "timeMs": 0,
+      "row": 4,
+      "col": 0,
+      "plantId": "sunrootBloom",
+      "note": "Open on economy so the replay still represents a serious attempt at the board rather than an intentionally empty lane."
+    },
+    {
+      "timeMs": 4000,
+      "row": 1,
+      "col": 0,
+      "plantId": "thornVine",
+      "note": "Incorrect answer in lane 1: Thorn Vine fires, but its bolts pass underneath Thornwing."
+    },
+    {
+      "timeMs": 12000,
+      "row": 3,
+      "col": 0,
+      "plantId": "thornVine",
+      "note": "Mirror the same wrong answer in lane 3."
+    },
+    {
+      "timeMs": 20000,
+      "row": 2,
+      "col": 0,
+      "plantId": "thornVine",
+      "note": "Begin the grounded defense after the airborne failure is already committed."
+    },
+    {
+      "timeMs": 25000,
+      "row": 0,
+      "col": 0,
+      "plantId": "thornVine",
+      "note": "Top-lane ground cover."
+    },
+    {
+      "timeMs": 30000,
+      "row": 4,
+      "col": 1,
+      "plantId": "thornVine",
+      "note": "Screen the Sunroot lane, but the replay should already be lost to the flying lanes."
+    }
+  ]
+}

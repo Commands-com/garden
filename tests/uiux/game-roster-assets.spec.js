@@ -144,6 +144,47 @@ test("April 17 Frost Fern and frost particle manifest entries resolve to repo-ba
   expect(assetState.frostParticleBody).toContain("<svg");
 });
 
+test("April 18 Thornwing Moth has manifest-backed enemy art", async ({
+  page,
+}) => {
+  await installLocalSiteRoutes(page);
+  await page.goto(getAppUrl("/game/?testMode=1&date=2026-04-18"));
+  await page.waitForFunction(
+    () =>
+      window.__gameTestHooks &&
+      typeof window.__gameTestHooks.getState === "function"
+  );
+
+  const assetState = await page.evaluate(async () => {
+    const assetManifest = await fetch("/game/assets-manifest.json").then(
+      (response) => response.json()
+    );
+    const thornwing = (assetManifest.assets || []).find(
+      (asset) => asset.id === "thornwing-moth"
+    );
+    const response = await fetch(thornwing.path);
+
+    return {
+      thornwing,
+      ok: response.ok,
+      body: await response.text(),
+    };
+  });
+
+  expect(assetState.thornwing).toMatchObject({
+    id: "thornwing-moth",
+    provider: "repo",
+    path: "/game/assets/manual/enemies/thornwing-moth.svg",
+  });
+  expect(assetState.thornwing.metadata).toMatchObject({
+    category: "enemy",
+    width: 128,
+    height: 128,
+  });
+  expect(assetState.ok).toBe(true);
+  expect(assetState.body).toContain("<svg");
+});
+
 test("April 15 Sunroot Bloom loads manifest-backed art and expects no projectile", async ({
   page,
 }) => {

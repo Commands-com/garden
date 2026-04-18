@@ -1,0 +1,263 @@
+{
+  "schemaVersion": 2,
+  "runDate": "2026-04-18",
+  "generatedAt": "2026-04-18T12:00:00Z",
+  "scoringDimensions": [
+    { "id": "compoundingValue", "label": "Compounding Value" },
+    { "id": "usefulnessClarity", "label": "Usefulness & Clarity" },
+    { "id": "noveltySurprise", "label": "Novelty & Surprise" },
+    { "id": "feasibility", "label": "Feasibility" },
+    { "id": "legibility", "label": "Legibility" },
+    { "id": "continuity", "label": "Continuity" },
+    { "id": "shareability", "label": "Shareability" }
+  ],
+  "judgePanel": [
+    {
+      "agentId": "explore_explorer_0",
+      "displayName": "GPT (Visitor)",
+      "conceptKey": "openai",
+      "modelFamily": "gpt",
+      "provider": "codex_cli",
+      "model": "gpt-5.4",
+      "lens": "visitor"
+    },
+    {
+      "agentId": "explore_explorer_1",
+      "displayName": "Claude (Gardener)",
+      "conceptKey": "claude",
+      "modelFamily": "claude",
+      "provider": "claude",
+      "model": "opus",
+      "lens": "gardener"
+    },
+    {
+      "agentId": "explore_explorer_2",
+      "displayName": "Gemini (Explorer)",
+      "conceptKey": "gemini",
+      "modelFamily": "gemini",
+      "provider": "gemini_cli",
+      "model": "gemini-3.1-pro-preview",
+      "lens": "explorer"
+    }
+  ],
+  "summary": "Rootline Defense now has its first flying enemy. Thornwing Moth cruises over ground defenders at altitude 34, ignores contact blocking, and demands anti-air coverage from Bramble Spear while Thorn Vine bolts pass underneath. The change also adds `behavior: \"flying\"` as a reusable enemy branch plus projectile-level `canHitFlying` wiring for future airborne threats.",
+  "candidates": [
+    {
+      "id": "candidate-1",
+      "title": "Thornwing Moth — First Flying Enemy and `behavior: \"flying\"` Branch",
+      "summary": "Adds Thornwing Moth as the first flying enemy, introduces a reusable `behavior: \"flying\"` branch, ships projectile-level anti-air gating via `canHitFlying`, extends Board Scout and observation exports for flying/anti-air data, and publishes the April 18 Wings Over the Garden tutorial/challenge where Thornwings only occupy lanes 1 and 3.",
+      "averageScore": 9.0,
+      "reviewCount": 3,
+      "rank": 1,
+      "dimensionAverages": {
+        "compoundingValue": { "label": "Compounding Value", "average": 9.3, "reviewCount": 3 },
+        "usefulnessClarity": { "label": "Usefulness & Clarity", "average": 8.7, "reviewCount": 3 },
+        "noveltySurprise": { "label": "Novelty & Surprise", "average": 9.3, "reviewCount": 3 },
+        "feasibility": { "label": "Feasibility", "average": 8.3, "reviewCount": 3 },
+        "legibility": { "label": "Legibility", "average": 9.0, "reviewCount": 3 },
+        "continuity": { "label": "Continuity", "average": 9.0, "reviewCount": 3 },
+        "shareability": { "label": "Shareability", "average": 9.0, "reviewCount": 3 }
+      },
+      "reviewerBreakdown": [
+        {
+          "reviewer": {
+            "agentId": "explore_explorer_0",
+            "displayName": "GPT (Visitor)",
+            "modelFamily": "gpt",
+            "lens": "visitor"
+          },
+          "overallScore": 8.8,
+          "dimensionScores": {
+            "compoundingValue": 9,
+            "usefulnessClarity": 9,
+            "noveltySurprise": 9,
+            "feasibility": 8,
+            "legibility": 9,
+            "continuity": 9,
+            "shareability": 9
+          },
+          "keep": [
+            "Flying changes what the player must cover, not just how much damage they output.",
+            "The under-flight read is visible because the moth stacks altitude offset, shadow, and bob instead of only moving the hitbox.",
+            "Board Scout explains the answer before the run starts: Flying on the enemy card, Anti-air on the plant card."
+          ],
+          "mustChange": [
+            "Playwright must prove Thorn Vine bolts continue past the moth and still damage a grounded target behind it."
+          ],
+          "risks": [
+            "If the altitude cue is too subtle, the miss will read as a collision bug rather than intended counterplay."
+          ]
+        },
+        {
+          "reviewer": {
+            "agentId": "explore_explorer_1",
+            "displayName": "Claude (Gardener)",
+            "modelFamily": "claude",
+            "lens": "gardener"
+          },
+          "overallScore": 9.1,
+          "dimensionScores": {
+            "compoundingValue": 10,
+            "usefulnessClarity": 8,
+            "noveltySurprise": 10,
+            "feasibility": 8,
+            "legibility": 9,
+            "continuity": 9,
+            "shareability": 9
+          },
+          "keep": [
+            "A second behavior branch after sniper means enemy logic is now archetype-driven instead of monolithic walker code.",
+            "Projectile-level `canHitFlying` is the right extensibility point: future anti-air plants inherit the same surface.",
+            "Constraining Thornwing to lanes 1 and 3 keeps the board hard but teachable instead of random."
+          ],
+          "mustChange": [
+            "Endless must exclude Thornwing so the memorization contract stays attached to the scripted challenge."
+          ],
+          "risks": [
+            "Moving Thornwing into endless too early would turn a taught lesson into a surprise failure mode."
+          ]
+        },
+        {
+          "reviewer": {
+            "agentId": "explore_explorer_2",
+            "displayName": "Gemini (Explorer)",
+            "modelFamily": "gemini",
+            "lens": "explorer"
+          },
+          "overallScore": 9.0,
+          "dimensionScores": {
+            "compoundingValue": 9,
+            "usefulnessClarity": 9,
+            "noveltySurprise": 9,
+            "feasibility": 9,
+            "legibility": 9,
+            "continuity": 9,
+            "shareability": 9
+          },
+          "keep": [
+            "The first flying enemy is immediately screenshot-able because the shadow and offset make the new class legible in a still frame.",
+            "Observation exports stay replay-friendly: `behavior`, `flying`, `altitude`, and top-level `projectiles[].canHitFlying` are all deterministic.",
+            "The titled board, Wings Over the Garden, links the mechanic to a daily scenario instead of a one-off sandbox test."
+          ],
+          "mustChange": [
+            "Tests must lock the two-shot Bramble lethality against `maxHealth: 32` so future tuning drift is visible."
+          ],
+          "risks": [
+            "If Bramble loses the two-shot breakpoint, the anti-air answer stops feeling clean."
+          ]
+        }
+      ],
+      "keep": [
+        "Ship a real airborne threat with a reusable `behavior: \"flying\"` branch and manifest-backed art.",
+        "Route anti-air through projectile data instead of plant-specific collision code.",
+        "Teach the mechanic in a dedicated tutorial and keep the endless pool grounded."
+      ],
+      "mustChange": [
+        "Observation exports must include `behavior`, `flying`, `altitude`, and top-level `projectiles[]` so the new class is testable.",
+        "Board Scout must expose both sides of the counterplay: `Flying` on Thornwing and `Anti-air` on attackers.",
+        "The challenge must keep every Thornwing event in lane 1 or lane 3."
+      ],
+      "risks": [
+        "Altitude legibility can fail if the shadow/offset stack is not obvious enough in motion and stills.",
+        "The no-contact flying branch must not regress existing walker/sniper behavior dispatch."
+      ],
+      "feedbackReferences": [
+        "Players asked for enemies with more distinct behaviors than more walkers.",
+        "Board Scout feedback pushed the implementation to make the new counterplay visible before a run starts."
+      ]
+    },
+    {
+      "id": "candidate-2",
+      "title": "Wave Forecast Strip for Board Scout",
+      "summary": "Adds a stronger pre-run wave timeline to Board Scout so players can see the next cluster of pressure without adding a new enemy class or a new damage channel.",
+      "averageScore": 7.6,
+      "reviewCount": 3,
+      "rank": 2,
+      "dimensionAverages": {
+        "compoundingValue": { "label": "Compounding Value", "average": 7.7, "reviewCount": 3 },
+        "usefulnessClarity": { "label": "Usefulness & Clarity", "average": 8.0, "reviewCount": 3 },
+        "noveltySurprise": { "label": "Novelty & Surprise", "average": 7.0, "reviewCount": 3 },
+        "feasibility": { "label": "Feasibility", "average": 8.0, "reviewCount": 3 },
+        "legibility": { "label": "Legibility", "average": 8.0, "reviewCount": 3 },
+        "continuity": { "label": "Continuity", "average": 7.7, "reviewCount": 3 },
+        "shareability": { "label": "Shareability", "average": 6.7, "reviewCount": 3 }
+      },
+      "keep": [
+        "Improves planning without touching runtime combat."
+      ],
+      "mustChange": [
+        "Needs a new strategic verb, not only better forecasting."
+      ],
+      "risks": [
+        "Legible but less surprising than the first airborne enemy."
+      ]
+    },
+    {
+      "id": "candidate-3",
+      "title": "Second Control Plant — Root Snare",
+      "summary": "Adds another control plant after Frost Fern, but extends the roster before the game has a second enemy class to justify a new answer.",
+      "averageScore": 7.2,
+      "reviewCount": 3,
+      "rank": 3,
+      "dimensionAverages": {
+        "compoundingValue": { "label": "Compounding Value", "average": 7.7, "reviewCount": 3 },
+        "usefulnessClarity": { "label": "Usefulness & Clarity", "average": 7.3, "reviewCount": 3 },
+        "noveltySurprise": { "label": "Novelty & Surprise", "average": 6.7, "reviewCount": 3 },
+        "feasibility": { "label": "Feasibility", "average": 7.3, "reviewCount": 3 },
+        "legibility": { "label": "Legibility", "average": 7.0, "reviewCount": 3 },
+        "continuity": { "label": "Continuity", "average": 7.3, "reviewCount": 3 },
+        "shareability": { "label": "Shareability", "average": 7.0, "reviewCount": 3 }
+      },
+      "keep": [
+        "Builds on the reusable status-effect work from April 17."
+      ],
+      "mustChange": [
+        "Needs a new enemy pressure shape to justify the added roster complexity."
+      ],
+      "risks": [
+        "Another plant before another enemy class deepens the answer set faster than the question set."
+      ]
+    }
+  ],
+  "winner": {
+    "candidateId": "candidate-1",
+    "title": "Thornwing Moth — First Flying Enemy and `behavior: \"flying\"` Branch",
+    "summary": "Adds Thornwing Moth as the first flying enemy, introduces a reusable `behavior: \"flying\"` branch, ships projectile-level anti-air gating via `canHitFlying`, extends Board Scout and observation exports for flying/anti-air data, and publishes the April 18 Wings Over the Garden tutorial/challenge where Thornwings only occupy lanes 1 and 3.",
+    "averageScore": 9.0
+  },
+  "rationale": "Thornwing Moth won because it creates the first enemy that demands a different damage channel rather than simply more damage. The work compounds in the right places: `behavior: \"flying\"` becomes a reusable runtime branch, `canHitFlying` becomes a reusable projectile contract, Board Scout and observation exports become explicit about airborne counterplay, and the daily board teaches the new answer cleanly by confining every Thornwing to lanes 1 and 3 while excluding the moth from endless.",
+  "featureType": "game",
+  "tags": [
+    "game",
+    "rootline-defense",
+    "thornwing-moth",
+    "flying-enemy",
+    "anti-air",
+    "behavior-flying",
+    "board-scout",
+    "scenario",
+    "playwright"
+  ],
+  "feedbackInfluence": [
+    {
+      "summary": "Players asked for more enemy behaviors than additional walkers; flying creates a new damage-eligibility problem instead of a pure stat variation.",
+      "impact": "high"
+    },
+    {
+      "summary": "Board Scout feedback pushed the implementation to publish Flying and Anti-air status directly in the pre-run UI.",
+      "impact": "medium"
+    }
+  ],
+  "artifacts": {
+    "spec": "spec.md",
+    "buildSummary": "build-summary.md"
+  },
+  "keyDecisions": [
+    "Model Thornwing Moth with `behavior: \"flying\"`, `flying: true`, `altitude: 34`, `maxHealth: 32`, `speed: 52`, `breachDamage: 1`, and `score: 26`.",
+    "Branch enemy updates into `updateFlyingEnemy(enemy, deltaMs)` after the sniper branch and keep flying enemies out of blocker/contact logic.",
+    "Render altitude with sprite Y offset plus a Phaser Graphics ground shadow and a bob driven by scene `elapsedMs`, not by chill-scaled local animation time.",
+    "Copy `canHitFlying` from plant definitions onto runtime projectiles and skip flying targets when the flag is false.",
+    "Expose `behavior`, `flying`, `altitude`, and top-level `projectiles[].canHitFlying` in observation data for Playwright and replay consumers.",
+    "Ship April 18 as `Wings Over the Garden` with a 2-wave tutorial, a 4-wave challenge, Thornwing confined to lanes 1 and 3, and an endless pool that excludes `thornwingMoth`."
+  ]
+}
