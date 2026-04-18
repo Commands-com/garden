@@ -5,7 +5,7 @@ const {
 } = require("./helpers/local-site");
 
 test.describe("HUD threats label truncation", () => {
-  test("caps at the first 3 labels and appends '+N more' once unlocks exceed 3", async ({
+  test("shows all unlocks in order up to 3; collapses 4+ to the two strongest + '+N more'", async ({
     page,
   }) => {
     const runtimeErrors = [];
@@ -21,44 +21,45 @@ test.describe("HUD threats label truncation", () => {
     const result = await page.evaluate(async () => {
       const { formatThreatsLabel } = await import("/game/src/scenes/play.js");
       return {
-        zero: formatThreatsLabel([], 3),
-        one: formatThreatsLabel(["briarBeetle"], 3),
-        three: formatThreatsLabel(
-          ["briarBeetle", "shardMite", "glassRam"],
-          3
-        ),
-        four: formatThreatsLabel(
-          ["briarBeetle", "shardMite", "glassRam", "briarSniper"],
-          3
-        ),
-        five: formatThreatsLabel(
-          [
-            "briarBeetle",
-            "shardMite",
-            "glassRam",
-            "briarSniper",
-            "thornwingMoth",
-          ],
-          3
-        ),
-        unknown: formatThreatsLabel(
-          ["briarBeetle", "missingEnemy", "shardMite", "anotherMissing"],
-          3
-        ),
+        zero: formatThreatsLabel([]),
+        one: formatThreatsLabel(["briarBeetle"]),
+        three: formatThreatsLabel(["briarBeetle", "shardMite", "glassRam"]),
+        fourStrongestInOrder: formatThreatsLabel([
+          "briarBeetle",
+          "shardMite",
+          "glassRam",
+          "briarSniper",
+        ]),
+        fiveWave4: formatThreatsLabel([
+          "briarBeetle",
+          "shardMite",
+          "glassRam",
+          "briarSniper",
+          "thornwingMoth",
+        ]),
+        unknownIdsDemoted: formatThreatsLabel([
+          "briarBeetle",
+          "missingEnemy",
+          "shardMite",
+          "anotherMissing",
+        ]),
       };
     });
 
     expect(result.zero).toBe("");
     expect(result.one).toBe("Briar Beetle");
     expect(result.three).toBe("Briar Beetle  ·  Shard Mite  ·  Glass Ram");
-    expect(result.four).toBe(
-      "Briar Beetle  ·  Shard Mite  ·  Glass Ram  ·  +1 more"
+    // 4+: rank by score — glassRam (32) > briarSniper (28) > others.
+    expect(result.fourStrongestInOrder).toBe(
+      "Glass Ram  ·  Briar Sniper  ·  +2 more"
     );
-    expect(result.five).toBe(
-      "Briar Beetle  ·  Shard Mite  ·  Glass Ram  ·  +2 more"
-    );
-    expect(result.unknown).toBe(
-      "Briar Beetle  ·  missingEnemy  ·  Shard Mite  ·  +1 more"
+    // Wave 4 of 2026-04-18: five unlocks, top two by score are glassRam (32)
+    // then briarSniper (28); the remaining three collapse into "+3 more".
+    expect(result.fiveWave4).toBe("Glass Ram  ·  Briar Sniper  ·  +3 more");
+    // Unknown ids get score 0 and sink to the bottom, so real enemies still
+    // surface in the visible slots.
+    expect(result.unknownIdsDemoted).toBe(
+      "Briar Beetle  ·  Shard Mite  ·  +2 more"
     );
 
     expect(runtimeErrors, runtimeErrors.join("\n")).toEqual([]);

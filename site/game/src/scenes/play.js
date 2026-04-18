@@ -108,13 +108,26 @@ export function getEffectiveCadence(enemy, baseMs) {
   return baseMs / Math.max(0.01, 1 - attackMagnitude);
 }
 
-export function formatThreatsLabel(unlockIds, maxVisible = 3) {
-  const labels = (unlockIds || []).map((id) => ENEMY_BY_ID[id]?.label || id);
-  if (labels.length <= maxVisible) {
-    return labels.join("  ·  ");
+export function formatThreatsLabel(unlockIds, maxVisibleWhenOverflow = 2) {
+  const ids = unlockIds || [];
+  if (ids.length <= 3) {
+    return ids.map((id) => ENEMY_BY_ID[id]?.label || id).join("  ·  ");
   }
-  const visible = labels.slice(0, maxVisible).join("  ·  ");
-  return `${visible}  ·  +${labels.length - maxVisible} more`;
+  // 4 or more unlocks: surface only the strongest few, then "+N more".
+  // "Strongest" is ranked by enemy score (tie-broken by maxHealth) because
+  // score is the game's own per-kill threat weight — glassRam/sniper/moth
+  // rise above the rank-and-file beetle and shard.
+  const ranked = [...ids].sort((a, b) => {
+    const aScore = ENEMY_BY_ID[a]?.score ?? 0;
+    const bScore = ENEMY_BY_ID[b]?.score ?? 0;
+    if (bScore !== aScore) return bScore - aScore;
+    return (ENEMY_BY_ID[b]?.maxHealth ?? 0) - (ENEMY_BY_ID[a]?.maxHealth ?? 0);
+  });
+  const visible = ranked
+    .slice(0, maxVisibleWhenOverflow)
+    .map((id) => ENEMY_BY_ID[id]?.label || id)
+    .join("  ·  ");
+  return `${visible}  ·  +${ids.length - maxVisibleWhenOverflow} more`;
 }
 
 export class PlayScene extends Phaser.Scene {
@@ -1294,7 +1307,7 @@ export class PlayScene extends Phaser.Scene {
 
   updateHud() {
     const currentWave = this.encounterSystem.getCurrentWave();
-    const threats = formatThreatsLabel(currentWave.unlocks || [], 3);
+    const threats = formatThreatsLabel(currentWave.unlocks || []);
     const selectedPlantChanged = this.syncSelectedPlantAvailability();
 
     this.resourceText.setText(`Sap ${this.resources}`);
