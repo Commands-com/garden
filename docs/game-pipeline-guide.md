@@ -111,8 +111,11 @@ If you modify a core system, include regression coverage for the behavior you ar
 - `npm run bot:play-scenario -- --date YYYY-MM-DD --output /tmp/plan.json` runs the local observation-driven player and emits a replay plan.
 - `npm run codex:plan-scenario -- --date YYYY-MM-DD --attempts 3 --output /tmp/codex-plan.json` asks Codex CLI for a full replay plan, verifies it in Phaser, and feeds replay failures back to Codex for another try.
 - `npm run ai:play-scenario -- --date YYYY-MM-DD --provider openai --output /tmp/ai-plan.json` lets an API model play move-by-move through the same observation/action protocol and emits a replay plan.
+- In `?testMode=1`, export both `getRecordedReplay()` and `getRecordedChallengeReplay()` after strong human runs. Keep the full run for history, but prefer the challenge-clear export as the canonical winning line.
+- `npm run replay:derive-clear -- --input scripts/replay-YYYY-MM-DD-*.json --output scripts/replay-YYYY-MM-DD-human-clear.json` derives a clean challenge-clear artifact from a raw human full run when needed later.
 - Treat replay plans as evidence, not opinions. If an AI claims a board is winnable or exploitable, save the plan and replay it.
 - The replay harness complements the validator. A successful replay proves one line works; `validate:scenario-difficulty` still decides whether the board is hard enough and whether new plants are genuinely required.
+- Codex planning now auto-loads recent verified `*-human-clear.json` or `*-challenge-clear.json` fixtures from `scripts/` as exemplar strategy memory.
 
 ### Asset Validation
 

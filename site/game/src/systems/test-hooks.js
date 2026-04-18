@@ -4,6 +4,65 @@ export function installGameTestHooks(game, bootstrap) {
   }
 
   const getPlayScene = () => game.scene.getScene("play");
+  const cloneValue = (value) =>
+    value == null ? value : JSON.parse(JSON.stringify(value));
+
+  const getRecordedReplayFromBootstrap = (options = {}) => {
+    const recorded = bootstrap.recordedReplayExport;
+    if (!recorded) {
+      return null;
+    }
+
+    const replay = cloneValue(recorded);
+    if (options.label) {
+      replay.label = options.label;
+    }
+    if (options.description) {
+      replay.description = options.description;
+    }
+    if (options.outcome) {
+      replay.expect = {
+        ...(replay.expect || {}),
+        outcome: options.outcome,
+      };
+    }
+    if (options.challengeOutcome) {
+      replay.expect = {
+        ...(replay.expect || {}),
+        challengeOutcome: options.challengeOutcome,
+      };
+      replay.challengeOutcome = options.challengeOutcome;
+    }
+    return replay;
+  };
+
+  const getRecordedChallengeReplayFromBootstrap = (options = {}) => {
+    const recorded = bootstrap.recordedChallengeReplayExport;
+    if (!recorded) {
+      return null;
+    }
+
+    const replay = cloneValue(recorded);
+    if (options.label) {
+      replay.label = options.label;
+    }
+    if (options.description) {
+      replay.description = options.description;
+    }
+    if (options.outcome || options.challengeOutcome) {
+      replay.expect = {
+        ...(replay.expect || {}),
+        ...(options.outcome ? { outcome: options.outcome } : {}),
+        ...(options.challengeOutcome
+          ? { challengeOutcome: options.challengeOutcome }
+          : {}),
+      };
+    }
+    if (options.challengeOutcome) {
+      replay.challengeOutcome = options.challengeOutcome;
+    }
+    return replay;
+  };
 
   const hooks = {
     startMode(mode = "challenge") {
@@ -123,6 +182,48 @@ export function installGameTestHooks(game, bootstrap) {
       }
 
       return playScene.getObservation();
+    },
+
+    getRecordedReplay(options = {}) {
+      const playScene = getPlayScene();
+      if (playScene?.scene?.isActive() && typeof playScene.getRecordedReplay === "function") {
+        return playScene.getRecordedReplay(options);
+      }
+
+      return getRecordedReplayFromBootstrap(options);
+    },
+
+    getRecordedReplayJSON(options = {}) {
+      const replay = hooks.getRecordedReplay(options);
+      return replay ? JSON.stringify(replay, null, 2) : null;
+    },
+
+    getRecordedChallengeReplay(options = {}) {
+      const playScene = getPlayScene();
+      if (
+        playScene?.scene?.isActive() &&
+        typeof playScene.getRecordedChallengeReplay === "function"
+      ) {
+        return playScene.getRecordedChallengeReplay(options);
+      }
+
+      return getRecordedChallengeReplayFromBootstrap(options);
+    },
+
+    getRecordedChallengeReplayJSON(options = {}) {
+      const replay = hooks.getRecordedChallengeReplay(options);
+      return replay ? JSON.stringify(replay, null, 2) : null;
+    },
+
+    clearRecordedReplay() {
+      const playScene = getPlayScene();
+      if (playScene?.scene?.isActive() && typeof playScene.clearRecordedReplay === "function") {
+        return playScene.clearRecordedReplay();
+      }
+
+      bootstrap.recordedReplayExport = null;
+      bootstrap.recordedChallengeReplayExport = null;
+      return true;
     },
 
     applyAction(action = {}) {

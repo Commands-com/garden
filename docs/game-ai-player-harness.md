@@ -64,6 +64,33 @@ window.__gameTestHooks.setPaused(true)
 window.__gameTestHooks.setPaused(false)
 ```
 
+## Human Replay Capture
+
+In `?testMode=1`, a live human run can now be exported from DevTools:
+
+```js
+window.__gameTestHooks.getRecordedReplay()
+window.__gameTestHooks.getRecordedReplayJSON({ label: "my-full-run" })
+window.__gameTestHooks.getRecordedChallengeReplay()
+window.__gameTestHooks.getRecordedChallengeReplayJSON({ label: "my-clear" })
+window.__gameTestHooks.clearRecordedReplay()
+```
+
+Use the two exports differently:
+
+- `getRecordedReplay()`: full historical run, including post-clear endless play and eventual death.
+- `getRecordedChallengeReplay()`: trimmed winning line at the moment the scripted challenge first clears.
+
+The clear export is the better artifact for planning and regression. The full export is still valuable for endless tuning and post-clear difficulty analysis.
+
+If you already have a full recorded run and want to derive the trimmed clear artifact later:
+
+```bash
+npm run replay:derive-clear -- \
+  --input scripts/replay-2026-04-18-with-bramble.json \
+  --output scripts/replay-2026-04-18-human-clear.json
+```
+
 ## Replay Plans
 
 Replay plans are JSON files that schedule actions at game-time millisecond offsets:
@@ -116,6 +143,17 @@ Use this harness as the bridge between model play and deterministic validation:
 5. `npm run validate:scenario-difficulty -- --date YYYY-MM-DD` remains the hard validation gate on walker-only boards.
 
 Future pipeline runs should publish AI play reports only after the replay succeeds. If the AI finds an exploit or an old-roster clear, save that plan as evidence and retune the board rather than relying on prose claims.
+
+### Human Strategy Memory
+
+Verified human clears are now first-class exemplar inputs, not just anecdotes.
+
+Recommended artifact pattern:
+
+- keep the raw human run under `scripts/replay-YYYY-MM-DD-*.json`
+- derive a separate `*-human-clear.json` or `*-challenge-clear.json` artifact
+- use the clear artifact as the canonical winning line in tests and planner prompts
+- keep the full run for endless and archive analysis
 
 ### Ranged-enemy scenarios
 
@@ -183,6 +221,8 @@ Configuration:
 - `--request-timeout-ms`: wall-clock timeout for the Codex planning call.
 
 The planner runs `codex exec --ephemeral --sandbox read-only --output-schema ...` and writes only a replay plan. If the replay fails after all attempts, treat that as evidence that the board or prompt needs more work rather than accepting the prose rationale.
+
+The planner also auto-loads recent verified human-clear fixtures from `scripts/` when they exist. Those exemplars are hints, not templates: Codex should borrow openings or pressure responses that match the current roster and board, not blindly copy placements from a different day.
 
 ## Action-Loop Player
 

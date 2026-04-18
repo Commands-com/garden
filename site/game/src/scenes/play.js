@@ -178,6 +178,11 @@ export class PlayScene extends Phaser.Scene {
     this.enemyProjectiles = [];
     this.defendersByTile = new Map();
     this.nextDefenderId = 1;
+    this.recordedReplayPlacements = [];
+    this.recordedChallengeReplayPlacements = null;
+    this.recordedChallengeReplayAtMs = null;
+    this.recordedChallengeReplayGardenHP = null;
+    this.syncRecordedReplayExport();
 
     this.drawBoard();
     this.createHud();
@@ -1292,6 +1297,11 @@ export class PlayScene extends Phaser.Scene {
     this.challengeCleared = true;
     this.endlessActive = true;
     this.bootstrap.endlessUnlocked = true;
+    this.recordedChallengeReplayPlacements = (this.recordedReplayPlacements || []).map(
+      (placement) => ({ ...placement })
+    );
+    this.recordedChallengeReplayAtMs = Math.round(this.survivedMs);
+    this.recordedChallengeReplayGardenHP = this.gardenHP;
     this.resources += this.modeDefinition.endlessRewardResources || 0;
     this.score += this.modeDefinition.endlessRewardScore || 0;
     this.audioController.playEffect("challenge-clear");
@@ -1302,6 +1312,8 @@ export class PlayScene extends Phaser.Scene {
         this.transitionBanner.setVisible(false);
       }
     });
+    this.syncRecordedChallengeReplayExport();
+    this.syncRecordedReplayExport({ outcome: "cleared" });
     this.publishIfNeeded(true);
   }
 
@@ -1367,6 +1379,117 @@ export class PlayScene extends Phaser.Scene {
       : this.transitioningToChallenge
         ? "transition"
         : this.mode;
+  }
+
+  getRecordedReplay(options = {}) {
+    const terminalOutcome =
+      this.gameEnding || this.gardenHP <= 0 ? "gameover" : null;
+    const challengeOutcome = this.challengeCleared
+      ? "cleared"
+      : terminalOutcome === "gameover"
+        ? "failed"
+        : "pending";
+
+    return {
+      schemaVersion: 1,
+      label:
+        options.label ||
+        `${this.modeDefinition.scenarioDate}-${this.mode}-recorded`,
+      date: this.modeDefinition.scenarioDate,
+      mode: this.mode,
+      description:
+        options.description ||
+        `Recorded ${this.mode} placements exported from ?testMode=1 for ${this.modeDefinition.scenarioTitle}.`,
+      expect: {
+        outcome:
+          options.outcome ||
+          terminalOutcome ||
+          (challengeOutcome === "failed" ? "gameover" : "cleared"),
+        challengeOutcome:
+          options.challengeOutcome || challengeOutcome,
+      },
+      placements: (this.recordedReplayPlacements || []).map((placement) => ({
+        ...placement,
+      })),
+      recordingIncomplete: terminalOutcome == null,
+      terminalOutcome,
+      challengeOutcome,
+      exportedAtMs: Math.round(this.survivedMs),
+      scenarioTitle: this.modeDefinition.scenarioTitle,
+      challengeCleared: this.challengeCleared,
+      gardenHP: this.gardenHP,
+    };
+  }
+
+  getRecordedReplayJSON(options = {}) {
+    return JSON.stringify(this.getRecordedReplay(options), null, 2);
+  }
+
+  getRecordedChallengeReplay(options = {}) {
+    if (!this.recordedChallengeReplayPlacements) {
+      return null;
+    }
+
+    return {
+      schemaVersion: 1,
+      label:
+        options.label ||
+        `${this.modeDefinition.scenarioDate}-${this.mode}-challenge-clear`,
+      date: this.modeDefinition.scenarioDate,
+      mode: this.mode,
+      description:
+        options.description ||
+        `Recorded ${this.mode} placements trimmed to the first challenge clear for ${this.modeDefinition.scenarioTitle}.`,
+      expect: {
+        outcome: options.outcome || "cleared",
+        challengeOutcome: options.challengeOutcome || "cleared",
+      },
+      placements: this.recordedChallengeReplayPlacements.map((placement) => ({
+        ...placement,
+      })),
+      recordingIncomplete: false,
+      terminalOutcome: "cleared",
+      challengeOutcome: "cleared",
+      exportedAtMs: this.recordedChallengeReplayAtMs ?? Math.round(this.survivedMs),
+      scenarioTitle: this.modeDefinition.scenarioTitle,
+      challengeCleared: true,
+      gardenHP: this.recordedChallengeReplayGardenHP ?? this.gardenHP,
+    };
+  }
+
+  getRecordedChallengeReplayJSON(options = {}) {
+    const replay = this.getRecordedChallengeReplay(options);
+    return replay ? JSON.stringify(replay, null, 2) : null;
+  }
+
+  clearRecordedReplay() {
+    this.recordedReplayPlacements = [];
+    this.recordedChallengeReplayPlacements = null;
+    this.recordedChallengeReplayAtMs = null;
+    this.recordedChallengeReplayGardenHP = null;
+    this.syncRecordedReplayExport();
+    this.bootstrap.recordedChallengeReplayExport = null;
+    return true;
+  }
+
+  recordReplayPlacement(row, col, plantId) {
+    this.recordedReplayPlacements.push({
+      timeMs: Math.round(this.survivedMs),
+      row,
+      col,
+      plantId,
+    });
+    this.syncRecordedReplayExport();
+  }
+
+  syncRecordedReplayExport(options = {}) {
+    this.bootstrap.recordedReplayExport = this.getRecordedReplay(options);
+  }
+
+  syncRecordedChallengeReplayExport(options = {}) {
+    const replay = this.getRecordedChallengeReplay(options);
+    this.bootstrap.recordedChallengeReplayExport = replay;
+    return replay;
   }
 
   getObservation() {
@@ -1608,6 +1731,7 @@ export class PlayScene extends Phaser.Scene {
     this.resources -= definition.cost;
     this.defenders.push(defender);
     this.defendersByTile.set(tileKey, defender);
+    this.recordReplayPlacement(row, col, definition.id);
     this.audioController.playEffect("pickup");
     this.publishIfNeeded(true);
     return true;
@@ -2106,6 +2230,7 @@ export class PlayScene extends Phaser.Scene {
     this.audioController.playEffect("gameover");
 
     const finalState = this.getSnapshot("gameover");
+    this.syncRecordedReplayExport({ outcome: "gameover" });
     this.bootstrap.publishState(finalState);
 
     const submission = this.mode === "tutorial"

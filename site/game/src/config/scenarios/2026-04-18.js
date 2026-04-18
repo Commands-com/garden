@@ -2,7 +2,7 @@ const scenario_2026_04_18 = {
   date: "2026-04-18",
   title: "Wings Over the Garden",
   summary:
-    "Rootline Defense's first flying threat, Thornwing Moth, cruises over walkers and ignores ground defenders. Only Bramble Spear can shoot it down — every Thornwing lands in lane 1 or 3 so you can memorize the anti-air answer.",
+    "Rootline Defense's first flying threat, Thornwing Moth, cruises over walkers and ignores ground defenders. Only Bramble Spear can shoot it down — wave two now opens with edge-lane scouts before the later passes return to lanes 1 and 3.",
   availablePlants: ["thornVine", "brambleSpear", "sunrootBloom", "frostFern"],
   tutorial: {
     id: "wings-over-the-garden-tutorial",
@@ -10,7 +10,7 @@ const scenario_2026_04_18 = {
     intro:
       "Thornwing Moth flies over Thorn Vine bolts — they pass harmlessly underneath. Only Bramble Spear has anti-air: its piercing bolt hits the moth mid-air and still carries through to grounded enemies behind it.",
     objective:
-      "Wave one teaches that Thorn Vine cannot hit the moth. Wave two asks you to plant Bramble Spear in lanes 1 and 3, where every Thornwing spawns, so both flying lanes are covered.",
+      "Wave one teaches that Thorn Vine cannot hit the moth. Wave two still drills Bramble Spear as the anti-air answer, but the challenge now opens wave two with top and bottom edge scouts before the main flying lanes settle back into lanes 1 and 3.",
     startingResources: 110,
     resourcePerTick: 25,
     resourceTickMs: 3000,
@@ -20,7 +20,7 @@ const scenario_2026_04_18 = {
     briefing: [
       "Thornwing Moth ignores ground defenders — no contact attacks, no blocking.",
       "Thorn Vine bolts cannot hit flying enemies; Bramble Spear can.",
-      "Every Thornwing in today's board spawns in lane 1 or lane 3. Cover both.",
+      "Challenge wave two opens with top and bottom edge moths, then the later flights still lean on lanes 1 and 3.",
     ],
     waves: [
       {
@@ -53,9 +53,9 @@ const scenario_2026_04_18 = {
     id: "wings-over-the-garden",
     label: "Today's Challenge",
     intro:
-      "April 18 asks you to split damage between ground lanes and two dedicated anti-air lanes. Every Thornwing Moth confines itself to lane 1 or lane 3 so the memorization target is clear: one Bramble Spear per flying lane.",
+      "April 18 now opens wave two with an edge sweep before the usual lane-1 and lane-3 flights return. You still need reliable anti-air, but you can no longer memorize just two fixed lanes and coast.",
     objective:
-      "Survive four scripted waves with a 1 HP wall. Thornwings only ever appear in lanes 1 and 3 — cover both with Bramble Spear. Use Thorn Vine elsewhere, keep a Sunroot Bloom funding the board, and Frost Fern if the ground rush gets loud.",
+      "Survive four scripted waves with a 1 HP wall. Thornwing edge scouts now arrive at the start of wave two before the later lane-1 and lane-3 flights. Use Bramble Spear to answer the air threats, Thorn Vine elsewhere, keep a Sunroot Bloom funding the board, and Frost Fern if the ground rush gets loud.",
     startingResources: 120,
     resourcePerTick: 15,
     resourceTickMs: 4000,
@@ -79,10 +79,12 @@ const scenario_2026_04_18 = {
       },
       {
         wave: 2,
-        label: "Two Lanes Aloft",
+        label: "Edge Sweep",
         startAtMs: 26000,
         unlocks: ["briarBeetle", "shardMite", "thornwingMoth"],
         events: [
+          { offsetMs: 500, lane: 0, enemyId: "thornwingMoth" },
+          { offsetMs: 1200, lane: 4, enemyId: "thornwingMoth" },
           { offsetMs: 2000, lane: 1, enemyId: "thornwingMoth" },
           { offsetMs: 5500, lane: 3, enemyId: "thornwingMoth" },
           { offsetMs: 8000, lane: 2, enemyId: "briarBeetle" },
@@ -95,13 +97,18 @@ const scenario_2026_04_18 = {
         wave: 3,
         label: "Sniper Airshow",
         startAtMs: 48000,
-        unlocks: ["briarBeetle", "shardMite", "briarSniper", "thornwingMoth"],
+        unlocks: ["briarBeetle", "shardMite", "glassRam", "briarSniper", "thornwingMoth"],
         events: [
+          { offsetMs: 1000, lane: 2, enemyId: "glassRam" },
           { offsetMs: 2000, lane: 1, enemyId: "thornwingMoth" },
           { offsetMs: 5500, lane: 3, enemyId: "thornwingMoth" },
           { offsetMs: 8500, lane: 2, enemyId: "briarSniper" },
+          { offsetMs: 10500, lane: 4, enemyId: "shardMite" },
           { offsetMs: 12000, lane: 0, enemyId: "shardMite" },
+          { offsetMs: 13500, lane: 4, enemyId: "briarSniper" },
           { offsetMs: 15500, lane: 4, enemyId: "briarBeetle" },
+          { offsetMs: 16800, lane: 0, enemyId: "glassRam" },
+          { offsetMs: 18200, lane: 4, enemyId: "glassRam" },
         ],
       },
       {
@@ -113,7 +120,8 @@ const scenario_2026_04_18 = {
           { offsetMs: 2500, lane: 1, enemyId: "thornwingMoth" },
           { offsetMs: 5000, lane: 3, enemyId: "thornwingMoth" },
           { offsetMs: 8000, lane: 2, enemyId: "glassRam" },
-          { offsetMs: 12000, lane: 0, enemyId: "shardMite" },
+          { offsetMs: 12000, lane: 0, enemyId: "glassRam" },
+          { offsetMs: 14500, lane: 0, enemyId: "glassRam" },
           { offsetMs: 15500, lane: 1, enemyId: "thornwingMoth" },
           { offsetMs: 18500, lane: 4, enemyId: "briarBeetle" },
         ],

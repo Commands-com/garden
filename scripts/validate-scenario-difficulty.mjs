@@ -3,8 +3,11 @@ import {
   BOARD_COLS,
   BOARD_ROWS,
   BREACH_X,
+  CELL_WIDTH,
   ENEMY_SPAWN_X,
+  WALL_X,
   getCellCenter,
+  getLaneY,
 } from "../site/game/src/config/board.js";
 import { ENEMY_BY_ID } from "../site/game/src/config/enemies.js";
 import { PLANT_DEFINITIONS, STARTING_PLANT_ID } from "../site/game/src/config/plants.js";
@@ -39,6 +42,46 @@ const DEFAULT_OPTIONS = {
 
 function clamp(value, min, max) {
   return Math.max(min, Math.min(max, value));
+}
+
+function applyStatusEffect(enemy, entry, nowMs) {
+  if (!enemy || !entry || !entry.kind) return;
+  const bag = enemy.statusEffects || (enemy.statusEffects = {});
+  const magnitude = Number(entry.magnitude || 0);
+  const attackMagnitude = Number(entry.attackMagnitude || 0);
+  const expiresAtMs = Number.isFinite(entry.expiresAtMs)
+    ? entry.expiresAtMs
+    : nowMs + Number(entry.durationMs || 0);
+  const existing = bag[entry.kind];
+  if (!existing) {
+    bag[entry.kind] = { kind: entry.kind, magnitude, attackMagnitude, expiresAtMs };
+    return;
+  }
+  existing.magnitude = Math.max(existing.magnitude || 0, magnitude);
+  existing.attackMagnitude = Math.max(existing.attackMagnitude || 0, attackMagnitude);
+  existing.expiresAtMs = Math.max(existing.expiresAtMs || 0, expiresAtMs);
+}
+
+function tickStatusEffects(enemy, nowMs) {
+  const bag = enemy?.statusEffects;
+  if (!bag) return;
+  for (const kind of Object.keys(bag)) {
+    if (bag[kind].expiresAtMs <= nowMs) {
+      delete bag[kind];
+    }
+  }
+}
+
+function getEffectiveSpeed(enemy) {
+  const slow = enemy?.statusEffects?.slow;
+  const magnitude = slow?.magnitude || 0;
+  return enemy.definition.speed * Math.max(0, 1 - magnitude);
+}
+
+function getEffectiveCadence(enemy, baseMs) {
+  const slow = enemy?.statusEffects?.slow;
+  const attackMagnitude = slow?.attackMagnitude || 0;
+  return baseMs / Math.max(0.01, 1 - attackMagnitude);
 }
 
 function parseNumericOption(
@@ -312,8 +355,10 @@ class ScenarioSimulator {
     this.randomState = this.initialRandomState;
     this.defenders = [];
     this.defendersByTile = new Map();
+    this.nextDefenderId = 1;
     this.enemies = [];
     this.projectiles = [];
+    this.enemyProjectiles = [];
     this.placements = [];
     this.won = false;
     this.lost = false;
@@ -335,6 +380,7 @@ class ScenarioSimulator {
     next.endlessSurvivedMs = this.endlessSurvivedMs;
     next.endlessBudgetMs = this.endlessBudgetMs;
     next.randomState = this.randomState;
+    next.nextDefenderId = this.nextDefenderId;
     next.defenders = this.defenders.map((defender) => ({ ...defender }));
     next.defendersByTile = new Map(
       next.defenders.map((defender) => [defender.tileKey, defender])
@@ -342,6 +388,11 @@ class ScenarioSimulator {
     next.enemies = this.enemies.map((enemy) => ({
       ...enemy,
       definition: { ...enemy.definition },
+      statusEffects: enemy.statusEffects
+        ? Object.fromEntries(
+            Object.entries(enemy.statusEffects).map(([kind, value]) => [kind, { ...value }])
+          )
+        : {},
     }));
     next.projectiles = this.projectiles.map((projectile) => ({
       ...projectile,
@@ -351,6 +402,9 @@ class ScenarioSimulator {
           return idx >= 0 ? next.enemies[idx] : oldEnemy;
         })
       ),
+    }));
+    next.enemyProjectiles = this.enemyProjectiles.map((projectile) => ({
+      ...projectile,
     }));
     next.placements = clonePlan(this.placements);
     next.won = this.won;
@@ -396,10 +450,12 @@ class ScenarioSimulator {
 
     const center = getCellCenter(row, col);
     const defender = {
+      id: this.nextDefenderId++,
       row,
       col,
       tileKey,
       x: center.x,
+      y: center.y,
       hp: plant.maxHealth,
       cooldownMs:
         plant.initialCooldownMs ??
@@ -450,8 +506,10 @@ class ScenarioSimulator {
     this.awardResources();
     this.spawnDueEvents(deltaMs);
     this.updateDefenders(deltaMs);
+    this.updateControlPlants(deltaMs);
     this.updateProjectiles(deltaMs);
     this.updateEnemies(deltaMs);
+    this.updateEnemyProjectiles(deltaMs);
     this.cleanupDestroyed();
     this.checkProgression();
   }
@@ -523,12 +581,21 @@ class ScenarioSimulator {
       id: enemyId,
       lane,
       x: ENEMY_SPAWN_X,
+      y: getLaneY(lane),
       hp: Math.round(definition.maxHealth * scaleFactor),
       attackCooldownMs: definition.attackCadenceMs,
       definition: {
         ...definition,
         speed: definition.speed * speedScale,
       },
+      snipeState: definition.behavior === "sniper" ? "approach" : null,
+      aimTimerMs: 0,
+      cooldownMs: 0,
+      targetDefenderId: null,
+      targetTileKey: null,
+      targetX: 0,
+      targetY: 0,
+      statusEffects: {},
       destroyed: false,
     });
     return true;
@@ -537,6 +604,10 @@ class ScenarioSimulator {
   updateDefenders(deltaMs) {
     for (const defender of this.defenders) {
       if (defender.destroyed) {
+        continue;
+      }
+
+      if (defender.definition.role === "control") {
         continue;
       }
 
@@ -564,9 +635,43 @@ class ScenarioSimulator {
         speed: defender.definition.projectileSpeed,
         radius: defender.definition.projectileRadius,
         piercing: Boolean(defender.definition.piercing),
+        canHitFlying: Boolean(defender.definition.canHitFlying),
         hitEnemies: new Set(),
         destroyed: false,
       });
+    }
+  }
+
+  updateControlPlants(deltaMs) {
+    for (const defender of this.defenders) {
+      if (defender.destroyed) continue;
+      if (defender.definition.role !== "control") continue;
+
+      defender.cooldownMs -= deltaMs;
+      if (defender.cooldownMs > 0) continue;
+      defender.cooldownMs = defender.definition.cadenceMs;
+
+      const def = defender.definition;
+      const rangeCols = def.chillRangeCols || 3;
+      const zoneMinX = defender.x - CELL_WIDTH / 2;
+      const zoneMaxX = zoneMinX + rangeCols * CELL_WIDTH;
+
+      for (const enemy of this.enemies) {
+        if (enemy.destroyed) continue;
+        if (enemy.lane !== defender.row) continue;
+        if (enemy.x < zoneMinX || enemy.x > zoneMaxX) continue;
+
+        applyStatusEffect(
+          enemy,
+          {
+            kind: "slow",
+            magnitude: def.chillMagnitude,
+            attackMagnitude: def.chillAttackMagnitude,
+            expiresAtMs: this.elapsedMs + def.chillDurationMs,
+          },
+          this.elapsedMs
+        );
+      }
     }
   }
 
@@ -587,6 +692,9 @@ class ScenarioSimulator {
         // Piercing projectiles damage every enemy they touch, once each
         for (const enemy of this.enemies) {
           if (enemy.destroyed || enemy.lane !== projectile.lane) {
+            continue;
+          }
+          if (enemy.definition.flying === true && !projectile.canHitFlying) {
             continue;
           }
           if (projectile.hitEnemies.has(enemy)) {
@@ -615,21 +723,105 @@ class ScenarioSimulator {
         continue;
       }
 
+      tickStatusEffects(enemy, this.elapsedMs);
+
+      if (enemy.definition.behavior === "sniper") {
+        this.updateSniperEnemy(enemy, deltaMs);
+        continue;
+      }
+
+      if (enemy.definition.behavior === "flying") {
+        enemy.x -= getEffectiveSpeed(enemy) * (deltaMs / 1000);
+        if (enemy.x <= BREACH_X) {
+          this.resolveBreach(enemy);
+        }
+        continue;
+      }
+
       const blocker = this.getBlockingDefender(enemy);
       if (blocker) {
         enemy.attackCooldownMs -= deltaMs;
         enemy.x = Math.max(enemy.x, blocker.x + enemy.definition.contactRange);
 
         if (enemy.attackCooldownMs <= 0) {
-          enemy.attackCooldownMs = enemy.definition.attackCadenceMs;
+          enemy.attackCooldownMs = getEffectiveCadence(enemy, enemy.definition.attackCadenceMs);
           this.damageDefender(blocker, enemy.definition.attackDamage);
         }
       } else {
         enemy.attackCooldownMs = Math.max(0, enemy.attackCooldownMs - deltaMs);
-        enemy.x -= enemy.definition.speed * (deltaMs / 1000);
+        enemy.x -= getEffectiveSpeed(enemy) * (deltaMs / 1000);
 
         if (enemy.x <= BREACH_X) {
           this.resolveBreach(enemy);
+        }
+      }
+    }
+  }
+
+  updateSniperEnemy(enemy, deltaMs) {
+    const def = enemy.definition;
+    if (enemy.snipeState === "approach") {
+      enemy.x -= getEffectiveSpeed(enemy) * (deltaMs / 1000);
+      if (enemy.x <= def.attackAnchorX) {
+        enemy.x = def.attackAnchorX;
+        enemy.snipeState = "idle";
+      }
+      return;
+    }
+
+    if (enemy.snipeState === "idle") {
+      const target = this.findSniperTarget(enemy);
+      if (target) {
+        enemy.snipeState = "aim";
+        enemy.aimTimerMs = getEffectiveCadence(enemy, def.aimDurationMs);
+        enemy.targetDefenderId = target.id;
+        enemy.targetTileKey = target.tileKey;
+        enemy.targetX = target.x;
+        enemy.targetY = target.y;
+      }
+      return;
+    }
+
+    if (enemy.snipeState === "aim") {
+      const target = this.getDefenderById(enemy.targetDefenderId);
+      if (!target || target.destroyed) {
+        const replacement = this.findSniperTarget(enemy);
+        if (!replacement) {
+          enemy.snipeState = "idle";
+          enemy.targetDefenderId = null;
+          enemy.targetTileKey = null;
+          return;
+        }
+        enemy.targetDefenderId = replacement.id;
+        enemy.targetTileKey = replacement.tileKey;
+        enemy.targetX = replacement.x;
+        enemy.targetY = replacement.y;
+      }
+
+      enemy.aimTimerMs -= deltaMs;
+      if (enemy.aimTimerMs <= 0) {
+        this.spawnEnemyProjectile(enemy);
+        enemy.snipeState = "cooldown";
+        enemy.cooldownMs = getEffectiveCadence(enemy, def.attackCadenceMs);
+      }
+      return;
+    }
+
+    if (enemy.snipeState === "cooldown") {
+      enemy.cooldownMs -= deltaMs;
+      if (enemy.cooldownMs <= 0) {
+        const target = this.findSniperTarget(enemy);
+        if (target) {
+          enemy.snipeState = "aim";
+          enemy.aimTimerMs = getEffectiveCadence(enemy, def.aimDurationMs);
+          enemy.targetDefenderId = target.id;
+          enemy.targetTileKey = target.tileKey;
+          enemy.targetX = target.x;
+          enemy.targetY = target.y;
+        } else {
+          enemy.snipeState = "idle";
+          enemy.targetDefenderId = null;
+          enemy.targetTileKey = null;
         }
       }
     }
@@ -652,6 +844,10 @@ class ScenarioSimulator {
   }
 
   getBlockingDefender(enemy) {
+    if (enemy.definition.flying === true) {
+      return null;
+    }
+
     let blocker = null;
 
     for (const defender of this.defenders) {
@@ -679,6 +875,9 @@ class ScenarioSimulator {
       if (enemy.destroyed || enemy.lane !== projectile.lane) {
         continue;
       }
+      if (enemy.definition.flying === true && !projectile.canHitFlying) {
+        continue;
+      }
 
       const hitRadius = projectile.radius + enemy.definition.radius * 0.8;
       const distance = Math.abs(enemy.x - projectile.x);
@@ -691,6 +890,90 @@ class ScenarioSimulator {
     }
 
     return match;
+  }
+
+  getDefenderById(defenderId) {
+    if (defenderId == null) return null;
+    for (const defender of this.defenders) {
+      if (defender.id === defenderId) {
+        return defender;
+      }
+    }
+    return null;
+  }
+
+  findSniperTarget(enemy) {
+    const lane = enemy.lane;
+    const sniperX = enemy.x;
+    const inLane = this.defenders.filter(
+      (defender) => !defender.destroyed && defender.row === lane && defender.x < sniperX
+    );
+
+    const eligible = inLane.filter((defender) => {
+      for (const other of inLane) {
+        if (other === defender) continue;
+        if ((other.definition.role || "attacker") !== "attacker") continue;
+        if (other.x > defender.x && other.x < sniperX) {
+          return false;
+        }
+      }
+      return true;
+    });
+
+    if (eligible.length === 0) return null;
+
+    const priorityOf = (defender) => {
+      const role = defender.definition.role || "attacker";
+      if (role === "support") return 0;
+      if (defender.definition.subRole === "piercing") return 1;
+      return 2;
+    };
+
+    eligible.sort((left, right) => {
+      const leftPriority = priorityOf(left);
+      const rightPriority = priorityOf(right);
+      if (leftPriority !== rightPriority) {
+        return leftPriority - rightPriority;
+      }
+      return right.x - left.x;
+    });
+
+    return eligible[0];
+  }
+
+  spawnEnemyProjectile(enemy) {
+    const def = enemy.definition;
+    this.enemyProjectiles.push({
+      lane: enemy.lane,
+      x: enemy.x - 18,
+      y: enemy.y,
+      targetTileKey: enemy.targetTileKey,
+      targetX: enemy.targetX,
+      damage: def.projectileDamage,
+      speed: def.projectileSpeed,
+      destroyed: false,
+    });
+  }
+
+  updateEnemyProjectiles(deltaMs) {
+    for (const projectile of this.enemyProjectiles) {
+      if (projectile.destroyed) continue;
+
+      projectile.x -= projectile.speed * (deltaMs / 1000);
+
+      if (projectile.x <= projectile.targetX + 14) {
+        const defender = this.defendersByTile.get(projectile.targetTileKey);
+        if (defender && !defender.destroyed) {
+          this.damageDefender(defender, projectile.damage);
+        }
+        projectile.destroyed = true;
+        continue;
+      }
+
+      if (projectile.x <= WALL_X) {
+        projectile.destroyed = true;
+      }
+    }
   }
 
   getDefenderCountInLane(row) {
@@ -772,6 +1055,9 @@ class ScenarioSimulator {
 
   cleanupDestroyed() {
     this.projectiles = this.projectiles.filter((projectile) => !projectile.destroyed);
+    this.enemyProjectiles = this.enemyProjectiles.filter(
+      (projectile) => !projectile.destroyed
+    );
     this.enemies = this.enemies.filter((enemy) => !enemy.destroyed);
     this.defenders = this.defenders.filter((defender) => !defender.destroyed);
   }
@@ -960,7 +1246,26 @@ function buildStateSignature(simulator) {
     .sort()
     .join(",");
   const enemySignature = simulator.enemies
-    .map((enemy) => `${enemy.id}:${enemy.lane}:${Math.round(enemy.x / 32)}:${Math.ceil(enemy.hp / 6)}`)
+    .map(
+      (enemy) =>
+        [
+          enemy.id,
+          enemy.lane,
+          Math.round(enemy.x / 32),
+          Math.ceil(enemy.hp / 6),
+          enemy.snipeState || "walk",
+          roundToBucket(enemy.aimTimerMs || enemy.cooldownMs || 0, 200),
+          enemy.targetTileKey || "",
+          enemy.statusEffects?.slow ? "slow" : "base",
+        ].join(":")
+    )
+    .sort()
+    .join(",");
+  const enemyProjectileSignature = simulator.enemyProjectiles
+    .map(
+      (projectile) =>
+        `${projectile.lane}:${Math.round(projectile.x / 32)}:${projectile.targetTileKey || ""}`
+    )
     .sort()
     .join(",");
 
@@ -974,6 +1279,7 @@ function buildStateSignature(simulator) {
     roundToBucket(simulator.endlessSurvivedMs || 0, 500),
     defenderSignature,
     enemySignature,
+    enemyProjectileSignature,
   ].join("|");
 }
 
@@ -995,6 +1301,8 @@ function getUpcomingLaneStats(simulator) {
       count: 0,
       clusterHits: 0,
       piercingValue: 0,
+      flyingCount: 0,
+      sniperCount: 0,
       previousAtMs: null,
     };
 
@@ -1005,6 +1313,13 @@ function getUpcomingLaneStats(simulator) {
 
     current.previousAtMs = event.atMs;
     current.piercingValue += event.enemyId === "shardMite" ? 2 : 1;
+    const definition = ENEMY_BY_ID[event.enemyId];
+    if (definition?.flying === true) {
+      current.flyingCount += 1;
+    }
+    if (definition?.behavior === "sniper") {
+      current.sniperCount += 1;
+    }
     stats.set(event.lane, current);
   }
 
@@ -1047,10 +1362,31 @@ function evaluateSimulator(simulator) {
     const defendersInLane = simulator.defenders.filter(
       (defender) => !defender.destroyed && defender.row === row
     );
+    const activeEnemiesInLane = simulator.enemies.filter(
+      (enemy) => !enemy.destroyed && enemy.lane === row
+    );
     const piercingCount = defendersInLane.filter(
       (defender) => Boolean(defender.definition?.piercing)
     ).length;
+    const attackerCount = defendersInLane.filter(
+      (defender) => (defender.definition?.role || "attacker") === "attacker"
+    ).length;
+    const supportCount = defendersInLane.filter(
+      (defender) => defender.definition?.role === "support"
+    ).length;
+    const controlCount = defendersInLane.filter(
+      (defender) => defender.definition?.role === "control"
+    ).length;
+    const antiAirCount = defendersInLane.filter(
+      (defender) => Boolean(defender.definition?.canHitFlying)
+    ).length;
     const laneStat = laneStats.get(row);
+    const activeFlyingCount = activeEnemiesInLane.filter(
+      (enemy) => enemy.definition?.flying === true
+    ).length;
+    const activeSniperCount = activeEnemiesInLane.filter(
+      (enemy) => enemy.definition?.behavior === "sniper"
+    ).length;
     if (defenderCount > 0) {
       score += 2_000;
     }
@@ -1064,6 +1400,27 @@ function evaluateSimulator(simulator) {
       score += Math.min(1, piercingCount) * 8_500;
       if (piercingCount === 0) {
         score -= (laneStat.clusterHits > 0 ? 5_500 : 3_000);
+      }
+    }
+
+    const flyingThreatCount = (laneStat?.flyingCount || 0) + activeFlyingCount;
+    if (flyingThreatCount > 0) {
+      score += Math.min(antiAirCount, 1) * 10_500;
+      score += Math.max(0, antiAirCount - 1) * 1_800;
+      if (antiAirCount === 0) {
+        score -= 16_000 + flyingThreatCount * 2_200;
+      }
+    }
+
+    const sniperThreatCount = (laneStat?.sniperCount || 0) + activeSniperCount;
+    if (sniperThreatCount > 0) {
+      score += Math.min(attackerCount, 1) * 6_500;
+      score += Math.min(controlCount, 1) * 2_200;
+      if (attackerCount === 0) {
+        score -= 13_000;
+      }
+      if (supportCount > 0 && attackerCount === 0) {
+        score -= supportCount * 6_500;
       }
     }
   }
@@ -2352,52 +2709,9 @@ function evaluateRequiredPlantCheck(modeDefinition, canonicalPlan, options) {
   };
 }
 
-function scenarioReferencesUnsupportedEnemy(modeDefinition) {
-  const unsupported = new Set();
-  for (const wave of modeDefinition.waves || []) {
-    for (const event of wave.events || []) {
-      const definition = ENEMY_BY_ID[event.enemyId];
-      // The difficulty validator simulates only walker-style enemies. Ranged
-      // (sniper) behaviors would require modeling aim telegraphs, projectile
-      // screening rules, and defender-targeted damage — so we flag the
-      // scenario indeterminate and defer to the runtime probe + Playwright
-      // specs for coverage.
-      if (definition?.behavior === "sniper") {
-        unsupported.add(event.enemyId);
-      }
-    }
-  }
-
-  return [...unsupported];
-}
-
 function main() {
   const options = parseArgs(process.argv.slice(2));
   const modeDefinition = getScenarioModeDefinition(options.date, options.mode);
-
-  const unsupportedEnemies = scenarioReferencesUnsupportedEnemy(modeDefinition);
-  if (unsupportedEnemies.length > 0) {
-    const indeterminate = {
-      ok: true,
-      indeterminate: true,
-      date: options.date,
-      mode: options.mode,
-      scenarioTitle: modeDefinition.scenarioTitle,
-      unsupportedEnemies,
-      reason:
-        `Scenario references ranged enemy behaviors (${unsupportedEnemies.join(
-          ", "
-        )}) that the difficulty validator does not simulate. Verdict deferred to runtime probe and Playwright specs.`,
-    };
-    if (options.json) {
-      console.log(JSON.stringify(indeterminate, null, 2));
-    } else {
-      console.log(`Scenario ${options.date} (${modeDefinition.scenarioTitle})`);
-      console.log(`Result: indeterminate — ${indeterminate.reason}`);
-    }
-    process.exitCode = 0;
-    return;
-  }
 
   const bestSimulator = findBestWinningSimulator(modeDefinition, options);
 

@@ -38,8 +38,8 @@ async function prepareGamePage(page) {
   return runtimeErrors;
 }
 
-async function applyReplayPlacements(page, placements) {
-  const replayResult = await page.evaluate(async (scheduledPlacements) => {
+async function applyReplayPlacements(page, placements, options = {}) {
+  const replayResult = await page.evaluate(async ({ scheduledPlacements, options }) => {
     const maxWaitMs = 60000;
     const startedAt = Date.now();
     const applied = [];
@@ -50,11 +50,28 @@ async function applyReplayPlacements(page, placements) {
         const observation = window.__gameTestHooks.getObservation();
         const nextPlacement = scheduledPlacements[applied.length];
 
+        if (
+          options?.stopWhenChallengeCleared &&
+          state?.scene === "play" &&
+          (state?.scenarioPhase === "endless" || state?.challengeCleared)
+        ) {
+          resolve({
+            ok: true,
+            reason: "challenge-cleared",
+            applied,
+            finalState: state,
+            finalObservation: observation,
+          });
+          return;
+        }
+
         if (!nextPlacement) {
           resolve({
             ok: true,
+            reason: "all-placements-applied",
             applied,
             finalState: state,
+            finalObservation: observation,
           });
           return;
         }
@@ -131,19 +148,19 @@ async function applyReplayPlacements(page, placements) {
 
       step();
     });
-  }, placements);
+  }, { scheduledPlacements: placements, options });
 
   expect(replayResult.ok, JSON.stringify(replayResult, null, 2)).toBe(true);
 }
 
 test.describe("April 18 tutorial -> challenge -> endless flow", () => {
-  test("teaches grounded failure first, unlocks anti-air second, and clears into endless with the Bramble replay", async ({
+  test("teaches grounded failure first, unlocks anti-air second, and clears into endless with the trimmed human-clear replay", async ({
     page,
   }) => {
     test.setTimeout(120000);
 
     const runtimeErrors = await prepareGamePage(page);
-    const withBramble = readReplayFixture("replay-2026-04-18-with-bramble.json");
+    const humanClear = readReplayFixture("replay-2026-04-18-human-clear.json");
 
     const scenarioContract = await page.evaluate(async () => {
       const {
@@ -182,9 +199,9 @@ test.describe("April 18 tutorial -> challenge -> endless flow", () => {
       "glassRam",
     ]);
     expect(scenarioContract.thornwingLanes.length).toBeGreaterThan(0);
-    expect(
-      scenarioContract.thornwingLanes.every((lane) => lane === 1 || lane === 3)
-    ).toBe(true);
+    expect(new Set(scenarioContract.thornwingLanes)).toEqual(
+      new Set([0, 1, 3, 4])
+    );
 
     await page.evaluate(() => window.__gameTestHooks.startMode("tutorial"));
     await page.evaluate(() => window.__gameTestHooks.setTimeScale(8));
@@ -268,7 +285,9 @@ test.describe("April 18 tutorial -> challenge -> endless flow", () => {
     expect(challengeOpening.challengeCleared).toBe(false);
 
     await page.evaluate(() => window.__gameTestHooks.setTimeScale(8));
-    await applyReplayPlacements(page, withBramble.placements);
+    await applyReplayPlacements(page, humanClear.placements, {
+      stopWhenChallengeCleared: true,
+    });
 
     await page.waitForFunction(
       () => {

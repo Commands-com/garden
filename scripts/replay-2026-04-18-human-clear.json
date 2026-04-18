@@ -1,0 +1,93 @@
+{
+  "schemaVersion": 1,
+  "label": "2026-04-18-human-clear",
+  "date": "2026-04-18",
+  "mode": "challenge",
+  "description": "Human-recorded April 18 full run. This trace clears Wings Over the Garden, rolls into endless, and eventually dies there; keep it as the raw historical playthrough, not the trimmed canonical clear artifact. Trimmed to the first challenge clear for exemplar use.",
+  "expect": {
+    "outcome": "cleared",
+    "challengeOutcome": "cleared"
+  },
+  "placements": [
+    {
+      "timeMs": 667,
+      "row": 4,
+      "col": 0,
+      "plantId": "sunrootBloom"
+    },
+    {
+      "timeMs": 7600,
+      "row": 1,
+      "col": 0,
+      "plantId": "brambleSpear"
+    },
+    {
+      "timeMs": 12267,
+      "row": 3,
+      "col": 0,
+      "plantId": "brambleSpear"
+    },
+    {
+      "timeMs": 20400,
+      "row": 2,
+      "col": 0,
+      "plantId": "thornVine"
+    },
+    {
+      "timeMs": 28667,
+      "row": 4,
+      "col": 1,
+      "plantId": "brambleSpear"
+    },
+    {
+      "timeMs": 36000,
+      "row": 0,
+      "col": 0,
+      "plantId": "brambleSpear"
+    },
+    {
+      "timeMs": 51867,
+      "row": 2,
+      "col": 1,
+      "plantId": "brambleSpear"
+    },
+    {
+      "timeMs": 52933,
+      "row": 2,
+      "col": 2,
+      "plantId": "thornVine"
+    },
+    {
+      "timeMs": 68000,
+      "row": 0,
+      "col": 1,
+      "plantId": "brambleSpear"
+    },
+    {
+      "timeMs": 68800,
+      "row": 0,
+      "col": 2,
+      "plantId": "thornVine"
+    },
+    {
+      "timeMs": 71467,
+      "row": 4,
+      "col": 2,
+      "plantId": "thornVine"
+    },
+    {
+      "timeMs": 76133,
+      "row": 4,
+      "col": 3,
+      "plantId": "thornVine"
+    }
+  ],
+  "recordingIncomplete": false,
+  "terminalOutcome": "cleared",
+  "challengeOutcome": "cleared",
+  "exportedAtMs": 90500,
+  "scenarioTitle": "Wings Over the Garden",
+  "challengeCleared": true,
+  "gardenHP": 2,
+  "derivedFrom": "scripts/replay-2026-04-18-with-bramble.json"
+}

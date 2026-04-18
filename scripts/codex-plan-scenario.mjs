@@ -39,6 +39,8 @@ const DEFAULT_OPTIONS = {
   replayTerminalTimeoutMs: 45_000,
   requestTimeoutMs: 10 * 60_000,
   endlessSurvivalMs: 5_000,
+  exemplarLimit: 3,
+  useExemplars: true,
 };
 
 const PLAN_SCHEMA = {
@@ -209,6 +211,18 @@ function parseArgs(argv) {
 
     if (token === "--json") {
       options.json = true;
+      continue;
+    }
+
+    if (token === "--no-exemplars") {
+      options.useExemplars = false;
+      continue;
+    }
+
+    if (token === "--exemplar-limit" && next) {
+      options.exemplarLimit = Math.round(parseNumber(next, DEFAULT_OPTIONS.exemplarLimit, { min: 0, max: 8 }));
+      index += 1;
+      continue;
     }
   }
 
@@ -274,7 +288,80 @@ function getScenarioPacket(options) {
   };
 }
 
-function buildPrompt(packet, attemptHistory = []) {
+async function loadHumanClearExemplars(options, packet) {
+  if (!options.useExemplars || options.exemplarLimit <= 0) {
+    return [];
+  }
+
+  const currentPlantIds = new Set((packet.plants || []).map((plant) => plant.id));
+  const scriptsDir = path.join(repoRoot, "scripts");
+  const entries = await fs.readdir(scriptsDir, { withFileTypes: true });
+  const candidates = entries
+    .filter(
+      (entry) =>
+        entry.isFile() &&
+        /^replay-\d{4}-\d{2}-\d{2}-.*(?:human-clear|challenge-clear)\.json$/u.test(
+          entry.name
+        )
+    )
+    .map((entry) => path.join(scriptsDir, entry.name));
+
+  const parsed = await Promise.all(
+    candidates.map(async (filePath) => {
+      try {
+        const replay = JSON.parse(await fs.readFile(filePath, "utf8"));
+        const date = String(replay.date || "");
+        const usedPlantIds = [...new Set((replay.placements || []).map((placement) => placement.plantId).filter(Boolean))];
+        const overlap = usedPlantIds.filter((plantId) => currentPlantIds.has(plantId)).length;
+        return {
+          filePath,
+          replay,
+          date,
+          usedPlantIds,
+          overlap,
+        };
+      } catch {
+        return null;
+      }
+    })
+  );
+
+  return parsed
+    .filter(
+      (entry) =>
+        entry &&
+        entry.replay &&
+        entry.date &&
+        entry.replay.expect?.challengeOutcome === "cleared" &&
+        entry.replay.expect?.outcome === "cleared" &&
+        (!options.date || entry.date <= options.date)
+    )
+    .sort((left, right) => {
+      if (right.overlap !== left.overlap) {
+        return right.overlap - left.overlap;
+      }
+      return String(right.date).localeCompare(String(left.date));
+    })
+    .slice(0, options.exemplarLimit)
+    .map((entry) => ({
+      date: entry.replay.date,
+      label: entry.replay.label || path.basename(entry.filePath),
+      scenarioTitle: entry.replay.scenarioTitle || null,
+      source: path.relative(repoRoot, entry.filePath),
+      usedPlantIds: entry.usedPlantIds,
+      placementCount: (entry.replay.placements || []).length,
+      placements: (entry.replay.placements || []).map((placement) => ({
+        timeMs: placement.timeMs,
+        row: placement.row,
+        col: placement.col,
+        plantId: placement.plantId,
+      })),
+      overlapScore: entry.overlap,
+      description: entry.replay.description || null,
+    }));
+}
+
+function buildPrompt(packet, attemptHistory = [], exemplars = []) {
   const parts = [
     "You are planning a deterministic Rootline Defense replay for Command Garden.",
     "Return only the JSON object required by the output schema.",
@@ -291,9 +378,16 @@ function buildPrompt(packet, attemptHistory = []) {
     "- Glass Rams require multiple attacking defenders in the lane; support plants do not count.",
     "- Avoid random overbuilding. Every placement should answer current or future wave pressure.",
     "- Prefer a plan that replay:scenario can verify over a clever but brittle theory.",
-    "Scenario packet:",
-    JSON.stringify(packet),
   ];
+
+  if (exemplars.length > 0) {
+    parts.push(
+      "Verified human-clear exemplars. Treat these as hints about strong openings, not templates to copy blindly. Reuse only the parts that fit the current roster and pressure pattern.",
+      JSON.stringify(exemplars)
+    );
+  }
+
+  parts.push("Scenario packet:", JSON.stringify(packet));
 
   if (attemptHistory.length > 0) {
     parts.push(
@@ -430,7 +524,7 @@ async function callCodexPlanner(packet, options, attemptHistory = []) {
     const result = await runProcess(
       options.codexBin,
       args,
-      buildPrompt(packet, attemptHistory),
+      buildPrompt(packet, attemptHistory, options.exemplars || []),
       options.requestTimeoutMs
     );
 
@@ -619,6 +713,7 @@ async function writePlan(outputPath, plan) {
 function printTextReport(report, outputPath) {
   console.log(`${report.ok ? "PASS" : "FAIL"} Codex plan for ${report.date} ${report.mode}`);
   console.log(`Actions: ${report.plan?.actions?.length || 0}`);
+  console.log(`Human exemplars: ${report.exemplarCount || 0}`);
   if (report.attempts?.length) {
     console.log(`Attempts: ${report.attempts.length}`);
   }
@@ -641,6 +736,8 @@ function printTextReport(report, outputPath) {
 async function main() {
   const options = parseArgs(process.argv.slice(2));
   const packet = getScenarioPacket(options);
+  const exemplars = await loadHumanClearExemplars(options, packet);
+  options.exemplars = exemplars;
 
   try {
     const result = options.verify
@@ -660,6 +757,8 @@ async function main() {
       provider: "codex",
       model: options.model,
       codexReasoningEffort: options.codexReasoningEffort,
+      exemplarCount: exemplars.length,
+      exemplars,
       attemptsRequested: options.attempts,
       reason,
       plan,
@@ -683,6 +782,8 @@ async function main() {
       provider: "codex",
       model: options.model,
       codexReasoningEffort: options.codexReasoningEffort,
+      exemplarCount: exemplars.length,
+      exemplars,
       error: error instanceof Error ? error.message : String(error),
     };
 

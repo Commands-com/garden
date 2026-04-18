@@ -174,13 +174,15 @@ test("April 18 Thornwing Moth has manifest-backed enemy art", async ({
   expect(assetState.thornwing).toMatchObject({
     id: "thornwing-moth",
     kind: "animation",
-    path: "/game/assets/generated/animations/thornwing-moth.png",
+    provider: "repo",
+    path: "/game/assets/manual/enemies/thornwing-moth-sheet.png",
   });
   expect(assetState.thornwing.metadata).toMatchObject({
     category: "enemy",
+    format: "png",
     phaser: {
-      frameWidth: 48,
-      frameHeight: 48,
+      frameWidth: 64,
+      frameHeight: 64,
     },
   });
   expect(assetState.ok).toBe(true);

@@ -18,6 +18,7 @@
     "validate:scenario-difficulty": "node --no-warnings scripts/validate-scenario-difficulty.mjs",
     "probe:scenario-runtime": "node --no-warnings scripts/probe-runtime-scenario.mjs",
     "replay:scenario": "node --no-warnings scripts/replay-scenario-plan.mjs",
+    "replay:derive-clear": "node --no-warnings scripts/derive-challenge-clear-replay.mjs",
     "bot:play-scenario": "node --no-warnings scripts/bot-play-scenario.mjs",
     "ai:play-scenario": "node --no-warnings scripts/ai-play-scenario.mjs",
     "codex:plan-scenario": "node --no-warnings scripts/codex-plan-scenario.mjs",

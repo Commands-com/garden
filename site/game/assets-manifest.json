@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "updatedAt": "2026-04-18T14:35:45.495Z",
+  "updatedAt": "2026-04-18T14:46:24.976Z",
   "assets": [
     {
       "id": "bramble-spear",
@@ -327,22 +327,18 @@
       "id": "thornwing-moth",
       "type": "sprite",
       "kind": "animation",
-      "provider": "replicate",
-      "path": "/game/assets/generated/animations/thornwing-moth.png",
-      "prompt": "Create an animated enemy sprite of thornwing moth flying leftward with thorn-tipped wings, amber eyespots, and a thorn-edged abdomen; hostile lane-pushing creature for a top-down lane-defense game, readable attack silhouette, visually distinct body shape, premium indie-game finish. hostile lane-pushing creature for a top-down lane-defense game, readable attack silhouette, visually distinct body shape, premium indie-game finish. Render a cohesive low-framerate gameplay animation with consistent character volume, palette, and positioning across frames. Use the rd-animation style walking_and_idle. Each frame must keep the same subject identity, palette, and camera angle while showing one coherent gameplay action. Target frame size 48x48. No text, labels, borders, UI panels, or background scene dressing. modern polished pixel art, crisp readable silhouettes, consistent shading, and strong gameplay clarity. avoid muddy low-contrast frames, avoid random pose drift, avoid noisy background detail, avoid deliberately primitive 8-bit nostalgia.",
-      "generatedAt": "2026-04-18T14:35:45.481Z",
+      "provider": "repo",
+      "path": "/game/assets/manual/enemies/thornwing-moth-sheet.png",
+      "prompt": "User-authored Thornwing Moth spritesheet imported from /Users/dtannen/Desktop/moth.png and resized with nearest-neighbor scaling to a 4x4, 64x64-frame Phaser sheet for the April 18 flying enemy.",
+      "generatedAt": "2026-04-18T14:50:00.000Z",
       "metadata": {
-        "predictionId": "rjvbyhaw11rmr0cxm429bzdtar",
-        "modelVersion": "2e4eabbc836578423e151ba27352a1d8a566c6f1186c0da3ddf66c54deacf28b",
-        "model": "rd-animation",
         "category": "enemy",
-        "style": "walking_and_idle",
-        "width": 48,
-        "height": 48,
-        "returnSpritesheet": true,
+        "format": "png",
+        "width": 256,
+        "height": 256,
         "phaser": {
-          "frameWidth": 48,
-          "frameHeight": 48
+          "frameWidth": 64,
+          "frameHeight": 64
         }
       }
     }

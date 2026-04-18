@@ -50,8 +50,8 @@ async function startChallenge(page) {
   );
 }
 
-async function runReplayToTerminal(page, placements) {
-  return page.evaluate(async (scheduledPlacements) => {
+async function runReplayToTerminal(page, placements, expectations = {}) {
+  return page.evaluate(async ({ scheduledPlacements, expectations }) => {
     const placementWaitMs = 60000;
     const startedAt = Date.now();
     const applied = [];
@@ -167,20 +167,46 @@ async function runReplayToTerminal(page, placements) {
 
     const terminalWaitMs = 90000;
     const waitStart = Date.now();
+    let sawChallengeClear = false;
     const terminalOutcome = await new Promise((resolve) => {
       const pollTerminal = () => {
         const state = window.__gameTestHooks.getState();
         const observation = window.__gameTestHooks.getObservation();
         if (state?.scene === "gameover") {
-          resolve({ outcome: "gameover", state, observation });
+          resolve({
+            outcome: "gameover",
+            state,
+            observation,
+            sawChallengeClear:
+              sawChallengeClear || Boolean(state?.challengeCleared),
+          });
           return;
         }
+
         if (state?.scenarioPhase === "endless" || state?.challengeCleared) {
-          resolve({ outcome: "cleared", state, observation });
+          sawChallengeClear = true;
+        }
+
+        if (
+          expectations?.outcome !== "gameover" &&
+          (state?.scenarioPhase === "endless" || state?.challengeCleared)
+        ) {
+          resolve({
+            outcome: "cleared",
+            state,
+            observation,
+            sawChallengeClear: true,
+          });
           return;
         }
         if (Date.now() - waitStart > terminalWaitMs) {
-          resolve({ outcome: "timeout", state, observation });
+          resolve({
+            outcome: "timeout",
+            state,
+            observation,
+            sawChallengeClear:
+              sawChallengeClear || Boolean(state?.challengeCleared),
+          });
           return;
         }
         requestAnimationFrame(pollTerminal);
@@ -195,30 +221,33 @@ async function runReplayToTerminal(page, placements) {
       applied,
       finalState: terminalOutcome.state,
       finalObservation: terminalOutcome.observation,
+      sawChallengeClear: Boolean(terminalOutcome.sawChallengeClear),
     };
-  }, placements);
+  }, { scheduledPlacements: placements, expectations });
 }
 
 test.describe("April 18 replay probes (natural outcomes)", () => {
-  test("replay-2026-04-18-with-bramble.json clears the challenge naturally", async ({
+  test("replay-2026-04-18-with-bramble.json preserves the full recorded human run into endless death", async ({
     page,
   }) => {
     test.setTimeout(120000);
 
     const runtimeErrors = await prepareGamePage(page);
     const fixture = readReplayFixture("replay-2026-04-18-with-bramble.json");
-    expect(fixture.expect.outcome).toBe("cleared");
+    expect(fixture.expect.outcome).toBe("gameover");
+    expect(fixture.expect.challengeOutcome).toBe("cleared");
 
     await startChallenge(page);
     await page.evaluate(() => window.__gameTestHooks.setTimeScale(8));
 
-    const result = await runReplayToTerminal(page, fixture.placements);
+    const result = await runReplayToTerminal(page, fixture.placements, fixture.expect);
     expect(
       result,
-      `with-bramble replay did not clear naturally: ${JSON.stringify(result, null, 2)}`
-    ).toMatchObject({ outcome: "cleared", phase: "terminal" });
-    expect(result.finalState.gardenHP).toBeGreaterThanOrEqual(1);
+      `human replay did not reach the recorded endless death: ${JSON.stringify(result, null, 2)}`
+    ).toMatchObject({ outcome: "gameover", phase: "terminal" });
+    expect(result.sawChallengeClear).toBe(true);
     expect(result.finalState.challengeCleared).toBe(true);
+    expect(result.finalState.gardenHP).toBe(0);
 
     expect(runtimeErrors, runtimeErrors.join("\n")).toEqual([]);
   });
@@ -235,7 +264,7 @@ test.describe("April 18 replay probes (natural outcomes)", () => {
     await startChallenge(page);
     await page.evaluate(() => window.__gameTestHooks.setTimeScale(8));
 
-    const result = await runReplayToTerminal(page, fixture.placements);
+    const result = await runReplayToTerminal(page, fixture.placements, fixture.expect);
     expect(
       result,
       `no-anti-air replay did not reach gameover: ${JSON.stringify(result, null, 2)}`

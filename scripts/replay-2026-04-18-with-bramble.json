@@ -1,89 +1,189 @@
 {
-  "label": "2026-04-18-with-bramble",
+  "schemaVersion": 1,
+  "label": "2026-04-18-human-full-run",
   "date": "2026-04-18",
   "mode": "challenge",
-  "description": "April 18 canonical anti-air line: open on Sunroot to finance the board, buy one Bramble Spear for each flying lane (lane 1 and lane 3), and spend the rest of the run on grounded coverage plus a late Frost Fern / center support line. Thornwing stays confined to lanes 1 and 3, so those two Brambles should carry every airborne event while Thorn Vines and the control/economy pieces handle the ground rush.",
+  "description": "Human-recorded April 18 full run. This trace clears Wings Over the Garden, rolls into endless, and eventually dies there; keep it as the raw historical playthrough, not the trimmed canonical clear artifact.",
   "expect": {
-    "outcome": "cleared",
-    "reason": "paired-bramble-coverage-in-lanes-1-and-3-solves-the-flying-constraint-while-the-ground-roster-holds"
+    "outcome": "gameover",
+    "challengeOutcome": "cleared",
+    "reason": "human-clear-then-endless-death"
   },
   "placements": [
     {
-      "timeMs": 0,
+      "timeMs": 667,
+      "row": 4,
+      "col": 0,
+      "plantId": "sunrootBloom"
+    },
+    {
+      "timeMs": 7550,
+      "row": 1,
+      "col": 0,
+      "plantId": "brambleSpear"
+    },
+    {
+      "timeMs": 12067,
+      "row": 3,
+      "col": 0,
+      "plantId": "brambleSpear"
+    },
+    {
+      "timeMs": 20067,
       "row": 2,
       "col": 0,
-      "plantId": "sunrootBloom",
-      "note": "Open in the center lane. The first beetle and shard take a long time to reach c0, so Sunroot both funds the anti-air purchases and physically stalls the early lane-2 ground pressure."
+      "plantId": "thornVine"
     },
     {
-      "timeMs": 4000,
+      "timeMs": 28350,
+      "row": 4,
+      "col": 1,
+      "plantId": "brambleSpear"
+    },
+    {
+      "timeMs": 35667,
+      "row": 0,
+      "col": 0,
+      "plantId": "brambleSpear"
+    },
+    {
+      "timeMs": 51817,
+      "row": 2,
+      "col": 1,
+      "plantId": "brambleSpear"
+    },
+    {
+      "timeMs": 52600,
+      "row": 2,
+      "col": 2,
+      "plantId": "thornVine"
+    },
+    {
+      "timeMs": 67867,
+      "row": 0,
+      "col": 1,
+      "plantId": "brambleSpear"
+    },
+    {
+      "timeMs": 68583,
+      "row": 0,
+      "col": 2,
+      "plantId": "thornVine"
+    },
+    {
+      "timeMs": 71167,
+      "row": 4,
+      "col": 2,
+      "plantId": "thornVine"
+    },
+    {
+      "timeMs": 75783,
+      "row": 4,
+      "col": 3,
+      "plantId": "thornVine"
+    },
+    {
+      "timeMs": 98733,
       "row": 1,
-      "col": 5,
-      "plantId": "brambleSpear",
-      "note": "Dedicated lane-1 anti-air placed far forward. This lane only hosts Thornwings, so pushing the Bramble to col 5 cuts projectile travel time without exposing it to ground pressure."
+      "col": 1,
+      "plantId": "brambleSpear"
     },
     {
-      "timeMs": 12000,
+      "timeMs": 100517,
+      "row": 1,
+      "col": 2,
+      "plantId": "brambleSpear"
+    },
+    {
+      "timeMs": 101167,
+      "row": 3,
+      "col": 1,
+      "plantId": "thornVine"
+    },
+    {
+      "timeMs": 108533,
       "row": 3,
       "col": 2,
-      "plantId": "brambleSpear",
-      "note": "Lane 3 needs an earlier shot path than a c5 Spear can give at 12s. Planting at col 2 keeps the projectile origin left of the opening Thornwing so the first wave can still be intercepted."
+      "plantId": "brambleSpear"
     },
     {
-      "timeMs": 20000,
-      "row": 2,
-      "col": 1,
-      "plantId": "thornVine",
-      "note": "Center-lane damage arrives behind the Sunroot wall once both anti-air lanes are covered."
-    },
-    {
-      "timeMs": 24000,
+      "timeMs": 111300,
       "row": 0,
-      "col": 0,
-      "plantId": "thornVine",
-      "note": "Top-lane coverage before the late shard pressure compounds."
+      "col": 3,
+      "plantId": "brambleSpear"
     },
     {
-      "timeMs": 30000,
+      "timeMs": 123167,
       "row": 4,
-      "col": 0,
-      "plantId": "thornVine",
-      "note": "Bottom-lane ground cover after the top-lane shard answer is online."
-    },
-    {
-      "timeMs": 36000,
-      "row": 2,
-      "col": 5,
-      "plantId": "frostFern",
-      "note": "Late lane-2 control anchor near the sniper attack point and ram path."
-    },
-    {
-      "timeMs": 40000,
-      "row": 0,
-      "col": 1,
-      "plantId": "thornVine",
-      "note": "Second top-lane Thorn for the later shard and ram pressure."
-    },
-    {
-      "timeMs": 48000,
-      "row": 4,
-      "col": 1,
-      "plantId": "thornVine",
-      "note": "Second bottom-lane Thorn so the late grounded traffic does not erase the economy lane."
-    },
-    {
-      "timeMs": 56000,
-      "row": 2,
-      "col": 2,
-      "plantId": "thornVine",
-      "note": "Second center attacker to help the chilled lane survive the wave-3 and wave-4 ground stack."
-    },
-    {
-      "timeMs": 65000,
-      "row": 2,
       "col": 4,
-      "plantId": "brambleSpear",
-      "note": "Late center piercing support for the double-ram/double-sniper endgame."
+      "plantId": "brambleSpear"
+    },
+    {
+      "timeMs": 124883,
+      "row": 2,
+      "col": 3,
+      "plantId": "brambleSpear"
+    },
+    {
+      "timeMs": 128267,
+      "row": 1,
+      "col": 3,
+      "plantId": "brambleSpear"
+    },
+    {
+      "timeMs": 136050,
+      "row": 3,
+      "col": 3,
+      "plantId": "brambleSpear"
+    },
+    {
+      "timeMs": 140850,
+      "row": 4,
+      "col": 5,
+      "plantId": "thornVine"
+    },
+    {
+      "timeMs": 151050,
+      "row": 4,
+      "col": 3,
+      "plantId": "brambleSpear"
+    },
+    {
+      "timeMs": 160483,
+      "row": 4,
+      "col": 4,
+      "plantId": "brambleSpear"
+    },
+    {
+      "timeMs": 165783,
+      "row": 1,
+      "col": 4,
+      "plantId": "thornVine"
+    },
+    {
+      "timeMs": 171367,
+      "row": 2,
+      "col": 3,
+      "plantId": "thornVine"
+    },
+    {
+      "timeMs": 176233,
+      "row": 4,
+      "col": 3,
+      "plantId": "thornVine"
+    },
+    {
+      "timeMs": 183633,
+      "row": 4,
+      "col": 1,
+      "plantId": "thornVine"
     }
-  ]
+  ],
+  "recordingIncomplete": false,
+  "terminalOutcome": "gameover",
+  "challengeOutcome": "cleared",
+  "exportedAtMs": 188583,
+  "scenarioTitle": "Wings Over the Garden",
+  "challengeCleared": true,
+  "gardenHP": 0
 }
