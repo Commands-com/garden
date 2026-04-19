@@ -505,5 +505,10 @@
     "content/days/2026-04-19/screenshots/board-scout-after-2026-04-19.png",
     "content/days/2026-04-19/screenshots/challenge-wave2-pollen-hud.png",
     "content/days/2026-04-19/screenshots/splash-ring-detonation.png"
-  ]
+  ],
+  "bluesky_post": {
+    "headline": "Day 14: Pollen Puff joins Rootline Defense.",
+    "body": "Second anti-air plant + reusable splash projectile. One bolt detonates on contact; every target in a 1-col radius takes damage. Paired flyers die in one shot.",
+    "alt_text": "Board Scout sidebar showing the new Pollen Puff plant card with Anti-air: Yes and Splash radius: 1.0 col · 16 dmg."
+  }
 }
