@@ -1,7 +1,37 @@
 {
   "schemaVersion": 1,
-  "updatedAt": "2026-04-18T14:46:24.976Z",
+  "updatedAt": "2026-04-19T00:00:00.000Z",
   "assets": [
+    {
+      "id": "pollen-puff",
+      "type": "sprite",
+      "kind": "sprite",
+      "provider": "repo",
+      "path": "/game/assets/manual/plants/pollen-puff.svg",
+      "prompt": "Hand-authored repo asset for the April 19 Pollen Puff splash plant. Warm yellow puffball bloom with a soft pollen halo so the second anti-air plant reads as radius rather than a piercing line.",
+      "generatedAt": "2026-04-19T00:00:00.000Z",
+      "metadata": {
+        "category": "player",
+        "format": "svg",
+        "width": 128,
+        "height": 128
+      }
+    },
+    {
+      "id": "pollen-puff-projectile",
+      "type": "sprite",
+      "kind": "sprite",
+      "provider": "repo",
+      "path": "/game/assets/manual/projectiles/pollen-puff-projectile.svg",
+      "prompt": "Hand-authored repo asset for the April 19 Pollen Puff projectile. Glowing amber pollen orb with a dusty trail so splash bolts are visually distinct from Bramble Spear lances and Thorn Vine thorns.",
+      "generatedAt": "2026-04-19T00:00:00.000Z",
+      "metadata": {
+        "category": "projectile",
+        "format": "svg",
+        "width": 96,
+        "height": 32
+      }
+    },
     {
       "id": "bramble-spear",
       "type": "sprite",

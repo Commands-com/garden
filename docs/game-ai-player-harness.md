@@ -155,6 +155,48 @@ Recommended artifact pattern:
 - use the clear artifact as the canonical winning line in tests and planner prompts
 - keep the full run for endless and archive analysis
 
+### Splash projectiles
+
+Starting with the April 19 Pollen Puff, the engine supports a reusable splash
+projectile contract. Splash is a projectile-level flag, not a plant-specific
+branch — any future plant that sets `splash: true` picks up the same resolution
+path without adding plant-special-case code. Splash and piercing are mutually
+exclusive: a plant definition that declares both causes `spawnProjectile` to
+throw at first fire.
+
+`getObservation().projectiles[]` entries now carry three additional fields:
+
+- `splash` — `true` when the bolt detonates and damages neighbors in a radius.
+- `splashRadiusCols` — splash radius expressed in board columns (multiplied by
+  `CELL_WIDTH = 90` to get pixels at runtime).
+- `splashDamage` — damage applied to *every other* eligible enemy inside the
+  radius. The primary target takes `damage` (not `splashDamage`); there is no
+  double-dip.
+
+`getObservation()` also exposes a top-level `splashEvents[]` array (bounded to
+the 32 most recent detonations) so agents can reconstruct splash geometry
+without re-simulating the runtime. Each entry has the shape:
+
+```json
+{
+  "atMs": 12480,
+  "lane": 2,
+  "x": 742,
+  "y": 276,
+  "radiusPx": 90,
+  "primaryEnemyId": "thornwingMoth",
+  "splashHits": [{ "enemyId": "thornwingMoth", "damage": 12 }]
+}
+```
+
+`splashHits` is the list of neighbors damaged *beyond* the primary target. The
+primary impact is represented by `primaryEnemyId`, not by an entry in
+`splashHits`. Splash geometry uses logical combat coordinates (`enemy.x` +
+lane-center `y`) — altitude and bob offsets on flying sprites are ignored for
+the range query so the radius is deterministic and replay-stable. Splash
+honors the same anti-air gate as the primary impact: neighbors with
+`flying === true` are only hit when the projectile is `canHitFlying`.
+
 ### Ranged-enemy scenarios
 
 On boards that include `behavior: "sniper"` enemies (starting with the April 16 Briar Sniper), the difficulty validator returns an `indeterminate` verdict because it does not simulate aim telegraphs, attacker-only screening, or enemy projectiles. For those scenarios:

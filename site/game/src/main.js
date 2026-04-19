@@ -392,6 +392,9 @@ function renderBoardScout(dayDate, assetCatalog) {
               : false,
             plant.role !== "support" && plant.role !== "control" && plant.piercing
               ? el("span", { className: "game-scout__badge game-scout__badge--piercing" }, "Piercing")
+              : false,
+            plant.role !== "support" && plant.role !== "control" && plant.splash === true
+              ? el("span", { className: "game-scout__badge game-scout__badge--splash" }, "Splash")
               : false
           )
         )
@@ -586,23 +589,34 @@ function selectScoutCard(card, type, data, scenario) {
       )
     );
   } else {
+    const statChildren = [
+      el("dt", {}, "Cost"),
+      el("dd", {}, String(data.cost)),
+      el("dt", {}, "Piercing"),
+      el("dd", {}, data.piercing ? "Yes" : "No"),
+      el("dt", {}, "Anti-air"),
+      el("dd", {}, data.canHitFlying === true ? "Yes" : "No"),
+    ];
+    if (data.splash === true) {
+      statChildren.push(
+        el("dt", {}, "Splash radius"),
+        el(
+          "dd",
+          {},
+          `${Number(data.splashRadiusCols || 0).toFixed(1)} col · ${Number(data.splashDamage || 0)} dmg`
+        )
+      );
+    }
+    statChildren.push(
+      el("dt", {}, "Fire Rate"),
+      el("dd", {}, `${data.cadenceMs}ms`),
+      el("dt", {}, "Damage"),
+      el("dd", {}, String(data.projectileDamage))
+    );
     detail.append(
       el("h4", { className: "game-scout__detail-title" }, data.label),
       el("p", { className: "game-scout__detail-desc" }, data.description || ""),
-      el(
-        "dl",
-        { className: "game-scout__detail-stats" },
-        el("dt", {}, "Cost"),
-        el("dd", {}, String(data.cost)),
-        el("dt", {}, "Piercing"),
-        el("dd", {}, data.piercing ? "Yes" : "No"),
-        el("dt", {}, "Anti-air"),
-        el("dd", {}, data.canHitFlying === true ? "Yes" : "No"),
-        el("dt", {}, "Fire Rate"),
-        el("dd", {}, `${data.cadenceMs}ms`),
-        el("dt", {}, "Damage"),
-        el("dd", {}, String(data.projectileDamage))
-      )
+      el("dl", { className: "game-scout__detail-stats" }, ...statChildren)
     );
   }
 }

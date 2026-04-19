@@ -71,6 +71,29 @@ export const PLANT_DEFINITIONS = {
     displayWidth: 48,
     displayHeight: 52,
   },
+  pollenPuff: {
+    id: "pollenPuff",
+    label: "Pollen Puff",
+    description:
+      "Fires a pollen bolt that bursts on first contact, damaging all enemies in a small radius. Hits flying.",
+    role: "attacker",
+    subRole: "splash",
+    textureKey: "pollen-puff",
+    cost: 80,
+    maxHealth: 24,
+    cadenceMs: 1500,
+    initialCooldownMs: 600,
+    projectileSpeed: 320,
+    projectileDamage: 16,
+    projectileRadius: 8,
+    splash: true,
+    splashRadiusCols: 1.0,
+    splashDamage: 12,
+    canHitFlying: true,
+    projectileTextureKey: "pollen-puff-projectile",
+    displayWidth: 48,
+    displayHeight: 52,
+  },
 };
 
 export const STARTING_PLANT_ID = "thornVine";

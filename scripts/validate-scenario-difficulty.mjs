@@ -628,14 +628,25 @@ class ScenarioSimulator {
       }
 
       defender.cooldownMs = defender.definition.cadenceMs;
+      const plantDef = defender.definition;
+      const piercing = Boolean(plantDef.piercing);
+      const splash = plantDef.splash === true;
+      if (splash && piercing) {
+        throw new Error(
+          `Plant "${plantDef.id}" declares both splash:true and piercing:true; mixed splash+piercing is forbidden.`
+        );
+      }
       this.projectiles.push({
         lane: defender.row,
         x: defender.x + 18,
-        damage: defender.definition.projectileDamage,
-        speed: defender.definition.projectileSpeed,
-        radius: defender.definition.projectileRadius,
-        piercing: Boolean(defender.definition.piercing),
-        canHitFlying: Boolean(defender.definition.canHitFlying),
+        damage: plantDef.projectileDamage,
+        speed: plantDef.projectileSpeed,
+        radius: plantDef.projectileRadius,
+        piercing,
+        canHitFlying: Boolean(plantDef.canHitFlying),
+        splash,
+        splashRadiusCols: splash ? Number(plantDef.splashRadiusCols) || 0 : 0,
+        splashDamage: splash ? Number(plantDef.splashDamage) || 0 : 0,
         hitEnemies: new Set(),
         destroyed: false,
       });
@@ -704,6 +715,29 @@ class ScenarioSimulator {
           if (Math.abs(enemy.x - projectile.x) <= hitRadius) {
             projectile.hitEnemies.add(enemy);
             this.damageEnemy(enemy, projectile.damage);
+          }
+        }
+      } else if (projectile.splash === true) {
+        // Splash projectiles mirror play.js resolveSplashImpact: logical
+        // combat coordinates (enemy.x + lane-center y), anti-air gate on
+        // neighbors, damage routed through damageEnemy so under-defended
+        // modifiers still compose.
+        const target = this.findProjectileTarget(projectile);
+        if (!target) {
+          continue;
+        }
+        projectile.destroyed = true;
+        const radiusPx = (projectile.splashRadiusCols || 0) * CELL_WIDTH;
+        const centerX = target.x;
+        const centerY = getLaneY(target.lane);
+        this.damageEnemy(target, projectile.damage);
+        for (const enemy of this.enemies) {
+          if (enemy === target || enemy.destroyed) continue;
+          if (enemy.definition.flying === true && !projectile.canHitFlying) continue;
+          const dx = enemy.x - centerX;
+          const dy = getLaneY(enemy.lane) - centerY;
+          if (Math.sqrt(dx * dx + dy * dy) <= radiusPx) {
+            this.damageEnemy(enemy, projectile.splashDamage);
           }
         }
       } else {

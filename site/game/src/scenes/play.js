@@ -176,6 +176,7 @@ export class PlayScene extends Phaser.Scene {
     this.enemies = [];
     this.projectiles = [];
     this.enemyProjectiles = [];
+    this.splashEvents = [];
     this.defendersByTile = new Map();
     this.nextDefenderId = 1;
     this.recordedReplayPlacements = [];
@@ -935,12 +936,88 @@ export class PlayScene extends Phaser.Scene {
       if (projectile.piercing) {
         projectile.hitEnemies.add(target);
         this.damageEnemy(target, projectile.damage);
+      } else if (projectile.splash === true) {
+        projectile.destroyed = true;
+        projectile.sprite.destroy();
+        this.resolveSplashImpact(projectile, target);
       } else {
         projectile.destroyed = true;
         projectile.sprite.destroy();
         this.damageEnemy(target, projectile.damage);
       }
     }
+  }
+
+  // AC-1 / AC-3 / AC-4: splash resolution is projectile-level and gated only
+  // on projectile.splash. Damage routes through damageEnemy so Glass Ram's
+  // getEffectiveProjectileDamage modifier composes identically to direct hits.
+  // Geometry uses logical combat coordinates (enemy.x + lane-center y), not
+  // visual altitude/bob-adjusted sprite position, so splash against flying
+  // clusters is deterministic and replay-stable.
+  resolveSplashImpact(projectile, primaryEnemy) {
+    const radiusPx = (projectile.splashRadiusCols || 0) * CELL_WIDTH;
+    const centerX = primaryEnemy.x;
+    const centerY = getLaneY(primaryEnemy.lane);
+    const splashHits = [];
+
+    // Primary target always takes the projectile's primary damage (AC-5:
+    // two-shot lethality is locked on projectileDamage alone, no double-dip).
+    this.damageEnemy(primaryEnemy, projectile.damage);
+
+    for (const enemy of this.enemies) {
+      if (enemy === primaryEnemy || enemy.destroyed) continue;
+      if (enemy.definition.flying === true && !projectile.canHitFlying) continue;
+
+      const dx = enemy.x - centerX;
+      const dy = getLaneY(enemy.lane) - centerY;
+      if (Math.sqrt(dx * dx + dy * dy) > radiusPx) continue;
+
+      const enemyId = enemy.id;
+      const damage = projectile.splashDamage;
+      this.damageEnemy(enemy, damage);
+      splashHits.push({ enemyId, damage });
+    }
+
+    this.recordSplashEvent({
+      atMs: Math.round(this.elapsedMs),
+      lane: primaryEnemy.lane,
+      x: Math.round(centerX),
+      y: Math.round(centerY),
+      radiusPx: Math.round(radiusPx),
+      primaryEnemyId: primaryEnemy.id,
+      splashHits,
+    });
+
+    this.renderSplashBurst(centerX, centerY, radiusPx);
+  }
+
+  recordSplashEvent(entry) {
+    if (!Array.isArray(this.splashEvents)) {
+      this.splashEvents = [];
+    }
+    this.splashEvents.push(entry);
+    // Bound observation payload size. 32 most recent events is plenty for
+    // the current single-splash plant and keeps getObservation() predictable.
+    while (this.splashEvents.length > 32) {
+      this.splashEvents.shift();
+    }
+  }
+
+  renderSplashBurst(x, y, radiusPx) {
+    if (!radiusPx || typeof this.add?.graphics !== "function") return;
+    const burst = this.add.graphics();
+    burst.lineStyle(3, 0xfff5c2, 0.9);
+    burst.strokeCircle(x, y, Math.max(8, radiusPx * 0.35));
+    burst.lineStyle(2, 0xf4cc55, 0.7);
+    burst.strokeCircle(x, y, radiusPx);
+    burst.setDepth(7);
+    this.tweens.add({
+      targets: burst,
+      alpha: 0,
+      duration: 320,
+      ease: "Sine.Out",
+      onComplete: () => burst.destroy(),
+    });
   }
 
   updateEnemies(deltaMs) {
@@ -1640,7 +1717,13 @@ export class PlayScene extends Phaser.Scene {
           damage: projectile.damage,
           piercing: projectile.piercing === true,
           canHitFlying: projectile.canHitFlying === true,
+          splash: projectile.splash === true,
+          splashRadiusCols: projectile.splash === true ? projectile.splashRadiusCols : 0,
+          splashDamage: projectile.splash === true ? projectile.splashDamage : 0,
         })),
+      splashEvents: Array.isArray(this.splashEvents)
+        ? this.splashEvents.map((event) => ({ ...event, splashHits: [...event.splashHits] }))
+        : [],
       enemyProjectiles: this.enemyProjectiles
         .filter((projectile) => !projectile.destroyed)
         .map((projectile) => ({
@@ -1738,20 +1821,29 @@ export class PlayScene extends Phaser.Scene {
   }
 
   spawnProjectile(defender) {
-    const sprite = this.add.image(
-      defender.x + 18,
-      defender.y,
-      defender.definition.projectileTextureKey
-    );
-    sprite.setDisplaySize(
-      defender.definition.projectileRadius * 2 + 8,
-      defender.definition.projectileRadius * 2
-    );
-    sprite.setDepth(5);
-
     const plantDef = defender.definition;
     const piercing = plantDef.piercing || false;
     const canHitFlying = plantDef.canHitFlying === true;
+    const splash = plantDef.splash === true;
+
+    // AC-2 guard: mixed splash+piercing is a v1 build error, not a runtime
+    // fallback. Fail at first fire so ambiguous combat behavior cannot ship.
+    if (splash && piercing) {
+      throw new Error(
+        `Plant "${plantDef.id}" declares both splash:true and piercing:true; mixed splash+piercing is forbidden.`
+      );
+    }
+
+    const sprite = this.add.image(
+      defender.x + 18,
+      defender.y,
+      plantDef.projectileTextureKey
+    );
+    sprite.setDisplaySize(
+      plantDef.projectileRadius * 2 + 8,
+      plantDef.projectileRadius * 2
+    );
+    sprite.setDepth(5);
 
     this.projectiles.push({
       lane: defender.row,
@@ -1762,6 +1854,9 @@ export class PlayScene extends Phaser.Scene {
       radius: plantDef.projectileRadius,
       piercing,
       canHitFlying,
+      splash,
+      splashRadiusCols: splash ? Number(plantDef.splashRadiusCols) || 0 : 0,
+      splashDamage: splash ? Number(plantDef.splashDamage) || 0 : 0,
       hitEnemies: piercing ? new Set() : null,
       sprite,
       destroyed: false,
