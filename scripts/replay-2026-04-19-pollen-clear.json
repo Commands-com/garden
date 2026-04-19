@@ -1,0 +1,26 @@
+{
+  "schemaVersion": 1,
+  "id": "2026-04-19-pollen-clear",
+  "date": "2026-04-19",
+  "mode": "challenge",
+  "coordinateBase": 0,
+  "description": "April 19 clear line that keeps the April 18 Bramble opener, adds a lane-2 Pollen Puff for the Paired Flight seams, then transitions into a three-defender lane-2 Glass Ram answer before a lane-3 Pollen Puff covers the late 3+4 flock. Expected to clear the scripted challenge and enter endless.",
+  "expect": {
+    "outcome": "cleared",
+    "endlessSurvivalMs": 0
+  },
+  "actions": [
+    { "atMs": 0, "type": "place", "plantId": "brambleSpear", "row": 1, "col": 0 },
+    { "atMs": 4000, "type": "place", "plantId": "sunrootBloom", "row": 4, "col": 0 },
+    { "atMs": 14000, "type": "place", "plantId": "pollenPuff", "row": 2, "col": 0 },
+    { "atMs": 20000, "type": "place", "plantId": "thornVine", "row": 0, "col": 0 },
+    { "atMs": 28000, "type": "place", "plantId": "thornVine", "row": 4, "col": 1 },
+    { "atMs": 32000, "type": "place", "plantId": "thornVine", "row": 2, "col": 1 },
+    { "atMs": 39000, "type": "place", "plantId": "thornVine", "row": 2, "col": 2 },
+    { "atMs": 49000, "type": "place", "plantId": "pollenPuff", "row": 3, "col": 0 },
+    { "atMs": 54000, "type": "place", "plantId": "thornVine", "row": 0, "col": 1 },
+    { "atMs": 60000, "type": "place", "plantId": "thornVine", "row": 0, "col": 2 },
+    { "atMs": 69000, "type": "place", "plantId": "brambleSpear", "row": 1, "col": 1 },
+    { "atMs": 74000, "type": "place", "plantId": "thornVine", "row": 4, "col": 2 }
+  ]
+}

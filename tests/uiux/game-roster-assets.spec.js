@@ -258,3 +258,67 @@ test("April 15 Sunroot Bloom loads manifest-backed art and expects no projectile
   expect(sunrootAssetState.requestedManifestAsset).toBe(true);
   expect(sunrootAssetState.hasSunrootProjectileAsset).toBe(false);
 });
+
+test("April 19 Pollen Puff plant and projectile manifest entries resolve to repo-backed SVG assets", async ({
+  page,
+}) => {
+  await installLocalSiteRoutes(page);
+  await page.goto(getAppUrl("/game/?testMode=1&date=2026-04-19"));
+  await page.waitForFunction(
+    () =>
+      window.__gameTestHooks &&
+      typeof window.__gameTestHooks.getState === "function"
+  );
+
+  const assetState = await page.evaluate(async () => {
+    const assetManifest = await fetch("/game/assets-manifest.json").then(
+      (response) => response.json()
+    );
+    const assets = assetManifest.assets || [];
+    const pollenPuff = assets.find((asset) => asset.id === "pollen-puff");
+    const pollenProjectile = assets.find(
+      (asset) => asset.id === "pollen-puff-projectile"
+    );
+
+    const [plantResponse, projectileResponse] = await Promise.all([
+      fetch(pollenPuff.path),
+      fetch(pollenProjectile.path),
+    ]);
+
+    return {
+      pollenPuff,
+      pollenProjectile,
+      plantOk: plantResponse.ok,
+      projectileOk: projectileResponse.ok,
+      plantBody: await plantResponse.text(),
+      projectileBody: await projectileResponse.text(),
+    };
+  });
+
+  expect(assetState.pollenPuff).toMatchObject({
+    id: "pollen-puff",
+    provider: "repo",
+    path: "/game/assets/manual/plants/pollen-puff.svg",
+  });
+  expect(assetState.pollenPuff.metadata).toMatchObject({
+    category: "player",
+    width: 128,
+    height: 128,
+  });
+
+  expect(assetState.pollenProjectile).toMatchObject({
+    id: "pollen-puff-projectile",
+    provider: "repo",
+    path: "/game/assets/manual/projectiles/pollen-puff-projectile.svg",
+  });
+  expect(assetState.pollenProjectile.metadata).toMatchObject({
+    category: "projectile",
+    width: 96,
+    height: 32,
+  });
+
+  expect(assetState.plantOk).toBe(true);
+  expect(assetState.projectileOk).toBe(true);
+  expect(assetState.plantBody).toContain("<svg");
+  expect(assetState.projectileBody).toContain("<svg");
+});

@@ -1,0 +1,21 @@
+{
+  "schemaVersion": 1,
+  "id": "2026-04-19-tutorial-puff-double",
+  "date": "2026-04-19",
+  "mode": "tutorial",
+  "coordinateBase": 0,
+  "description": "Tutorial evidence fixture for the first 'Two Birds, One Puff' pulse. The carried Bramble Spear clears wave 1 and chips the lane-2 bird in wave 2; one lane-1 Pollen Puff detonation then finishes both paired Thornwings in the opener.",
+  "expect": {
+    "outcome": "running",
+    "endlessSurvivalMs": 0
+  },
+  "evidence": {
+    "targetWaveLabel": "Two Birds, One Puff",
+    "claim": "The first Pollen Puff shot in tutorial wave 2 finishes both paired Thornwings once the persistent Bramble Spear has already tagged lane 2."
+  },
+  "actions": [
+    { "atMs": 0, "type": "place", "plantId": "brambleSpear", "row": 2, "col": 0 },
+    { "atMs": 18500, "type": "place", "plantId": "pollenPuff", "row": 1, "col": 0 },
+    { "atMs": 25500, "type": "place", "plantId": "pollenPuff", "row": 2, "col": 1 }
+  ]
+}

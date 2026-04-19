@@ -1,0 +1,31 @@
+{
+  "schemaVersion": 1,
+  "id": "2026-04-19-prior-roster",
+  "date": "2026-04-19",
+  "mode": "challenge",
+  "coordinateBase": 0,
+  "description": "Serious April 19 attempt that only uses the April 18 roster. It opens with the existing Bramble + Sunroot shell and stacks grounded damage into lanes 0 and 2, but without Pollen Puff the paired Thornwing seams eventually leak and the board should fail before endless.",
+  "availablePlants": [
+    "thornVine",
+    "brambleSpear",
+    "sunrootBloom"
+  ],
+  "expect": {
+    "outcome": "gameover",
+    "endlessSurvivalMs": 0
+  },
+  "actions": [
+    { "atMs": 0, "type": "place", "plantId": "brambleSpear", "row": 1, "col": 0 },
+    { "atMs": 4000, "type": "place", "plantId": "sunrootBloom", "row": 4, "col": 0 },
+    { "atMs": 14000, "type": "place", "plantId": "thornVine", "row": 2, "col": 0 },
+    { "atMs": 20000, "type": "place", "plantId": "thornVine", "row": 0, "col": 0 },
+    { "atMs": 28000, "type": "place", "plantId": "thornVine", "row": 4, "col": 1 },
+    { "atMs": 32000, "type": "place", "plantId": "thornVine", "row": 2, "col": 1 },
+    { "atMs": 39000, "type": "place", "plantId": "thornVine", "row": 2, "col": 2 },
+    { "atMs": 49000, "type": "place", "plantId": "brambleSpear", "row": 3, "col": 0 },
+    { "atMs": 54000, "type": "place", "plantId": "thornVine", "row": 0, "col": 1 },
+    { "atMs": 60000, "type": "place", "plantId": "thornVine", "row": 0, "col": 2 },
+    { "atMs": 69000, "type": "place", "plantId": "brambleSpear", "row": 1, "col": 1 },
+    { "atMs": 74000, "type": "place", "plantId": "thornVine", "row": 4, "col": 2 }
+  ]
+}
