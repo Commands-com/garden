@@ -5,6 +5,7 @@ node_modules/
 !.env.example
 content/days/*/
 !content/days/_example/
+!content/days/2026-04-19/
 content/days/_follow-log.json
 content/days/_handled-notifications.json
 *.zip
