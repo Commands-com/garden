@@ -51,11 +51,11 @@ async function patchPlantsForMixedSplashPierce(page) {
     cadenceMs: 1,
     initialCooldownMs: 0,
     projectileSpeed: 320,
-    projectileDamage: 16,
+    projectileDamage: 28,
     projectileRadius: 8,
     splash: true,
     splashRadiusCols: 1.0,
-    splashDamage: 12,
+    splashDamage: 16,
     piercing: true,
     canHitFlying: true,
     projectileTextureKey: "pollen-puff-projectile",
@@ -219,7 +219,7 @@ test.describe("Pollen Puff splash projectile contract", () => {
         (projectile) =>
           projectile.splash === true &&
           projectile.splashRadiusCols === 1 &&
-          projectile.splashDamage === 12
+          projectile.splashDamage === 16
       );
     });
 
@@ -229,7 +229,7 @@ test.describe("Pollen Puff splash projectile contract", () => {
         (projectile) =>
           projectile.splash === true &&
           projectile.splashRadiusCols === 1 &&
-          projectile.splashDamage === 12 &&
+          projectile.splashDamage === 16 &&
           projectile.canHitFlying === true
       )
     ).toBe(true);
@@ -247,7 +247,7 @@ test.describe("Pollen Puff splash projectile contract", () => {
       radiusPx: CELL_WIDTH,
     });
     expect(observation.splashEvents[0].splashHits).toEqual([
-      { enemyId: "thornwingMoth", damage: 12 },
+      { enemyId: "thornwingMoth", damage: 16 },
     ]);
     expect(runtimeErrors, runtimeErrors.join("\n")).toEqual([]);
   });
@@ -277,7 +277,7 @@ test.describe("Pollen Puff splash projectile contract", () => {
       expect.arrayContaining([
         expect.objectContaining({
           enemyId: "thornwingMoth",
-          hp: 16,
+          hp: 4,
           maxHealth: 32,
         }),
       ])
@@ -331,8 +331,8 @@ test.describe("Pollen Puff splash projectile contract", () => {
     });
     expect(observation.splashEvents[0].splashHits).toEqual(
       expect.arrayContaining([
-        { enemyId: "thornwingMoth", damage: 12 },
-        { enemyId: "shardMite", damage: 12 },
+        { enemyId: "thornwingMoth", damage: 16 },
+        { enemyId: "shardMite", damage: 16 },
       ])
     );
     expect(observation.splashEvents[0].splashHits).toHaveLength(2);
@@ -365,7 +365,7 @@ test.describe("Pollen Puff splash projectile contract", () => {
     expect(observation.splashEvents).toHaveLength(1);
     expect(observation.splashEvents[0].radiusPx).toBe(CELL_WIDTH);
     expect(observation.splashEvents[0].splashHits).toEqual([
-      { enemyId: "thornwingMoth", damage: 12 },
+      { enemyId: "thornwingMoth", damage: 16 },
     ]);
     expect(
       observation.splashEvents[0].splashHits.some(

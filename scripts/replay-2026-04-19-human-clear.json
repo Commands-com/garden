@@ -1,14 +1,13 @@
 {
   "schemaVersion": 1,
-  "id": "2026-04-19-pollen-clear",
+  "label": "2026-04-19-human-clear",
   "date": "2026-04-19",
   "mode": "challenge",
   "coordinateBase": 0,
-  "description": "April 19 passing replay line for the current Petals in the Wind board. Opens Sunroot into Bramble anchors, then uses late Pollen Puff coverage across lanes 1, 4, and the top seam to clear into endless.",
+  "description": "Latest strong human challenge clear captured from testMode after final April 19 tuning.",
   "expect": {
     "outcome": "cleared",
-    "challengeOutcome": "cleared",
-    "endlessSurvivalMs": 0
+    "challengeOutcome": "cleared"
   },
   "actions": [
     {
@@ -109,5 +108,98 @@
       "col": 1,
       "plantId": "thornVine"
     }
-  ]
+  ],
+  "placements": [
+    {
+      "timeMs": 517,
+      "row": 4,
+      "col": 0,
+      "plantId": "sunrootBloom"
+    },
+    {
+      "timeMs": 5417,
+      "row": 1,
+      "col": 0,
+      "plantId": "brambleSpear"
+    },
+    {
+      "timeMs": 12017,
+      "row": 3,
+      "col": 0,
+      "plantId": "brambleSpear"
+    },
+    {
+      "timeMs": 20067,
+      "row": 2,
+      "col": 0,
+      "plantId": "thornVine"
+    },
+    {
+      "timeMs": 29617,
+      "row": 2,
+      "col": 1,
+      "plantId": "brambleSpear"
+    },
+    {
+      "timeMs": 32067,
+      "row": 4,
+      "col": 1,
+      "plantId": "thornVine"
+    },
+    {
+      "timeMs": 40383,
+      "row": 0,
+      "col": 0,
+      "plantId": "thornVine"
+    },
+    {
+      "timeMs": 51150,
+      "row": 2,
+      "col": 2,
+      "plantId": "brambleSpear"
+    },
+    {
+      "timeMs": 84183,
+      "row": 0,
+      "col": 1,
+      "plantId": "pollenPuff"
+    },
+    {
+      "timeMs": 85267,
+      "row": 0,
+      "col": 2,
+      "plantId": "pollenPuff"
+    },
+    {
+      "timeMs": 86217,
+      "row": 4,
+      "col": 2,
+      "plantId": "pollenPuff"
+    },
+    {
+      "timeMs": 91700,
+      "row": 1,
+      "col": 1,
+      "plantId": "pollenPuff"
+    },
+    {
+      "timeMs": 92250,
+      "row": 1,
+      "col": 2,
+      "plantId": "pollenPuff"
+    },
+    {
+      "timeMs": 100033,
+      "row": 3,
+      "col": 1,
+      "plantId": "thornVine"
+    }
+  ],
+  "recordingIncomplete": false,
+  "terminalOutcome": "cleared",
+  "challengeOutcome": "cleared",
+  "exportedAtMs": 104600,
+  "scenarioTitle": "Petals in the Wind",
+  "challengeCleared": true,
+  "gardenHP": 1
 }

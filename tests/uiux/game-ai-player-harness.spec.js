@@ -202,6 +202,25 @@ test.describe("AI player harness", () => {
       outcome: "cleared",
       challengeOutcome: "pending",
     });
+    expect(replay.actions).toHaveLength(2);
+    expect(replay.actions[0]).toEqual(
+      expect.objectContaining({
+        atMs: expect.any(Number),
+        type: "place",
+        row: 2,
+        col: 0,
+        plantId: "sunrootBloom",
+      })
+    );
+    expect(replay.actions[1]).toEqual(
+      expect.objectContaining({
+        atMs: expect.any(Number),
+        type: "place",
+        row: 2,
+        col: 1,
+        plantId: "thornVine",
+      })
+    );
     expect(replay.placements).toHaveLength(2);
     expect(replay.placements[0]).toEqual(
       expect.objectContaining({
@@ -238,6 +257,7 @@ test.describe("AI player harness", () => {
       window.__gameTestHooks.clearRecordedReplay();
       return window.__gameTestHooks.getRecordedReplay();
     });
+    expect(clearedReplay.actions).toEqual([]);
     expect(clearedReplay.placements).toEqual([]);
   });
 
@@ -277,6 +297,14 @@ test.describe("AI player harness", () => {
       outcome: "gameover",
       challengeOutcome: "failed",
     });
+    expect(replay.actions).toEqual([
+      expect.objectContaining({
+        type: "place",
+        row: 2,
+        col: 0,
+        plantId: "sunrootBloom",
+      }),
+    ]);
     expect(replay.placements).toEqual([
       expect.objectContaining({
         row: 2,
@@ -372,9 +400,11 @@ test.describe("AI player harness", () => {
       outcome: "cleared",
       challengeOutcome: "cleared",
     });
+    expect(challengeReplay.actions).toEqual([]);
     expect(challengeReplay.placements).toEqual([]);
     expect(JSON.parse(challengeReplayJson)).toEqual(
       expect.objectContaining({
+        actions: [],
         terminalOutcome: "cleared",
         challengeOutcome: "cleared",
       })

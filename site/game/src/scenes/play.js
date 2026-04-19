@@ -1005,6 +1005,72 @@ export class PlayScene extends Phaser.Scene {
 
   renderSplashBurst(x, y, radiusPx) {
     if (!radiusPx || typeof this.add?.graphics !== "function") return;
+
+    if (typeof this.add.circle === "function") {
+      const shockwave = this.add.circle(x, y, radiusPx, 0, 0);
+      shockwave.setStrokeStyle(3, 0xfff5c2, 0.9);
+      shockwave.setDepth(7);
+      shockwave.setScale(0.22);
+      this.tweens.add({
+        targets: shockwave,
+        scale: 1,
+        alpha: 0,
+        duration: 380,
+        ease: "Sine.Out",
+        onComplete: () => shockwave.destroy(),
+      });
+
+      const core = this.add.circle(x, y, radiusPx * 0.42, 0xfde27a, 0.72);
+      core.setDepth(7);
+      core.setScale(0.35);
+      this.tweens.add({
+        targets: core,
+        scale: 1.05,
+        alpha: 0,
+        duration: 260,
+        ease: "Quad.Out",
+        onComplete: () => core.destroy(),
+      });
+
+      const highlight = this.add.circle(x, y, radiusPx * 0.18, 0xffffff, 0.85);
+      highlight.setDepth(7);
+      this.tweens.add({
+        targets: highlight,
+        scale: 1.6,
+        alpha: 0,
+        duration: 180,
+        ease: "Quad.Out",
+        onComplete: () => highlight.destroy(),
+      });
+
+      const moteCount = 10;
+      const innerR = radiusPx * 0.2;
+      const outerR = radiusPx * 0.9;
+      const angleJitter = (Math.PI * 2) / moteCount;
+      for (let i = 0; i < moteCount; i += 1) {
+        const angle = (i / moteCount) * Math.PI * 2 + (Math.random() - 0.5) * angleJitter * 0.4;
+        const dist = outerR * (0.75 + Math.random() * 0.3);
+        const startX = x + Math.cos(angle) * innerR;
+        const startY = y + Math.sin(angle) * innerR;
+        const endX = x + Math.cos(angle) * dist;
+        const endY = y + Math.sin(angle) * dist;
+        const moteColor = i % 2 === 0 ? 0xfde27a : 0xffd84d;
+        const mote = this.add.circle(startX, startY, 3 + Math.random() * 1.5, moteColor, 0.95);
+        mote.setDepth(7);
+        this.tweens.add({
+          targets: mote,
+          x: endX,
+          y: endY,
+          scale: 0.15,
+          alpha: 0,
+          duration: 320 + Math.random() * 80,
+          ease: "Cubic.Out",
+          onComplete: () => mote.destroy(),
+        });
+      }
+      return;
+    }
+
     const burst = this.add.graphics();
     burst.lineStyle(3, 0xfff5c2, 0.9);
     burst.strokeCircle(x, y, Math.max(8, radiusPx * 0.35));
@@ -1458,6 +1524,16 @@ export class PlayScene extends Phaser.Scene {
         : this.mode;
   }
 
+  buildReplayActions(placements = []) {
+    return placements.map((placement) => ({
+      atMs: placement.timeMs,
+      type: "place",
+      row: placement.row,
+      col: placement.col,
+      plantId: placement.plantId,
+    }));
+  }
+
   getRecordedReplay(options = {}) {
     const terminalOutcome =
       this.gameEnding || this.gardenHP <= 0 ? "gameover" : null;
@@ -1466,6 +1542,9 @@ export class PlayScene extends Phaser.Scene {
       : terminalOutcome === "gameover"
         ? "failed"
         : "pending";
+    const placements = (this.recordedReplayPlacements || []).map((placement) => ({
+      ...placement,
+    }));
 
     return {
       schemaVersion: 1,
@@ -1474,6 +1553,7 @@ export class PlayScene extends Phaser.Scene {
         `${this.modeDefinition.scenarioDate}-${this.mode}-recorded`,
       date: this.modeDefinition.scenarioDate,
       mode: this.mode,
+      coordinateBase: 0,
       description:
         options.description ||
         `Recorded ${this.mode} placements exported from ?testMode=1 for ${this.modeDefinition.scenarioTitle}.`,
@@ -1485,9 +1565,8 @@ export class PlayScene extends Phaser.Scene {
         challengeOutcome:
           options.challengeOutcome || challengeOutcome,
       },
-      placements: (this.recordedReplayPlacements || []).map((placement) => ({
-        ...placement,
-      })),
+      actions: this.buildReplayActions(placements),
+      placements,
       recordingIncomplete: terminalOutcome == null,
       terminalOutcome,
       challengeOutcome,
@@ -1507,6 +1586,10 @@ export class PlayScene extends Phaser.Scene {
       return null;
     }
 
+    const placements = this.recordedChallengeReplayPlacements.map((placement) => ({
+      ...placement,
+    }));
+
     return {
       schemaVersion: 1,
       label:
@@ -1514,6 +1597,7 @@ export class PlayScene extends Phaser.Scene {
         `${this.modeDefinition.scenarioDate}-${this.mode}-challenge-clear`,
       date: this.modeDefinition.scenarioDate,
       mode: this.mode,
+      coordinateBase: 0,
       description:
         options.description ||
         `Recorded ${this.mode} placements trimmed to the first challenge clear for ${this.modeDefinition.scenarioTitle}.`,
@@ -1521,9 +1605,8 @@ export class PlayScene extends Phaser.Scene {
         outcome: options.outcome || "cleared",
         challengeOutcome: options.challengeOutcome || "cleared",
       },
-      placements: this.recordedChallengeReplayPlacements.map((placement) => ({
-        ...placement,
-      })),
+      actions: this.buildReplayActions(placements),
+      placements,
       recordingIncomplete: false,
       terminalOutcome: "cleared",
       challengeOutcome: "cleared",

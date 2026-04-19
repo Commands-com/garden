@@ -136,7 +136,18 @@ function normalizePlan(plan, options) {
   const coordinateBase = Number(plan.coordinateBase ?? 0);
   const date = options.date || plan.date;
   const mode = options.mode || (plan.mode === "tutorial" ? "tutorial" : "challenge");
-  const actions = (plan.actions || [])
+  const sourceActions = Array.isArray(plan.actions)
+    ? plan.actions
+    : Array.isArray(plan.placements)
+      ? plan.placements.map((placement) => ({
+          atMs: placement.atMs ?? placement.timeMs,
+          type: "place",
+          row: placement.row,
+          col: placement.col,
+          plantId: placement.plantId,
+        }))
+      : [];
+  const actions = sourceActions
     .map((action) => normalizeAction(action, coordinateBase))
     .sort((left, right) => left.atMs - right.atMs);
 

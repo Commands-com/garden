@@ -20,6 +20,24 @@ function readReplayPlan(fileName) {
   );
 }
 
+function getReplayActions(replayPlan) {
+  if (Array.isArray(replayPlan.actions)) {
+    return replayPlan.actions;
+  }
+
+  if (Array.isArray(replayPlan.placements)) {
+    return replayPlan.placements.map((placement) => ({
+      atMs: placement.atMs ?? placement.timeMs ?? 0,
+      type: "place",
+      row: placement.row,
+      col: placement.col,
+      plantId: placement.plantId,
+    }));
+  }
+
+  return [];
+}
+
 async function prepareGamePage(page) {
   const runtimeErrors = [];
   page.on("console", (message) => {
@@ -126,8 +144,9 @@ async function waitForActionReady(page, action, timeoutMs = 60000) {
 
 async function runReplayPlan(page, replayPlan) {
   const appliedActions = [];
+  const actions = getReplayActions(replayPlan);
 
-  for (const action of replayPlan.actions || []) {
+  for (const action of actions) {
     const readiness = await waitForActionReady(page, action);
     if (
       !readiness.ready &&

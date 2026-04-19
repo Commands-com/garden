@@ -19,6 +19,27 @@ const VOLUME_MAP = {
   "thorn-hit": 0.06,
 };
 
+// Minimum ms between retriggers of the same effect. Late game we can fire
+// dozens of bolts per second across lanes; without a throttle every projectile
+// fire + every splash neighbor hit stacks into a wall of noise.
+const THROTTLE_MS = {
+  fire: 45,
+  "thorn-fire": 45,
+  hit: 40,
+  "thorn-hit": 40,
+  hurt: 80,
+};
+
+// Hard cap on simultaneously-playing voices per effect key. Beyond this we
+// drop new plays rather than layering more amplitude on top.
+const VOICE_CAP = {
+  fire: 3,
+  "thorn-fire": 3,
+  hit: 3,
+  "thorn-hit": 3,
+  hurt: 2,
+};
+
 const STORAGE_MUTE_KEY = "command-garden:audio-muted";
 const STORAGE_VOLUME_KEY = "command-garden:audio-volume";
 
@@ -50,6 +71,8 @@ export class GardenAudio {
     this.muted = readBool(STORAGE_MUTE_KEY);
     this.masterVolume = readFloat(STORAGE_VOLUME_KEY, 0.8);
     this.unlockHandler = this.unlock.bind(this);
+    this.lastPlayedAt = Object.create(null);
+    this.activeVoices = Object.create(null);
   }
 
   attach(scene) {
@@ -117,9 +140,54 @@ export class GardenAudio {
       return;
     }
 
+    const now =
+      typeof performance !== "undefined" && typeof performance.now === "function"
+        ? performance.now()
+        : Date.now();
+
+    const throttle = THROTTLE_MS[effectKey] ?? 0;
+    if (throttle > 0) {
+      const last = this.lastPlayedAt[effectKey] ?? -Infinity;
+      if (now - last < throttle) {
+        return;
+      }
+    }
+
+    const cap = VOICE_CAP[effectKey] ?? Infinity;
+    const active = this.activeVoices[effectKey] ?? 0;
+    if (active >= cap) {
+      return;
+    }
+
+    this.lastPlayedAt[effectKey] = now;
+
     if (this.scene.cache.audio.exists(effectKey)) {
-      const vol = (VOLUME_MAP[effectKey] ?? 0.22) * this.masterVolume;
-      this.scene.sound.play(effectKey, { volume: vol });
+      // Attenuate volume as voices stack so N overlapping plays don't sum to
+      // clipping. sqrt(1/voices) is the standard equal-power mixdown curve.
+      const voicesWithThis = active + 1;
+      const stackScale = 1 / Math.sqrt(voicesWithThis);
+      const vol =
+        (VOLUME_MAP[effectKey] ?? 0.22) * this.masterVolume * stackScale;
+
+      const instance = this.scene.sound.add(effectKey, { volume: vol });
+      if (!instance) {
+        return;
+      }
+      this.activeVoices[effectKey] = voicesWithThis;
+      const release = () => {
+        this.activeVoices[effectKey] = Math.max(
+          0,
+          (this.activeVoices[effectKey] ?? 1) - 1
+        );
+        if (typeof instance.destroy === "function") {
+          instance.destroy();
+        }
+      };
+      if (typeof instance.once === "function") {
+        instance.once("complete", release);
+        instance.once("stop", release);
+      }
+      instance.play();
       return;
     }
 

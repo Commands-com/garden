@@ -62,7 +62,7 @@ test.describe("Board Scout — April 19 Pollen Puff copy", () => {
     );
     const pollenStats = await readDetailStats(detail);
     expect(pollenStats["Anti-air"]).toBe("Yes");
-    expect(pollenStats["Splash radius"]).toBe("1.0 col · 12 dmg");
+    expect(pollenStats["Splash radius"]).toBe("1.0 col · 16 dmg");
 
     const brambleCard = getScoutCardByName(
       page,
