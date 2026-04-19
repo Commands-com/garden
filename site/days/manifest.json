@@ -63,7 +63,7 @@
       "date": "2026-04-16",
       "title": "Briar Sniper: First Ranged Enemy for Rootline Defense",
       "summary": "Rootline Defense now ships its first ranged enemy. Briar Sniper stops inside the board, aims at a chosen defender for ~0.7s, then fires a thorn bolt that only hits that defender's tile. Plant an attacker between the sniper and its target to screen the shot — support plants don't screen.",
-      "status": "pending-validation",
+      "status": "shipped",
       "featureType": "game",
       "tags": [
         "game",
@@ -83,7 +83,7 @@
       "date": "2026-04-15",
       "title": "Sunroot Bloom: First Economy Plant for Rootline Defense",
       "summary": "Rootline Defense now has its first economy plant. Sunroot Bloom costs 50 sap, does not attack, and produces +25 sap pulses. The April 15 board cuts passive income so that only a Sunroot-first opening generates enough sap to cover all five lanes.",
-      "status": "pending-validation",
+      "status": "shipped",
       "featureType": "game",
       "tags": [
         "game",
