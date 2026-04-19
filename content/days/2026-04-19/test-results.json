@@ -1,0 +1,56 @@
+{
+  "schemaVersion": 1,
+  "runDate": "2026-04-19",
+  "generatedAt": "2026-04-19T13:19:41Z",
+  "summary": {
+    "totalScenarios": 6,
+    "passed": 6,
+    "failed": 0,
+    "passRate": 100.0
+  },
+  "scenarios": [
+    {
+      "name": "Artifact schema validation",
+      "persona": "validator",
+      "status": "pass",
+      "description": "Validated the completed April 19 artifact directory with the repository schema validator after the manual recovery added review.md, test-results.json, and the screenshot set.",
+      "details": "`node schemas/validate.js content/days/2026-04-19` passes decision.json, feedback-digest.json, test-results.json, spec.md, build-summary.md, and review.md."
+    },
+    {
+      "name": "Scenario difficulty validator",
+      "persona": "validator",
+      "status": "pass",
+      "description": "Ran the repaired scenario-difficulty validator against April 19's Petals in the Wind board. The validator now seeds from checked-in replay fixtures and counts only strategic placements for the near-perfect perturbation gate.",
+      "details": "`npm run validate:scenario-difficulty -- --date 2026-04-19 --json` → exit 0 with `ok: true`, `nearPerfect: true`, `canonicalWin: true`, `difficulty: true`, `requiredPlants: true`. The canonical clear uses Pollen Puff and survives 25s of post-clear endless."
+    },
+    {
+      "name": "Playwright — April 19 ship gate",
+      "persona": "visitor",
+      "status": "pass",
+      "description": "Validated the Pollen Puff feature surface directly: splash projectile behavior, Board Scout splash copy, April 19 tutorial/challenge flow, paired replay outcomes, and manifest-backed roster art.",
+      "details": "`npx playwright test tests/uiux/game-pollen-puff.spec.js tests/uiux/game-board-scout-2026-04-19.spec.js tests/uiux/game-2026-04-19-flow.spec.js tests/uiux/game-2026-04-19-replays.spec.js tests/uiux/game-roster-assets.spec.js --config=playwright.config.js` — 16 passed."
+    },
+    {
+      "name": "Artifact screenshots",
+      "persona": "visitor",
+      "status": "pass",
+      "description": "Generated the four April 19 PNG captures that the blocked room failed to migrate: Board Scout before/after, a challenge wave-2 Pollen Puff HUD frame, and a splash-ring detonation frame.",
+      "details": "`npx playwright test tests/uiux/_capture-april-19-screenshots.spec.js --config=playwright.config.js` — 1 passed before the temporary helper was removed. Files now exist under `content/days/2026-04-19/screenshots/`."
+    },
+    {
+      "name": "Playwright — repaired historical replay/flow probes",
+      "persona": "validator",
+      "status": "pass",
+      "description": "Revalidated the stale April 17 Frost clear line after refreshing `replay-2026-04-17-chilled-lane.json` to the current shipped Cold Lane board. This closes the last non-April-19 failures blocking a trustworthy full-suite gate.",
+      "details": "`npx playwright test tests/uiux/game-2026-04-17-flow.spec.js tests/uiux/game-2026-04-17-replays.spec.js --config=playwright.config.js` — 3 passed."
+    },
+    {
+      "name": "Full Playwright suite",
+      "persona": "visitor",
+      "status": "pass",
+      "description": "Ran the repo-wide Playwright suite after the validator and stale replay repairs to confirm the rescued April 19 ship state is regression-clean across the site and the game archive.",
+      "details": "`npx playwright test --config=playwright.config.js` — 432 passed."
+    }
+  ],
+  "testPersonas": ["validator", "visitor"]
+}

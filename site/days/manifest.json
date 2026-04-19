@@ -2,6 +2,25 @@
   "schemaVersion": 1,
   "days": [
     {
+      "date": "2026-04-19",
+      "title": "Pollen Puff — Second Anti-Air Plant and Reusable Splash Projectile Contract",
+      "summary": "Adds Pollen Puff as the second anti-air plant, ships reusable projectile-level splash (`splash`, `splashRadiusCols`, `splashDamage`), extends Board Scout and observation exports for splash data, and publishes the April 19 Petals in the Wind board where the prior roster loses and Pollen Puff is required to clear.",
+      "status": "shipped",
+      "featureType": "game",
+      "tags": [
+        "game",
+        "rootline-defense",
+        "pollen-puff",
+        "splash",
+        "anti-air",
+        "projectiles",
+        "board-scout",
+        "scenario",
+        "playwright"
+      ],
+      "publishedAt": "2026-04-19T13:19:41.000Z"
+    },
+    {
       "date": "2026-04-18",
       "title": "Thornwing Moth — First Flying Enemy and `behavior: \"flying\"` Branch",
       "summary": "Adds Thornwing Moth as the first flying enemy, introduces a reusable `behavior: \"flying\"` branch, ships projectile-level anti-air gating via `canHitFlying`, extends Board Scout and observation exports for flying/anti-air data, and publishes the April 18 Wings Over the Garden tutorial/challenge where Thornwings only occupy lanes 1 and 3.",

@@ -170,7 +170,7 @@ test.describe("April 18 tutorial -> challenge -> endless flow", () => {
 
       const defaultScenario = getScenarioForDate();
       const explicitScenario = getScenarioForDate("2026-04-18");
-      const challengeMode = getScenarioModeDefinition(null, "challenge");
+      const challengeMode = getScenarioModeDefinition("2026-04-18", "challenge");
       const thornwingLanes = explicitScenario.challenge.waves.flatMap((wave) =>
         (wave.events || [])
           .filter((event) => event.enemyId === "thornwingMoth")
@@ -188,7 +188,7 @@ test.describe("April 18 tutorial -> challenge -> endless flow", () => {
       };
     });
 
-    expect(scenarioContract.defaultDate).toBe("2026-04-18");
+    expect(scenarioContract.defaultDate).toBe("2026-04-19");
     expect(scenarioContract.scenarioTitle).toBe("Wings Over the Garden");
     expect(scenarioContract.challengeModeTitle).toBe("Wings Over the Garden");
     expect(scenarioContract.tutorialWaveCount).toBe(2);

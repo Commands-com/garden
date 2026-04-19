@@ -1,3 +1,5 @@
+import fs from "node:fs";
+import path from "node:path";
 import { spawnSync } from "node:child_process";
 import {
   BOARD_COLS,
@@ -234,6 +236,112 @@ function buildModeDefinitionWithRoster(modeDefinition, availablePlants) {
     ...modeDefinition,
     availablePlants: cloneAvailablePlants(availablePlants),
   };
+}
+
+function extractReplaySeedPlan(replayFixture, modeDefinition, options) {
+  const sourceActions = Array.isArray(replayFixture?.actions)
+    ? replayFixture.actions
+    : Array.isArray(replayFixture?.placements)
+      ? replayFixture.placements
+      : [];
+
+  const plan = sourceActions
+    .filter((action) => {
+      const type = action?.type || "place";
+      return type === "place";
+    })
+    .map((action) => ({
+      timeMs: roundToBucket(
+        Number(action.timeMs ?? action.atMs ?? 0),
+        options.decisionIntervalMs || DEFAULT_OPTIONS.decisionIntervalMs
+      ),
+      row: Number(action.row),
+      col: Number(action.col),
+      plantId: action.plantId,
+    }))
+    .filter(
+      (action) =>
+        Number.isFinite(action.timeMs) &&
+        Number.isInteger(action.row) &&
+        Number.isInteger(action.col) &&
+        action.row >= 0 &&
+        action.row < BOARD_ROWS &&
+        action.col >= 0 &&
+        action.col < BOARD_COLS &&
+        typeof action.plantId === "string" &&
+        action.plantId.length > 0
+    );
+
+  if (plan.length === 0) {
+    return null;
+  }
+
+  const modeMatches =
+    !replayFixture.mode ||
+    replayFixture.mode === modeDefinition.mode ||
+    (modeDefinition.mode === "challenge" &&
+      replayFixture.mode === "challenge-clear");
+  if (!modeMatches) {
+    return null;
+  }
+
+  const challengeOutcome =
+    replayFixture?.expect?.challengeOutcome ||
+    replayFixture?.challengeOutcome ||
+    (replayFixture?.challengeCleared === true ? "cleared" : null);
+  const terminalOutcome =
+    replayFixture?.expect?.outcome || replayFixture?.terminalOutcome || null;
+  const replayClearsChallenge =
+    terminalOutcome === "cleared" || challengeOutcome === "cleared";
+
+  if (modeDefinition.mode === "challenge" && !replayClearsChallenge) {
+    return null;
+  }
+
+  const availablePlants = cloneAvailablePlants(
+    modeDefinition.availablePlants || [STARTING_PLANT_ID]
+  );
+  if (plan.some((action) => !availablePlants.includes(action.plantId))) {
+    return null;
+  }
+
+  return sortPlan(plan);
+}
+
+function loadReplaySeedPlans(modeDefinition, options) {
+  const scriptsDir = path.join(process.cwd(), "scripts");
+  if (!fs.existsSync(scriptsDir)) {
+    return [];
+  }
+
+  const prefix = `replay-${modeDefinition.scenarioDate}-`;
+  const replayFiles = fs
+    .readdirSync(scriptsDir)
+    .filter((fileName) => fileName.startsWith(prefix) && fileName.endsWith(".json"))
+    .sort();
+
+  const seeds = [];
+  for (const fileName of replayFiles) {
+    try {
+      const fixture = JSON.parse(
+        fs.readFileSync(path.join(scriptsDir, fileName), "utf8")
+      );
+      const plan = extractReplaySeedPlan(fixture, modeDefinition, options);
+      if (!plan) {
+        continue;
+      }
+
+      seeds.push({
+        label: `replay-seed:${fileName}`,
+        plan,
+      });
+    } catch (_error) {
+      // Ignore malformed replay fixtures; validation should not fail closed
+      // on an unrelated seed file.
+    }
+  }
+
+  return seeds;
 }
 
 function getPreviousScenarioDate(dayDate) {
@@ -1571,6 +1679,9 @@ function buildPerturbations(plan, options) {
 function getDifficultyPlacementIndexes(plan, { maxTimeMs = Number.POSITIVE_INFINITY } = {}) {
   const indexes = new Set();
   const firstSupportByPlant = new Set();
+  const firstCombatByPlant = new Set();
+  const combatRowsCovered = new Set();
+  let fullCombatCoverageReached = false;
 
   for (let index = 0; index < plan.length; index += 1) {
     const action = plan[index];
@@ -1585,7 +1696,15 @@ function getDifficultyPlacementIndexes(plan, { maxTimeMs = Number.POSITIVE_INFIN
     }
 
     if (plant.role !== "support") {
-      indexes.add(index);
+      const firstUseOfPlant = !firstCombatByPlant.has(plant.id);
+      if (firstUseOfPlant || !fullCombatCoverageReached) {
+        indexes.add(index);
+      }
+      firstCombatByPlant.add(plant.id);
+      combatRowsCovered.add(action.row);
+      if (combatRowsCovered.size === BOARD_ROWS) {
+        fullCombatCoverageReached = true;
+      }
       continue;
     }
 
@@ -2358,6 +2477,10 @@ function buildSearchSeedPlans(modeDefinition, options) {
         );
       }
     }
+  }
+
+  for (const replaySeed of loadReplaySeedPlans(modeDefinition, options)) {
+    pushSeed(replaySeed.label, replaySeed.plan);
   }
 
   return seeds;

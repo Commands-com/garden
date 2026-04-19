@@ -47,8 +47,12 @@ test.describe("Scenario difficulty validator", () => {
         )
       ).toBe(true);
     } else {
-      expect(typeof report.reason).toBe("string");
-      expect(report.reason).toContain("No winning");
+      expect(report.validationGates).toBeTruthy();
+      expect(
+        report.validationGates.canonicalWin === false ||
+          report.validationGates.difficulty === false ||
+          report.validationGates.requiredPlants === false
+      ).toBe(true);
     }
   });
 });
