@@ -49,7 +49,7 @@ async function getExpectedScoutData(page, dayDate = "2026-04-14") {
       const enemy = ENEMY_BY_ID[enemyId];
       return {
         name: enemy.label,
-        stats: [`HP: ${enemy.maxHealth}`, `Speed: ${enemy.speed}`],
+        stats: [`${enemy.maxHealth} HP`, `SPD ${enemy.speed}`],
       };
     });
 
@@ -58,9 +58,9 @@ async function getExpectedScoutData(page, dayDate = "2026-04-14") {
       return {
         name: plant.label,
         stats: [
-          `Cost: ${plant.cost}`,
+          `${plant.cost}g`,
           ...(typeof plant.projectileDamage === "number"
-            ? [`DMG: ${plant.projectileDamage}`]
+            ? [`${plant.projectileDamage} DMG`]
             : []),
         ],
         piercing: Boolean(plant.piercing),

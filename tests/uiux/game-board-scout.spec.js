@@ -101,16 +101,16 @@ test.describe("Board Scout rail", () => {
     );
 
     await expect(briarBeetleCard.locator(".game-scout__card-stat")).toHaveText([
-      "HP: 38",
-      "Speed: 30",
+      "38 HP",
+      "SPD 30",
     ]);
     await expect(shardMiteCard.locator(".game-scout__card-stat")).toHaveText([
-      "HP: 22",
-      "Speed: 58",
+      "22 HP",
+      "SPD 58",
     ]);
     await expect(glassRamCard.locator(".game-scout__card-stat")).toHaveText([
-      "HP: 160",
-      "Speed: 36",
+      "160 HP",
+      "SPD 36",
     ]);
 
     const thornVineCard = getScoutCardByName(
@@ -125,16 +125,16 @@ test.describe("Board Scout rail", () => {
     );
 
     await expect(thornVineCard.locator(".game-scout__card-stat")).toHaveText([
-      "Cost: 50",
-      "DMG: 14",
+      "50g",
+      "14 DMG",
     ]);
     await expect(
       thornVineCard.locator(".game-scout__badge--piercing")
     ).toHaveCount(0);
 
     await expect(brambleSpearCard.locator(".game-scout__card-stat")).toHaveText([
-      "Cost: 75",
-      "DMG: 22",
+      "75g",
+      "22 DMG",
     ]);
     await expect(
       brambleSpearCard.locator(".game-scout__badge--piercing")

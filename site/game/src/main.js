@@ -296,6 +296,17 @@ function renderBoardScout(dayDate, assetCatalog) {
   for (const id of enemyIds) {
     const enemy = ENEMY_BY_ID[id];
     if (!enemy) continue;
+    const badges = [];
+    if (enemy.behavior === "sniper") {
+      badges.push(
+        el("span", { className: "game-scout__badge game-scout__badge--ranged" }, "Ranged")
+      );
+    }
+    if (enemy.behavior === "flying" || enemy.flying === true) {
+      badges.push(
+        el("span", { className: "game-scout__badge game-scout__badge--flying" }, "Flying")
+      );
+    }
     const card = el(
       "button",
       {
@@ -305,36 +316,16 @@ function renderBoardScout(dayDate, assetCatalog) {
         "aria-label": enemy.label,
         onClick: () => selectScoutCard(card, "enemy", enemy, scenario),
       },
+      createScoutArt(enemy, assetIndex),
+      el("div", { className: "game-scout__card-name" }, enemy.label),
       el(
         "div",
-        { className: "game-scout__card-main" },
-        createScoutArt(enemy, assetIndex),
-        el(
-          "div",
-          { className: "game-scout__card-copy" },
-          el("div", { className: "game-scout__card-name" }, enemy.label),
-          el(
-            "div",
-            { className: "game-scout__card-stats" },
-            el("span", { className: "game-scout__card-stat" }, `HP: ${enemy.maxHealth}`),
-            el("span", { className: "game-scout__card-stat" }, `Speed: ${enemy.speed}`),
-            enemy.behavior === "sniper"
-              ? el(
-                  "span",
-                  { className: "game-scout__badge game-scout__badge--ranged" },
-                  "Ranged"
-                )
-              : false,
-            enemy.behavior === "flying" || enemy.flying === true
-              ? el(
-                  "span",
-                  { className: "game-scout__badge game-scout__badge--flying" },
-                  "Flying"
-                )
-              : false
-          )
-        )
-      )
+        { className: "game-scout__card-stats" },
+        el("span", { className: "game-scout__card-stat" }, `${enemy.maxHealth} HP`),
+        el("span", { className: "game-scout__card-stat-sep" }, "·"),
+        el("span", { className: "game-scout__card-stat" }, `SPD ${enemy.speed}`)
+      ),
+      el("div", { className: "game-scout__card-badges" }, ...badges)
     );
     dom.scoutEnemies?.append(card);
   }
@@ -343,6 +334,78 @@ function renderBoardScout(dayDate, assetCatalog) {
   for (const id of scenario.availablePlants || []) {
     const plant = PLANT_DEFINITIONS[id];
     if (!plant) continue;
+
+    // Build compact headline stat and a single role badge.
+    // Verbose descriptions live in the detail panel on click.
+    const statNodes = [el("span", { className: "game-scout__card-stat" }, `${plant.cost}g`)];
+    const badges = [];
+
+    if (plant.role === "support") {
+      badges.push(
+        el(
+          "span",
+          { className: "game-scout__badge game-scout__badge--economy" },
+          formatSapPulse(plant.sapPerPulse, true)
+        )
+      );
+    } else if (plant.role === "control") {
+      statNodes.push(
+        el("span", { className: "game-scout__card-stat-sep" }, "·"),
+        el(
+          "span",
+          { className: "game-scout__card-stat" },
+          `-${Math.round((plant.chillMagnitude || 0) * 100)}%`
+        )
+      );
+      badges.push(
+        el(
+          "span",
+          { className: "game-scout__badge game-scout__badge--control" },
+          "Control"
+        )
+      );
+    } else if (plant.role === "defender") {
+      statNodes.push(
+        el("span", { className: "game-scout__card-stat-sep" }, "·"),
+        el("span", { className: "game-scout__card-stat" }, `${plant.maxHealth} HP`)
+      );
+      badges.push(
+        el(
+          "span",
+          { className: "game-scout__badge game-scout__badge--defender" },
+          "Wall"
+        )
+      );
+    } else {
+      if (typeof plant.projectileDamage === "number") {
+        statNodes.push(
+          el("span", { className: "game-scout__card-stat-sep" }, "·"),
+          el(
+            "span",
+            { className: "game-scout__card-stat" },
+            `${plant.projectileDamage} DMG`
+          )
+        );
+      }
+      if (plant.piercing) {
+        badges.push(
+          el(
+            "span",
+            { className: "game-scout__badge game-scout__badge--piercing" },
+            "Piercing"
+          )
+        );
+      } else if (plant.splash === true) {
+        badges.push(
+          el(
+            "span",
+            { className: "game-scout__badge game-scout__badge--splash" },
+            "Splash"
+          )
+        );
+      }
+    }
+
     const card = el(
       "button",
       {
@@ -352,67 +415,10 @@ function renderBoardScout(dayDate, assetCatalog) {
         "aria-label": plant.label,
         onClick: () => selectScoutCard(card, "plant", plant, scenario),
       },
-      el(
-        "div",
-        { className: "game-scout__card-main" },
-        createScoutArt(plant, assetIndex),
-        el(
-          "div",
-          { className: "game-scout__card-copy" },
-          el("div", { className: "game-scout__card-name" }, plant.label),
-          el(
-            "div",
-            { className: "game-scout__card-stats" },
-            el("span", { className: "game-scout__card-stat" }, `Cost: ${plant.cost}`),
-            plant.role === "support"
-              ? el(
-                  "span",
-                  { className: "game-scout__badge game-scout__badge--economy" },
-                  formatSapPulse(plant.sapPerPulse, true)
-                )
-              : false,
-            plant.role === "control"
-              ? el(
-                  "span",
-                  { className: "game-scout__badge game-scout__badge--control" },
-                  "Control"
-                )
-              : false,
-            plant.role === "control"
-              ? el(
-                  "span",
-                  { className: "game-scout__card-stat" },
-                  `Slow −${Math.round((plant.chillMagnitude || 0) * 100)}% / ${(
-                    (plant.chillDurationMs || 0) / 1000
-                  ).toFixed(1)}s`
-                )
-              : false,
-            plant.role === "defender"
-              ? el(
-                  "span",
-                  { className: "game-scout__badge game-scout__badge--defender" },
-                  "Wall"
-                )
-              : false,
-            plant.role === "defender"
-              ? el(
-                  "span",
-                  { className: "game-scout__card-stat" },
-                  `No damage · Soaks sniper bolts · HP: ${plant.maxHealth}`
-                )
-              : false,
-            plant.role !== "support" && plant.role !== "control" && plant.role !== "defender" && typeof plant.projectileDamage === "number"
-              ? el("span", { className: "game-scout__card-stat" }, `DMG: ${plant.projectileDamage}`)
-              : false,
-            plant.role !== "support" && plant.role !== "control" && plant.role !== "defender" && plant.piercing
-              ? el("span", { className: "game-scout__badge game-scout__badge--piercing" }, "Piercing")
-              : false,
-            plant.role !== "support" && plant.role !== "control" && plant.role !== "defender" && plant.splash === true
-              ? el("span", { className: "game-scout__badge game-scout__badge--splash" }, "Splash")
-              : false
-          )
-        )
-      )
+      createScoutArt(plant, assetIndex),
+      el("div", { className: "game-scout__card-name" }, plant.label),
+      el("div", { className: "game-scout__card-stats" }, ...statNodes),
+      el("div", { className: "game-scout__card-badges" }, ...badges)
     );
     dom.scoutPlants?.append(card);
   }

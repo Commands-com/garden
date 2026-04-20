@@ -60,8 +60,8 @@ test.describe("Board Scout — Briar Sniper ranged stats and targeting priority"
 
     // Standard stats: HP and Speed chips are present alongside the Ranged badge.
     const stats = sniperCard.locator(".game-scout__card-stat");
-    await expect(stats).toContainText([/^HP:\s*\d+/]);
-    await expect(stats).toContainText([/^Speed:\s*\d+/]);
+    await expect(stats).toContainText([/^\d+\s*HP$/]);
+    await expect(stats).toContainText([/^SPD\s*\d+/]);
 
     // Ranged chip/badge is the sniper-specific affordance.
     const rangedBadge = sniperCard.locator(".game-scout__badge--ranged");

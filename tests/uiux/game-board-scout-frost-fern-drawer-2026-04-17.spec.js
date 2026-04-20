@@ -89,10 +89,9 @@ test.describe("Board Scout Frost Fern drawer — April 17", () => {
     expect.soft(cardImageState.currentSrc).toContain("frost-fern.svg");
 
     const frostCardText = (await frostCard.textContent()).replace(/\s+/g, " ").trim();
-    expect.soft(frostCardText).toContain("Cost: 65");
+    expect.soft(frostCardText).toContain("65g");
     expect.soft(frostCardText).toContain("Control");
     expect.soft(frostCardText).toContain("40%");
-    expect.soft(frostCardText).toContain("2.5s");
 
     await frostCard.click();
 

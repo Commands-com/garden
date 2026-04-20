@@ -66,9 +66,10 @@ test.describe("Board Scout — April 20 Amber Wall copy", () => {
         ".game-scout__badge.game-scout__badge--defender"
       )
     ).toHaveText("Wall");
-    await expect(
-      amberWallCard.locator(".game-scout__card-stat").nth(1)
-    ).toHaveText("No damage · Soaks sniper bolts · HP: 120");
+    await expect(amberWallCard.locator(".game-scout__card-stat")).toHaveText([
+      "50g",
+      "120 HP",
+    ]);
 
     await amberWallCard.click();
 

@@ -2970,19 +2970,24 @@ kbd {
 
 .game-scout__roster {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(168px, 1fr));
-  gap: var(--space-3);
+  grid-template-columns: repeat(auto-fit, minmax(108px, 1fr));
+  grid-auto-rows: 1fr;
+  gap: var(--space-2);
 }
 
 .game-scout__card {
-  display: block;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
   width: 100%;
+  height: 100%;
+  min-height: 152px;
   border: var(--border-default);
   border-radius: var(--radius-lg);
   background: linear-gradient(180deg, rgba(255, 255, 255, 0.96), rgba(245, 240, 232, 0.98));
-  padding: var(--space-3);
+  padding: var(--space-2) var(--space-2) var(--space-3);
   cursor: pointer;
-  text-align: left;
+  text-align: center;
   transition: border-color var(--duration-normal) var(--ease-default),
               box-shadow var(--duration-normal) var(--ease-default),
               transform var(--duration-normal) var(--ease-default);
@@ -2999,20 +3004,9 @@ kbd {
   box-shadow: 0 0 0 2px rgba(45, 122, 79, 0.2);
 }
 
-.game-scout__card-main {
-  display: grid;
-  grid-template-columns: 72px minmax(0, 1fr);
-  align-items: center;
-  gap: var(--space-3);
-}
-
-.game-scout__card-copy {
-  min-width: 0;
-}
-
 .game-scout__card-art {
-  width: 72px;
-  height: 72px;
+  width: 64px;
+  height: 64px;
   border-radius: calc(var(--radius-lg) - 2px);
   overflow: hidden;
   display: flex;
@@ -3023,6 +3017,8 @@ kbd {
     linear-gradient(160deg, rgba(26, 77, 46, 0.16), rgba(92, 138, 110, 0.08));
   border: 1px solid rgba(26, 77, 46, 0.12);
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.6);
+  margin-bottom: var(--space-2);
+  flex-shrink: 0;
 }
 
 .game-scout__card-art-fallback {
@@ -3071,19 +3067,50 @@ kbd {
   font-weight: var(--weight-semibold);
   font-size: var(--text-sm);
   color: var(--color-text-dark);
+  line-height: 1.2;
+  min-height: calc(var(--text-sm) * 1.2 * 2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  width: 100%;
   margin-bottom: var(--space-1);
+  overflow-wrap: break-word;
+  hyphens: auto;
 }
 
 .game-scout__card-stats {
   display: flex;
-  gap: var(--space-2);
-  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  flex-wrap: nowrap;
+  width: 100%;
+  margin-bottom: var(--space-2);
 }
 
 .game-scout__card-stat {
   font-size: var(--text-xs);
   color: var(--color-text-muted);
   font-family: var(--font-mono);
+  white-space: nowrap;
+}
+
+.game-scout__card-stat-sep {
+  font-size: var(--text-xs);
+  color: var(--color-text-muted);
+  opacity: 0.5;
+}
+
+.game-scout__card-badges {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  flex-wrap: wrap;
+  width: 100%;
+  min-height: 20px;
+  margin-top: auto;
 }
 
 .game-scout__badge {
@@ -3093,6 +3120,7 @@ kbd {
   padding: 2px var(--space-2);
   border-radius: var(--radius-full);
   line-height: 1.4;
+  white-space: nowrap;
 }
 
 .game-scout__badge--new-threat {
@@ -3123,6 +3151,16 @@ kbd {
 .game-scout__badge--defender {
   background: #8a5a14;
   color: #ffe7a8;
+}
+
+.game-scout__badge--control {
+  background: #2f6d93;
+  color: #e6f0f7;
+}
+
+.game-scout__badge--flying {
+  background: #6a4a8a;
+  color: #f0e6ff;
 }
 
 .game-scout__waves {
@@ -3221,8 +3259,9 @@ kbd {
     grid-column: 1;
   }
 
-  #game-scout-plants.game-scout__roster {
-    grid-template-columns: repeat(5, minmax(140px, 1fr));
+  #game-scout-plants.game-scout__roster,
+  #game-scout-enemies.game-scout__roster {
+    grid-template-columns: repeat(auto-fit, minmax(112px, 1fr));
   }
 
   .game-scout__detail {

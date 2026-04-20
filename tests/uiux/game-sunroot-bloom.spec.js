@@ -305,7 +305,7 @@ test.describe("Sunroot Bloom economy plant", () => {
     );
     await expect(sunrootCard).toHaveCount(1);
     await expect(sunrootCard.locator(".game-scout__card-stat")).toHaveText([
-      "Cost: 60",
+      "60g",
     ]);
     await expect(sunrootCard.locator(".game-scout__badge--economy")).toHaveText(
       "+25 SAP"
