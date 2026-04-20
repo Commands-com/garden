@@ -78,7 +78,7 @@
           "approvalMode": "auto",
           "allowSummaryFallback": true,
           "includeArtifacts": true,
-          "requiredStatus": ["finalized", "partial", "blocked"]
+          "requiredStatus": ["finalized", "partial", "failed"]
         }
       },
       {
