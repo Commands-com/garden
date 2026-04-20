@@ -1052,9 +1052,11 @@ class ScenarioSimulator {
     );
 
     const eligible = inLane.filter((defender) => {
+      // Mirror play.js: attacker OR defender-role plants screen sniper fire.
       for (const other of inLane) {
         if (other === defender) continue;
-        if ((other.definition.role || "attacker") !== "attacker") continue;
+        const role = other.definition.role || "attacker";
+        if (role !== "attacker" && role !== "defender") continue;
         if (other.x > defender.x && other.x < sniperX) {
           return false;
         }

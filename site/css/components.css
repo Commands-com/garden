@@ -3120,6 +3120,11 @@ kbd {
   color: #fff5c2;
 }
 
+.game-scout__badge--defender {
+  background: #8a5a14;
+  color: #ffe7a8;
+}
+
 .game-scout__waves {
   display: flex;
   flex-direction: column;

@@ -1,0 +1,29 @@
+{
+  "schemaVersion": 1,
+  "id": "2026-04-20-wall-clear",
+  "date": "2026-04-20",
+  "mode": "challenge",
+  "coordinateBase": 0,
+  "description": "Canonical April 20 challenge-clear line using the full April 20 roster including Amber Wall. Walls are placed in front of attackers in sniper lanes (2, 0, 4) so the wall screens the bolt while the attacker behind it keeps firing, and the wall + attacker pair also satisfies Glass Ram's 2-plant siege-lane combat threshold. This is the AC-7 positive case: same board, wall available, board clears.",
+  "expect": {
+    "outcome": "cleared",
+    "challengeOutcome": "cleared"
+  },
+  "actions": [
+    { "atMs": 500, "type": "place", "plantId": "sunrootBloom", "row": 2, "col": 0 },
+    { "atMs": 5000, "type": "place", "plantId": "thornVine", "row": 2, "col": 1 },
+    { "atMs": 11000, "type": "place", "plantId": "thornVine", "row": 1, "col": 0 },
+    { "atMs": 17000, "type": "place", "plantId": "thornVine", "row": 3, "col": 0 },
+    { "atMs": 23000, "type": "place", "plantId": "thornVine", "row": 0, "col": 0 },
+    { "atMs": 27000, "type": "place", "plantId": "amberWall", "row": 2, "col": 3 },
+    { "atMs": 33000, "type": "place", "plantId": "thornVine", "row": 4, "col": 0 },
+    { "atMs": 38000, "type": "place", "plantId": "amberWall", "row": 4, "col": 3 },
+    { "atMs": 44000, "type": "place", "plantId": "amberWall", "row": 0, "col": 3 },
+    { "atMs": 50000, "type": "place", "plantId": "brambleSpear", "row": 2, "col": 2 },
+    { "atMs": 58000, "type": "place", "plantId": "brambleSpear", "row": 0, "col": 1 },
+    { "atMs": 66000, "type": "place", "plantId": "brambleSpear", "row": 4, "col": 1 },
+    { "atMs": 76000, "type": "place", "plantId": "pollenPuff", "row": 2, "col": 2 },
+    { "atMs": 82000, "type": "place", "plantId": "thornVine", "row": 1, "col": 1 },
+    { "atMs": 88000, "type": "place", "plantId": "thornVine", "row": 3, "col": 1 }
+  ]
+}

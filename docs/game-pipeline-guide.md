@@ -101,6 +101,7 @@ If you modify a core system, include regression coverage for the behavior you ar
   - `scripts/probe-runtime-scenario.mjs` (including the `--replay` branch for specific candidate plans), which executes real Phaser frames where the sniper FSM, aim lines, and enemy projectiles all run, and
   - the Playwright specs under `tests/uiux/game-briar-sniper.spec.js` and `tests/uiux/game-board-scout-2026-04-16.spec.js`, which assert the sniper FSM, screening rule, and Board Scout wiring.
 - If a future change teaches the validator to model ranged behaviors, remove the indeterminate branch in `scripts/validate-scenario-difficulty.mjs` and fold the scenario back into the regular gate.
+- Defender-role plants (e.g., Amber Wall, shipped April 20) screen sniper fire identically to attackers per the `role: "defender"` contract; sniper scenarios remain validator-indeterminate and continue to rely on the runtime probe plus Playwright for authoritative difficulty evidence.
 
 ### AI Player Replay Harness
 

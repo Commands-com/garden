@@ -1,7 +1,22 @@
 {
   "schemaVersion": 1,
-  "updatedAt": "2026-04-19T00:00:00.000Z",
+  "updatedAt": "2026-04-20T00:00:00.000Z",
   "assets": [
+    {
+      "id": "amber-wall",
+      "type": "sprite",
+      "kind": "sprite",
+      "provider": "repo",
+      "path": "/game/assets/manual/plants/amber-wall.svg",
+      "prompt": "Hand-authored repo asset for the April 20 Amber Wall defender plant. Chunky amber/honey-tinted lane wall with stacked resin blocks so the new defender role reads as a tank, visually distinct from attackers (thorn motifs) and support (flower motifs).",
+      "generatedAt": "2026-04-20T00:00:00.000Z",
+      "metadata": {
+        "category": "player",
+        "format": "svg",
+        "width": 128,
+        "height": 128
+      }
+    },
     {
       "id": "pollen-puff",
       "type": "sprite",

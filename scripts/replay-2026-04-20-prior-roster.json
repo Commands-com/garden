@@ -1,0 +1,32 @@
+{
+  "schemaVersion": 1,
+  "id": "2026-04-20-prior-roster",
+  "date": "2026-04-20",
+  "mode": "challenge",
+  "coordinateBase": 0,
+  "description": "Serious April 20 attempt using only the April 19 roster (no Amber Wall). Without the defender, every sniper screener has to be an attacker plant, which eats the same lane tile as the siege-lane combat plant you need for Glass Ram. The board should fail before endless — this is the AC-7 counterexample.",
+  "availablePlants": [
+    "thornVine",
+    "brambleSpear",
+    "pollenPuff",
+    "sunrootBloom"
+  ],
+  "expect": {
+    "outcome": "gameover",
+    "endlessSurvivalMs": 0
+  },
+  "actions": [
+    { "atMs": 500, "type": "place", "plantId": "sunrootBloom", "row": 2, "col": 0 },
+    { "atMs": 5500, "type": "place", "plantId": "thornVine", "row": 2, "col": 1 },
+    { "atMs": 12000, "type": "place", "plantId": "thornVine", "row": 1, "col": 0 },
+    { "atMs": 18000, "type": "place", "plantId": "thornVine", "row": 3, "col": 0 },
+    { "atMs": 24000, "type": "place", "plantId": "thornVine", "row": 0, "col": 0 },
+    { "atMs": 30000, "type": "place", "plantId": "thornVine", "row": 4, "col": 0 },
+    { "atMs": 38000, "type": "place", "plantId": "brambleSpear", "row": 2, "col": 2 },
+    { "atMs": 48000, "type": "place", "plantId": "thornVine", "row": 0, "col": 1 },
+    { "atMs": 56000, "type": "place", "plantId": "thornVine", "row": 4, "col": 1 },
+    { "atMs": 64000, "type": "place", "plantId": "pollenPuff", "row": 2, "col": 3 },
+    { "atMs": 72000, "type": "place", "plantId": "brambleSpear", "row": 0, "col": 2 },
+    { "atMs": 80000, "type": "place", "plantId": "brambleSpear", "row": 4, "col": 2 }
+  ]
+}

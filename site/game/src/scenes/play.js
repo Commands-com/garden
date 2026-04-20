@@ -818,6 +818,13 @@ export class PlayScene extends Phaser.Scene {
         continue; // skip projectile logic entirely
       }
 
+      // Defender-role plants are pure tanks — no attack, no sap, no status.
+      // They still absorb damage and count toward the siege-lane combat
+      // threshold via getCombatDefenderCountInLane.
+      if ((defender.definition.role || 'attacker') === 'defender') {
+        continue;
+      }
+
       defender.cooldownMs -= deltaMs;
       const target = this.getFrontEnemyInLane(defender.row, defender.x);
       if (!target || defender.cooldownMs > 0) {
@@ -1247,10 +1254,13 @@ export class PlayScene extends Phaser.Scene {
     );
 
     const eligible = inLane.filter((defender) => {
-      // Any attacker strictly between defender and sniper screens this defender.
+      // Any attacker OR defender-role plant strictly between this defender and
+      // the sniper screens it. Defenders (e.g., Amber Wall) screen sniper fire
+      // identically to attackers per the role contract.
       for (const other of inLane) {
         if (other === defender) continue;
-        if ((other.definition.role || "attacker") !== "attacker") continue;
+        const role = other.definition.role || "attacker";
+        if (role !== "attacker" && role !== "defender") continue;
         if (other.x > defender.x && other.x < sniperX) {
           return false;
         }

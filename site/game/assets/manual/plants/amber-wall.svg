@@ -1,0 +1,68 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" role="img" aria-labelledby="title desc">
+  <title id="title">Amber Wall defender</title>
+  <desc id="desc">A chunky honey-amber lane wall of stacked resin bricks, reinforced with leaf-wrapped roots. No bloom, no thorn, no petal ring — defender silhouette reads as a tank that soaks hits.</desc>
+  <defs>
+    <linearGradient id="amber-face" x1="0" x2="0" y1="0" y2="1">
+      <stop offset="0%" stop-color="#ffd98a"/>
+      <stop offset="55%" stop-color="#d9892a"/>
+      <stop offset="100%" stop-color="#7a4510"/>
+    </linearGradient>
+    <linearGradient id="amber-face-bright" x1="0" x2="0" y1="0" y2="1">
+      <stop offset="0%" stop-color="#ffe9a8"/>
+      <stop offset="55%" stop-color="#f0a63a"/>
+      <stop offset="100%" stop-color="#9a5a14"/>
+    </linearGradient>
+    <linearGradient id="amber-cap" x1="0" x2="0" y1="0" y2="1">
+      <stop offset="0%" stop-color="#fff3c0"/>
+      <stop offset="100%" stop-color="#e0a848"/>
+    </linearGradient>
+    <linearGradient id="vine-grad" x1="0" x2="0" y1="0" y2="1">
+      <stop offset="0%" stop-color="#5a8a48"/>
+      <stop offset="100%" stop-color="#2a5428"/>
+    </linearGradient>
+    <radialGradient id="resin-gloss" cx="35%" cy="30%" r="70%">
+      <stop offset="0%" stop-color="#ffffff" stop-opacity=".7"/>
+      <stop offset="60%" stop-color="#ffffff" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+
+  <!-- ground shadow -->
+  <ellipse cx="64" cy="112" rx="42" ry="10" fill="#0f1a10" opacity=".38"/>
+
+  <!-- base plinth -->
+  <rect x="18" y="96" width="92" height="14" rx="3" fill="#6a3d14" stroke="#3a220a" stroke-width="2"/>
+  <rect x="20" y="98" width="88" height="4" fill="#8a5a22" opacity=".7"/>
+
+  <!-- lower brick course -->
+  <rect x="24" y="74" width="30" height="22" rx="2" fill="url(#amber-face)" stroke="#5a3208" stroke-width="2"/>
+  <rect x="56" y="74" width="20" height="22" rx="2" fill="url(#amber-face-bright)" stroke="#5a3208" stroke-width="2"/>
+  <rect x="78" y="74" width="26" height="22" rx="2" fill="url(#amber-face)" stroke="#5a3208" stroke-width="2"/>
+
+  <!-- middle brick course (offset for masonry feel) -->
+  <rect x="24" y="52" width="22" height="22" rx="2" fill="url(#amber-face-bright)" stroke="#5a3208" stroke-width="2"/>
+  <rect x="48" y="52" width="32" height="22" rx="2" fill="url(#amber-face)" stroke="#5a3208" stroke-width="2"/>
+  <rect x="82" y="52" width="22" height="22" rx="2" fill="url(#amber-face-bright)" stroke="#5a3208" stroke-width="2"/>
+
+  <!-- top brick course -->
+  <rect x="28" y="32" width="30" height="20" rx="2" fill="url(#amber-face)" stroke="#5a3208" stroke-width="2"/>
+  <rect x="60" y="32" width="40" height="20" rx="2" fill="url(#amber-face-bright)" stroke="#5a3208" stroke-width="2"/>
+
+  <!-- crenellated cap -->
+  <rect x="24" y="22" width="14" height="12" fill="url(#amber-cap)" stroke="#7a4514" stroke-width="2"/>
+  <rect x="44" y="22" width="14" height="12" fill="url(#amber-cap)" stroke="#7a4514" stroke-width="2"/>
+  <rect x="64" y="22" width="14" height="12" fill="url(#amber-cap)" stroke="#7a4514" stroke-width="2"/>
+  <rect x="84" y="22" width="14" height="12" fill="url(#amber-cap)" stroke="#7a4514" stroke-width="2"/>
+
+  <!-- resin gloss highlight -->
+  <rect x="24" y="22" width="82" height="74" rx="4" fill="url(#resin-gloss)" pointer-events="none"/>
+
+  <!-- vine wrap -->
+  <path d="M16 94 C24 88 22 78 18 72 C14 66 22 58 28 58" fill="none" stroke="url(#vine-grad)" stroke-width="4" stroke-linecap="round"/>
+  <path d="M112 94 C104 88 106 78 110 72 C114 66 106 58 100 58" fill="none" stroke="url(#vine-grad)" stroke-width="4" stroke-linecap="round"/>
+  <ellipse cx="20" cy="64" rx="5" ry="3" fill="#4a7a3a" stroke="#1e3d16" stroke-width="1"/>
+  <ellipse cx="108" cy="64" rx="5" ry="3" fill="#4a7a3a" stroke="#1e3d16" stroke-width="1"/>
+
+  <!-- resin drip -->
+  <path d="M60 52 C60 58 62 60 62 64 C62 66 60 66 60 64 Z" fill="#ffd86a" opacity=".85"/>
+  <path d="M90 74 C90 80 92 82 92 86 C92 88 90 88 90 86 Z" fill="#ffd86a" opacity=".85"/>
+</svg>

@@ -387,13 +387,27 @@ function renderBoardScout(dayDate, assetCatalog) {
                   ).toFixed(1)}s`
                 )
               : false,
-            plant.role !== "support" && plant.role !== "control" && typeof plant.projectileDamage === "number"
+            plant.role === "defender"
+              ? el(
+                  "span",
+                  { className: "game-scout__badge game-scout__badge--defender" },
+                  "Wall"
+                )
+              : false,
+            plant.role === "defender"
+              ? el(
+                  "span",
+                  { className: "game-scout__card-stat" },
+                  `No damage · Soaks sniper bolts · HP: ${plant.maxHealth}`
+                )
+              : false,
+            plant.role !== "support" && plant.role !== "control" && plant.role !== "defender" && typeof plant.projectileDamage === "number"
               ? el("span", { className: "game-scout__card-stat" }, `DMG: ${plant.projectileDamage}`)
               : false,
-            plant.role !== "support" && plant.role !== "control" && plant.piercing
+            plant.role !== "support" && plant.role !== "control" && plant.role !== "defender" && plant.piercing
               ? el("span", { className: "game-scout__badge game-scout__badge--piercing" }, "Piercing")
               : false,
-            plant.role !== "support" && plant.role !== "control" && plant.splash === true
+            plant.role !== "support" && plant.role !== "control" && plant.role !== "defender" && plant.splash === true
               ? el("span", { className: "game-scout__badge game-scout__badge--splash" }, "Splash")
               : false
           )
@@ -526,28 +540,35 @@ function selectScoutCard(card, type, data, scenario) {
           el("dt", {}, "Priority"),
           el("dd", {}, "Support > Piercing attacker > Attacker"),
           el("dt", {}, "Counterplay"),
-          el("dd", {}, "Screen it — plant an attacker between sniper and target"),
+          el("dd", {}, "Screen it — plant an attacker or a defender/wall between sniper and target"),
           el("dt", {}, "Appears In"),
           el("dd", {}, wavePresence.join(", ") || "No scripted waves")
         )
       );
     } else {
+      const walkerRows = [
+        el("dt", {}, "HP"),
+        el("dd", {}, String(data.maxHealth)),
+        el("dt", {}, "Speed"),
+        el("dd", {}, String(data.speed)),
+        el("dt", {}, "Attack Damage"),
+        el("dd", {}, String(data.attackDamage)),
+        el("dt", {}, "Attack Cadence"),
+        el("dd", {}, `${data.attackCadenceMs}ms`),
+      ];
+      if ((data.requiredDefendersInLane || 0) > 0) {
+        walkerRows.push(
+          el("dt", {}, "Lane combat plants required"),
+          el("dd", {}, String(data.requiredDefendersInLane))
+        );
+      }
+      walkerRows.push(
+        el("dt", {}, "Appears In"),
+        el("dd", {}, wavePresence.join(", ") || "No scripted waves")
+      );
       detail.append(
         el("h4", { className: "game-scout__detail-title" }, data.label),
-        el(
-          "dl",
-          { className: "game-scout__detail-stats" },
-          el("dt", {}, "HP"),
-          el("dd", {}, String(data.maxHealth)),
-          el("dt", {}, "Speed"),
-          el("dd", {}, String(data.speed)),
-          el("dt", {}, "Attack Damage"),
-          el("dd", {}, String(data.attackDamage)),
-          el("dt", {}, "Attack Cadence"),
-          el("dd", {}, `${data.attackCadenceMs}ms`),
-          el("dt", {}, "Appears In"),
-          el("dd", {}, wavePresence.join(", ") || "No scripted waves")
-        )
+        el("dl", { className: "game-scout__detail-stats" }, ...walkerRows)
       );
     }
   } else if (data.role === "support") {
@@ -586,6 +607,27 @@ function selectScoutCard(card, type, data, scenario) {
         el("dd", {}, formatCadenceSeconds(data.chillDurationMs)),
         el("dt", {}, "Notes"),
         el("dd", {}, "No damage, no sap; refreshes on re-chill (no stack)")
+      )
+    );
+  } else if (data.role === "defender") {
+    detail.append(
+      el("h4", { className: "game-scout__detail-title" }, data.label),
+      el("p", { className: "game-scout__detail-desc" }, data.description || ""),
+      el(
+        "dl",
+        { className: "game-scout__detail-stats" },
+        el("dt", {}, "Cost"),
+        el("dd", {}, String(data.cost)),
+        el("dt", {}, "Max HP"),
+        el("dd", {}, String(data.maxHealth)),
+        el("dt", {}, "Role"),
+        el("dd", {}, "Wall"),
+        el("dt", {}, "Screening"),
+        el("dd", {}, "Soaks sniper bolts while alive"),
+        el("dt", {}, "Siege lanes"),
+        el("dd", {}, "Counts toward siege-lane combat threshold"),
+        el("dt", {}, "Attacks"),
+        el("dd", {}, "—")
       )
     );
   } else {

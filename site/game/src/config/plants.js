@@ -94,6 +94,18 @@ export const PLANT_DEFINITIONS = {
     displayWidth: 48,
     displayHeight: 52,
   },
+  amberWall: {
+    id: "amberWall",
+    label: "Amber Wall",
+    description:
+      "Defensive tank plant with no attack. Soaks sniper bolts and contact damage, buying time for attackers behind it. Counts toward siege-lane combat threshold.",
+    role: "defender",
+    textureKey: "amber-wall",
+    cost: 50,
+    maxHealth: 120,
+    displayWidth: 48,
+    displayHeight: 52,
+  },
 };
 
 export const STARTING_PLANT_ID = "thornVine";
