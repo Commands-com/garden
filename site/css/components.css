@@ -3207,6 +3207,32 @@ kbd {
   font-style: italic;
 }
 
+@media (min-width: 1100px) {
+  .game-scout__body {
+    grid-template-columns: minmax(0, 1fr) minmax(260px, 300px);
+    align-items: start;
+  }
+
+  .game-scout__section {
+    grid-column: 1;
+  }
+
+  .game-scout__section:last-of-type {
+    grid-column: 1;
+  }
+
+  #game-scout-plants.game-scout__roster {
+    grid-template-columns: repeat(5, minmax(140px, 1fr));
+  }
+
+  .game-scout__detail {
+    grid-column: 2;
+    grid-row: 1 / span 3;
+    margin-top: 0;
+    align-self: start;
+  }
+}
+
 @media (max-width: 767px) {
   .game-shell__topbar {
     flex-direction: column;

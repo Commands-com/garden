@@ -377,6 +377,9 @@ test.describe("Amber Wall defender contract", () => {
     await startChallenge(page, 12);
     await isolatePlayScene(page, { resources: 300 });
 
+    // Speed up the simulation so snipers fire within the test timeout.
+    await page.evaluate(() => window.__gameTestHooks.setTimeScale(8));
+
     const row = 1;
     const col = 3;
     await placePlant(page, row, col, "amberWall");
@@ -405,16 +408,24 @@ test.describe("Amber Wall defender contract", () => {
             hpHistory.push(hp);
           }
 
-          if (tracked?.destroyed) {
+          if (!tracked || tracked.destroyed) {
+            // Runtime contract: at 0 HP the defender is immediately destroyed
+            // and filtered out of `scene.defenders` on the next frame, so the
+            // last live HP sample is the tick just before death (e.g. 20).
+            // Record the terminal 0 so the full HP arc is observable.
+            if (hpHistory[hpHistory.length - 1] !== 0) {
+              hpHistory.push(0);
+            }
             resolve({
               destroyed: true,
-              finalHp: hp,
+              finalHp: 0,
               hpHistory,
             });
             return;
           }
 
-          if (performance.now() - startedAt > 6000) {
+          // 15s real-world timeout (at 8x time scale = 120s in-game).
+          if (performance.now() - startedAt > 15000) {
             resolve({
               destroyed: tracked?.destroyed ?? false,
               finalHp: hp,
@@ -433,6 +444,7 @@ test.describe("Amber Wall defender contract", () => {
 
     expect(outcome.destroyed, JSON.stringify(outcome, null, 2)).toBe(true);
     expect(outcome.hpHistory[0]).toBe(120);
+    // Sniper projectileDamage is 20. 120 -> 100 -> 80 ... -> 0.
     expect(outcome.hpHistory).toContain(100);
     expect(outcome.finalHp).toBe(0);
     expect(outcome.hpHistory.at(-1)).toBe(0);

@@ -21,9 +21,6 @@
     { "atMs": 44000, "type": "place", "plantId": "amberWall", "row": 0, "col": 3 },
     { "atMs": 50000, "type": "place", "plantId": "brambleSpear", "row": 2, "col": 2 },
     { "atMs": 58000, "type": "place", "plantId": "brambleSpear", "row": 0, "col": 1 },
-    { "atMs": 66000, "type": "place", "plantId": "brambleSpear", "row": 4, "col": 1 },
-    { "atMs": 76000, "type": "place", "plantId": "pollenPuff", "row": 2, "col": 2 },
-    { "atMs": 82000, "type": "place", "plantId": "thornVine", "row": 1, "col": 1 },
-    { "atMs": 88000, "type": "place", "plantId": "thornVine", "row": 3, "col": 1 }
+    { "atMs": 66000, "type": "place", "plantId": "brambleSpear", "row": 4, "col": 1 }
   ]
 }

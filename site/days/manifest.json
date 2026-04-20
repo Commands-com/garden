@@ -2,6 +2,24 @@
   "schemaVersion": 1,
   "days": [
     {
+      "date": "2026-04-20",
+      "title": "Amber Wall — First Defender Role Contract and the Hold the Line Board",
+      "summary": "Adds Amber Wall as Rootline Defense's first defender plant, ships the reusable defender-role contract, updates Board Scout to surface the wall's role and stats, and publishes the April 20 Hold the Line board where the previous roster can no longer clear without the new wall.",
+      "status": "shipped",
+      "featureType": "game",
+      "tags": [
+        "game",
+        "rootline-defense",
+        "amber-wall",
+        "defender-role",
+        "board-scout",
+        "hold-the-line",
+        "scenario",
+        "playwright"
+      ],
+      "publishedAt": "2026-04-20T12:00:00.000Z"
+    },
+    {
       "date": "2026-04-19",
       "title": "Pollen Puff — Second Anti-Air Plant and Reusable Splash Projectile Contract",
       "summary": "Adds Pollen Puff as the second anti-air plant, ships reusable projectile-level splash (`splash`, `splashRadiusCols`, `splashDamage`), extends Board Scout and observation exports for splash data, and publishes the April 19 Petals in the Wind board where the prior roster loses and Pollen Puff is required to clear.",

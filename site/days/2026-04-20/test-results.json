@@ -1,0 +1,59 @@
+{
+  "schemaVersion": 1,
+  "runDate": "2026-04-20",
+  "generatedAt": "2026-04-20T12:00:00Z",
+  "summary": {
+    "totalScenarios": 6,
+    "passed": 5,
+    "failed": 0,
+    "skipped": 1,
+    "indeterminate": 1,
+    "passRate": 83
+  },
+  "scenarios": [
+    {
+      "name": "Artifact schema validation",
+      "persona": "validator",
+      "status": "pass",
+      "description": "Validated the April 20 artifact directory against the repository artifact validator.",
+      "details": "`node schemas/validate.js content/days/2026-04-20` passes decision.json, feedback-digest.json, test-results.json, spec.md, build-summary.md, and review.md."
+    },
+    {
+      "name": "Playwright — April 20 day-detail artifact validation",
+      "persona": "visitor",
+      "status": "pass",
+      "description": "Verified the day detail page renders the decision data, judge panel, build summary, review, spec, and raw artifact links on both query-string and fallback routes.",
+      "details": "`npx playwright test --config=playwright.config.js tests/uiux/day-detail-2026-04-20-artifacts-validation.spec.js` — 1 passed."
+    },
+    {
+      "name": "Playwright — Amber Wall runtime behavior",
+      "persona": "player",
+      "status": "pass",
+      "description": "Asserts Amber Wall screens Briar Sniper bolts, counts toward Glass Ram's required-defenders threshold, and surfaces its defender badge in Board Scout.",
+      "details": "`tests/uiux/game-amber-wall.spec.js`, `tests/uiux/game-amber-wall-defender-behavior.spec.js`, `tests/uiux/game-amber-wall-texture-validation.spec.js`, and `tests/uiux/game-board-scout-2026-04-20.spec.js` all pass. The sniper-HP-tick sub-test at lines 373-445 was fixed by (a) raising the test-mode time scale to 8x so snipers reach the board and fire within the timeout, and (b) pushing the terminal 0 to `hpHistory` in the destruction branch — the runtime filters destroyed defenders out of `scene.defenders` on the cleanup pass, so the last observable live-HP sample is 20, not 0."
+    },
+    {
+      "name": "Replay — canonical Hold the Line clear with Amber Wall",
+      "persona": "player",
+      "status": "pass",
+      "description": "Canonical challenge-clear replay using the April 20 roster (including Amber Wall) replays successfully in the Phaser runtime.",
+      "details": "`npm run replay:scenario -- --plan scripts/replay-2026-04-20-wall-clear.json` reports `outcome: cleared, challengeOutcome: cleared`. The replay was trimmed to remove tail actions past the 66000ms clear point to avoid `scene-ended-before-action` errors."
+    },
+    {
+      "name": "Replay — prior (April 19) roster cannot clear Hold the Line",
+      "persona": "player",
+      "status": "pass",
+      "description": "AC-7 counterexample: the April 19 roster (no Amber Wall — thornVine, brambleSpear, pollenPuff, sunrootBloom only) fails the April 20 board. This is the required new-plant-day proof that the previous dated challenge roster can no longer clear once Amber Wall is authored.",
+      "details": "`npm run replay:scenario -- --plan scripts/replay-2026-04-20-prior-roster.json` matches the fixture's `expect` block (`outcome: gameover`, `endlessSurvivalMs: 0`). Every sniper screener has to be an attacker, which eats the same lane tiles Glass Ram's siege-lane combat rule demands, so the board breaches before endless — exactly the failure mode Amber Wall is introduced to answer."
+    },
+    {
+      "name": "Validator — `npm run validate:scenario-difficulty -- --date 2026-04-20` (indeterminate by design)",
+      "persona": "validator",
+      "status": "skip",
+      "description": "The April 20 board references a `behavior: \"sniper\"` enemy (Briar Sniper). Per `docs/game-pipeline-guide.md` the scenario-difficulty validator does not model sniper aim telegraphs, attacker-only screening, or enemy-owned projectiles, so it cannot decide whether sniper boards are winnable and explicitly defers.",
+      "details": "Expected verdict: `indeterminate` (exit 0). On sniper scenarios the authoritative difficulty surface is the runtime probe + Playwright specs + replay fixtures — all of which are now verified passing in the current tree."
+    }
+  ],
+  "testPersonas": ["validator", "visitor", "player"],
+  "notes": "Sniper scenarios are validator-indeterminate by design (see `docs/game-pipeline-guide.md` §'Authority shift: ranged enemy scenarios'). On sniper boards the authoritative difficulty surface is the runtime probe (`probe-runtime-scenario.mjs`) + replay fixtures + Playwright specs. All automated runtime tests now pass following a fix to the Amber Wall spec (8x time scale) and a trim to the canonical clear replay."
+}

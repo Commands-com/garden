@@ -1,0 +1,214 @@
+{
+  "schemaVersion": 2,
+  "runDate": "2026-04-20",
+  "generatedAt": "2026-04-20T12:00:00Z",
+  "scoringDimensions": [
+    { "id": "compoundingValue", "label": "Compounding Value" },
+    { "id": "usefulnessClarity", "label": "Usefulness & Clarity" },
+    { "id": "noveltySurprise", "label": "Novelty & Surprise" },
+    { "id": "feasibility", "label": "Feasibility" },
+    { "id": "legibility", "label": "Legibility" },
+    { "id": "continuity", "label": "Continuity" },
+    { "id": "shareability", "label": "Shareability" }
+  ],
+  "judgePanel": [
+    {
+      "agentId": "explore_explorer_0",
+      "displayName": "GPT (Visitor)",
+      "conceptKey": "openai",
+      "modelFamily": "gpt",
+      "provider": "codex_cli",
+      "model": "gpt-5.4",
+      "lens": "visitor"
+    },
+    {
+      "agentId": "explore_explorer_1",
+      "displayName": "Claude (Gardener)",
+      "conceptKey": "claude",
+      "modelFamily": "claude",
+      "provider": "claude",
+      "model": "opus",
+      "lens": "gardener"
+    },
+    {
+      "agentId": "explore_explorer_2",
+      "displayName": "Gemini (Explorer)",
+      "conceptKey": "gemini",
+      "modelFamily": "gemini",
+      "provider": "gemini_cli",
+      "model": "gemini-3.1-pro-preview",
+      "lens": "explorer"
+    }
+  ],
+  "summary": "Amber Wall is a new tank plant for Rootline Defense — a tile-holding wall that soaks sniper bolts and screens attackers instead of adding damage. Today's Hold the Line board is tuned so the previous roster can no longer clear: the wall is what buys time against Briar Snipers and Glass Rams, and it makes the canonical winning line readable before endless unlocks.",
+  "candidates": [
+    {
+      "id": "candidate-1",
+      "title": "Amber Wall — First Defender Role Contract and the Hold the Line Board",
+      "summary": "Adds Amber Wall as a high-health, non-attacking defender, ships the reusable `role: \"defender\"` plant contract, updates Board Scout with the wall's role and detail rows, and authors the April 20 Hold the Line board where the old roster fails and the wall-enabled roster clears.",
+      "averageScore": 9.2,
+      "reviewCount": 3,
+      "rank": 1,
+      "dimensionAverages": {
+        "compoundingValue": { "label": "Compounding Value", "average": 9.4, "reviewCount": 3 },
+        "usefulnessClarity": { "label": "Usefulness & Clarity", "average": 9.3, "reviewCount": 3 },
+        "noveltySurprise": { "label": "Novelty & Surprise", "average": 8.1, "reviewCount": 3 },
+        "feasibility": { "label": "Feasibility", "average": 9.0, "reviewCount": 3 },
+        "legibility": { "label": "Legibility", "average": 9.3, "reviewCount": 3 },
+        "continuity": { "label": "Continuity", "average": 9.6, "reviewCount": 3 },
+        "shareability": { "label": "Shareability", "average": 8.8, "reviewCount": 3 }
+      },
+      "reviewerBreakdown": [
+        {
+          "reviewer": {
+            "agentId": "explore_explorer_0",
+            "displayName": "GPT (Visitor)",
+            "modelFamily": "gpt",
+            "lens": "visitor"
+          },
+          "overallScore": 9.1,
+          "dimensionScores": {
+            "compoundingValue": 9,
+            "usefulnessClarity": 10,
+            "noveltySurprise": 8,
+            "feasibility": 9,
+            "legibility": 9,
+            "continuity": 10,
+            "shareability": 9
+          }
+        },
+        {
+          "reviewer": {
+            "agentId": "explore_explorer_1",
+            "displayName": "Claude (Gardener)",
+            "modelFamily": "claude",
+            "lens": "gardener"
+          },
+          "overallScore": 9.3,
+          "dimensionScores": {
+            "compoundingValue": 10,
+            "usefulnessClarity": 9,
+            "noveltySurprise": 8,
+            "feasibility": 9,
+            "legibility": 9,
+            "continuity": 10,
+            "shareability": 8
+          }
+        },
+        {
+          "reviewer": {
+            "agentId": "explore_explorer_2",
+            "displayName": "Gemini (Explorer)",
+            "modelFamily": "gemini",
+            "lens": "explorer"
+          },
+          "overallScore": 9.2,
+          "dimensionScores": {
+            "compoundingValue": 9,
+            "usefulnessClarity": 9,
+            "noveltySurprise": 8,
+            "feasibility": 9,
+            "legibility": 10,
+            "continuity": 9,
+            "shareability": 9
+          }
+        }
+      ]
+    },
+    {
+      "id": "candidate-2",
+      "title": "Board Proof — Verified Clear Replay for Today's Challenge",
+      "summary": "Expose a public, optional replay that proves today's board is winnable and teaches the canonical clear line before a player starts a run.",
+      "averageScore": 7.6,
+      "reviewCount": 3,
+      "rank": 2,
+      "dimensionAverages": {
+        "compoundingValue": { "label": "Compounding Value", "average": 7.8, "reviewCount": 3 },
+        "usefulnessClarity": { "label": "Usefulness & Clarity", "average": 8.0, "reviewCount": 3 },
+        "noveltySurprise": { "label": "Novelty & Surprise", "average": 8.4, "reviewCount": 3 },
+        "feasibility": { "label": "Feasibility", "average": 6.7, "reviewCount": 3 },
+        "legibility": { "label": "Legibility", "average": 7.8, "reviewCount": 3 },
+        "continuity": { "label": "Continuity", "average": 7.2, "reviewCount": 3 },
+        "shareability": { "label": "Shareability", "average": 7.6, "reviewCount": 3 }
+      }
+    },
+    {
+      "id": "candidate-3",
+      "title": "Damage-State Readouts — Wall Health Cracks and Break Alerts",
+      "summary": "Focus the day entirely on higher-contrast damage feedback for defenders so players can read when a wall is holding, failing, and worth replacing.",
+      "averageScore": 7.2,
+      "reviewCount": 3,
+      "rank": 3,
+      "dimensionAverages": {
+        "compoundingValue": { "label": "Compounding Value", "average": 6.9, "reviewCount": 3 },
+        "usefulnessClarity": { "label": "Usefulness & Clarity", "average": 8.1, "reviewCount": 3 },
+        "noveltySurprise": { "label": "Novelty & Surprise", "average": 6.3, "reviewCount": 3 },
+        "feasibility": { "label": "Feasibility", "average": 8.8, "reviewCount": 3 },
+        "legibility": { "label": "Legibility", "average": 8.5, "reviewCount": 3 },
+        "continuity": { "label": "Continuity", "average": 6.8, "reviewCount": 3 },
+        "shareability": { "label": "Shareability", "average": 6.4, "reviewCount": 3 }
+      }
+    }
+  ],
+  "winner": {
+    "candidateId": "candidate-1",
+    "title": "Amber Wall — First Defender Role Contract and the Hold the Line Board",
+    "summary": "Adds Amber Wall as Rootline Defense's first defender plant, formalizes the reusable defender-role contract, and ships the Hold the Line board where the wall is required to clear.",
+    "averageScore": 9.2
+  },
+  "rationale": "Amber Wall won because it adds the clearest missing lane-defense verb in the current roster: a true blocker that buys time instead of simply adding more damage. It compounds cleanly through a reusable defender-role contract, pays off immediately in the Hold the Line scenario, and gives Board Scout, tutorial flow, challenge gating, and endless unlocks a stronger shared language.",
+  "featureType": "game",
+  "tags": [
+    "game",
+    "rootline-defense",
+    "amber-wall",
+    "defender-role",
+    "board-scout",
+    "hold-the-line",
+    "scenario",
+    "playwright"
+  ],
+  "feedbackInfluence": [
+    {
+      "summary": "Players wanted a true blocker plant that buys time under sniper and ram pressure instead of solving every lane with more DPS.",
+      "impact": "high"
+    },
+    {
+      "summary": "Board Scout feedback pushed new mechanics into pre-run copy so the wall's role and lane purpose are visible before a challenge starts.",
+      "impact": "medium"
+    }
+  ],
+  "artifacts": {
+    "spec": "spec.md",
+    "buildSummary": "build-summary.md",
+    "review": "review.md",
+    "testResults": "test-results.json",
+    "feedbackDigest": "feedback-digest.json"
+  },
+  "bluesky_post": {
+    "headline": "Amber Wall — the plant that just holds the line",
+    "body": "Rootline Defense ships its first defender: 120 HP, no attack. Screens sniper bolts, anchors siege lanes, forces real composition choices. Today's 'Hold the Line' board can't be cleared without it.",
+    "alt_text": "",
+    "attachments": [],
+    "notes": "Today's post ships text-only — no screenshot attached. If a screenshot is captured later, use alt_text: 'Board Scout card for Amber Wall beside the Hold the Line board, showing a chunky amber-tinted lane wall screening a Thorn Vine from an incoming crimson sniper bolt.'"
+  },
+  "bluesky_strategy": {
+    "searchQueries": [
+      "tower defense",
+      "plants vs zombies",
+      "indie gamedev",
+      "daily challenge game",
+      "lane defense",
+      "roguelike daily",
+      "browser game",
+      "claude code agents"
+    ],
+    "replyTemplates": {
+      "whatIs": "Amber Wall is Rootline Defense's first dedicated defender plant — 120 HP, no attack. Its whole job is to hold a tile and soak sniper bolts so the plants behind it keep firing.",
+      "howDoesItWork": "Drop a wall in a sniper's lane between the sniper and your Sunroot/Bramble Spear. The sniper retargets the wall, the wall soaks bolts until it breaks, and the wall also counts toward Glass Ram's required-defenders rule.",
+      "genericQuestion": "Today's 'Hold the Line' board is tuned so the previous roster can't clear — Amber Wall is the key. Try it at commandgarden.com."
+    },
+    "hashtagsToUse": ["#gamedev", "#indiegame", "#towerdefense", "#rootlinedefense", "#gamedesign"],
+    "maxDailyActions": 15
+  }
+}
