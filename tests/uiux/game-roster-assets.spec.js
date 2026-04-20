@@ -188,6 +188,42 @@ test("April 18 Thornwing Moth has manifest-backed enemy art", async ({
   expect(assetState.ok).toBe(true);
 });
 
+test("April 20 Amber Wall has a repo-backed SVG manifest entry", async ({
+  page,
+}) => {
+  await installLocalSiteRoutes(page);
+  await page.goto(getAppUrl("/game/?testMode=1&date=2026-04-20"));
+  await page.waitForFunction(
+    () =>
+      window.__gameTestHooks &&
+      typeof window.__gameTestHooks.getState === "function"
+  );
+
+  const assetState = await page.evaluate(async () => {
+    const assetManifest = await fetch("/game/assets-manifest.json").then(
+      (response) => response.json()
+    );
+    const amberWall = (assetManifest.assets || []).find(
+      (asset) => asset.id === "amber-wall"
+    );
+    const response = await fetch(amberWall.path);
+
+    return {
+      amberWall,
+      ok: response.ok,
+      body: await response.text(),
+    };
+  });
+
+  expect(assetState.amberWall).toMatchObject({
+    id: "amber-wall",
+    provider: "repo",
+    path: "/game/assets/manual/plants/amber-wall.svg",
+  });
+  expect(assetState.ok).toBe(true);
+  expect(assetState.body).toContain("<svg");
+});
+
 test("April 15 Sunroot Bloom loads manifest-backed art and expects no projectile", async ({
   page,
 }) => {
