@@ -218,7 +218,7 @@ test.describe("Cottonburr Mortar — rearmost selector + arc projectile contract
     expect(arc.targetPriority).toBe("rearmost");
     expect(arc.splash).toBe(true);
     expect(arc.splashRadiusCols).toBeCloseTo(0.6, 5);
-    expect(arc.splashDamage).toBe(14);
+    expect(arc.splashDamage).toBe(28);
     expect(arc.canHitFlying).toBe(false);
     expect(arc.piercing).toBe(false);
     // The selector picked the larger-x (rearmost) enemy; snapshot landingX

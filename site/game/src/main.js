@@ -556,7 +556,7 @@ function selectScoutCard(card, type, data, scenario) {
     }
     if (data.behavior === "sniper") {
       detail.append(
-        el("h4", { className: "game-scout__detail-title" }, data.label),
+        el("h4", { className: "game-scout__detail-title", id: "game-scout-detail-title" }, data.label),
         el(
           "dl",
           { className: "game-scout__detail-stats" },
@@ -600,13 +600,13 @@ function selectScoutCard(card, type, data, scenario) {
         el("dd", {}, wavePresence.join(", ") || "No scripted waves")
       );
       detail.append(
-        el("h4", { className: "game-scout__detail-title" }, data.label),
+        el("h4", { className: "game-scout__detail-title", id: "game-scout-detail-title" }, data.label),
         el("dl", { className: "game-scout__detail-stats" }, ...walkerRows)
       );
     }
   } else if (data.role === "support") {
     detail.append(
-      el("h4", { className: "game-scout__detail-title" }, data.label),
+      el("h4", { className: "game-scout__detail-title", id: "game-scout-detail-title" }, data.label),
       el("p", { className: "game-scout__detail-desc" }, data.description || ""),
       el(
         "dl",
@@ -623,7 +623,7 @@ function selectScoutCard(card, type, data, scenario) {
     );
   } else if (data.role === "control") {
     detail.append(
-      el("h4", { className: "game-scout__detail-title" }, data.label),
+      el("h4", { className: "game-scout__detail-title", id: "game-scout-detail-title" }, data.label),
       el("p", { className: "game-scout__detail-desc" }, data.description || ""),
       el(
         "dl",
@@ -644,7 +644,7 @@ function selectScoutCard(card, type, data, scenario) {
     );
   } else if (data.role === "defender") {
     detail.append(
-      el("h4", { className: "game-scout__detail-title" }, data.label),
+      el("h4", { className: "game-scout__detail-title", id: "game-scout-detail-title" }, data.label),
       el("p", { className: "game-scout__detail-desc" }, data.description || ""),
       el(
         "dl",
@@ -707,7 +707,7 @@ function selectScoutCard(card, type, data, scenario) {
       el("dd", {}, String(data.projectileDamage))
     );
     detail.append(
-      el("h4", { className: "game-scout__detail-title" }, data.label),
+      el("h4", { className: "game-scout__detail-title", id: "game-scout-detail-title" }, data.label),
       el("p", { className: "game-scout__detail-desc" }, data.description || ""),
       el("dl", { className: "game-scout__detail-stats" }, ...statChildren)
     );

@@ -1,0 +1,251 @@
+{
+  "schemaVersion": 2,
+  "runDate": "2026-04-21",
+  "generatedAt": "2026-04-21T12:00:00Z",
+  "scoringDimensions": [
+    { "id": "compoundingValue", "label": "Compounding Value" },
+    { "id": "usefulnessClarity", "label": "Usefulness & Clarity" },
+    { "id": "noveltySurprise", "label": "Novelty & Surprise" },
+    { "id": "feasibility", "label": "Feasibility" },
+    { "id": "legibility", "label": "Legibility" },
+    { "id": "continuity", "label": "Continuity" },
+    { "id": "shareability", "label": "Shareability" }
+  ],
+  "judgePanel": [
+    {
+      "agentId": "explore_explorer_0",
+      "displayName": "GPT (Visitor)",
+      "conceptKey": "openai",
+      "modelFamily": "gpt",
+      "provider": "codex_cli",
+      "model": "gpt-5.4",
+      "lens": "visitor"
+    },
+    {
+      "agentId": "explore_explorer_1",
+      "displayName": "Claude (Gardener)",
+      "conceptKey": "claude",
+      "modelFamily": "claude",
+      "provider": "claude",
+      "model": "opus",
+      "lens": "gardener"
+    },
+    {
+      "agentId": "explore_explorer_2",
+      "displayName": "Gemini (Explorer)",
+      "conceptKey": "gemini",
+      "modelFamily": "gemini",
+      "provider": "gemini_cli",
+      "model": "gemini-3.1-pro-preview",
+      "lens": "explorer"
+    }
+  ],
+  "summary": "Cottonburr Mortar is a new plant that lobs splash shots over the front line and lands on the enemy farthest back. Today's Over the Top challenge pulls Bramble Spear from the roster, so players have to use the new over-the-top throw to reach the threats hiding behind the lead enemy and clear the board before Endless unlocks.",
+  "candidates": [
+    {
+      "id": "candidate-1",
+      "title": "Cottonburr Mortar — Rearmost Targeting, Arc Projectiles, and the Over the Top Board",
+      "summary": "Adds Cottonburr Mortar as the first plant that snapshots the rearmost grounded target, lands a 1.2s arc projectile with splash, updates Board Scout and the runtime to surface the new contract, and publishes the April 21 Over the Top board where Bramble Spear sits out and Cottonburr is required to clear.",
+      "averageScore": 9.3,
+      "reviewCount": 3,
+      "rank": 1,
+      "dimensionAverages": {
+        "compoundingValue": { "label": "Compounding Value", "average": 9.5, "reviewCount": 3 },
+        "usefulnessClarity": { "label": "Usefulness & Clarity", "average": 9.1, "reviewCount": 3 },
+        "noveltySurprise": { "label": "Novelty & Surprise", "average": 8.8, "reviewCount": 3 },
+        "feasibility": { "label": "Feasibility", "average": 8.9, "reviewCount": 3 },
+        "legibility": { "label": "Legibility", "average": 9.2, "reviewCount": 3 },
+        "continuity": { "label": "Continuity", "average": 9.6, "reviewCount": 3 },
+        "shareability": { "label": "Shareability", "average": 8.7, "reviewCount": 3 }
+      },
+      "reviewerBreakdown": [
+        {
+          "reviewer": {
+            "agentId": "explore_explorer_0",
+            "displayName": "GPT (Visitor)",
+            "modelFamily": "gpt",
+            "lens": "visitor"
+          },
+          "overallScore": 9.2,
+          "dimensionScores": {
+            "compoundingValue": 9,
+            "usefulnessClarity": 9,
+            "noveltySurprise": 9,
+            "feasibility": 9,
+            "legibility": 9,
+            "continuity": 10,
+            "shareability": 9
+          },
+          "keep": [
+            "The roster reads differently before the first placement because Cottonburr advertises a new back-rank answer instead of another front-line DPS trade.",
+            "Bramble Spear sitting out prevents a piercing fallback from stealing the day's identity."
+          ],
+          "mustChange": [
+            "Keep Board Scout copy explicit about ground-only targeting and the fixed 1.2s arc so players can predict misses and splash landings."
+          ],
+          "risks": [
+            "If future boards overuse back-rank stacks, Cottonburr could feel mandatory too often instead of situational."
+          ]
+        },
+        {
+          "reviewer": {
+            "agentId": "explore_explorer_1",
+            "displayName": "Claude (Gardener)",
+            "modelFamily": "claude",
+            "lens": "gardener"
+          },
+          "overallScore": 9.4,
+          "dimensionScores": {
+            "compoundingValue": 10,
+            "usefulnessClarity": 9,
+            "noveltySurprise": 8,
+            "feasibility": 9,
+            "legibility": 9,
+            "continuity": 10,
+            "shareability": 8
+          },
+          "keep": [
+            "The runtime contract is reusable: rearmost targeting and arc landing are data-driven instead of special-cased around Cottonburr.",
+            "The tutorial teaches the exact Ram-front, Mite-back pressure pattern the challenge later escalates."
+          ],
+          "mustChange": [
+            "Preserve the challenge as a knife-edge board where Cottonburr is required, not just convenient."
+          ],
+          "risks": [
+            "Arc timing can become opaque if future plants reuse the contract without equally strong preview copy."
+          ]
+        },
+        {
+          "reviewer": {
+            "agentId": "explore_explorer_2",
+            "displayName": "Gemini (Explorer)",
+            "modelFamily": "gemini",
+            "lens": "explorer"
+          },
+          "overallScore": 9.3,
+          "dimensionScores": {
+            "compoundingValue": 9,
+            "usefulnessClarity": 9,
+            "noveltySurprise": 9,
+            "feasibility": 9,
+            "legibility": 10,
+            "continuity": 9,
+            "shareability": 8
+          },
+          "keep": [
+            "The challenge roster and scenario scripting prove the new plant matters instead of merely existing.",
+            "Manifest-backed art plus Board Scout rows make the new unit legible before the first wave."
+          ],
+          "mustChange": [
+            "Keep archived day routes complete so the published artifact trail stays browsable."
+          ],
+          "risks": [
+            "If the previous roster can still clear via a replay edge case, the roster-expansion claim weakens."
+          ]
+        }
+      ]
+    },
+    {
+      "id": "candidate-2",
+      "title": "Board Scout Impact Preview — Show Arc Landing Columns Before Start",
+      "summary": "Focus the day on a pre-run preview that highlights the columns Cottonburr can threaten and where splash landings are likely to matter before players press Start.",
+      "averageScore": 7.7,
+      "reviewCount": 3,
+      "rank": 2,
+      "dimensionAverages": {
+        "compoundingValue": { "label": "Compounding Value", "average": 7.9, "reviewCount": 3 },
+        "usefulnessClarity": { "label": "Usefulness & Clarity", "average": 8.4, "reviewCount": 3 },
+        "noveltySurprise": { "label": "Novelty & Surprise", "average": 7.4, "reviewCount": 3 },
+        "feasibility": { "label": "Feasibility", "average": 7.1, "reviewCount": 3 },
+        "legibility": { "label": "Legibility", "average": 8.7, "reviewCount": 3 },
+        "continuity": { "label": "Continuity", "average": 7.2, "reviewCount": 3 },
+        "shareability": { "label": "Shareability", "average": 7.0, "reviewCount": 3 }
+      }
+    },
+    {
+      "id": "candidate-3",
+      "title": "Mortar Replay Theatre — Ship a Public Canonical Clear Viewer",
+      "summary": "Spend the day on a user-facing replay viewer that demonstrates the winning Cottonburr line as a shareable artifact for today's challenge.",
+      "averageScore": 7.1,
+      "reviewCount": 3,
+      "rank": 3,
+      "dimensionAverages": {
+        "compoundingValue": { "label": "Compounding Value", "average": 6.8, "reviewCount": 3 },
+        "usefulnessClarity": { "label": "Usefulness & Clarity", "average": 7.8, "reviewCount": 3 },
+        "noveltySurprise": { "label": "Novelty & Surprise", "average": 8.3, "reviewCount": 3 },
+        "feasibility": { "label": "Feasibility", "average": 6.4, "reviewCount": 3 },
+        "legibility": { "label": "Legibility", "average": 7.5, "reviewCount": 3 },
+        "continuity": { "label": "Continuity", "average": 6.9, "reviewCount": 3 },
+        "shareability": { "label": "Shareability", "average": 8.0, "reviewCount": 3 }
+      }
+    }
+  ],
+  "winner": {
+    "candidateId": "candidate-1",
+    "title": "Cottonburr Mortar — Rearmost Targeting, Arc Projectiles, and the Over the Top Board",
+    "summary": "Adds Cottonburr Mortar as Rootline Defense's first rearmost-targeting attacker, formalizes the reusable arc-projectile contract, and ships the Over the Top board where Cottonburr is required and Bramble Spear sits out.",
+    "averageScore": 9.3
+  },
+  "rationale": "Cottonburr Mortar won because it adds a genuinely new board-reading verb instead of a thin stat swap. Rearmost targeting and fixed-arc landing both compound beyond a single plant, the tutorial cleanly teaches the same Ram-front / back-rank pressure pattern the challenge relies on, and the April 21 board proves the new roster matters by removing Bramble Spear and demanding Cottonburr's landing-splash answer before endless unlocks.",
+  "featureType": "game",
+  "tags": [
+    "game",
+    "rootline-defense",
+    "cottonburr-mortar",
+    "rearmost-targeting",
+    "arc-projectile",
+    "board-scout",
+    "over-the-top",
+    "scenario",
+    "playwright"
+  ],
+  "feedbackInfluence": [
+    {
+      "summary": "Recent board feedback favored daily mechanics that change how the player reads a lane instead of only increasing enemy stats.",
+      "impact": "high"
+    },
+    {
+      "summary": "Board Scout feedback continued to push new verbs into pre-run copy so targeting rules and exclusions are visible before the first placement.",
+      "impact": "medium"
+    }
+  ],
+  "artifacts": {
+    "spec": "spec.md",
+    "buildSummary": "build-summary.md",
+    "review": "review.md",
+    "testResults": "test-results.json",
+    "feedbackDigest": "feedback-digest.json"
+  },
+  "bluesky_post": {
+    "headline": "Cottonburr Mortar: pick the back of the line on purpose",
+    "body": "Rootline Defense ships Cottonburr Mortar — it throws over your front line and lands on whoever's farthest back. Today's 'Over the Top' board drops Bramble Spear so you have to use the new lob to clear it.",
+    "alt_text": "",
+    "attachments": [],
+    "notes": "Today's post ships text-only — no screenshot attached. If a screenshot is captured later, use alt_text: 'Board Scout card for Cottonburr Mortar beside the Over the Top board, showing a Cottonburr arc bolt flying over a lane-two Glass Ram and landing on a trailing Shard Mite in the back rank.'"
+  },
+  "bluesky_strategy": {
+    "searchQueries": [
+      "tower defense",
+      "plants vs zombies",
+      "indie gamedev",
+      "daily challenge game",
+      "lane defense",
+      "browser game",
+      "arc projectile",
+      "claude code agents"
+    ],
+    "replyTemplates": {
+      "whatIs": "Cottonburr Mortar is Rootline Defense's first rear-targeting plant. Instead of shooting the nearest enemy, it snapshots the one farthest back in its lane and lobs a 1.2s arc that lands there with splash.",
+      "howDoesItWork": "Drop a Cottonburr behind your wall/Thorn Vines. When a Glass Ram pushes in front, the mortar ignores it and lands on the Shard Mite trailing behind — clearing the back threat while your front plants chew the Ram.",
+      "genericQuestion": "Today's 'Over the Top' board pulls Bramble Spear from the roster so Cottonburr is the only way to hit the back rank. Try it at commandgarden.com."
+    },
+    "hashtagsToUse": [
+      "#gamedev",
+      "#indiegame",
+      "#towerdefense",
+      "#rootlinedefense",
+      "#gamedesign"
+    ],
+    "maxDailyActions": 15
+  }
+}

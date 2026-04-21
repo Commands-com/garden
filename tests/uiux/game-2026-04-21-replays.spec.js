@@ -236,15 +236,16 @@ test.describe("April 21 replays and scenario shape", () => {
     expect(fixture.expect.outcome).toBe("cleared");
     expect(fixture.expect.challengeOutcome).toBe("cleared");
 
-    // Canonical: one cottonburrMortar placement at row 2, col 4, at atMs 72000
-    // (= 01:12) matches task_1's validator win report.
+    // Canonical: one cottonburrMortar placement at the validator's human
+    // row 2, col 4 -> internal coordinateBase=0 row 1, col 3, at atMs 72000
+    // (= 01:12).
     const cottonburrPlacements = fixture.actions.filter(
       (action) =>
         action.type === "place" && action.plantId === "cottonburrMortar"
     );
     expect(cottonburrPlacements.length).toBeGreaterThanOrEqual(1);
     const canonical = cottonburrPlacements.find(
-      (action) => action.row === 2 && action.col === 4
+      (action) => action.row === 1 && action.col === 3
     );
     expect(canonical, JSON.stringify(cottonburrPlacements, null, 2)).toBeTruthy();
     expect(canonical.atMs).toBe(72000);

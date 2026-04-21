@@ -1,0 +1,59 @@
+{
+  "schemaVersion": 1,
+  "runDate": "2026-04-21",
+  "generatedAt": "2026-04-21T12:00:00Z",
+  "summary": {
+    "totalScenarios": 6,
+    "passed": 4,
+    "failed": 2,
+    "skipped": 0,
+    "indeterminate": 0,
+    "passRate": 67
+  },
+  "scenarios": [
+    {
+      "name": "Artifact schema validation",
+      "persona": "validator",
+      "status": "pass",
+      "description": "Validated the April 21 artifact directory against the repository artifact validator.",
+      "details": "`node schemas/validate.js content/days/2026-04-21` passes `decision.json`, `feedback-digest.json`, `test-results.json`, `spec.md`, `build-summary.md`, and `review.md`."
+    },
+    {
+      "name": "Validator — April 21 scenario difficulty",
+      "persona": "validator",
+      "status": "pass",
+      "description": "Validated the Over the Top board difficulty and the required-new-plant condition (node-side simulator).",
+      "details": "`npm run validate:scenario-difficulty -- --date 2026-04-21` reports `Canonical result: WIN • wall 1 • clear 01:31 • endless 00:25 • resources left 69`, `Required new plant check: PASS • cottonburrMortar`, and `Verdict: near-perfect. Small timing/lane mistakes usually lose.`"
+    },
+    {
+      "name": "Playwright — April 21 day-detail artifact validation",
+      "persona": "visitor",
+      "status": "fail",
+      "description": "Verifies the published day-detail route renders the decision data, raw artifact links, inline spec section, and adjacent-day navigation for April 21, and that the homepage recent-days list links to the day.",
+      "details": "`npx playwright test --config=playwright.config.js tests/uiux/day-detail-2026-04-21-artifacts-validation.spec.js` — 0 passed, 2 failed. Both failures are expected side-effects of rejecting this run: the April 21 entry has been removed from `site/days/manifest.json` so the homepage timeline and adjacent-day navigation no longer surface the day. The test file remains in place so it will go green automatically when the run ships in a follow-up day with the replay fixed and the manifest entry restored."
+    },
+    {
+      "name": "Playwright — tutorial → challenge → endless gating",
+      "persona": "player",
+      "status": "pass",
+      "description": "Asserts the title scene keeps Endless gated before clear, the tutorial rolls into the live April 21 challenge, the challenge roster includes Cottonburr Mortar and excludes Bramble Spear, and Endless unlocks only after a deterministic clear.",
+      "details": "`npx playwright test --config=playwright.config.js tests/uiux/game-tutorial-challenge-endless-gating-2026-04-21.spec.js` — 1 passed."
+    },
+    {
+      "name": "Playwright — responsive shell and Board Scout layout",
+      "persona": "player",
+      "status": "pass",
+      "description": "Verified the April 21 game shell and Board Scout stay readable at mobile, tablet, and desktop sizes, including the Cottonburr card and `Arc 1.2s` badge.",
+      "details": "`npx playwright test --config=playwright.config.js tests/uiux/game-shell-board-scout-responsive-2026-04-21.spec.js` — 3 passed."
+    },
+    {
+      "name": "Playwright — scripts/replay-2026-04-21-mortar-clear.json browser replay",
+      "persona": "player",
+      "status": "fail",
+      "description": "Replays the checked-in canonical clear fixture against the live browser runtime and expects the challenge to clear into endless.",
+      "details": "`npx playwright test --config=playwright.config.js tests/uiux/game-2026-04-21-replays.spec.js` — 2 passed, 1 failed. The replay fixture hits `gardenHP: 0` at `survivedMs: 60000` during wave 3 before the advertised Cottonburr placement at `atMs: 72000` fires, so the fixture does not reproduce the validator-reported canonical clear in Chromium. The node-side difficulty validator still reports `Canonical result: WIN`, so this is tracked as a simulator-vs-runtime mismatch to investigate: either the replay needs to be regenerated from a browser-verified clear, or the node simulator and browser runtime need to be reconciled before the replay fixture can be trusted as the public canonical line."
+    }
+  ],
+  "testPersonas": ["validator", "visitor", "player"],
+  "notes": "April 21 is a roster-expansion day, but the browser-verified canonical clear (`scripts/replay-2026-04-21-mortar-clear.json`) does not reproduce in Chromium — the board ends at `gardenHP: 0` / `survivedMs: 60000` during wave 3, before the advertised Cottonburr placement at `atMs: 72000` ever fires. Because the browser is the source of truth for the shipped game and the browser-based canonical-clear proof is red, this run has been rejected: `review.md` is marked `Rejected — not published` and the April 21 entry has been removed from `site/days/manifest.json` so the homepage and day index do not surface the day. That manifest removal is the reason the day-detail spec now reports two failing sub-tests — expected side-effects of rejection, not new gameplay bugs. The core implementation (new plant + runtime contract + scenario + tutorial + Board Scout + node-side difficulty validator) still passes and will ship in a follow-up day once the replay fixture is regenerated from a browser-verified clear or the simulator/runtime divergence is reconciled."
+}
