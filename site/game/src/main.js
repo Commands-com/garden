@@ -133,6 +133,20 @@ function formatCadenceSeconds(cadenceMs) {
   return `${(Number(cadenceMs || 0) / 1000).toFixed(1)}s`;
 }
 
+function getInventoryPlantNotes(plant) {
+  const notes = [];
+  if (plant.targetPriority === "rearmost") {
+    notes.push("Target: Rearmost");
+  }
+  if (plant.rangeCols) {
+    notes.push(`Range: ${plant.rangeCols}c`);
+  }
+  if (plant.arc) {
+    notes.push(`Arc ${formatCadenceSeconds(plant.arcDurationMs)}`);
+  }
+  return notes.join(" · ");
+}
+
 function formatSapPulse(sapPerPulse, uppercase = false) {
   const amount = Number(sapPerPulse || 0);
   const unit = uppercase ? "SAP" : "sap";
@@ -226,7 +240,10 @@ function renderInventory(dayDate) {
           "p",
           { className: "game-inventory__desc" },
           plant.description || "Configured in the daily scenario roster."
-        )
+        ),
+        getInventoryPlantNotes(plant)
+          ? el("p", { className: "game-inventory__desc" }, getInventoryPlantNotes(plant))
+          : null
       )
     );
   });
@@ -395,12 +412,22 @@ function renderBoardScout(dayDate, assetCatalog) {
             "Piercing"
           )
         );
-      } else if (plant.splash === true) {
+      }
+      if (plant.splash === true) {
         badges.push(
           el(
             "span",
             { className: "game-scout__badge game-scout__badge--splash" },
             "Splash"
+          )
+        );
+      }
+      if (plant.arc) {
+        badges.push(
+          el(
+            "span",
+            { className: "game-scout__badge game-scout__badge--arc" },
+            `Arc ${formatCadenceSeconds(plant.arcDurationMs)}`
           )
         );
       }
@@ -653,6 +680,24 @@ function selectScoutCard(card, type, data, scenario) {
           {},
           `${Number(data.splashRadiusCols || 0).toFixed(1)} col · ${Number(data.splashDamage || 0)} dmg`
         )
+      );
+    }
+    if (data.targetPriority === "rearmost") {
+      statChildren.push(
+        el("dt", {}, "Target"),
+        el("dd", {}, "Rearmost")
+      );
+    }
+    if (data.rangeCols) {
+      statChildren.push(
+        el("dt", {}, "Range"),
+        el("dd", {}, `${data.rangeCols}c`)
+      );
+    }
+    if (data.arc) {
+      statChildren.push(
+        el("dt", {}, "Arc"),
+        el("dd", {}, formatCadenceSeconds(data.arcDurationMs))
       );
     }
     statChildren.push(

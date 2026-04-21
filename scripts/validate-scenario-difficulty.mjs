@@ -368,6 +368,18 @@ function getSupportPlantDefinitions(modeDefinition) {
   );
 }
 
+function getRearTargetPlantDefinitions(modeDefinition) {
+  return getAvailablePlantDefinitions(modeDefinition)
+    .filter((plant) => (plant.targetPriority || "nearest") === "rearmost")
+    .sort((left, right) => {
+      if (left.cost !== right.cost) {
+        return left.cost - right.cost;
+      }
+
+      return left.id.localeCompare(right.id);
+    });
+}
+
 function getCheapestPlantDefinition(modeDefinition) {
   return (
     getAttackingPlantDefinitions(modeDefinition).sort((left, right) => {
@@ -730,27 +742,59 @@ class ScenarioSimulator {
       }
 
       defender.cooldownMs -= deltaMs;
-      const target = this.getFrontEnemyInLane(defender.row, defender.x);
+      const plantDef = defender.definition;
+      const targetPriority = plantDef.targetPriority || "nearest";
+      const rangeCols = Number(plantDef.rangeCols);
+      const maxRangePx = Number.isFinite(rangeCols)
+        ? rangeCols * CELL_WIDTH
+        : Number.POSITIVE_INFINITY;
+      // Missing targetPriority defaults to nearest so legacy attackers match
+      // the pre-April-21 runtime without migration.
+      const target = targetPriority === "rearmost"
+        ? this.getRearmostEnemyInLane(defender.row, defender.x, maxRangePx)
+        : this.getFrontEnemyInLane(defender.row, defender.x);
       if (!target || defender.cooldownMs > 0) {
+        continue;
+      }
+      if (target.x > defender.x + maxRangePx) {
         continue;
       }
 
       defender.cooldownMs = defender.definition.cadenceMs;
-      const plantDef = defender.definition;
       const piercing = Boolean(plantDef.piercing);
       const splash = plantDef.splash === true;
+      // Arc defaults to false here too, matching runtime: non-arc attackers
+      // continue to use linear projectile travel and collision checks.
+      const arc = plantDef.arc === true;
       if (splash && piercing) {
         throw new Error(
           `Plant "${plantDef.id}" declares both splash:true and piercing:true; mixed splash+piercing is forbidden.`
         );
       }
+      if (arc && piercing) {
+        throw new Error(
+          `Plant "${plantDef.id}" declares both arc:true and piercing:true; mixed arc+piercing is forbidden.`
+        );
+      }
+      const startX = defender.x + 18;
+      const startY = defender.y;
       this.projectiles.push({
         lane: defender.row,
-        x: defender.x + 18,
+        x: startX,
+        y: startY,
         damage: plantDef.projectileDamage,
         speed: plantDef.projectileSpeed,
         radius: plantDef.projectileRadius,
         piercing,
+        arc,
+        arcApexPx: arc ? Number(plantDef.arcApexPx) || 0 : 0,
+        startX,
+        startY,
+        landingX: arc ? target.x : null,
+        landingY: arc ? getLaneY(defender.row) : null,
+        elapsedMs: 0,
+        durationMs: arc ? Math.max(1, Number(plantDef.arcDurationMs) || 1200) : 0,
+        targetPriority,
         canHitFlying: Boolean(plantDef.canHitFlying),
         splash,
         splashRadiusCols: splash ? Number(plantDef.splashRadiusCols) || 0 : 0,
@@ -800,6 +844,31 @@ class ScenarioSimulator {
         continue;
       }
 
+      if (projectile.arc === true) {
+        projectile.elapsedMs += deltaMs;
+        const t = clamp(projectile.elapsedMs / projectile.durationMs, 0, 1);
+        projectile.x = projectile.startX + (projectile.landingX - projectile.startX) * t;
+
+        // Arc projectiles mirror play.js: no mid-flight collision, no
+        // retargeting, and detonation at the logical landing snapshot.
+        if (t >= 1) {
+          const primaryEnemy = this.getClosestSplashEnemy(
+            projectile,
+            projectile.landingX,
+            projectile.landingY,
+            { sameLaneOnly: true }
+          );
+          projectile.destroyed = true;
+          this.resolveSplashImpact(projectile, primaryEnemy, {
+            centerX: projectile.landingX,
+            centerY: projectile.landingY,
+            lane: projectile.lane,
+            sameLaneOnly: true,
+          });
+        }
+        continue;
+      }
+
       projectile.x += projectile.speed * (deltaMs / 1000);
 
       if (projectile.x > ENEMY_SPAWN_X + 80) {
@@ -826,28 +895,12 @@ class ScenarioSimulator {
           }
         }
       } else if (projectile.splash === true) {
-        // Splash projectiles mirror play.js resolveSplashImpact: logical
-        // combat coordinates (enemy.x + lane-center y), anti-air gate on
-        // neighbors, damage routed through damageEnemy so under-defended
-        // modifiers still compose.
         const target = this.findProjectileTarget(projectile);
         if (!target) {
           continue;
         }
         projectile.destroyed = true;
-        const radiusPx = (projectile.splashRadiusCols || 0) * CELL_WIDTH;
-        const centerX = target.x;
-        const centerY = getLaneY(target.lane);
-        this.damageEnemy(target, projectile.damage);
-        for (const enemy of this.enemies) {
-          if (enemy === target || enemy.destroyed) continue;
-          if (enemy.definition.flying === true && !projectile.canHitFlying) continue;
-          const dx = enemy.x - centerX;
-          const dy = getLaneY(enemy.lane) - centerY;
-          if (Math.sqrt(dx * dx + dy * dy) <= radiusPx) {
-            this.damageEnemy(enemy, projectile.splashDamage);
-          }
-        }
+        this.resolveSplashImpact(projectile, target);
       } else {
         const target = this.findProjectileTarget(projectile);
         if (!target) {
@@ -985,6 +1038,27 @@ class ScenarioSimulator {
     return match;
   }
 
+  getRearmostEnemyInLane(row, originX, maxRangePx) {
+    let match = null;
+    const maxX = originX + maxRangePx;
+
+    for (const enemy of this.enemies) {
+      if (enemy.destroyed || enemy.lane !== row || enemy.x <= originX + 6) {
+        continue;
+      }
+      // Arc v1 remains ground-only in the validator just like runtime.
+      if (enemy.definition.flying === true || enemy.x > maxX) {
+        continue;
+      }
+
+      if (!match || enemy.x > match.x) {
+        match = enemy;
+      }
+    }
+
+    return match;
+  }
+
   getBlockingDefender(enemy) {
     if (enemy.definition.flying === true) {
       return null;
@@ -1032,6 +1106,54 @@ class ScenarioSimulator {
     }
 
     return match;
+  }
+
+  getClosestSplashEnemy(projectile, centerX, centerY, options = {}) {
+    const radiusPx = (projectile.splashRadiusCols || 0) * CELL_WIDTH;
+    const sameLaneOnly = options.sameLaneOnly === true;
+    const lane = options.lane ?? projectile.lane;
+    let match = null;
+    let closestDistance = Number.POSITIVE_INFINITY;
+
+    for (const enemy of this.enemies) {
+      if (enemy.destroyed) continue;
+      if (sameLaneOnly && enemy.lane !== lane) continue;
+      if (enemy.definition.flying === true && !projectile.canHitFlying) continue;
+
+      const dx = enemy.x - centerX;
+      const dy = getLaneY(enemy.lane) - centerY;
+      const distance = Math.sqrt(dx * dx + dy * dy);
+      if (distance > radiusPx || distance >= closestDistance) continue;
+
+      match = enemy;
+      closestDistance = distance;
+    }
+
+    return match;
+  }
+
+  resolveSplashImpact(projectile, primaryEnemy, options = {}) {
+    const radiusPx = (projectile.splashRadiusCols || 0) * CELL_WIDTH;
+    const centerX = options.centerX ?? primaryEnemy?.x ?? projectile.x;
+    const impactLane = options.lane ?? primaryEnemy?.lane ?? projectile.lane;
+    const centerY = options.centerY ?? getLaneY(impactLane);
+    const sameLaneOnly = options.sameLaneOnly === true;
+
+    if (primaryEnemy && !primaryEnemy.destroyed) {
+      this.damageEnemy(primaryEnemy, projectile.damage);
+    }
+
+    for (const enemy of this.enemies) {
+      if (enemy === primaryEnemy || enemy.destroyed) continue;
+      if (sameLaneOnly && enemy.lane !== impactLane) continue;
+      if (enemy.definition.flying === true && !projectile.canHitFlying) continue;
+
+      const dx = enemy.x - centerX;
+      const dy = getLaneY(enemy.lane) - centerY;
+      if (Math.sqrt(dx * dx + dy * dy) > radiusPx) continue;
+
+      this.damageEnemy(enemy, projectile.splashDamage);
+    }
   }
 
   getDefenderById(defenderId) {
@@ -1445,9 +1567,11 @@ function getUpcomingLaneStats(simulator) {
       count: 0,
       clusterHits: 0,
       piercingValue: 0,
+      rearThreat: 0,
       flyingCount: 0,
       sniperCount: 0,
       previousAtMs: null,
+      lastTankAtMs: null,
     };
 
     current.count += 1;
@@ -1458,6 +1582,15 @@ function getUpcomingLaneStats(simulator) {
     current.previousAtMs = event.atMs;
     current.piercingValue += event.enemyId === "shardMite" ? 2 : 1;
     const definition = ENEMY_BY_ID[event.enemyId];
+    if ((definition?.requiredDefendersInLane || 0) > 1) {
+      current.lastTankAtMs = event.atMs;
+    } else if (
+      definition?.flying !== true &&
+      current.lastTankAtMs != null &&
+      event.atMs - current.lastTankAtMs <= 5_000
+    ) {
+      current.rearThreat += 1;
+    }
     if (definition?.flying === true) {
       current.flyingCount += 1;
     }
@@ -1521,6 +1654,9 @@ function evaluateSimulator(simulator) {
     const controlCount = defendersInLane.filter(
       (defender) => defender.definition?.role === "control"
     ).length;
+    const rearTargetCount = defendersInLane.filter(
+      (defender) => (defender.definition?.targetPriority || "nearest") === "rearmost"
+    ).length;
     const antiAirCount = defendersInLane.filter(
       (defender) => Boolean(defender.definition?.canHitFlying)
     ).length;
@@ -1528,6 +1664,18 @@ function evaluateSimulator(simulator) {
     const activeFlyingCount = activeEnemiesInLane.filter(
       (enemy) => enemy.definition?.flying === true
     ).length;
+    const activeTank = activeEnemiesInLane.find(
+      (enemy) => (enemy.definition?.requiredDefendersInLane || 0) > 1
+    );
+    const activeRearThreat = Boolean(
+      activeTank &&
+        activeEnemiesInLane.some(
+          (enemy) =>
+            enemy !== activeTank &&
+            enemy.definition?.flying !== true &&
+            enemy.x > activeTank.x + 24
+        )
+    );
     const activeSniperCount = activeEnemiesInLane.filter(
       (enemy) => enemy.definition?.behavior === "sniper"
     ).length;
@@ -1544,6 +1692,18 @@ function evaluateSimulator(simulator) {
       score += Math.min(1, piercingCount) * 8_500;
       if (piercingCount === 0) {
         score -= (laneStat.clusterHits > 0 ? 5_500 : 3_000);
+      }
+    }
+
+    if (
+      (laneStat?.rearThreat > 0 || activeRearThreat) &&
+      simulator.availablePlants.some(
+        (plantId) => (PLANT_DEFINITIONS[plantId]?.targetPriority || "nearest") === "rearmost"
+      )
+    ) {
+      score += Math.min(rearTargetCount, 1) * 20_000;
+      if (rearTargetCount === 0) {
+        score -= 18_000;
       }
     }
 
@@ -2339,6 +2499,7 @@ function buildSearchSeedPlans(modeDefinition, options) {
   const firstSeenRows = getFirstSeenLaneOrder(modeDefinition);
   const cheapestPlant = getCheapestPlantDefinition(modeDefinition);
   const specializedPlants = getSpecializedPlantDefinitions(modeDefinition);
+  const rearTargetPlants = getRearTargetPlantDefinitions(modeDefinition);
   const seen = new Set();
   const seeds = [];
 
@@ -2404,6 +2565,23 @@ function buildSearchSeedPlans(modeDefinition, options) {
           ]
         );
       }
+    }
+
+    for (const plant of rearTargetPlants) {
+      const fallbackAttacker =
+        getAvailablePlantDefinitions(modeDefinition).find(
+          (candidate) => candidate.id !== plant.id && candidate.role === "attacker"
+        ) || cheapestPlant;
+      pushSeed(
+        `pressure-row-${pressureRow.row}-${plant.id}-rear-guard`,
+        [
+          { row: pressureRow.row, col: 0, plantId: plant.id },
+          { row: pressureRow.row, col: 1, plantId: fallbackAttacker.id },
+          ...coverRows
+            .slice(0, 2)
+            .map((row) => ({ row, col: 0, plantId: fallbackAttacker.id })),
+        ]
+      );
     }
   }
 

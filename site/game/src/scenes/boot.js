@@ -82,6 +82,55 @@ function createProjectileTexture(scene, key) {
   graphics.destroy();
 }
 
+function createCottonburrMortarTexture(scene, key) {
+  const size = 84;
+  const graphics = scene.make.graphics({ x: 0, y: 0, add: false });
+  graphics.fillStyle(0x102218, 0.36);
+  graphics.fillEllipse(size / 2, size / 2 + 16, 42, 18);
+
+  graphics.fillStyle(0x224631, 1);
+  graphics.fillEllipse(size / 2, size / 2 + 10, 30, 14);
+
+  graphics.fillStyle(0x2d5a39, 1);
+  graphics.fillRoundedRect(size / 2 - 9, 44, 18, 28, 8);
+  graphics.lineStyle(3, 0xf5f0e8, 0.92);
+  graphics.strokeRoundedRect(size / 2 - 9, 44, 18, 28, 8);
+
+  graphics.lineStyle(4, 0x2d5a39, 1);
+  graphics.beginPath();
+  graphics.moveTo(28, 56);
+  graphics.lineTo(size / 2, 34);
+  graphics.lineTo(56, 56);
+  graphics.strokePath();
+
+  graphics.fillStyle(0xe9deb5, 1);
+  graphics.fillCircle(size / 2, 28, 14);
+  graphics.fillStyle(0xc8a65c, 0.95);
+  graphics.fillCircle(size / 2, 28, 10);
+  graphics.lineStyle(2, 0x6f5222, 0.9);
+  graphics.strokeCircle(size / 2, 28, 14);
+
+  graphics.fillStyle(0x6f5222, 1);
+  const burrSpikes = [
+    [42, 14],
+    [53, 16],
+    [58, 26],
+    [52, 38],
+    [42, 40],
+    [31, 36],
+    [26, 26],
+    [31, 16],
+  ];
+  burrSpikes.forEach(([x, y]) => graphics.fillCircle(x, y, 2.2));
+
+  graphics.generateTexture(key, size, size);
+  graphics.destroy();
+}
+
+function createCottonburrMortarProjectileTexture(scene, key) {
+  createCircleTexture(scene, key, 6, 0xc5a35f, 0xf5f0e8);
+}
+
 export class BootScene extends Phaser.Scene {
   constructor(bootstrap) {
     super("boot");
@@ -128,6 +177,12 @@ export class BootScene extends Phaser.Scene {
   create() {
     createBackdropTexture(this, "garden-backdrop");
     createBoardTileTexture(this, "board-cell");
+    if (!this.textures.exists("cottonburr-mortar")) {
+      createCottonburrMortarTexture(this, "cottonburr-mortar");
+    }
+    if (!this.textures.exists("cottonburr-mortar-projectile")) {
+      createCottonburrMortarProjectileTexture(this, "cottonburr-mortar-projectile");
+    }
 
     for (const enemy of ENEMY_DEFINITIONS) {
       if (!this.textures.exists(enemy.textureKey)) {

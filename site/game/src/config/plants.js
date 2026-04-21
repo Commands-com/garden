@@ -106,6 +106,33 @@ export const PLANT_DEFINITIONS = {
     displayWidth: 48,
     displayHeight: 52,
   },
+  cottonburrMortar: {
+    id: "cottonburrMortar",
+    label: "Cottonburr Mortar",
+    description:
+      "Lobs a cottonburr in a high arc and lands on the rearmost ground enemy in range. Splashes on impact, but cannot hit flying targets.",
+    role: "attacker",
+    textureKey: "cottonburr-mortar",
+    projectileTextureKey: "cottonburr-mortar-projectile",
+    cost: 90,
+    maxHealth: 22,
+    cadenceMs: 2400,
+    initialCooldownMs: 1000,
+    targetPriority: "rearmost",
+    rangeCols: 4,
+    arc: true,
+    arcApexPx: 120,
+    arcDurationMs: 1200,
+    projectileSpeed: 0,
+    projectileDamage: 20,
+    projectileRadius: 7,
+    splash: true,
+    splashRadiusCols: 0.6,
+    splashDamage: 14,
+    canHitFlying: false,
+    displayWidth: 48,
+    displayHeight: 52,
+  },
 };
 
 export const STARTING_PLANT_ID = "thornVine";

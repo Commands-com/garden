@@ -35,6 +35,12 @@ function clamp(value, min, max) {
   return Math.max(min, Math.min(max, value));
 }
 
+function getParabolaY(startY, peakY, endY, t) {
+  const baselineY = startY + (endY - startY) * t;
+  const arcHeight = Math.max(0, Math.max(startY, endY) - peakY);
+  return baselineY - 4 * arcHeight * t * (1 - t);
+}
+
 const SEED_TRAY_PAGE_SIZE = 4;
 const SEED_TRAY_MAX_WIDTH = 640;
 const SEED_TRAY_GAP = 8;
@@ -826,13 +832,26 @@ export class PlayScene extends Phaser.Scene {
       }
 
       defender.cooldownMs -= deltaMs;
-      const target = this.getFrontEnemyInLane(defender.row, defender.x);
+      const plant = defender.definition;
+      const targetPriority = plant.targetPriority || "nearest";
+      const rangeCols = Number(plant.rangeCols);
+      const maxRangePx = Number.isFinite(rangeCols)
+        ? rangeCols * CELL_WIDTH
+        : Number.POSITIVE_INFINITY;
+      // Absent targetPriority defaults to nearest so legacy attackers keep
+      // their current behavior unchanged.
+      const target = targetPriority === "rearmost"
+        ? this.getRearmostEnemyInLane(defender.row, defender.x, maxRangePx)
+        : this.getFrontEnemyInLane(defender.row, defender.x);
       if (!target || defender.cooldownMs > 0) {
+        continue;
+      }
+      if (target.x > defender.x + maxRangePx) {
         continue;
       }
 
       defender.cooldownMs = defender.definition.cadenceMs;
-      this.spawnProjectile(defender);
+      this.spawnProjectile(defender, target);
     }
   }
 
@@ -925,6 +944,37 @@ export class PlayScene extends Phaser.Scene {
         continue;
       }
 
+      if (projectile.arc === true) {
+        projectile.elapsedMs += deltaMs;
+        const t = clamp(projectile.elapsedMs / projectile.durationMs, 0, 1);
+        const peakY =
+          Math.min(projectile.startY, projectile.landingY) - (projectile.arcApexPx || 0);
+        projectile.x = projectile.startX + (projectile.landingX - projectile.startX) * t;
+        projectile.y = getParabolaY(projectile.startY, peakY, projectile.landingY, t);
+        projectile.sprite.setPosition(projectile.x, projectile.y);
+
+        // Arc projectiles skip mid-flight collision entirely. They always
+        // detonate at their logical landing snapshot, even if the target moved.
+        if (t >= 1) {
+          const primaryEnemy = this.getClosestSplashEnemy(
+            projectile,
+            projectile.landingX,
+            projectile.landingY,
+            { sameLaneOnly: true }
+          );
+          projectile.destroyed = true;
+          projectile.sprite.destroy();
+          this.resolveSplashImpact(projectile, primaryEnemy, {
+            centerX: projectile.landingX,
+            centerY: projectile.landingY,
+            lane: projectile.lane,
+            sameLaneOnly: true,
+            impactType: "arc",
+          });
+        }
+        continue;
+      }
+
       const prevX = projectile.x;
       projectile.x += projectile.speed * (deltaMs / 1000);
       projectile.sprite.setPosition(projectile.x, projectile.y);
@@ -946,7 +996,7 @@ export class PlayScene extends Phaser.Scene {
       } else if (projectile.splash === true) {
         projectile.destroyed = true;
         projectile.sprite.destroy();
-        this.resolveSplashImpact(projectile, target);
+        this.resolveSplashImpact(projectile, target, { impactType: "splash" });
       } else {
         projectile.destroyed = true;
         projectile.sprite.destroy();
@@ -955,24 +1005,53 @@ export class PlayScene extends Phaser.Scene {
     }
   }
 
+  getClosestSplashEnemy(projectile, centerX, centerY, options = {}) {
+    const radiusPx = (projectile.splashRadiusCols || 0) * CELL_WIDTH;
+    const sameLaneOnly = options.sameLaneOnly === true;
+    const lane = options.lane ?? projectile.lane;
+    let match = null;
+    let closestDistance = Number.POSITIVE_INFINITY;
+
+    for (const enemy of this.enemies) {
+      if (enemy.destroyed) continue;
+      if (sameLaneOnly && enemy.lane !== lane) continue;
+      if (enemy.definition.flying === true && !projectile.canHitFlying) continue;
+
+      const dx = enemy.x - centerX;
+      const dy = getLaneY(enemy.lane) - centerY;
+      const distance = Math.sqrt(dx * dx + dy * dy);
+      if (distance > radiusPx || distance >= closestDistance) continue;
+
+      match = enemy;
+      closestDistance = distance;
+    }
+
+    return match;
+  }
+
   // AC-1 / AC-3 / AC-4: splash resolution is projectile-level and gated only
   // on projectile.splash. Damage routes through damageEnemy so Glass Ram's
   // getEffectiveProjectileDamage modifier composes identically to direct hits.
   // Geometry uses logical combat coordinates (enemy.x + lane-center y), not
   // visual altitude/bob-adjusted sprite position, so splash against flying
   // clusters is deterministic and replay-stable.
-  resolveSplashImpact(projectile, primaryEnemy) {
+  resolveSplashImpact(projectile, primaryEnemy, options = {}) {
     const radiusPx = (projectile.splashRadiusCols || 0) * CELL_WIDTH;
-    const centerX = primaryEnemy.x;
-    const centerY = getLaneY(primaryEnemy.lane);
+    const centerX = options.centerX ?? primaryEnemy?.x ?? projectile.x;
+    const impactLane = options.lane ?? primaryEnemy?.lane ?? projectile.lane;
+    const centerY = options.centerY ?? getLaneY(impactLane);
+    const sameLaneOnly = options.sameLaneOnly === true;
     const splashHits = [];
 
     // Primary target always takes the projectile's primary damage (AC-5:
     // two-shot lethality is locked on projectileDamage alone, no double-dip).
-    this.damageEnemy(primaryEnemy, projectile.damage);
+    if (primaryEnemy && !primaryEnemy.destroyed) {
+      this.damageEnemy(primaryEnemy, projectile.damage);
+    }
 
     for (const enemy of this.enemies) {
       if (enemy === primaryEnemy || enemy.destroyed) continue;
+      if (sameLaneOnly && enemy.lane !== impactLane) continue;
       if (enemy.definition.flying === true && !projectile.canHitFlying) continue;
 
       const dx = enemy.x - centerX;
@@ -987,12 +1066,13 @@ export class PlayScene extends Phaser.Scene {
 
     this.recordSplashEvent({
       atMs: Math.round(this.elapsedMs),
-      lane: primaryEnemy.lane,
+      lane: impactLane,
       x: Math.round(centerX),
       y: Math.round(centerY),
       radiusPx: Math.round(radiusPx),
-      primaryEnemyId: primaryEnemy.id,
+      primaryEnemyId: primaryEnemy?.id || null,
       splashHits,
+      impactType: options.impactType || "splash",
     });
 
     this.renderSplashBurst(centerX, centerY, radiusPx);
@@ -1808,6 +1888,18 @@ export class PlayScene extends Phaser.Scene {
           x: Math.round(projectile.x),
           y: Math.round(projectile.y),
           damage: projectile.damage,
+          arc: projectile.arc === true,
+          elapsedMs: projectile.arc === true ? Math.round(projectile.elapsedMs || 0) : 0,
+          durationMs: projectile.arc === true ? Math.round(projectile.durationMs || 0) : 0,
+          landingX:
+            projectile.arc === true && Number.isFinite(projectile.landingX)
+              ? Math.round(projectile.landingX)
+              : null,
+          landingY:
+            projectile.arc === true && Number.isFinite(projectile.landingY)
+              ? Math.round(projectile.landingY)
+              : null,
+          targetPriority: projectile.targetPriority || "nearest",
           piercing: projectile.piercing === true,
           canHitFlying: projectile.canHitFlying === true,
           splash: projectile.splash === true,
@@ -1913,11 +2005,15 @@ export class PlayScene extends Phaser.Scene {
     return true;
   }
 
-  spawnProjectile(defender) {
+  spawnProjectile(defender, target = null) {
     const plantDef = defender.definition;
     const piercing = plantDef.piercing || false;
     const canHitFlying = plantDef.canHitFlying === true;
     const splash = plantDef.splash === true;
+    // Arc defaults to false. Non-arc attackers keep the existing linear
+    // projectile + collision path, while arc attackers snapshot landing.
+    const arc = plantDef.arc === true;
+    const targetPriority = plantDef.targetPriority || "nearest";
 
     // AC-2 guard: mixed splash+piercing is a v1 build error, not a runtime
     // fallback. Fail at first fire so ambiguous combat behavior cannot ship.
@@ -1926,34 +2022,50 @@ export class PlayScene extends Phaser.Scene {
         `Plant "${plantDef.id}" declares both splash:true and piercing:true; mixed splash+piercing is forbidden.`
       );
     }
+    if (arc && piercing) {
+      throw new Error(
+        `Plant "${plantDef.id}" declares both arc:true and piercing:true; mixed arc+piercing is forbidden.`
+      );
+    }
+    if (arc && !target) {
+      return;
+    }
 
-    const sprite = this.add.image(
-      defender.x + 18,
-      defender.y,
-      plantDef.projectileTextureKey
-    );
+    const startX = defender.x + 18;
+    const startY = defender.y;
+    const sprite = this.add.image(startX, startY, plantDef.projectileTextureKey);
     sprite.setDisplaySize(
       plantDef.projectileRadius * 2 + 8,
       plantDef.projectileRadius * 2
     );
     sprite.setDepth(5);
 
-    this.projectiles.push({
+    const projectile = {
       lane: defender.row,
-      x: defender.x + 18,
-      y: defender.y,
+      x: startX,
+      y: startY,
       damage: plantDef.projectileDamage,
       speed: plantDef.projectileSpeed,
       radius: plantDef.projectileRadius,
       piercing,
       canHitFlying,
+      targetPriority,
+      arc,
+      arcApexPx: arc ? Number(plantDef.arcApexPx) || 0 : 0,
+      startX,
+      startY,
+      landingX: arc ? target.x : null,
+      landingY: arc ? getLaneY(defender.row) : null,
+      elapsedMs: 0,
+      durationMs: arc ? Math.max(1, Number(plantDef.arcDurationMs) || 1200) : 0,
       splash,
       splashRadiusCols: splash ? Number(plantDef.splashRadiusCols) || 0 : 0,
       splashDamage: splash ? Number(plantDef.splashDamage) || 0 : 0,
       hitEnemies: piercing ? new Set() : null,
       sprite,
       destroyed: false,
-    });
+    };
+    this.projectiles.push(projectile);
 
     this.audioController.playEffect("thorn-fire");
 
@@ -2082,6 +2194,28 @@ export class PlayScene extends Phaser.Scene {
       }
 
       if (!match || enemy.x < match.x) {
+        match = enemy;
+      }
+    }
+
+    return match;
+  }
+
+  getRearmostEnemyInLane(row, originX, maxRangePx) {
+    let match = null;
+    const maxX = originX + maxRangePx;
+
+    for (const enemy of this.enemies) {
+      if (enemy.destroyed || enemy.lane !== row || enemy.x <= originX + 6) {
+        continue;
+      }
+      // Arc v1 is ground-only. Flying enemies remain explicitly excluded from
+      // the rearmost selector until a future anti-air arc contract exists.
+      if (enemy.definition.flying === true || enemy.x > maxX) {
+        continue;
+      }
+
+      if (!match || enemy.x > match.x) {
         match = enemy;
       }
     }

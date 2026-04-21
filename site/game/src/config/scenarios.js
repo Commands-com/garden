@@ -11,6 +11,7 @@ import scenario_2026_04_17 from "./scenarios/2026-04-17.js";
 import scenario_2026_04_18 from "./scenarios/2026-04-18.js";
 import scenario_2026_04_19 from "./scenarios/2026-04-19.js";
 import scenario_2026_04_20 from "./scenarios/2026-04-20.js";
+import scenario_2026_04_21 from "./scenarios/2026-04-21.js";
 
 // Append new daily scenarios here. Keep prior dated files intact so archived
 // boards remain replayable instead of being overwritten by later runs.
@@ -24,6 +25,7 @@ const SCENARIO_REGISTRY = [
   scenario_2026_04_18,
   scenario_2026_04_19,
   scenario_2026_04_20,
+  scenario_2026_04_21,
 ];
 
 function normalizeScenarioEntry(entry) {

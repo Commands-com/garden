@@ -18,6 +18,36 @@
       }
     },
     {
+      "id": "cottonburr-mortar",
+      "type": "sprite",
+      "kind": "sprite",
+      "provider": "repo",
+      "path": "/game/assets/manual/plants/cottonburr-mortar.svg",
+      "prompt": "Hand-authored repo asset for the April 21 Cottonburr Mortar plant. A rooted green mortar cup holding a pale cottonburr payload so the new arc-and-rearmost plant reads as a back-rank siege piece instead of a straight-line shooter.",
+      "generatedAt": "2026-04-21T00:00:00.000Z",
+      "metadata": {
+        "category": "player",
+        "format": "svg",
+        "width": 128,
+        "height": 128
+      }
+    },
+    {
+      "id": "cottonburr-mortar-projectile",
+      "type": "sprite",
+      "kind": "sprite",
+      "provider": "repo",
+      "path": "/game/assets/manual/projectiles/cottonburr-mortar-projectile.svg",
+      "prompt": "Hand-authored repo asset for the April 21 Cottonburr Mortar projectile. A spiked cottonburr seed with a warm core so arc shots read as a lobbed impact pod instead of a thorn bolt.",
+      "generatedAt": "2026-04-21T00:00:00.000Z",
+      "metadata": {
+        "category": "projectile",
+        "format": "svg",
+        "width": 96,
+        "height": 32
+      }
+    },
+    {
       "id": "pollen-puff",
       "type": "sprite",
       "kind": "sprite",
