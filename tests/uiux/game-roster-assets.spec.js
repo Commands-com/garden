@@ -358,3 +358,71 @@ test("April 19 Pollen Puff plant and projectile manifest entries resolve to repo
   expect(assetState.plantBody).toContain("<svg");
   expect(assetState.projectileBody).toContain("<svg");
 });
+
+test("April 21 Cottonburr Mortar plant and projectile manifest entries resolve to repo-backed SVG assets", async ({
+  page,
+}) => {
+  await installLocalSiteRoutes(page);
+  await page.goto(getAppUrl("/game/?testMode=1&date=2026-04-21"));
+  await page.waitForFunction(
+    () =>
+      window.__gameTestHooks &&
+      typeof window.__gameTestHooks.getState === "function"
+  );
+
+  const assetState = await page.evaluate(async () => {
+    const assetManifest = await fetch("/game/assets-manifest.json").then(
+      (response) => response.json()
+    );
+    const assets = assetManifest.assets || [];
+    const cottonburrMortar = assets.find(
+      (asset) => asset.id === "cottonburr-mortar"
+    );
+    const cottonburrProjectile = assets.find(
+      (asset) => asset.id === "cottonburr-mortar-projectile"
+    );
+
+    const [plantResponse, projectileResponse] = await Promise.all([
+      fetch(cottonburrMortar.path),
+      fetch(cottonburrProjectile.path),
+    ]);
+
+    return {
+      cottonburrMortar,
+      cottonburrProjectile,
+      plantOk: plantResponse.ok,
+      projectileOk: projectileResponse.ok,
+      plantBody: await plantResponse.text(),
+      projectileBody: await projectileResponse.text(),
+    };
+  });
+
+  expect(assetState.cottonburrMortar).toMatchObject({
+    id: "cottonburr-mortar",
+    provider: "repo",
+    path: "/game/assets/manual/plants/cottonburr-mortar.svg",
+  });
+  expect(assetState.cottonburrMortar.metadata).toMatchObject({
+    category: "player",
+    format: "svg",
+    width: 128,
+    height: 128,
+  });
+
+  expect(assetState.cottonburrProjectile).toMatchObject({
+    id: "cottonburr-mortar-projectile",
+    provider: "repo",
+    path: "/game/assets/manual/projectiles/cottonburr-mortar-projectile.svg",
+  });
+  expect(assetState.cottonburrProjectile.metadata).toMatchObject({
+    category: "projectile",
+    format: "svg",
+    width: 96,
+    height: 32,
+  });
+
+  expect(assetState.plantOk).toBe(true);
+  expect(assetState.projectileOk).toBe(true);
+  expect(assetState.plantBody).toContain("<svg");
+  expect(assetState.projectileBody).toContain("<svg");
+});

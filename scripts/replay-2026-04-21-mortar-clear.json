@@ -1,0 +1,26 @@
+{
+  "schemaVersion": 1,
+  "id": "2026-04-21-mortar-clear",
+  "date": "2026-04-21",
+  "mode": "challenge",
+  "coordinateBase": 0,
+  "description": "Canonical April 21 challenge-clear line using the Over-the-Top roster. Lane 2 (the wave 2/3 siege lane) is screened by an Amber Wall at col 3 with a Thorn Vine attacker behind it and a Cottonburr Mortar at col 4 so the mortar's rearmost-target arc lands on the back-rank Shard Mites behind the Glass Ram. Lane 1 (wave 4 siege) is screened by a second wall + mortar combo. This is the AC-7 positive case for the April 21 Cottonburr contract; task_1 confirmed the validator places Cottonburr at row 2 col 4 at 01:12.",
+  "expect": {
+    "outcome": "cleared",
+    "challengeOutcome": "cleared"
+  },
+  "actions": [
+    { "atMs": 500, "type": "place", "plantId": "sunrootBloom", "row": 2, "col": 0 },
+    { "atMs": 5000, "type": "place", "plantId": "thornVine", "row": 2, "col": 1 },
+    { "atMs": 11000, "type": "place", "plantId": "thornVine", "row": 1, "col": 0 },
+    { "atMs": 17000, "type": "place", "plantId": "thornVine", "row": 3, "col": 0 },
+    { "atMs": 23000, "type": "place", "plantId": "thornVine", "row": 0, "col": 0 },
+    { "atMs": 28000, "type": "place", "plantId": "amberWall", "row": 2, "col": 3 },
+    { "atMs": 34000, "type": "place", "plantId": "thornVine", "row": 4, "col": 0 },
+    { "atMs": 42000, "type": "place", "plantId": "amberWall", "row": 1, "col": 3 },
+    { "atMs": 50000, "type": "place", "plantId": "thornVine", "row": 2, "col": 2 },
+    { "atMs": 60000, "type": "place", "plantId": "thornVine", "row": 1, "col": 1 },
+    { "atMs": 72000, "type": "place", "plantId": "cottonburrMortar", "row": 2, "col": 4 },
+    { "atMs": 82000, "type": "place", "plantId": "cottonburrMortar", "row": 1, "col": 4 }
+  ]
+}
