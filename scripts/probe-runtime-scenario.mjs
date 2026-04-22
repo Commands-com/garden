@@ -105,19 +105,21 @@ function loadReplayStrategy(replayPath) {
   }
 
   const raw = JSON.parse(fs.readFileSync(resolved, "utf8"));
-  const placements = Array.isArray(raw.placements)
+  const sourceList = Array.isArray(raw.placements)
     ? raw.placements
     : Array.isArray(raw.plan)
       ? raw.plan
-      : null;
+      : Array.isArray(raw.actions)
+        ? raw.actions.filter((action) => (action?.type ?? "place") === "place")
+        : null;
 
-  if (!placements) {
+  if (!sourceList) {
     throw new Error(
-      `Replay file must contain a "placements" or "plan" array: ${resolved}`
+      `Replay file must contain a "placements", "plan", or "actions" array: ${resolved}`
     );
   }
 
-  const plan = placements.map((entry, index) => {
+  const plan = sourceList.map((entry, index) => {
     const rawRow = entry.row;
     const rawCol = entry.col;
     // Accept 1-based rows/cols from summarizePlan() output or 0-based internal plans.

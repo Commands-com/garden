@@ -2,6 +2,26 @@
   "schemaVersion": 1,
   "days": [
     {
+      "date": "2026-04-21",
+      "title": "Cottonburr Mortar — Rearmost-Targeting Arc Attack and the Over-the-Top Board",
+      "summary": "Adds Cottonburr Mortar as Rootline Defense's first rearmost-targeting attacker and first arcing projectile, extends plant targeting with `targetPriority: \"rearmost\"`, adds arc projectile motion (`arc`, `arcApexPx`, `arcDurationMs`) with ground-only splash on landing, updates Board Scout to surface the arc/rearmost metadata, and publishes the April 21 Over-the-Top board where Bramble Spear sits out so Cottonburr owns the back-rank answer.",
+      "status": "shipped",
+      "featureType": "game",
+      "tags": [
+        "game",
+        "rootline-defense",
+        "cottonburr-mortar",
+        "rearmost-targeting",
+        "arc-projectile",
+        "splash",
+        "board-scout",
+        "over-the-top",
+        "scenario",
+        "playwright"
+      ],
+      "publishedAt": "2026-04-21T12:00:00.000Z"
+    },
+    {
       "date": "2026-04-20",
       "title": "Amber Wall — First Defender Role Contract and the Hold the Line Board",
       "summary": "Adds Amber Wall as Rootline Defense's first defender plant, ships the reusable defender-role contract, updates Board Scout to surface the wall's role and stats, and publishes the April 20 Hold the Line board where the previous roster can no longer clear without the new wall.",
