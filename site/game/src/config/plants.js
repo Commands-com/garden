@@ -124,7 +124,7 @@ export const PLANT_DEFINITIONS = {
     arcApexPx: 120,
     arcDurationMs: 1200,
     projectileSpeed: 0,
-    projectileDamage: 46,
+    projectileDamage: 52,
     projectileRadius: 7,
     splash: true,
     splashRadiusCols: 0.6,

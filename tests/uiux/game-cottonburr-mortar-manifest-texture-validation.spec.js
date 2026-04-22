@@ -565,8 +565,8 @@ test.describe("Cottonburr Mortar — manifest-backed texture and arc projectile"
     expect(arcProjectile.observation.landingY).not.toBeNull();
     expect(arcProjectile.observation.splashRadiusCols).toBeGreaterThan(0);
     expect(arcProjectile.observation.splashDamage).toBeGreaterThan(0);
-    // Damage line matches the plant definition (46 primary damage).
-    expect(arcProjectile.observation.damage).toBe(46);
+    // Damage line matches the plant definition (52 primary damage).
+    expect(arcProjectile.observation.damage).toBe(52);
 
     // Live projectile sprite must also be texture-keyed to the manifest
     // projectile — if boot.js ever fell back to the procedural canvas, the
