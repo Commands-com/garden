@@ -156,9 +156,11 @@ const config = {
     validationTeamId: env('VALIDATION_TEAM_ID', ''),
     reviewTeamId: env('REVIEW_TEAM_ID', ''),
     maxTokenBudget: envNumber('MAX_TOKEN_BUDGET', 500000),
-    // Enforce a 4-hour minimum so stale local/prod env values don't cut off
-    // long-running validation or review stages prematurely.
-    maxWallClockMinutes: Math.max(envNumber('MAX_WALL_CLOCK_MINUTES', 240), 240),
+    // Enforce a 5-hour minimum so Explore+Spec+Implementation+Validation
+    // don't starve the Review stage of wall-clock budget. The 4-hour floor
+    // produced recurring "Stage 'review' failed — not in required status"
+    // failures (2026-04-15, 2026-04-23) when earlier stages ran long.
+    maxWallClockMinutes: Math.max(envNumber('MAX_WALL_CLOCK_MINUTES', 300), 300),
     timeoutGraceMinutes: envNumber('TIMEOUT_GRACE_MINUTES', 15),
     artifactBaseDir: env('ARTIFACT_BASE_DIR', 'content/days'),
   },

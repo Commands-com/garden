@@ -124,7 +124,7 @@
           "approvalMode": "auto",
           "allowSummaryFallback": true,
           "includeArtifacts": true,
-          "requiredStatus": ["finalized"]
+          "requiredStatus": ["finalized", "partial"]
         }
       }
     ]
