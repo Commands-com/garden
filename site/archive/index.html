@@ -339,6 +339,11 @@
         const timeline = el('div', { className: 'timeline' });
         group.days.forEach((day) => {
           const isToday = day.date === todayStr;
+          const dayTags = Array.isArray(day.tags)
+            ? day.tags
+            : day.tags
+            ? [day.tags]
+            : [];
           const dotClass = isToday
             ? 'timeline-entry__dot--today'
             : day.status === 'shipped'
@@ -360,6 +365,18 @@
             el('div', { className: 'timeline-entry__title' },
               el('a', { href: getDayUrl(day.date) }, day.title || 'Untitled entry')
             ),
+            dayTags.length > 0
+              ? el(
+                  'div',
+                  { className: 'd-flex flex-wrap gap-2 mt-2' },
+                  ...dayTags.slice(0, 4).map((tag) =>
+                    el('span', { className: 'tag tag--green' }, tag)
+                  ),
+                  dayTags.length > 4
+                    ? el('span', { className: 'tag' }, `+${dayTags.length - 4} more`)
+                    : null
+                )
+              : null,
             day.summary
               ? el('p', { className: 'timeline-entry__summary' }, day.summary)
               : null

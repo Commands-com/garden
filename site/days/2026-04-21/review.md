@@ -72,24 +72,24 @@ ground threats behind a lead body.
 
 ## Verdict
 
-**Rejected — not published.** The node-side difficulty validator reports a
-WIN for the canonical plan, but the browser-runtime replay proof does not
-reproduce: `npx playwright test --config=playwright.config.js
-tests/uiux/game-2026-04-21-replays.spec.js` still ends the board at
-`gardenHP: 0` / `survivedMs: 60000` during wave 3, before the advertised
-Cottonburr placement at `atMs: 72000` in
-`scripts/replay-2026-04-21-mortar-clear.json` ever fires. The browser is the
-source of truth for the shipped game, so a day introducing a new plant cannot
-be approved while the browser-based canonical-clear artifact is red — the
-roster-expansion proof effectively has a hole until the replay either clears
-in Chromium or the node validator and browser runtime are reconciled.
+**Shipped.** The browser-runtime canonical clear now reproduces:
+`scripts/replay-2026-04-21-mortar-clear.json` has been rewritten as a
+14-action actions[]-format fixture (coordinateBase 0) that front-loads the
+col-0 Thorn Vine wall (rows 1–4) with a corner Sunroot Bloom at (0, 0),
+triples lane 2 with `thornVine(2,1) + amberWall(2,2)`, re-triples lane 1 with
+`thornVine(1,1) + amberWall(1,2)` before the wave-4 Glass Ram, and places
+`cottonburrMortar` at (1, 3) at `atMs: 72000` so its arc picks off the
+rearmost trailers. Running `npx playwright test --config=playwright.config.js
+tests/uiux/game-2026-04-21-replays.spec.js` is green in Chromium — the board
+survives past the previously-fatal wave 3 and clears into endless with one
+wall HP remaining, matching the node-side validator's `WIN • wall 1 • clear
+01:31 • endless 00:25 • resources left 69`. The April 21 entry has been
+restored to `site/days/manifest.json` as `status: "shipped"`, so the
+day-detail artifact-validation and homepage-timeline specs that depended on
+the manifest entry now pass as well.
 
-The implementation itself is sound (new plant + manifest-backed art + reusable
-`targetPriority: "rearmost"` and arc-projectile contracts + tutorial and Board
-Scout coverage) and four of the five original browser scenarios still pass, so
-this is a canonical-clear / publish-blocking issue, not a core-gameplay bug.
-The day is held back from the public manifest and should ship in a follow-up
-day once `tests/uiux/game-2026-04-21-replays.spec.js` is green — the
-replay fixture needs to be regenerated from a browser-verified clear (e.g.
-via `npm run replay:derive-clear`) or the simulator/runtime divergence
-resolved.
+The implementation remains sound (new plant + manifest-backed art + reusable
+`targetPriority: "rearmost"` and arc-projectile contracts + tutorial and
+Board Scout coverage). With the replay fixture regenerated and the manifest
+entry restored, the roster-expansion proof is closed end-to-end and the day
+ships publicly.

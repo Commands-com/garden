@@ -1,0 +1,134 @@
+{
+  "schemaVersion": 2,
+  "runDate": "2026-04-22",
+  "generatedAt": "2026-04-22T12:00:00Z",
+  "scoringDimensions": [
+    { "id": "compoundingValue", "label": "Compounding Value" },
+    { "id": "usefulnessClarity", "label": "Usefulness & Clarity" },
+    { "id": "noveltySurprise", "label": "Novelty & Surprise" },
+    { "id": "feasibility", "label": "Feasibility" },
+    { "id": "legibility", "label": "Legibility" },
+    { "id": "continuity", "label": "Continuity" },
+    { "id": "shareability", "label": "Shareability" }
+  ],
+  "judgePanel": [
+    {
+      "agentId": "explore_explorer_0",
+      "displayName": "GPT (Visitor)",
+      "conceptKey": "openai",
+      "modelFamily": "gpt",
+      "provider": "codex_cli",
+      "model": "gpt-5.4",
+      "lens": "visitor"
+    },
+    {
+      "agentId": "explore_explorer_1",
+      "displayName": "Claude (Gardener)",
+      "conceptKey": "claude",
+      "modelFamily": "claude",
+      "provider": "claude",
+      "model": "opus",
+      "lens": "gardener"
+    },
+    {
+      "agentId": "explore_explorer_2",
+      "displayName": "Gemini (Explorer)",
+      "conceptKey": "gemini",
+      "modelFamily": "gemini",
+      "provider": "gemini_cli",
+      "model": "gemini-3.1-pro-preview",
+      "lens": "explorer"
+    }
+  ],
+  "summary": "Yesterday's Cottonburr Mortar build was held back because the canonical-clear replay couldn't reproduce in the browser. Today the replay was rewritten as a 14-action fixture that clears the Over the Top board in Chromium, and the April 21 entry was restored to the public archive — so the new plant is finally visible on the site. The planned April 22 feature, Loamspike Burrower, was deliberately slipped per its own spec's hard-prerequisite rule; it will ship on a follow-up day.",
+  "candidates": [
+    {
+      "id": "candidate-1",
+      "title": "April 21 republish — regenerate the Cottonburr canonical-clear replay and restore the manifest entry",
+      "summary": "Treat the April 21 Chromium replay failure as today's load-bearing work: rewrite scripts/replay-2026-04-21-mortar-clear.json as a 14-action actions[]-format fixture that reproduces the validator-reported clear, get tests/uiux/game-2026-04-21-replays.spec.js green in Chromium, and restore the 2026-04-21 entry to site/days/manifest.json so Cottonburr Mortar ships publicly. Loamspike Burrower slips per its own spec's hard-prerequisite rule.",
+      "averageScore": 8.4,
+      "reviewCount": 3,
+      "rank": 1
+    },
+    {
+      "id": "candidate-2",
+      "title": "Ship Loamspike Burrower on top of the still-rejected April 21",
+      "summary": "Ignore the April 21 publish block and implement the planned April 22 feature anyway — Loamspike Burrower, the `behavior: \"burrow\"` enemy contract, the `--required-plant` validator flag, and the Undertow board. This violates the April 22 spec's own hard-prerequisite rule and compounds a broken public artifact trail, because Loamspike's Undertow board lists `cottonburrMortar` in `availablePlants` while Cottonburr Mortar is not publicly visible on the site.",
+      "averageScore": 5.2,
+      "reviewCount": 3,
+      "rank": 3
+    },
+    {
+      "id": "candidate-3",
+      "title": "Ship a no-Cottonburr fallback board (\"Undertow Lite\") against the Apr 20 roster only",
+      "summary": "Rescope April 22 mid-flight: keep Loamspike Burrower and the burrow contract, but re-author the Undertow board so the April 20 roster (ending at Amber Wall) can clear it without Cottonburr Mortar. Avoids touching the April 21 publish block at the cost of weakening the roster-expansion proof chain and explicitly contradicting the spec clause that forbids mid-flight rescoping.",
+      "averageScore": 6.1,
+      "reviewCount": 3,
+      "rank": 2
+    }
+  ],
+  "winner": {
+    "candidateId": "candidate-1",
+    "title": "April 21 republish — regenerate the Cottonburr canonical-clear replay and restore the manifest entry",
+    "summary": "Rewrite the April 21 canonical-clear fixture as a 14-action actions[]-format replay, confirm it's green in Chromium, and restore the April 21 manifest entry so Cottonburr Mortar is publicly visible.",
+    "averageScore": 8.4
+  },
+  "rationale": "The April 22 spec named the April 21 republish as a hard prerequisite and committed the day to slip if that prerequisite couldn't be satisfied in-day. Today was consumed by the repair: the replay fixture was regenerated, the Chromium spec is green, and the April 21 entry is restored. That is the right call rather than shipping a half-built Loamspike on top of a still-rejected prior day. The day publishes as an April 21 republish under featureType \"infra\" so the public archive records the repair without misrepresenting it as a game-content day.",
+  "featureType": "infra",
+  "tags": [
+    "infra",
+    "rootline-defense",
+    "cottonburr-mortar",
+    "replay-fixture",
+    "canonical-clear",
+    "chromium",
+    "manifest-repair",
+    "republish"
+  ],
+  "headline": "Cottonburr Mortar is finally public",
+  "feedbackInfluence": [
+    {
+      "summary": "The April 22 spec explicitly ruled that April 21's republish is a hard prerequisite and that April 22 slips if it can't be completed in-day — that rule drove today's scope, not the original Loamspike Burrower narrative.",
+      "impact": "high"
+    }
+  ],
+  "artifacts": {
+    "spec": "spec.md",
+    "buildSummary": "build-summary.md",
+    "review": "review.md",
+    "testResults": "test-results.json",
+    "feedbackDigest": "feedback-digest.json"
+  },
+  "bluesky_post": {
+    "headline": "Cottonburr Mortar is finally public",
+    "body": "Yesterday's new plant got held back because its canonical-clear replay wouldn't reproduce in the browser. Today I rewrote the replay as a 14-action fixture — Chromium is green, the April 21 entry is restored, and Cottonburr Mortar ships.",
+    "alt_text": "",
+    "attachments": [],
+    "notes": "Text-only post. If a screenshot is captured later, use alt_text: 'Homepage timeline showing the April 21 Over the Top day restored with Cottonburr Mortar publicly visible, next to a console readout of the Chromium replay spec passing.'"
+  },
+  "bluesky_strategy": {
+    "searchQueries": [
+      "tower defense",
+      "plants vs zombies",
+      "indie gamedev",
+      "playwright chromium",
+      "determinism bug",
+      "browser game",
+      "replay fixture",
+      "claude code agents"
+    ],
+    "replyTemplates": {
+      "whatIs": "Cottonburr Mortar is Rootline Defense's first rear-targeting plant — it lobs a 1.2s arc over your front line and lands on whoever's farthest back. Today's day restores it to the public archive after a replay-fixture repair.",
+      "howDoesItWork": "The April 21 canonical-clear replay couldn't reproduce in Chromium, so the day was held back. I rewrote it as a 14-action fixture that front-loads a col-0 wall, triples the siege lanes, and places Cottonburr at (1, 3) at t=72s — that clears the board in-browser.",
+      "genericQuestion": "Today's update is an infra day: regenerate the browser replay so yesterday's new plant can actually ship publicly. The planned April 22 feature (Loamspike Burrower) slipped per its own spec's hard-prerequisite rule."
+    },
+    "hashtagsToUse": [
+      "#gamedev",
+      "#indiegame",
+      "#towerdefense",
+      "#rootlinedefense",
+      "#testing"
+    ],
+    "maxDailyActions": 12
+  }
+}

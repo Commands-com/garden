@@ -153,6 +153,68 @@ function formatSapPulse(sapPerPulse, uppercase = false) {
   return `${amount >= 0 ? "+" : ""}${amount} ${unit}`;
 }
 
+function getScoutCardGroup(card) {
+  const group = card?.parentElement;
+  if (!group) {
+    return [];
+  }
+
+  return [...group.querySelectorAll(".game-scout__card")].filter(
+    (node) => !node.hidden
+  );
+}
+
+function focusRelativeScoutCard(card, offset) {
+  const cards = getScoutCardGroup(card);
+  const currentIndex = cards.indexOf(card);
+  if (currentIndex === -1) {
+    return;
+  }
+
+  const nextIndex = Math.max(0, Math.min(cards.length - 1, currentIndex + offset));
+  const nextCard = cards[nextIndex];
+  if (nextCard && nextCard !== card) {
+    nextCard.focus();
+  }
+}
+
+function focusBoundaryScoutCard(card, edge) {
+  const cards = getScoutCardGroup(card);
+  if (!cards.length) {
+    return;
+  }
+
+  const target = edge === "end" ? cards[cards.length - 1] : cards[0];
+  if (target) {
+    target.focus();
+  }
+}
+
+function handleScoutCardKeydown(event, card) {
+  switch (event.key) {
+    case "ArrowRight":
+    case "ArrowDown":
+      event.preventDefault();
+      focusRelativeScoutCard(card, 1);
+      break;
+    case "ArrowLeft":
+    case "ArrowUp":
+      event.preventDefault();
+      focusRelativeScoutCard(card, -1);
+      break;
+    case "Home":
+      event.preventDefault();
+      focusBoundaryScoutCard(card, "start");
+      break;
+    case "End":
+      event.preventDefault();
+      focusBoundaryScoutCard(card, "end");
+      break;
+    default:
+      break;
+  }
+}
+
 function getPlayScene() {
   if (!game) {
     return null;
@@ -332,6 +394,7 @@ function renderBoardScout(dayDate, assetCatalog) {
         dataset: { enemyId: id },
         "aria-label": enemy.label,
         onClick: () => selectScoutCard(card, "enemy", enemy, scenario),
+        onKeydown: (event) => handleScoutCardKeydown(event, card),
       },
       createScoutArt(enemy, assetIndex),
       el("div", { className: "game-scout__card-name" }, enemy.label),
@@ -441,6 +504,7 @@ function renderBoardScout(dayDate, assetCatalog) {
         dataset: { plantId: id },
         "aria-label": plant.label,
         onClick: () => selectScoutCard(card, "plant", plant, scenario),
+        onKeydown: (event) => handleScoutCardKeydown(event, card),
       },
       createScoutArt(plant, assetIndex),
       el("div", { className: "game-scout__card-name" }, plant.label),

@@ -1,0 +1,59 @@
+{
+  "schemaVersion": 1,
+  "runDate": "2026-04-22",
+  "generatedAt": "2026-04-22T12:00:00Z",
+  "summary": {
+    "totalScenarios": 6,
+    "passed": 6,
+    "failed": 0,
+    "skipped": 0,
+    "indeterminate": 0,
+    "passRate": 100
+  },
+  "scenarios": [
+    {
+      "name": "Artifact schema validation",
+      "persona": "validator",
+      "status": "pass",
+      "description": "Validated the April 22 artifact directory against the repository artifact validator.",
+      "details": "`node schemas/validate.js content/days/2026-04-22` passes `decision.json`, `feedback-digest.json`, `test-results.json`, `spec.md`, `build-summary.md`, and `review.md`."
+    },
+    {
+      "name": "Validator — April 21 scenario difficulty (republish verification)",
+      "persona": "validator",
+      "status": "pass",
+      "description": "Re-validated the April 21 Over the Top board difficulty and the required-new-plant condition against the post-repair tree.",
+      "details": "`npm run validate:scenario-difficulty -- --date 2026-04-21` still reports `Canonical result: WIN • wall 1 • clear 01:31 • endless 00:25 • resources left 69`, `Required new plant check: PASS • cottonburrMortar`, confirming the regenerated replay does not change the canonical difficulty profile."
+    },
+    {
+      "name": "Playwright — April 21 replay fixture canonical clear (post-repair)",
+      "persona": "player",
+      "status": "pass",
+      "description": "Replays the regenerated canonical-clear fixture against the live browser runtime and expects the challenge to clear into endless.",
+      "details": "`npx playwright test --config=playwright.config.js tests/uiux/game-2026-04-21-replays.spec.js` — 3 passed. The rewritten 14-action actions[]-format fixture clears the Over the Top board in Chromium for the first time."
+    },
+    {
+      "name": "Playwright — April 21 day-detail artifact validation (post-restore)",
+      "persona": "visitor",
+      "status": "pass",
+      "description": "Verifies the published April 21 day-detail route renders the decision data, raw artifact links, inline spec, and adjacent-day navigation against the restored manifest entry.",
+      "details": "`npx playwright test --config=playwright.config.js tests/uiux/day-detail-2026-04-21-artifacts-validation.spec.js` — 2 passed."
+    },
+    {
+      "name": "Playwright — days index contains 2026-04-21 manifest entry",
+      "persona": "visitor",
+      "status": "pass",
+      "description": "Verifies the homepage recent-days timeline and days index surface the restored April 21 entry.",
+      "details": "`npx playwright test --config=playwright.config.js tests/uiux/days-index-2026-04-21-manifest-entry.spec.js` — 1 passed."
+    },
+    {
+      "name": "Playwright — tutorial → challenge → endless gating (April 21 still live)",
+      "persona": "player",
+      "status": "pass",
+      "description": "Asserts the April 21 challenge roster, gating, and endless unlock still behave correctly with the regenerated replay and restored manifest entry.",
+      "details": "`npx playwright test --config=playwright.config.js tests/uiux/game-tutorial-challenge-endless-gating-2026-04-21.spec.js` — 1 passed."
+    }
+  ],
+  "testPersonas": ["validator", "visitor", "player"],
+  "notes": "April 22 is an infra / republish day per spec.md §Prerequisites P1 — the planned Loamspike Burrower feature slipped per the spec's hard-prerequisite rule. All six scenarios above verify the April 21 republish is complete end-to-end: regenerated replay fixture, green Chromium replay spec, restored manifest entry, consistent day-detail artifact trail, and unchanged canonical difficulty profile."
+}

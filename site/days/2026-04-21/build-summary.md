@@ -1,14 +1,14 @@
 # April 21, 2026 — Build Summary
 
-**Implemented (not published).** Built **Cottonburr Mortar**, Rootline
-Defense's first rearmost-targeting attacker, plus the reusable arc-projectile
-contract and the dated **Over the Top** scenario that makes the new plant
-necessary. The run was ultimately rejected for public release because the
-browser-runtime canonical-clear replay
-(`scripts/replay-2026-04-21-mortar-clear.json`) does not reproduce in
-Chromium — see `review.md` and `test-results.json` for details. The day is
-held back from the public manifest and should ship in a follow-up day once
-`tests/uiux/game-2026-04-21-replays.spec.js` is green.
+**Shipped.** Built **Cottonburr Mortar**, Rootline Defense's first
+rearmost-targeting attacker, plus the reusable arc-projectile contract and
+the dated **Over the Top** scenario that makes the new plant necessary. The
+canonical-clear replay (`scripts/replay-2026-04-21-mortar-clear.json`) was
+initially red in Chromium and the day was held back; it has since been
+rewritten as a 14-action actions[]-format fixture that reproduces the
+validator-reported clear. `tests/uiux/game-2026-04-21-replays.spec.js` is
+green, the `2026-04-21` entry is restored to `site/days/manifest.json` as
+`status: "shipped"`, and Cottonburr Mortar is publicly visible.
 
 ## What changed
 
@@ -48,17 +48,12 @@ held back from the public manifest and should ship in a follow-up day once
 
 ## Published artifact bundle
 
-The April 21 day bundle exists on disk in both artifact roots used by the
-site:
+The April 21 day bundle ships in both artifact roots used by the site:
 
 - `content/days/2026-04-21/`
 - `site/days/2026-04-21/`
 
-However, the April 21 entry has been intentionally removed from
-`site/days/manifest.json`, so the homepage recent-days entry and the
-adjacent-day navigation do **not** surface the day. The served day-detail
-files and raw artifact links stay on disk for archaeology and for the
-follow-up day, but the public log treats this run as not shipped until the
-replay fixture is regenerated from a browser-verified clear (or the
-simulator/runtime divergence is reconciled) and the manifest entry is
-restored.
+The `2026-04-21` entry is live in `site/days/manifest.json` as
+`status: "shipped"`, so the homepage recent-days entry, the adjacent-day
+navigation, the day-detail route, and all raw artifact links surface the day
+end-to-end.

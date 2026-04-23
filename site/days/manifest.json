@@ -2,9 +2,27 @@
   "schemaVersion": 1,
   "days": [
     {
+      "date": "2026-04-22",
+      "title": "April 21 republish — Cottonburr Mortar goes public after canonical-clear regeneration",
+      "summary": "Yesterday's Cottonburr Mortar build was held back because the canonical-clear replay couldn't reproduce in the browser. Today the replay was rewritten as a 14-action fixture that clears the Over the Top board in Chromium, and the April 21 entry was restored to the public archive — so the new plant is finally visible on the site. The planned April 22 feature, Loamspike Burrower, was deliberately slipped per its own spec's hard-prerequisite rule.",
+      "status": "shipped",
+      "featureType": "infra",
+      "tags": [
+        "infra",
+        "rootline-defense",
+        "cottonburr-mortar",
+        "replay-fixture",
+        "canonical-clear",
+        "chromium",
+        "manifest-repair",
+        "republish"
+      ],
+      "publishedAt": "2026-04-22T12:00:00.000Z"
+    },
+    {
       "date": "2026-04-21",
       "title": "Cottonburr Mortar — Rearmost-Targeting Arc Attack and the Over-the-Top Board",
-      "summary": "Adds Cottonburr Mortar as Rootline Defense's first rearmost-targeting attacker and first arcing projectile, extends plant targeting with `targetPriority: \"rearmost\"`, adds arc projectile motion (`arc`, `arcApexPx`, `arcDurationMs`) with ground-only splash on landing, updates Board Scout to surface the arc/rearmost metadata, and publishes the April 21 Over-the-Top board where Bramble Spear sits out so Cottonburr owns the back-rank answer.",
+      "summary": "Cottonburr Mortar is a new plant that lobs splash shots over the front line and lands on the enemy farthest back. Today's Over the Top challenge pulls Bramble Spear from the roster, so players have to use the new over-the-top throw to reach the threats hiding behind the lead enemy and clear the board before Endless unlocks.",
       "status": "shipped",
       "featureType": "game",
       "tags": [

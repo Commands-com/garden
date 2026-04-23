@@ -2473,6 +2473,11 @@ kbd {
   background: rgba(245, 240, 232, 0.1);
 }
 
+.game-audio-toggle:focus-visible {
+  outline: 2px solid var(--color-accent-gold);
+  outline-offset: 2px;
+}
+
 .game-volume-slider {
   width: 80px;
   height: 4px;
@@ -2482,6 +2487,11 @@ kbd {
   border-radius: 2px;
   outline: none;
   cursor: pointer;
+}
+
+.game-volume-slider:focus-visible {
+  outline: 2px solid var(--color-accent-gold);
+  outline-offset: 3px;
 }
 
 .game-volume-slider::-webkit-slider-thumb {
