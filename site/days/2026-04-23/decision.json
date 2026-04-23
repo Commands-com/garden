@@ -1,0 +1,329 @@
+{
+  "schemaVersion": 2,
+  "runDate": "2026-04-23",
+  "generatedAt": "2026-04-23T12:00:00.000Z",
+  "scoringDimensions": [
+    {
+      "id": "compoundingValue",
+      "label": "Compounding Value"
+    },
+    {
+      "id": "usefulnessClarity",
+      "label": "Usefulness & Clarity"
+    },
+    {
+      "id": "noveltySurprise",
+      "label": "Novelty & Surprise"
+    },
+    {
+      "id": "feasibility",
+      "label": "Feasibility"
+    },
+    {
+      "id": "legibility",
+      "label": "Legibility"
+    },
+    {
+      "id": "continuity",
+      "label": "Continuity"
+    },
+    {
+      "id": "shareability",
+      "label": "Shareability"
+    }
+  ],
+  "judgePanel": [
+    {
+      "agentId": "explore_explorer_0",
+      "displayName": "GPT (Visitor)",
+      "conceptKey": "openai",
+      "modelFamily": "gpt",
+      "provider": "codex_cli",
+      "model": "gpt-5.4",
+      "lens": "visitor"
+    },
+    {
+      "agentId": "explore_explorer_1",
+      "displayName": "Claude (Gardener)",
+      "conceptKey": "claude",
+      "modelFamily": "claude",
+      "provider": "claude",
+      "model": "opus",
+      "lens": "gardener"
+    },
+    {
+      "agentId": "explore_explorer_2",
+      "displayName": "Gemini Pro (Explorer)",
+      "conceptKey": "gemini",
+      "modelFamily": "gemini",
+      "provider": "gemini_cli",
+      "model": "gemini-3.1-pro-preview",
+      "lens": "explorer"
+    }
+  ],
+  "summary": "April 23 moves the public decision trail forward to Loamspike Burrower, the first Rootline Defense enemy concept built around a reusable burrow behavior that bypasses the front defender line and reopens depth-defense play.",
+  "candidates": [
+    {
+      "id": "candidate-1",
+      "title": "Loamspike Burrower — Rootline Defense's First Enemy That Tunnels Under Your Wall",
+      "summary": "A ground enemy with a reusable burrow behavior that telegraphs, dives, resurfaces behind the frontmost defender, and forces the player to stop treating Amber Wall as a total answer.",
+      "averageScore": 8.5,
+      "reviewCount": 3,
+      "rank": 1,
+      "dimensionAverages": {
+        "compoundingValue": {
+          "label": "Compounding Value",
+          "average": 8.7,
+          "reviewCount": 3
+        },
+        "usefulnessClarity": {
+          "label": "Usefulness & Clarity",
+          "average": 8.3,
+          "reviewCount": 3
+        },
+        "noveltySurprise": {
+          "label": "Novelty & Surprise",
+          "average": 8,
+          "reviewCount": 3
+        },
+        "feasibility": {
+          "label": "Feasibility",
+          "average": 7.3,
+          "reviewCount": 3
+        },
+        "legibility": {
+          "label": "Legibility",
+          "average": 8.3,
+          "reviewCount": 3
+        },
+        "continuity": {
+          "label": "Continuity",
+          "average": 8.7,
+          "reviewCount": 3
+        },
+        "shareability": {
+          "label": "Shareability",
+          "average": 9,
+          "reviewCount": 3
+        }
+      },
+      "reviewerBreakdown": [
+        {
+          "reviewer": {
+            "agentId": "explore_explorer_0",
+            "displayName": "GPT (Visitor)",
+            "modelFamily": "gpt",
+            "lens": "visitor"
+          },
+          "overallScore": 8,
+          "dimensionScores": {
+            "compoundingValue": 8,
+            "usefulnessClarity": 8,
+            "noveltySurprise": 8,
+            "feasibility": 7,
+            "legibility": 8,
+            "continuity": 8,
+            "shareability": 9
+          },
+          "keep": [
+            "The concept adds a reusable enemy contract rather than a one-off scripted exception."
+          ],
+          "mustChange": [
+            "Keep the tutorial explanation short and let the burrow telegraph do most of the teaching."
+          ],
+          "risks": [
+            "If the telegraph is unclear, players will read the burrow as unfair rather than strategic."
+          ]
+        },
+        {
+          "reviewer": {
+            "agentId": "explore_explorer_1",
+            "displayName": "Claude (Gardener)",
+            "modelFamily": "claude",
+            "lens": "gardener"
+          },
+          "overallScore": 8,
+          "dimensionScores": {
+            "compoundingValue": 9,
+            "usefulnessClarity": 8,
+            "noveltySurprise": 8,
+            "feasibility": 7,
+            "legibility": 8,
+            "continuity": 9,
+            "shareability": 9
+          },
+          "keep": [
+            "Burrow pressure breaks the front-stack Amber Wall default without devaluing Amber Wall itself."
+          ],
+          "mustChange": [
+            "Validator and browser replay coverage need to stay explicit because burrow adds another authority-shifted enemy class."
+          ],
+          "risks": [
+            "If the board is tuned too tightly around one answer, the day becomes a recipe rather than a lesson."
+          ]
+        },
+        {
+          "reviewer": {
+            "agentId": "explore_explorer_2",
+            "displayName": "Gemini Pro (Explorer)",
+            "modelFamily": "gemini",
+            "lens": "explorer"
+          },
+          "overallScore": 9,
+          "dimensionScores": {
+            "compoundingValue": 9,
+            "usefulnessClarity": 9,
+            "noveltySurprise": 8,
+            "feasibility": 8,
+            "legibility": 9,
+            "continuity": 9,
+            "shareability": 9
+          },
+          "keep": [
+            "The state-machine framing is clear: telegraph, underground invulnerability, surface, then resume normal walker rules."
+          ],
+          "mustChange": [
+            "Make the Board Scout callout and in-play surface effect legible enough that the new verb reads before the first failure."
+          ],
+          "risks": [
+            "If underpass timing is too long, the new enemy can feel like dead air instead of pressure."
+          ]
+        }
+      ],
+      "keep": [
+        "The day compounds directly on Amber Wall and Cottonburr Mortar instead of resetting the game's direction."
+      ],
+      "mustChange": [
+        "Burrow needs strong validator and replay coverage because it deliberately bypasses the front line."
+      ],
+      "risks": [
+        "The new enemy is only compelling if the surfacing moment is both visible and strategically meaningful."
+      ]
+    },
+    {
+      "id": "candidate-2",
+      "title": "Board Proof — Browser-Verified Challenge Replay",
+      "summary": "An opt-in replay artifact that proves a real winning line for the current challenge and teaches the roster through browser-verified play instead of static explanation alone.",
+      "averageScore": 7.4,
+      "reviewCount": 3,
+      "rank": 2,
+      "dimensionAverages": {
+        "compoundingValue": {
+          "label": "Compounding Value",
+          "average": 7.3,
+          "reviewCount": 3
+        },
+        "usefulnessClarity": {
+          "label": "Usefulness & Clarity",
+          "average": 8.3,
+          "reviewCount": 3
+        },
+        "noveltySurprise": {
+          "label": "Novelty & Surprise",
+          "average": 6.7,
+          "reviewCount": 3
+        },
+        "feasibility": {
+          "label": "Feasibility",
+          "average": 8,
+          "reviewCount": 3
+        },
+        "legibility": {
+          "label": "Legibility",
+          "average": 8.3,
+          "reviewCount": 3
+        },
+        "continuity": {
+          "label": "Continuity",
+          "average": 7.7,
+          "reviewCount": 3
+        },
+        "shareability": {
+          "label": "Shareability",
+          "average": 6.7,
+          "reviewCount": 3
+        }
+      }
+    },
+    {
+      "id": "candidate-3",
+      "title": "Seed Tray Draft — Pre-Run Five-Plant Loadout Screen",
+      "summary": "A pre-game drafting surface that makes the growing Rootline Defense roster a strategic choice by forcing the player to pick a constrained loadout before starting the daily board.",
+      "averageScore": 5.9,
+      "reviewCount": 3,
+      "rank": 3,
+      "dimensionAverages": {
+        "compoundingValue": {
+          "label": "Compounding Value",
+          "average": 8,
+          "reviewCount": 3
+        },
+        "usefulnessClarity": {
+          "label": "Usefulness & Clarity",
+          "average": 6,
+          "reviewCount": 3
+        },
+        "noveltySurprise": {
+          "label": "Novelty & Surprise",
+          "average": 6.3,
+          "reviewCount": 3
+        },
+        "feasibility": {
+          "label": "Feasibility",
+          "average": 4.7,
+          "reviewCount": 3
+        },
+        "legibility": {
+          "label": "Legibility",
+          "average": 7,
+          "reviewCount": 3
+        },
+        "continuity": {
+          "label": "Continuity",
+          "average": 5.3,
+          "reviewCount": 3
+        },
+        "shareability": {
+          "label": "Shareability",
+          "average": 6,
+          "reviewCount": 3
+        }
+      }
+    }
+  ],
+  "winner": {
+    "candidateId": "candidate-1",
+    "title": "Loamspike Burrower — Rootline Defense's First Enemy That Tunnels Under Your Wall",
+    "summary": "A ground enemy with a reusable burrow behavior that telegraphs, dives, resurfaces behind the frontmost defender, and forces the player to stop treating Amber Wall as a total answer.",
+    "averageScore": 8.5
+  },
+  "rationale": "Loamspike Burrower won because it compounds directly on the current Rootline Defense roster, adds a reusable enemy behavior instead of another one-off exception, and creates a clear, legible pressure pattern that the homepage, day-detail archive, and judge scoreboard can surface immediately.",
+  "featureType": "game",
+  "tags": [
+    "game",
+    "rootline-defense",
+    "loamspike-burrower",
+    "burrow",
+    "enemy-contract",
+    "undertow",
+    "homepage",
+    "scoreboard"
+  ],
+  "feedbackInfluence": [
+    {
+      "summary": "The recent run of Rootline Defense days needed a pressure source that specifically punishes front-only defense instead of asking for more raw damage.",
+      "impact": "high"
+    },
+    {
+      "summary": "The public artifact trail needed to advance to the next dated day so the homepage, recent archive, and decision links stop stalling on the April 22 republish entry.",
+      "impact": "medium"
+    }
+  ],
+  "artifacts": {
+    "spec": "spec.md",
+    "buildSummary": "build-summary.md",
+    "review": "review.md",
+    "testResults": "test-results.json",
+    "feedbackDigest": "feedback-digest.json"
+  }
+}

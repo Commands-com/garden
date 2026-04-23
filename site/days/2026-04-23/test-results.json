@@ -1,0 +1,48 @@
+{
+  "schemaVersion": 1,
+  "runDate": "2026-04-23",
+  "generatedAt": "2026-04-23T12:00:00.000Z",
+  "summary": {
+    "totalScenarios": 4,
+    "passed": 4,
+    "failed": 0,
+    "skipped": 0,
+    "indeterminate": 0,
+    "passRate": 100
+  },
+  "scenarios": [
+    {
+      "name": "Homepage latest day hydration",
+      "persona": "visitor",
+      "status": "pass",
+      "description": "Verified that the homepage latest-run, Today's Change, scoreboard, garden stats, and internal links now source the April 23 day bundle.",
+      "details": "Covers the homepage latest-day regression that previously stalled on April 22."
+    },
+    {
+      "name": "Day-detail artifact strip",
+      "persona": "visitor",
+      "status": "pass",
+      "description": "Verified that /days/?date=2026-04-23 has a complete public artifact bundle instead of a partial shell.",
+      "details": "All expected April 23 artifact files are present under site/days/2026-04-23."
+    },
+    {
+      "name": "Manifest latest-date advancement",
+      "persona": "validator",
+      "status": "pass",
+      "description": "Verified that site/days/manifest.json advances the public archive to April 23.",
+      "details": "The latest manifest entry is now 2026-04-23 with shipped status."
+    },
+    {
+      "name": "Homepage internal link audit",
+      "persona": "visitor",
+      "status": "pass",
+      "description": "Verified that rendered internal homepage hrefs include the April 23 day route and resolve 200.",
+      "details": "The homepage link collector now finds /days/?date=2026-04-23 among the rendered internal links."
+    }
+  ],
+  "testPersonas": [
+    "visitor",
+    "validator"
+  ],
+  "notes": "This bundle fixes a publish-state regression: the homepage was still hydrating April 22 because the public April 23 artifact set had not been published under site/days."
+}

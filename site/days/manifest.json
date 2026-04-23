@@ -2,6 +2,24 @@
   "schemaVersion": 1,
   "days": [
     {
+      "date": "2026-04-23",
+      "title": "Loamspike Burrower — First Burrow Enemy Pressure Day",
+      "summary": "Publishes the April 23 decision bundle for Loamspike Burrower so the homepage, score comparison, and day-detail archive advance to the first burrow-behavior day instead of stalling on the April 22 republish entry.",
+      "status": "shipped",
+      "featureType": "game",
+      "tags": [
+        "game",
+        "rootline-defense",
+        "loamspike-burrower",
+        "burrow",
+        "enemy-contract",
+        "homepage",
+        "scoreboard",
+        "artifact-publish"
+      ],
+      "publishedAt": "2026-04-23T12:00:00.000Z"
+    },
+    {
       "date": "2026-04-22",
       "title": "April 21 republish — Cottonburr Mortar goes public after canonical-clear regeneration",
       "summary": "Yesterday's Cottonburr Mortar build was held back because the canonical-clear replay couldn't reproduce in the browser. Today the replay was rewritten as a 14-action fixture that clears the Over the Top board in Chromium, and the April 21 entry was restored to the public archive — so the new plant is finally visible on the site. The planned April 22 feature, Loamspike Burrower, was deliberately slipped per its own spec's hard-prerequisite rule.",
