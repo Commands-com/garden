@@ -205,6 +205,63 @@ On boards that include `behavior: "sniper"` enemies (starting with the April 16 
 - `scripts/probe-runtime-scenario.mjs --replay <plan.json>` runs a single plan against the live Phaser runtime so ranged-enemy boards still have an executable difficulty signal.
 - Playwright specs (`tests/uiux/game-briar-sniper.spec.js`, `tests/uiux/game-board-scout-2026-04-16.spec.js`) carry the regression guarantees the validator cannot.
 
+### Burrow
+
+Starting with the April 24 Loamspike Burrower, `behavior: "burrow"` enemies run
+a four-state machine that the harness exposes so agents can plan counterplay
+without re-deriving it from pixel data:
+
+- `approach` — walks from `ENEMY_SPAWN_X` toward `burrowAtCol`. Attackers can
+  damage it normally; defenders in lane are *ignored* (no blocker — it dives
+  before engaging).
+- `telegraph` — stationary at `burrowAtCol` for `telegraphMs` (≥400 ms so
+  human and agent players have time to react). Still damageable.
+- `underpass` — sprite hidden, invulnerable, travels at `underpassSpeed` from
+  `burrowAtCol` to `surfaceAtCol`. Projectiles, splash, piercing, and status
+  effects all miss; the runtime keeps a tracking shadow visible so the agent
+  can see *where* the burrower is, just not hit it.
+- `surface` — reappears at `surfaceAtCol` and resumes walker behavior. Fully
+  damageable again.
+
+Every enemy in `getObservation().enemies[]` now carries an `invulnerable:
+boolean` field. For non-burrow enemies this is always `false`; for burrowers it
+is `true` during the `underpass` state and `false` otherwise. The harness
+schema version is unchanged (`schemaVersion: 1`) — `invulnerable` is an
+additive-optional field, not a schema break. Agents that ignore it continue to
+behave correctly; agents that read it can avoid wasting projectiles on hidden
+targets.
+
+Burrow enemies also expose a per-enemy `burrow` block:
+
+```json
+{
+  "burrow": {
+    "state": "underpass",
+    "telegraphRemainingMs": 0,
+    "underpassRemainingMs": 1820,
+    "burrowAtCol": 2,
+    "surfaceAtCol": 0
+  }
+}
+```
+
+Use `state` + `underpassRemainingMs` to predict surface time, and `surfaceAtCol`
+to pre-place attackers at the resurface column before the enemy reappears. The
+block is only present on burrow enemies, so a missing `burrow` key implies a
+non-burrow walker/flyer/sniper.
+
+Board Scout renders a `Burrow` badge on burrow enemy cards and a detail panel
+that includes `Dive column`, `Surfaces at`, `Telegraph`, `Under-speed`, and a
+counterplay note ("Invulnerable while underpassed — hit during approach,
+telegraph, or after surface").
+
+The difficulty validator mirrors the same state machine and invulnerability
+gate (see `scripts/validate-scenario-difficulty.mjs`'s `updateBurrowEnemy`),
+so beam search correctly models approach-window damage and the underpass
+window during which projectiles are wasted. Timing values
+(`telegraphMs`, `underpassSpeed`, `underpassTimeoutMs`) are read from
+`ENEMY_DEFINITIONS` in both places so runtime and validator cannot drift.
+
 ## Local Bot Player
 
 Use the local observation-driven bot as the cheap first pass:

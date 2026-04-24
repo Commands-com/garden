@@ -76,6 +76,7 @@ function fitTextToWidth(textObject, value, maxWidth, startFontSize, minFontSize 
 // max-of-magnitudes and latest expiresAtMs (no stacking).
 export function applyStatusEffect(enemy, entry, nowMs) {
   if (!enemy || !entry || !entry.kind) return;
+  if (enemy.invulnerable === true) return;
   const bag = enemy.statusEffects || (enemy.statusEffects = {});
   const magnitude = Number(entry.magnitude || 0);
   const attackMagnitude = Number(entry.attackMagnitude || 0);
@@ -872,6 +873,7 @@ export class PlayScene extends Phaser.Scene {
 
       for (const enemy of this.enemies) {
         if (enemy.destroyed) continue;
+        if (enemy.invulnerable === true) continue;
         if (enemy.lane !== defender.row) continue;
         if (enemy.x < zoneMinX || enemy.x > zoneMaxX) continue;
 
@@ -1014,6 +1016,7 @@ export class PlayScene extends Phaser.Scene {
 
     for (const enemy of this.enemies) {
       if (enemy.destroyed) continue;
+      if (enemy.invulnerable === true) continue;
       if (sameLaneOnly && enemy.lane !== lane) continue;
       if (enemy.definition.flying === true && !projectile.canHitFlying) continue;
 
@@ -1045,12 +1048,13 @@ export class PlayScene extends Phaser.Scene {
 
     // Primary target always takes the projectile's primary damage (AC-5:
     // two-shot lethality is locked on projectileDamage alone, no double-dip).
-    if (primaryEnemy && !primaryEnemy.destroyed) {
+    if (primaryEnemy && !primaryEnemy.destroyed && primaryEnemy.invulnerable !== true) {
       this.damageEnemy(primaryEnemy, projectile.damage);
     }
 
     for (const enemy of this.enemies) {
       if (enemy === primaryEnemy || enemy.destroyed) continue;
+      if (enemy.invulnerable === true) continue;
       if (sameLaneOnly && enemy.lane !== impactLane) continue;
       if (enemy.definition.flying === true && !projectile.canHitFlying) continue;
 
@@ -1199,26 +1203,244 @@ export class PlayScene extends Phaser.Scene {
         continue;
       }
 
-      const blocker = this.getBlockingDefender(enemy);
-      if (blocker) {
-        enemy.attackCooldownMs -= deltaMs;
-        enemy.x = Math.max(enemy.x, blocker.x + enemy.definition.contactRange);
-
-        if (enemy.attackCooldownMs <= 0) {
-          enemy.attackCooldownMs = getEffectiveCadence(enemy, enemy.definition.attackCadenceMs);
-          this.damageDefender(blocker, enemy.definition.attackDamage);
-        }
-      } else {
-        enemy.attackCooldownMs = Math.max(0, enemy.attackCooldownMs - deltaMs);
-        enemy.x -= getEffectiveSpeed(enemy) * (deltaMs / 1000);
-
-        if (enemy.x <= BREACH_X) {
-          this.resolveBreach(enemy);
-          continue;
-        }
+      if (enemy.definition.behavior === "burrow") {
+        this.updateBurrowEnemy(enemy, deltaMs);
+        if (enemy.destroyed) continue;
+        enemy.sprite.setPosition(enemy.x, enemy.y);
+        continue;
       }
 
+      this.updateWalkerEnemy(enemy, deltaMs);
+      if (enemy.destroyed) continue;
       enemy.sprite.setPosition(enemy.x, enemy.y);
+    }
+  }
+
+  updateWalkerEnemy(enemy, deltaMs, options = {}) {
+    const ignoreBlockers = options.ignoreBlockers === true;
+    const blocker = ignoreBlockers ? null : this.getBlockingDefender(enemy);
+    if (blocker) {
+      enemy.attackCooldownMs -= deltaMs;
+      enemy.x = Math.max(enemy.x, blocker.x + enemy.definition.contactRange);
+
+      if (enemy.attackCooldownMs <= 0) {
+        enemy.attackCooldownMs = getEffectiveCadence(enemy, enemy.definition.attackCadenceMs);
+        this.damageDefender(blocker, enemy.definition.attackDamage);
+      }
+      return;
+    }
+
+    enemy.attackCooldownMs = Math.max(0, enemy.attackCooldownMs - deltaMs);
+    enemy.x -= getEffectiveSpeed(enemy) * (deltaMs / 1000);
+
+    if (enemy.x <= BREACH_X) {
+      this.resolveBreach(enemy);
+    }
+  }
+
+  updateBurrowEnemy(enemy, deltaMs) {
+    const def = enemy.definition;
+    const surfaceCenter = getCellCenter(enemy.lane, def.surfaceAtCol);
+    const surfaceX = surfaceCenter.x - CELL_WIDTH / 2 - 2;
+    const burrowCenter = getCellCenter(enemy.lane, def.burrowAtCol);
+
+    if (enemy.burrowState === "approach") {
+      this.updateWalkerEnemy(enemy, deltaMs, { ignoreBlockers: true });
+      if (enemy.destroyed) return;
+      if (enemy.x <= burrowCenter.x) {
+        enemy.x = burrowCenter.x;
+        enemy.burrowState = "telegraph";
+        enemy.telegraphTimerMs = def.telegraphMs || 0;
+        this.showBurrowTelegraph(enemy, burrowCenter, surfaceCenter);
+      }
+      return;
+    }
+
+    if (enemy.burrowState === "telegraph") {
+      enemy.telegraphTimerMs = Math.max(0, enemy.telegraphTimerMs - deltaMs);
+      if (enemy.telegraphTimerMs <= 0) {
+        this.clearBurrowTelegraph(enemy);
+        enemy.invulnerable = true;
+        enemy.burrowState = "underpass";
+        enemy.underpassTimerMs = def.underpassTimeoutMs || 0;
+        if (enemy.sprite?.setVisible) enemy.sprite.setVisible(false);
+        this.showBurrowShadow(enemy);
+        this.showBurrowSurfaceMarker(enemy, surfaceCenter);
+      }
+      return;
+    }
+
+    if (enemy.burrowState === "underpass") {
+      enemy.x -= (def.underpassSpeed || 0) * (deltaMs / 1000);
+      enemy.underpassTimerMs = Math.max(0, enemy.underpassTimerMs - deltaMs);
+      this.updateBurrowShadow(enemy);
+      const exitByX = enemy.x <= surfaceX;
+      const exitByTimeout = enemy.underpassTimerMs <= 0;
+      if (exitByX || exitByTimeout) {
+        enemy.x = surfaceX;
+        enemy.invulnerable = false;
+        if (enemy.sprite?.setVisible) enemy.sprite.setVisible(true);
+        this.clearBurrowShadow(enemy);
+        this.clearBurrowSurfaceMarker(enemy);
+        this.emitBurrowSurfaceDust(enemy);
+        enemy.burrowState = "surface";
+      }
+      return;
+    }
+
+    if (enemy.burrowState === "surface") {
+      this.updateWalkerEnemy(enemy, deltaMs);
+    }
+  }
+
+  showBurrowTelegraph(enemy, burrowCenter, surfaceCenter) {
+    const telegraphKey = enemy.definition.telegraphTextureKey;
+    const markerKey = enemy.definition.surfaceMarkerTextureKey;
+    if (telegraphKey && this.textures?.exists?.(telegraphKey)) {
+      enemy.burrowTelegraphGraphic = this.add.image(
+        burrowCenter.x,
+        burrowCenter.y,
+        telegraphKey
+      );
+      enemy.burrowTelegraphGraphic.setDepth(4);
+    } else if (typeof this.add?.circle === "function") {
+      enemy.burrowTelegraphGraphic = this.add.circle(
+        burrowCenter.x,
+        burrowCenter.y,
+        22,
+        0x4a2f1a,
+        0.65
+      );
+      enemy.burrowTelegraphGraphic.setStrokeStyle(2, 0xc4925a, 0.9);
+      enemy.burrowTelegraphGraphic.setDepth(4);
+    }
+    if (markerKey && this.textures?.exists?.(markerKey)) {
+      enemy.burrowSurfaceMarker = this.add.image(
+        surfaceCenter.x,
+        surfaceCenter.y,
+        markerKey
+      );
+      enemy.burrowSurfaceMarker.setAlpha(0.85);
+      enemy.burrowSurfaceMarker.setDepth(4);
+    } else if (typeof this.add?.circle === "function") {
+      enemy.burrowSurfaceMarker = this.add.circle(
+        surfaceCenter.x,
+        surfaceCenter.y,
+        18,
+        0x8a5a2a,
+        0.55
+      );
+      enemy.burrowSurfaceMarker.setStrokeStyle(2, 0xc4925a, 0.85);
+      enemy.burrowSurfaceMarker.setDepth(4);
+    }
+  }
+
+  clearBurrowTelegraph(enemy) {
+    if (enemy.burrowTelegraphGraphic) {
+      enemy.burrowTelegraphGraphic.destroy();
+      enemy.burrowTelegraphGraphic = null;
+    }
+  }
+
+  showBurrowSurfaceMarker(enemy, surfaceCenter) {
+    if (enemy.burrowSurfaceMarker) return;
+    const markerKey = enemy.definition.surfaceMarkerTextureKey;
+    if (markerKey && this.textures?.exists?.(markerKey)) {
+      enemy.burrowSurfaceMarker = this.add.image(
+        surfaceCenter.x,
+        surfaceCenter.y,
+        markerKey
+      );
+      enemy.burrowSurfaceMarker.setAlpha(0.55);
+      enemy.burrowSurfaceMarker.setDepth(4);
+    } else if (typeof this.add?.circle === "function") {
+      enemy.burrowSurfaceMarker = this.add.circle(
+        surfaceCenter.x,
+        surfaceCenter.y,
+        18,
+        0x8a5a2a,
+        0.45
+      );
+      enemy.burrowSurfaceMarker.setStrokeStyle(2, 0xc4925a, 0.7);
+      enemy.burrowSurfaceMarker.setDepth(4);
+    }
+  }
+
+  clearBurrowSurfaceMarker(enemy) {
+    if (enemy.burrowSurfaceMarker) {
+      enemy.burrowSurfaceMarker.destroy();
+      enemy.burrowSurfaceMarker = null;
+    }
+  }
+
+  showBurrowShadow(enemy) {
+    const key = enemy.definition.shadowTextureKey;
+    if (key && this.textures?.exists?.(key)) {
+      enemy.burrowShadow = this.add.image(enemy.x, enemy.y + 6, key);
+      enemy.burrowShadow.setAlpha(0.75);
+      enemy.burrowShadow.setDepth(5);
+    } else if (typeof this.add?.graphics === "function") {
+      const g = this.add.graphics();
+      g.fillStyle(0x000000, 0.42);
+      g.fillEllipse(0, 0, 30, 10);
+      g.setDepth(5);
+      g.setPosition(enemy.x, enemy.y + 6);
+      enemy.burrowShadow = g;
+    }
+  }
+
+  updateBurrowShadow(enemy) {
+    if (!enemy.burrowShadow) return;
+    if (typeof enemy.burrowShadow.setPosition === "function") {
+      enemy.burrowShadow.setPosition(enemy.x, enemy.y + 6);
+    }
+  }
+
+  clearBurrowShadow(enemy) {
+    if (enemy.burrowShadow) {
+      enemy.burrowShadow.destroy();
+      enemy.burrowShadow = null;
+    }
+  }
+
+  emitBurrowSurfaceDust(enemy) {
+    const key = enemy.definition.dustTextureKey;
+    let dust = null;
+    if (key && this.textures?.exists?.(key)) {
+      dust = this.add.image(enemy.x, enemy.y, key);
+      dust.setDepth(6);
+      dust.setAlpha(0.95);
+    } else if (typeof this.add?.circle === "function") {
+      dust = this.add.circle(enemy.x, enemy.y, 14, 0xd9b98a, 0.9);
+      dust.setDepth(6);
+    }
+    if (!dust) return;
+    enemy.burrowDustBurst = dust;
+    if (this.tweens?.add) {
+      this.tweens.add({
+        targets: dust,
+        scale: 1.8,
+        alpha: 0,
+        duration: 360,
+        ease: "Sine.Out",
+        onComplete: () => {
+          dust.destroy();
+          if (enemy.burrowDustBurst === dust) enemy.burrowDustBurst = null;
+        },
+      });
+    } else {
+      dust.destroy();
+      enemy.burrowDustBurst = null;
+    }
+  }
+
+  cleanupBurrowGraphics(enemy) {
+    this.clearBurrowTelegraph(enemy);
+    this.clearBurrowSurfaceMarker(enemy);
+    this.clearBurrowShadow(enemy);
+    if (enemy.burrowDustBurst) {
+      enemy.burrowDustBurst.destroy();
+      enemy.burrowDustBurst = null;
     }
   }
 
@@ -1814,6 +2036,7 @@ export class PlayScene extends Phaser.Scene {
             requiredDefendersInLane: enemy.definition.requiredDefendersInLane || 0,
             behavior: enemy.definition.behavior || "walker",
             flying: enemy.definition.flying === true,
+            invulnerable: enemy.invulnerable === true,
             statusEffects,
           };
           if (enemy.definition.flying === true) {
@@ -1826,6 +2049,21 @@ export class PlayScene extends Phaser.Scene {
               cooldownMs: Math.max(0, Math.round(enemy.cooldownMs || 0)),
               targetDefenderId: enemy.targetDefenderId,
               targetTileKey: enemy.targetTileKey,
+            };
+          }
+          if (enemy.definition.behavior === "burrow") {
+            base.burrow = {
+              state: enemy.burrowState,
+              telegraphRemainingMs:
+                enemy.burrowState === "telegraph"
+                  ? Math.max(0, Math.round(enemy.telegraphTimerMs || 0))
+                  : 0,
+              underpassRemainingMs:
+                enemy.burrowState === "underpass"
+                  ? Math.max(0, Math.round(enemy.underpassTimerMs || 0))
+                  : 0,
+              burrowAtCol: enemy.definition.burrowAtCol,
+              surfaceAtCol: enemy.definition.surfaceAtCol,
             };
           }
           return base;
@@ -2138,6 +2376,14 @@ export class PlayScene extends Phaser.Scene {
       altitude: definition.behavior === "flying" ? definition.altitude || 0 : 0,
       bobPhaseMs: 0,
       shadow: null,
+      invulnerable: false,
+      burrowState: definition.behavior === "burrow" ? "approach" : null,
+      telegraphTimerMs: 0,
+      underpassTimerMs: 0,
+      burrowTelegraphGraphic: null,
+      burrowSurfaceMarker: null,
+      burrowShadow: null,
+      burrowDustBurst: null,
     };
 
     if (definition.behavior === "flying") {
@@ -2192,6 +2438,7 @@ export class PlayScene extends Phaser.Scene {
       if (enemy.destroyed || enemy.lane !== row || enemy.x <= originX + 6) {
         continue;
       }
+      if (enemy.invulnerable === true) continue;
 
       if (!match || enemy.x < match.x) {
         match = enemy;
@@ -2209,6 +2456,7 @@ export class PlayScene extends Phaser.Scene {
       if (enemy.destroyed || enemy.lane !== row || enemy.x <= originX + 6) {
         continue;
       }
+      if (enemy.invulnerable === true) continue;
       // Arc v1 is ground-only. Flying enemies remain explicitly excluded from
       // the rearmost selector until a future anti-air arc contract exists.
       if (enemy.definition.flying === true || enemy.x > maxX) {
@@ -2225,6 +2473,9 @@ export class PlayScene extends Phaser.Scene {
 
   getBlockingDefender(enemy) {
     if (enemy.definition.flying === true) {
+      return null;
+    }
+    if (enemy.invulnerable === true) {
       return null;
     }
 
@@ -2262,6 +2513,7 @@ export class PlayScene extends Phaser.Scene {
       if (enemy.destroyed || enemy.lane !== projectile.lane) {
         continue;
       }
+      if (enemy.invulnerable === true) continue;
 
       if (enemy.definition.flying === true && !projectile.canHitFlying) {
         continue;
@@ -2330,6 +2582,9 @@ export class PlayScene extends Phaser.Scene {
   }
 
   damageEnemy(enemy, damage) {
+    if (!enemy || enemy.destroyed || enemy.invulnerable === true) {
+      return;
+    }
     const effectiveDamage = this.getEffectiveProjectileDamage(enemy, damage);
     enemy.hp -= effectiveDamage;
     enemy.sprite.setTint(0xffffff).setTintMode(Phaser.TintModes.FILL);
@@ -2364,6 +2619,7 @@ export class PlayScene extends Phaser.Scene {
       enemy.shadow.destroy();
       enemy.shadow = null;
     }
+    this.cleanupBurrowGraphics(enemy);
 
     if (awardScore) {
       this.score += enemy.definition.score;

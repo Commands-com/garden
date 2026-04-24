@@ -3173,6 +3173,11 @@ kbd {
   color: #f0e6ff;
 }
 
+.game-scout__badge--burrow {
+  background: #5a3a1a;
+  color: #f4d9a8;
+}
+
 .game-scout__waves {
   display: flex;
   flex-direction: column;

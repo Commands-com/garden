@@ -716,6 +716,14 @@ class ScenarioSimulator {
       targetX: 0,
       targetY: 0,
       statusEffects: {},
+      // Burrow fields — mirror runtime spawnEnemy so beam-search reasons about
+      // dive/surface timing identically. `invulnerable` is the data-driven gate
+      // that all helpers (targeting, damage, status) read; burrow enemies flip
+      // it true during the underpass phase and false on surface.
+      invulnerable: false,
+      burrowState: definition.behavior === "burrow" ? "approach" : null,
+      telegraphTimerMs: 0,
+      underpassTimerMs: 0,
       destroyed: false,
     });
     return true;
@@ -823,6 +831,9 @@ class ScenarioSimulator {
         if (enemy.destroyed) continue;
         if (enemy.lane !== defender.row) continue;
         if (enemy.x < zoneMinX || enemy.x > zoneMaxX) continue;
+        // Burrowers in underpass are untouchable by status effects too —
+        // match runtime applyStatusEffect gate.
+        if (enemy.invulnerable === true) continue;
 
         applyStatusEffect(
           enemy,
@@ -885,6 +896,9 @@ class ScenarioSimulator {
           if (enemy.definition.flying === true && !projectile.canHitFlying) {
             continue;
           }
+          if (enemy.invulnerable === true) {
+            continue;
+          }
           if (projectile.hitEnemies.has(enemy)) {
             continue;
           }
@@ -933,24 +947,105 @@ class ScenarioSimulator {
         continue;
       }
 
-      const blocker = this.getBlockingDefender(enemy);
-      if (blocker) {
-        enemy.attackCooldownMs -= deltaMs;
-        enemy.x = Math.max(enemy.x, blocker.x + enemy.definition.contactRange);
+      if (enemy.definition.behavior === "burrow") {
+        this.updateBurrowEnemy(enemy, deltaMs);
+        continue;
+      }
 
-        if (enemy.attackCooldownMs <= 0) {
-          enemy.attackCooldownMs = getEffectiveCadence(enemy, enemy.definition.attackCadenceMs);
-          this.damageDefender(blocker, enemy.definition.attackDamage);
-        }
-      } else {
-        enemy.attackCooldownMs = Math.max(0, enemy.attackCooldownMs - deltaMs);
-        enemy.x -= getEffectiveSpeed(enemy) * (deltaMs / 1000);
+      this.updateWalkerEnemy(enemy, deltaMs);
+    }
+  }
 
-        if (enemy.x <= BREACH_X) {
-          this.resolveBreach(enemy);
-        }
+  // Extracted walker body so updateBurrowEnemy can reuse the exact same
+  // approach/surface pathing (including attack/blocker resolution) without
+  // duplicating logic. `options.ignoreBlockers` is set while a burrower is in
+  // its approach phase so defenders do not block it pre-dive.
+  updateWalkerEnemy(enemy, deltaMs, options = {}) {
+    const ignoreBlockers = options.ignoreBlockers === true;
+    const blocker = ignoreBlockers ? null : this.getBlockingDefender(enemy);
+    if (blocker) {
+      enemy.attackCooldownMs -= deltaMs;
+      enemy.x = Math.max(enemy.x, blocker.x + enemy.definition.contactRange);
+
+      if (enemy.attackCooldownMs <= 0) {
+        enemy.attackCooldownMs = getEffectiveCadence(enemy, enemy.definition.attackCadenceMs);
+        this.damageDefender(blocker, enemy.definition.attackDamage);
+      }
+    } else {
+      enemy.attackCooldownMs = Math.max(0, enemy.attackCooldownMs - deltaMs);
+      enemy.x -= getEffectiveSpeed(enemy) * (deltaMs / 1000);
+
+      if (enemy.x <= BREACH_X) {
+        this.resolveBreach(enemy);
       }
     }
+  }
+
+  // Mirror of play.js updateBurrowEnemy. Four states:
+  //   approach   — walk toward burrowAtCol, blockers ignored (the enemy dives
+  //                before engaging), invulnerable=false.
+  //   telegraph  — stationary at burrowAtCol for telegraphMs; invulnerable=false
+  //                so Board Scout players can still damage pre-dive.
+  //   underpass  — sprite hidden, invulnerable=true, travel at underpassSpeed
+  //                to surfaceX (computed from surfaceAtCol), timeout-aborts via
+  //                underpassTimeoutMs.
+  //   surface    — walker behavior resumes; invulnerable=false.
+  // Timing values are read from the definition so runtime/validator stay in
+  // lockstep — no hard-coded constants.
+  updateBurrowEnemy(enemy, deltaMs) {
+    const def = enemy.definition;
+    const burrowAtCol = Number.isFinite(def.burrowAtCol) ? def.burrowAtCol : 2;
+    const surfaceAtCol = Number.isFinite(def.surfaceAtCol) ? def.surfaceAtCol : 0;
+    const telegraphMs = Number.isFinite(def.telegraphMs) ? def.telegraphMs : 650;
+    const underpassSpeed = Number.isFinite(def.underpassSpeed) ? def.underpassSpeed : 110;
+    const underpassTimeoutMs = Number.isFinite(def.underpassTimeoutMs)
+      ? def.underpassTimeoutMs
+      : 4000;
+
+    // Burrow/surface x anchors: mirror play.js exactly. burrowX is the column
+    // center minus a half-cell inset so the dive visually lines up with the
+    // telegraph decal; surfaceX uses the same inset.
+    const burrowX = getCellCenter(enemy.lane, burrowAtCol).x - CELL_WIDTH / 2 - 2;
+    const surfaceX = getCellCenter(enemy.lane, surfaceAtCol).x - CELL_WIDTH / 2 - 2;
+
+    if (enemy.burrowState === "approach") {
+      if (enemy.x <= burrowX) {
+        enemy.x = burrowX;
+        enemy.burrowState = "telegraph";
+        enemy.telegraphTimerMs = telegraphMs;
+        enemy.invulnerable = false;
+        return;
+      }
+      this.updateWalkerEnemy(enemy, deltaMs, { ignoreBlockers: true });
+      return;
+    }
+
+    if (enemy.burrowState === "telegraph") {
+      enemy.invulnerable = false;
+      enemy.telegraphTimerMs -= deltaMs;
+      if (enemy.telegraphTimerMs <= 0) {
+        enemy.burrowState = "underpass";
+        enemy.underpassTimerMs = underpassTimeoutMs;
+        enemy.invulnerable = true;
+      }
+      return;
+    }
+
+    if (enemy.burrowState === "underpass") {
+      enemy.invulnerable = true;
+      enemy.underpassTimerMs -= deltaMs;
+      enemy.x -= underpassSpeed * (deltaMs / 1000);
+      if (enemy.x <= surfaceX || enemy.underpassTimerMs <= 0) {
+        enemy.x = surfaceX;
+        enemy.burrowState = "surface";
+        enemy.invulnerable = false;
+      }
+      return;
+    }
+
+    // surface — resume walker behavior
+    enemy.invulnerable = false;
+    this.updateWalkerEnemy(enemy, deltaMs);
   }
 
   updateSniperEnemy(enemy, deltaMs) {
@@ -1029,6 +1124,11 @@ class ScenarioSimulator {
       if (enemy.destroyed || enemy.lane !== row || enemy.x <= originX + 6) {
         continue;
       }
+      // Invulnerable enemies (e.g. burrowers mid-underpass) are not valid
+      // targets for attackers; skip them so beam search doesn't credit damage.
+      if (enemy.invulnerable === true) {
+        continue;
+      }
 
       if (!match || enemy.x < match.x) {
         match = enemy;
@@ -1050,6 +1150,9 @@ class ScenarioSimulator {
       if (enemy.definition.flying === true || enemy.x > maxX) {
         continue;
       }
+      if (enemy.invulnerable === true) {
+        continue;
+      }
 
       if (!match || enemy.x > match.x) {
         match = enemy;
@@ -1061,6 +1164,11 @@ class ScenarioSimulator {
 
   getBlockingDefender(enemy) {
     if (enemy.definition.flying === true) {
+      return null;
+    }
+    // Burrowers underpass right past defenders — mirror runtime by returning
+    // no blocker while invulnerable.
+    if (enemy.invulnerable === true) {
       return null;
     }
 
@@ -1094,6 +1202,9 @@ class ScenarioSimulator {
       if (enemy.definition.flying === true && !projectile.canHitFlying) {
         continue;
       }
+      if (enemy.invulnerable === true) {
+        continue;
+      }
 
       const hitRadius = projectile.radius + enemy.definition.radius * 0.8;
       const distance = Math.abs(enemy.x - projectile.x);
@@ -1119,6 +1230,7 @@ class ScenarioSimulator {
       if (enemy.destroyed) continue;
       if (sameLaneOnly && enemy.lane !== lane) continue;
       if (enemy.definition.flying === true && !projectile.canHitFlying) continue;
+      if (enemy.invulnerable === true) continue;
 
       const dx = enemy.x - centerX;
       const dy = getLaneY(enemy.lane) - centerY;
@@ -1139,7 +1251,7 @@ class ScenarioSimulator {
     const centerY = options.centerY ?? getLaneY(impactLane);
     const sameLaneOnly = options.sameLaneOnly === true;
 
-    if (primaryEnemy && !primaryEnemy.destroyed) {
+    if (primaryEnemy && !primaryEnemy.destroyed && primaryEnemy.invulnerable !== true) {
       this.damageEnemy(primaryEnemy, projectile.damage);
     }
 
@@ -1147,6 +1259,7 @@ class ScenarioSimulator {
       if (enemy === primaryEnemy || enemy.destroyed) continue;
       if (sameLaneOnly && enemy.lane !== impactLane) continue;
       if (enemy.definition.flying === true && !projectile.canHitFlying) continue;
+      if (enemy.invulnerable === true) continue;
 
       const dx = enemy.x - centerX;
       const dy = getLaneY(enemy.lane) - centerY;
@@ -1286,6 +1399,11 @@ class ScenarioSimulator {
   }
 
   damageEnemy(enemy, damage) {
+    // Defensive guard: callers already skip invulnerable enemies, but this
+    // matches play.js so a stray damage call can't blow through the gate.
+    if (enemy.invulnerable === true) {
+      return;
+    }
     enemy.hp -= this.getEffectiveProjectileDamage(enemy, damage);
     if (enemy.hp <= 0) {
       enemy.destroyed = true;

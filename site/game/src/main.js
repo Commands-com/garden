@@ -386,6 +386,11 @@ function renderBoardScout(dayDate, assetCatalog) {
         el("span", { className: "game-scout__badge game-scout__badge--flying" }, "Flying")
       );
     }
+    if (enemy.behavior === "burrow") {
+      badges.push(
+        el("span", { className: "game-scout__badge game-scout__badge--burrow" }, "Burrow")
+      );
+    }
     const card = el(
       "button",
       {
@@ -638,6 +643,34 @@ function selectScoutCard(card, type, data, scenario) {
           el("dd", {}, "Support > Piercing attacker > Attacker"),
           el("dt", {}, "Counterplay"),
           el("dd", {}, "Screen it — plant an attacker or a defender/wall between sniper and target"),
+          el("dt", {}, "Appears In"),
+          el("dd", {}, wavePresence.join(", ") || "No scripted waves")
+        )
+      );
+    } else if (data.behavior === "burrow") {
+      detail.append(
+        el("h4", { className: "game-scout__detail-title", id: "game-scout-detail-title" }, data.label),
+        el(
+          "dl",
+          { className: "game-scout__detail-stats" },
+          el("dt", {}, "HP"),
+          el("dd", {}, String(data.maxHealth)),
+          el("dt", {}, "Speed"),
+          el("dd", {}, String(data.speed)),
+          el("dt", {}, "Attack Damage"),
+          el("dd", {}, String(data.attackDamage)),
+          el("dt", {}, "Attack Cadence"),
+          el("dd", {}, `${data.attackCadenceMs}ms`),
+          el("dt", {}, "Dive column"),
+          el("dd", {}, String(data.burrowAtCol)),
+          el("dt", {}, "Surfaces at"),
+          el("dd", {}, String(data.surfaceAtCol)),
+          el("dt", {}, "Telegraph"),
+          el("dd", {}, `${data.telegraphMs}ms`),
+          el("dt", {}, "Under-speed"),
+          el("dd", {}, `${data.underpassSpeed} px/s`),
+          el("dt", {}, "Counterplay"),
+          el("dd", {}, "Invulnerable while underpassed; only contact-damages the garden after surfacing"),
           el("dt", {}, "Appears In"),
           el("dd", {}, wavePresence.join(", ") || "No scripted waves")
         )

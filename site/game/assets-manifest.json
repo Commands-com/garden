@@ -416,6 +416,85 @@
           "frameHeight": 64
         }
       }
+    },
+    {
+      "id": "loamspike-walk",
+      "type": "sprite",
+      "kind": "animation",
+      "provider": "repo",
+      "path": "/game/assets/manual/enemies/loamspike-walk-sheet.png",
+      "prompt": "Hand-authored Loamspike Burrower walk+burrow spritesheet for the April 24 runtime. 4x4 grid of 64x64 frames; gameplay-facing walk row indices [12,13,14,15] match the existing walker enemy pattern (briar-beetle, shard-mite). Portrait reference lives at loamspike-walk.svg; the PNG is produced by the asset pipeline. Boot procedural fallback covers the texture until the PNG ships.",
+      "generatedAt": "2026-04-24T00:00:00.000Z",
+      "metadata": {
+        "category": "enemy",
+        "format": "png",
+        "width": 256,
+        "height": 256,
+        "phaser": {
+          "frameWidth": 64,
+          "frameHeight": 64
+        }
+      }
+    },
+    {
+      "id": "loamspike-telegraph",
+      "type": "sprite",
+      "kind": "sprite",
+      "provider": "repo",
+      "path": "/game/assets/manual/enemies/loamspike-telegraph.svg",
+      "prompt": "Hand-authored repo asset for the April 24 Loamspike dive telegraph. Soil-crack decal anchored at the dive column so the player can read where the burrower is about to go under.",
+      "generatedAt": "2026-04-24T00:00:00.000Z",
+      "metadata": {
+        "category": "decal",
+        "format": "svg",
+        "width": 64,
+        "height": 64
+      }
+    },
+    {
+      "id": "loamspike-surface-marker",
+      "type": "sprite",
+      "kind": "sprite",
+      "provider": "repo",
+      "path": "/game/assets/manual/enemies/loamspike-surface-marker.svg",
+      "prompt": "Hand-authored repo asset for the April 24 Loamspike surface marker. Subtle ground-crack at the surface column, visible from telegraph through underpass so surface prediction is readable.",
+      "generatedAt": "2026-04-24T00:00:00.000Z",
+      "metadata": {
+        "category": "decal",
+        "format": "svg",
+        "width": 64,
+        "height": 64
+      }
+    },
+    {
+      "id": "loamspike-underpass-shadow",
+      "type": "sprite",
+      "kind": "sprite",
+      "provider": "repo",
+      "path": "/game/assets/manual/enemies/loamspike-underpass-shadow.svg",
+      "prompt": "Hand-authored repo asset for the April 24 Loamspike underpass shadow. Semi-transparent tracking shadow that follows the burrower's x-position while underground so the player can see where it is.",
+      "generatedAt": "2026-04-24T00:00:00.000Z",
+      "metadata": {
+        "category": "decal",
+        "format": "svg",
+        "width": 64,
+        "height": 32
+      }
+    },
+    {
+      "id": "loamspike-surface-dust",
+      "type": "sprite",
+      "kind": "sprite",
+      "provider": "repo",
+      "path": "/game/assets/manual/particles/loamspike-surface-dust.svg",
+      "prompt": "Hand-authored repo asset for the April 24 Loamspike surface dust burst. One-shot puffball decal emitted when the burrower emerges from underpass.",
+      "generatedAt": "2026-04-24T00:00:00.000Z",
+      "metadata": {
+        "category": "particle",
+        "format": "svg",
+        "width": 48,
+        "height": 48
+      }
     }
   ]
 }

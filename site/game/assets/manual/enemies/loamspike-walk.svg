@@ -1,0 +1,34 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" role="img" aria-labelledby="title desc">
+  <title id="title">Loamspike Burrower reference</title>
+  <desc id="desc">Armored soil-digger with plated spine and forward claws. Reference portrait for the loamspike-walk spritesheet; the animation PNG is produced by the asset pipeline and falls back to a procedural circle until it lands.</desc>
+  <defs>
+    <linearGradient id="carapace" x1="0" x2="0" y1="0" y2="1">
+      <stop offset="0%" stop-color="#8c5a2a"/>
+      <stop offset="100%" stop-color="#3a210f"/>
+    </linearGradient>
+    <radialGradient id="eye" cx="50%" cy="50%" r="60%">
+      <stop offset="0%" stop-color="#ffedaa"/>
+      <stop offset="100%" stop-color="#8a4a12"/>
+    </radialGradient>
+  </defs>
+  <ellipse cx="64" cy="108" rx="38" ry="10" fill="#0b0609" opacity=".42"/>
+  <path d="M42 72 C40 52 52 40 64 40 C76 40 88 52 86 72 C98 74 104 88 98 100 C86 110 42 110 30 100 C24 88 30 74 42 72 Z"
+        fill="url(#carapace)" stroke="#1c110a" stroke-width="3"/>
+  <g stroke="#5a3a1a" stroke-width="2" fill="none" opacity="0.85">
+    <path d="M52 54 L48 76"/>
+    <path d="M62 50 L60 80"/>
+    <path d="M72 52 L74 78"/>
+    <path d="M80 58 L84 80"/>
+  </g>
+  <g fill="#f4d9a8">
+    <polygon points="48,44 52,36 56,44"/>
+    <polygon points="60,40 64,30 68,40"/>
+    <polygon points="72,44 76,36 80,44"/>
+  </g>
+  <circle cx="56" cy="62" r="4" fill="url(#eye)"/>
+  <circle cx="72" cy="62" r="4" fill="url(#eye)"/>
+  <circle cx="56" cy="62" r="1.4" fill="#1c110a"/>
+  <circle cx="72" cy="62" r="1.4" fill="#1c110a"/>
+  <path d="M44 90 L36 100 L46 100 Z" fill="#3a210f" stroke="#1c110a" stroke-width="2"/>
+  <path d="M84 90 L92 100 L82 100 Z" fill="#3a210f" stroke="#1c110a" stroke-width="2"/>
+</svg>
