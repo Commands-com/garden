@@ -2,6 +2,25 @@
   "schemaVersion": 1,
   "days": [
     {
+      "date": "2026-04-24",
+      "title": "Loamspike Burrower — Burrow Runtime and the Undermined Board",
+      "summary": "Lands the Loamspike Burrower runtime and publishes the Undermined daily board, where a telegraphed burrow enemy dives under the front line, surfaces behind it, and forces depth-aware defense before endless unlocks.",
+      "status": "shipped",
+      "featureType": "game",
+      "tags": [
+        "game",
+        "rootline-defense",
+        "loamspike-burrower",
+        "burrow",
+        "enemy-contract",
+        "undermined",
+        "board-scout",
+        "scenario",
+        "playwright"
+      ],
+      "publishedAt": "2026-04-24T12:00:00.000Z"
+    },
+    {
       "date": "2026-04-23",
       "title": "Loamspike Burrower — First Burrow Enemy Pressure Day",
       "summary": "Publishes the April 23 decision bundle for Loamspike Burrower so the homepage, score comparison, and day-detail archive advance to the first burrow-behavior day instead of stalling on the April 22 republish entry.",

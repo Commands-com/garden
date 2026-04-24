@@ -1,0 +1,29 @@
+{
+  "schemaVersion": 1,
+  "id": "2026-04-24-undermined-clear",
+  "date": "2026-04-24",
+  "mode": "challenge",
+  "coordinateBase": 0,
+  "label": "April 24 — Undermined canonical clear under scripted Loamspike pressure",
+  "description": "Canonical April 24 challenge-clear line. The board scripts 5 Loamspike Burrowers across waves 2–4; this fixture clears the run through all of them. Opens with a corner Sunroot Bloom at (0, 0) for sap economy, saturates lanes 1–3 (the loamspike lanes) with Thorn Vines at col 0/1 to apply approach pressure, and reaches the 3-defender glass-ram threshold in lanes 0 and 2 by the time wave-2 (t=27.5s) and wave-4 (t=79s) Glass Rams arrive. A rear Cottonburr Mortar at (2, 3) is placed at 01:12 (t=72000) as the scripted counterplay for wave 4's stacked burrower pressure. This fixture proves clearability of the Undermined challenge under Loamspike pressure — it is NOT an A/B load-bearing test (i.e. it does not prove Loamspike is the difference between clear and no-clear vs. a stripped roster); that comparison is left to a future AC-9 beam-search validator enhancement. coordinateBase stays 0 because the runtime replay harness consumes internal board coordinates.",
+  "expect": {
+    "outcome": "cleared",
+    "challengeOutcome": "cleared"
+  },
+  "actions": [
+    { "atMs": 200, "type": "place", "plantId": "sunrootBloom", "row": 0, "col": 0 },
+    { "atMs": 5500, "type": "place", "plantId": "thornVine", "row": 2, "col": 0 },
+    { "atMs": 10500, "type": "place", "plantId": "thornVine", "row": 1, "col": 0 },
+    { "atMs": 15500, "type": "place", "plantId": "thornVine", "row": 2, "col": 1 },
+    { "atMs": 20500, "type": "place", "plantId": "thornVine", "row": 3, "col": 0 },
+    { "atMs": 24500, "type": "place", "plantId": "amberWall", "row": 2, "col": 2 },
+    { "atMs": 28500, "type": "place", "plantId": "thornVine", "row": 4, "col": 0 },
+    { "atMs": 33500, "type": "place", "plantId": "thornVine", "row": 0, "col": 1 },
+    { "atMs": 38500, "type": "place", "plantId": "thornVine", "row": 0, "col": 2 },
+    { "atMs": 44500, "type": "place", "plantId": "thornVine", "row": 1, "col": 1 },
+    { "atMs": 50500, "type": "place", "plantId": "thornVine", "row": 3, "col": 1 },
+    { "atMs": 55500, "type": "place", "plantId": "amberWall", "row": 4, "col": 1 },
+    { "atMs": 65000, "type": "place", "plantId": "amberWall", "row": 1, "col": 2 },
+    { "atMs": 72000, "type": "place", "plantId": "cottonburrMortar", "row": 2, "col": 3 }
+  ]
+}

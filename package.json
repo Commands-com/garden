@@ -22,6 +22,8 @@
     "bot:play-scenario": "node --no-warnings scripts/bot-play-scenario.mjs",
     "ai:play-scenario": "node --no-warnings scripts/ai-play-scenario.mjs",
     "codex:plan-scenario": "node --no-warnings scripts/codex-plan-scenario.mjs",
+    "asset:loamspike-walk-sheet": "node scripts/generate-loamspike-walk-sheet.js",
+    "pretest:uiux": "node scripts/generate-loamspike-walk-sheet.js",
     "test:uiux": "npx playwright test --config=playwright.config.js"
   },
   "dependencies": {

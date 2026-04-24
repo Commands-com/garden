@@ -141,21 +141,21 @@ test.describe("Loamspike Burrower — 2026-04-24 Undermined", () => {
     await prepareGamePage(page);
 
     const scenarioShape = await page.evaluate(async () => {
-      const { getScenarioByDate } = await import(
+      const { getScenarioForDate } = await import(
         "/game/src/config/scenarios.js"
       );
-      const scenario = getScenarioByDate("2026-04-24");
+      const scenario = getScenarioForDate("2026-04-24");
       const allEnemyIds = new Set();
       for (const wave of scenario?.challenge?.waves || []) {
-        for (const spawn of wave.spawns || []) {
-          allEnemyIds.add(spawn.enemyId);
+        for (const event of wave.events || []) {
+          allEnemyIds.add(event.enemyId);
         }
       }
       return {
         date: scenario?.date,
         title: scenario?.title,
         hasLoamspike: allEnemyIds.has("loamspikeBurrower"),
-        endlessPool: scenario?.endless?.enemyPool || [],
+        endlessPool: scenario?.challenge?.endless?.enemyPool || [],
       };
     });
 
@@ -276,11 +276,10 @@ test.describe("Loamspike Burrower — 2026-04-24 Undermined", () => {
     await startChallenge(page);
     await suppressPassiveIncome(page);
 
-    // Place a Thorn Vine in lane 2 to pepper the burrower with projectiles.
-    await page.evaluate(() => window.__gameTestHooks.grantResources(200));
-    await page.evaluate(() =>
-      window.__gameTestHooks.placeDefender(2, 1, "thornVine")
-    );
+    // Spawn the burrower first so it can reach underpass without being shot
+    // down during approach. The Thorn Vine is then placed after the enemy
+    // submerges — the assertion target is the invulnerable window, not the
+    // approach phase.
     await page.evaluate(() =>
       window.__gameTestHooks.spawnEnemy(2, "loamspikeBurrower")
     );
@@ -305,6 +304,14 @@ test.describe("Loamspike Burrower — 2026-04-24 Undermined", () => {
       );
       return enemy.hp;
     });
+
+    // Place a Thorn Vine in lane 2 now that the burrower is invulnerable —
+    // the vine will attempt to target the enemy every ~900ms but must skip
+    // every invulnerable hit.
+    await page.evaluate(() => window.__gameTestHooks.grantResources(200));
+    await page.evaluate(() =>
+      window.__gameTestHooks.placeDefender(2, 1, "thornVine")
+    );
 
     // Advance a beat — during underpass, projectile targeting must skip the
     // burrower entirely, so HP must not decrease.
@@ -395,7 +402,7 @@ test.describe("Loamspike Burrower — 2026-04-24 Undermined", () => {
     }
 
     const burrowEntry = allEnemies.find(
-      (enemy) => enemy.id === "loamspikeBurrower" && enemy.burrow
+      (enemy) => enemy.enemyId === "loamspikeBurrower" && enemy.burrow
     );
     expect(burrowEntry).toBeTruthy();
     expect(burrowEntry.invulnerable).toBe(true);

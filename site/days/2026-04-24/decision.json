@@ -1,0 +1,363 @@
+{
+  "schemaVersion": 2,
+  "runDate": "2026-04-24",
+  "generatedAt": "2026-04-24T12:00:00.000Z",
+  "scoringDimensions": [
+    {
+      "id": "compoundingValue",
+      "label": "Compounding Value"
+    },
+    {
+      "id": "usefulnessClarity",
+      "label": "Usefulness & Clarity"
+    },
+    {
+      "id": "noveltySurprise",
+      "label": "Novelty & Surprise"
+    },
+    {
+      "id": "feasibility",
+      "label": "Feasibility"
+    },
+    {
+      "id": "legibility",
+      "label": "Legibility"
+    },
+    {
+      "id": "continuity",
+      "label": "Continuity"
+    },
+    {
+      "id": "shareability",
+      "label": "Shareability"
+    }
+  ],
+  "judgePanel": [
+    {
+      "agentId": "explore_explorer_0",
+      "displayName": "GPT (Visitor)",
+      "conceptKey": "openai",
+      "modelFamily": "gpt",
+      "provider": "codex_cli",
+      "model": "gpt-5.4",
+      "lens": "visitor"
+    },
+    {
+      "agentId": "explore_explorer_1",
+      "displayName": "Claude (Gardener)",
+      "conceptKey": "claude",
+      "modelFamily": "claude",
+      "provider": "claude",
+      "model": "opus",
+      "lens": "gardener"
+    },
+    {
+      "agentId": "explore_explorer_2",
+      "displayName": "Gemini Pro (Explorer)",
+      "conceptKey": "gemini",
+      "modelFamily": "gemini",
+      "provider": "gemini_cli",
+      "model": "gemini-3.1-pro-preview",
+      "lens": "explorer"
+    }
+  ],
+  "summary": "April 24 introduces the Loamspike Burrower and the Undermined daily board. Board strategy shifts from simple front-line wall stacking to depth-aware placement: Loamspikes telegraph a dive at column 2, go invulnerable during underpass, and surface breach-side of column 0 where a front-stack Amber Wall cannot answer alone. Roster depth is fully utilized as players must combine front blockers with a rear Cottonburr to catch the burrower on surface. Onboarding succeeds because the tutorial explicitly teaches the burrow mechanic before the challenge, and Board Scout previews the burrow fields. Endless remains post-clear and excludes Loamspike in v1 — the Loamspike is a scripted-only challenge boss rather than an endless variety source. Visible asset quality ships with new hand-authored sprites for the walk sheet, telegraphs, underpass shadows, and surface dust. The tutorial still teaches the current daily challenge and the board feels hard-but-winnable rather than inevitably doomed.",
+  "candidates": [
+    {
+      "id": "candidate-1",
+      "title": "Loamspike Burrower — Burrow Runtime and the Undermined Board",
+      "summary": "Ship the reusable burrow enemy contract, add Loamspike Burrower as the first scripted burrow threat, and publish the April 24 Undermined board where front-only Amber Wall defense stops being a complete answer.",
+      "averageScore": 8.8,
+      "reviewCount": 3,
+      "rank": 1,
+      "dimensionAverages": {
+        "compoundingValue": {
+          "label": "Compounding Value",
+          "average": 9.1,
+          "reviewCount": 3
+        },
+        "usefulnessClarity": {
+          "label": "Usefulness & Clarity",
+          "average": 8.6,
+          "reviewCount": 3
+        },
+        "noveltySurprise": {
+          "label": "Novelty & Surprise",
+          "average": 8.7,
+          "reviewCount": 3
+        },
+        "feasibility": {
+          "label": "Feasibility",
+          "average": 8.1,
+          "reviewCount": 3
+        },
+        "legibility": {
+          "label": "Legibility",
+          "average": 8.8,
+          "reviewCount": 3
+        },
+        "continuity": {
+          "label": "Continuity",
+          "average": 9.1,
+          "reviewCount": 3
+        },
+        "shareability": {
+          "label": "Shareability",
+          "average": 8.9,
+          "reviewCount": 3
+        }
+      },
+      "reviewerBreakdown": [
+        {
+          "reviewer": {
+            "agentId": "explore_explorer_0",
+            "displayName": "GPT (Visitor)",
+            "modelFamily": "gpt",
+            "lens": "visitor"
+          },
+          "overallScore": 8.6,
+          "dimensionScores": {
+            "compoundingValue": 9,
+            "usefulnessClarity": 8,
+            "noveltySurprise": 9,
+            "feasibility": 8,
+            "legibility": 9,
+            "continuity": 9,
+            "shareability": 8
+          },
+          "keep": [
+            "The feature changes how players read lane depth instead of only adding more damage or health.",
+            "Board Scout can explain the burrow fields before the first wave starts."
+          ],
+          "mustChange": [
+            "Keep the telegraph and surface marker readable so the enemy feels learnable rather than arbitrary."
+          ],
+          "risks": [
+            "Missing or broken Loamspike animation frames would make the new enemy look unfinished."
+          ]
+        },
+        {
+          "reviewer": {
+            "agentId": "explore_explorer_1",
+            "displayName": "Claude (Gardener)",
+            "modelFamily": "claude",
+            "lens": "gardener"
+          },
+          "overallScore": 8.9,
+          "dimensionScores": {
+            "compoundingValue": 9,
+            "usefulnessClarity": 9,
+            "noveltySurprise": 8,
+            "feasibility": 8,
+            "legibility": 9,
+            "continuity": 10,
+            "shareability": 9
+          },
+          "keep": [
+            "Burrow is implemented as a reusable behavior contract that future enemies can share.",
+            "The tutorial, challenge board, and Board Scout all teach the same pressure pattern."
+          ],
+          "mustChange": [
+            "Preserve endless as a post-clear mode; it should not unlock before the scripted challenge win."
+          ],
+          "risks": [
+            "The validator and browser hooks need to stay aligned because burrow introduces an invulnerable phase."
+          ]
+        },
+        {
+          "reviewer": {
+            "agentId": "explore_explorer_2",
+            "displayName": "Gemini Pro (Explorer)",
+            "modelFamily": "gemini",
+            "lens": "explorer"
+          },
+          "overallScore": 8.9,
+          "dimensionScores": {
+            "compoundingValue": 9,
+            "usefulnessClarity": 9,
+            "noveltySurprise": 9,
+            "feasibility": 8,
+            "legibility": 9,
+            "continuity": 9,
+            "shareability": 9
+          },
+          "keep": [
+            "The Undermined board is a clean player-facing proof that front-stack defense is no longer universal.",
+            "The Loamspike badge and burrow detail rows make the new mechanic inspectable in the public UI."
+          ],
+          "mustChange": [
+            "The artifact trail must publish with the day so the archive does not show a shipped board with missing source files."
+          ],
+          "risks": [
+            "If challenge tuning is too forgiving, Loamspike reads as decoration instead of a real pressure source."
+          ]
+        }
+      ],
+      "keep": [
+        "Land burrow as a data-driven enemy behavior and expose it in Board Scout.",
+        "Teach the mechanic through tutorial, challenge, and public artifact copy."
+      ],
+      "mustChange": [
+        "Keep the Loamspike asset manifest-backed and keep the score flow gated behind challenge success."
+      ],
+      "risks": [
+        "Texture-frame warnings or missing artifacts would undercut the day even if the core game loop works."
+      ]
+    },
+    {
+      "id": "candidate-2",
+      "title": "Board Scout Surface Preview — Explain Burrow Timing Before the Run",
+      "summary": "Focus the day on pre-run Board Scout affordances for burrow timing, surface columns, and counterplay while deferring the full challenge retune.",
+      "averageScore": 7.2,
+      "reviewCount": 3,
+      "rank": 2,
+      "dimensionAverages": {
+        "compoundingValue": {
+          "label": "Compounding Value",
+          "average": 7.5,
+          "reviewCount": 3
+        },
+        "usefulnessClarity": {
+          "label": "Usefulness & Clarity",
+          "average": 8.3,
+          "reviewCount": 3
+        },
+        "noveltySurprise": {
+          "label": "Novelty & Surprise",
+          "average": 6.8,
+          "reviewCount": 3
+        },
+        "feasibility": {
+          "label": "Feasibility",
+          "average": 8.4,
+          "reviewCount": 3
+        },
+        "legibility": {
+          "label": "Legibility",
+          "average": 8.5,
+          "reviewCount": 3
+        },
+        "continuity": {
+          "label": "Continuity",
+          "average": 6.4,
+          "reviewCount": 3
+        },
+        "shareability": {
+          "label": "Shareability",
+          "average": 5.8,
+          "reviewCount": 3
+        }
+      }
+    },
+    {
+      "id": "candidate-3",
+      "title": "Endless Threat Rotation — Add Loamspike to Post-Clear Scoring",
+      "summary": "Spend the day tuning Loamspike for endless mode and score-chase variety rather than making it the scripted challenge headline.",
+      "averageScore": 6.4,
+      "reviewCount": 3,
+      "rank": 3,
+      "dimensionAverages": {
+        "compoundingValue": {
+          "label": "Compounding Value",
+          "average": 7.1,
+          "reviewCount": 3
+        },
+        "usefulnessClarity": {
+          "label": "Usefulness & Clarity",
+          "average": 6.2,
+          "reviewCount": 3
+        },
+        "noveltySurprise": {
+          "label": "Novelty & Surprise",
+          "average": 7.4,
+          "reviewCount": 3
+        },
+        "feasibility": {
+          "label": "Feasibility",
+          "average": 5.9,
+          "reviewCount": 3
+        },
+        "legibility": {
+          "label": "Legibility",
+          "average": 6.5,
+          "reviewCount": 3
+        },
+        "continuity": {
+          "label": "Continuity",
+          "average": 6.7,
+          "reviewCount": 3
+        },
+        "shareability": {
+          "label": "Shareability",
+          "average": 5.3,
+          "reviewCount": 3
+        }
+      }
+    }
+  ],
+  "winner": {
+    "candidateId": "candidate-1",
+    "title": "Loamspike Burrower — Burrow Runtime and the Undermined Board",
+    "summary": "Ship the reusable burrow enemy contract, add Loamspike Burrower as the first scripted burrow threat, and publish the April 24 Undermined board where front-only Amber Wall defense stops being a complete answer.",
+    "averageScore": 8.8
+  },
+  "rationale": "Loamspike Burrower won because it pays off the prior public promise with a visible runtime mechanic, compounds the enemy system through a reusable burrow behavior, and makes the daily board ask for deeper placement decisions instead of another front-line wall stack.",
+  "featureType": "game",
+  "tags": [
+    "game",
+    "rootline-defense",
+    "loamspike-burrower",
+    "burrow",
+    "enemy-contract",
+    "undermined",
+    "board-scout",
+    "scenario",
+    "playwright"
+  ],
+  "feedbackInfluence": [
+    {
+      "summary": "Recent game days needed a pressure source that changes lane reading and makes front-only defense less universal.",
+      "impact": "high"
+    },
+    {
+      "summary": "The public artifact trail needed to move from announcing Loamspike to showing the runtime and scenario that use it.",
+      "impact": "medium"
+    }
+  ],
+  "artifacts": {
+    "spec": "spec.md",
+    "buildSummary": "build-summary.md",
+    "review": "review.md",
+    "testResults": "test-results.json",
+    "feedbackDigest": "feedback-digest.json"
+  },
+  "bluesky_post": {
+    "headline": "Loamspike Burrower dives under your wall — Undermined ships.",
+    "body": "Telegraphs a dive, goes invulnerable under the soil, surfaces breach-side of your front wall. A front-stack Amber Wall is no longer a total answer — read the dive, place depth. Play today's board: commandgarden.com",
+    "alt_text": "Rootline Defense gameplay with a Loamspike Burrower mid-telegraph: a soil-crack marker at the dive column, an underpass shadow, and an Amber Wall that the burrower will surface behind."
+  },
+  "bluesky_strategy": {
+    "searchQueries": [
+      "tower defense",
+      "plant defense",
+      "indie gamedev",
+      "daily gamedev",
+      "browser games",
+      "devlog",
+      "pixel art"
+    ],
+    "replyTemplates": {
+      "whatIs": "Rootline Defense is a daily tactical browser game where you defend a garden against mechanical bugs. Every day ships a new enemy, plant, or board — today added a burrow enemy that dives under your front line.",
+      "howDoesItWork": "The Loamspike Burrower telegraphs a dive at column 2 (a soil crack), goes invulnerable during underpass, and surfaces breach-side of column 0. You place a rear Cottonburr to catch it on surface instead of only front-stacking Amber Wall.",
+      "genericQuestion": "Thanks for checking it out! If you clear today's board, I'd love to hear what placement finally answered the burrow surface."
+    },
+    "hashtagsToUse": [
+      "#indiedev",
+      "#towerdefense",
+      "#browsergames",
+      "#pixelart",
+      "#devlog"
+    ],
+    "maxDailyActions": 12
+  }
+}

@@ -1,0 +1,153 @@
+{
+  "schemaVersion": 1,
+  "runDate": "2026-04-24",
+  "generatedAt": "2026-04-24T16:30:00.000Z",
+  "summary": {
+    "totalScenarios": 22,
+    "passed": 22,
+    "failed": 0,
+    "skipped": 0,
+    "passRate": 100
+  },
+  "duration": "43.2s",
+  "scenarios": [
+    {
+      "name": "Game Board Scout and title menu accessibility (2026-04-24) — exposes landmarks, Board Scout ARIA, keyboard focus order, inventory pressed states, canvas labeling, and burrow badge contrast",
+      "persona": "visitor",
+      "status": "pass",
+      "duration": "2.4s"
+    },
+    {
+      "name": "Game Board Scout and title menu accessibility (2026-04-24) — starts title menu tutorial and challenge shortcuts from the keyboard without mouse activation",
+      "persona": "visitor",
+      "status": "pass",
+      "duration": "1.3s"
+    },
+    {
+      "name": "Board Scout — Loamspike Burrower burrow badge & detail (2026-04-24) — opens scout, shows Burrow badge with readable contrast, detail lists burrow-specific rows, arrow-key nav works, and Escape returns focus",
+      "persona": "visitor",
+      "status": "pass",
+      "duration": "1.3s"
+    },
+    {
+      "name": "Board Scout — Loamspike Burrower burrow badge & detail (2026-04-24) — no layout overflow at desktop 1280x800 when the Loamspike detail is open",
+      "persona": "visitor",
+      "status": "pass",
+      "duration": "0.8s"
+    },
+    {
+      "name": "Board Scout — Loamspike Burrower burrow badge & detail (2026-04-24) — no layout overflow at mobile 375x667 when the Loamspike detail is open",
+      "persona": "visitor",
+      "status": "pass",
+      "duration": "0.6s"
+    },
+    {
+      "name": "April 24 'Undermined' game shell + Board Scout responsive layout — desktop 1440×900",
+      "persona": "visitor",
+      "status": "pass",
+      "duration": "2.0s"
+    },
+    {
+      "name": "April 24 'Undermined' game shell + Board Scout responsive layout — tablet 768×1024",
+      "persona": "visitor",
+      "status": "pass",
+      "duration": "1.2s"
+    },
+    {
+      "name": "April 24 'Undermined' game shell + Board Scout responsive layout — mobile 375×667",
+      "persona": "visitor",
+      "status": "pass",
+      "duration": "1.1s"
+    },
+    {
+      "name": "April 24 Undermined tutorial -> challenge -> endless gating — tutorial clear does not unlock endless; challenge clear after a Loamspike burrow sequence unlocks endless and submits score on gameover",
+      "persona": "gardener",
+      "status": "pass",
+      "duration": "7.6s"
+    },
+    {
+      "name": "Loamspike Burrower — loamspikeBurrower definition declares burrow behavior with all required fields",
+      "persona": "validator",
+      "status": "pass",
+      "duration": "0.7s"
+    },
+    {
+      "name": "Loamspike Burrower — scenario 2026-04-24 registers the Loamspike Burrower in challenge waves",
+      "persona": "validator",
+      "status": "pass",
+      "duration": "1.0s"
+    },
+    {
+      "name": "Loamspike Burrower — walks approach → telegraph → underpass (invulnerable) → surface (damageable again)",
+      "persona": "gardener",
+      "status": "pass",
+      "duration": "13.7s"
+    },
+    {
+      "name": "Loamspike Burrower — projectiles do not damage an underpassed loamspike (invulnerable gate)",
+      "persona": "gardener",
+      "status": "pass",
+      "duration": "13.1s"
+    },
+    {
+      "name": "Loamspike Burrower — getObservation() exposes per-enemy invulnerable and a burrow block on burrowers",
+      "persona": "validator",
+      "status": "pass",
+      "duration": "11.5s"
+    },
+    {
+      "name": "Loamspike Burrower — Board Scout renders a Burrow badge and burrow-specific detail rows",
+      "persona": "visitor",
+      "status": "pass",
+      "duration": "0.6s"
+    },
+    {
+      "name": "Loamspike walk spritesheet — manifest declares loamspike-walk with the sheet PNG path and frame metadata",
+      "persona": "validator",
+      "status": "pass",
+      "duration": "1.2s"
+    },
+    {
+      "name": "Loamspike walk spritesheet — loamspike-walk-sheet.png exists on disk (not just the .svg portrait reference)",
+      "persona": "validator",
+      "status": "pass",
+      "duration": "0.0s"
+    },
+    {
+      "name": "Loamspike walk spritesheet — boot loads loamspike-walk as an IMG-backed manifest texture (not the procedural fallback)",
+      "persona": "validator",
+      "status": "pass",
+      "duration": "0.4s"
+    },
+    {
+      "name": "Loamspike walk spritesheet — spawned loamspike enemy animation frame loop stays within the walk row [12..15] and does not drift",
+      "persona": "validator",
+      "status": "pass",
+      "duration": "2.7s"
+    },
+    {
+      "name": "2026-04-24 day detail artifacts and decision schema — renders the April 24 day detail, expands artifacts, keeps links healthy, and validates decision.json",
+      "persona": "visitor",
+      "status": "pass",
+      "duration": "1.1s"
+    },
+    {
+      "name": "April 24 Undermined replays — replay-2026-04-24-undermined-clear.json fixture is deterministic (actions[] format, coordinateBase=0, roster-gated)",
+      "persona": "validator",
+      "status": "pass",
+      "duration": "0.04s"
+    },
+    {
+      "name": "April 24 Undermined replays — replay-2026-04-24-undermined-clear.json clears the Undermined challenge under scripted Loamspike pressure (runtime winning-line evidence; not an A/B load-bearing test)",
+      "persona": "gardener",
+      "status": "pass",
+      "duration": "13.6s"
+    }
+  ],
+  "testPersonas": [
+    "visitor",
+    "gardener",
+    "validator"
+  ],
+  "notes": "All 22 April 24 Playwright specs pass. Adds a canonical winning-line replay fixture (scripts/replay-2026-04-24-undermined-clear.json) and a spec that drives the fixture end-to-end through applyAction, asserting challengeCleared + scenarioPhase==='endless' and gardenHP>0. This is concrete runtime evidence that the Undermined board is clearable under scripted Loamspike pressure (the scenario scripts 5 Loamspikes across waves 2–4, and the clear resolves every one), which converts the validator's 'unwinnable under current search' finding into a validator-beam-search limitation to retune. It is NOT an A/B load-bearing test: it does not prove that Loamspike is the difference between clear and no-clear vs. a stripped roster, so the AC-9 two-run beam-search fixture (run with Loamspike stripped, confirm trivially clearable) is still a next-day validator enhancement."
+}
