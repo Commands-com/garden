@@ -23,25 +23,24 @@ function getStage(template, stageId) {
 }
 
 test.describe("daily pipeline template contract", () => {
-  test("Explore runs a broad daily search and tolerates partial handoffs from provider stops", () => {
+  test("Explore runs a broad daily search and rejects unreviewed failed handoffs", () => {
     const template = loadTemplate();
     const explore = getStage(template, "explore");
 
     expect(explore.roomConfig.seedMode).toBe("Domain Search");
     expect(explore.objective).toContain("propose 3-5 candidate improvements");
     expect(explore.objective).toContain("broad daily search");
-    expect(explore.objective).toContain("partial concept bundle");
+    expect(explore.objective).toContain("reviewed and scored");
     expect(explore.handoff.requiredStatus).toEqual([
       "finalized",
       "partial",
-      "failed",
     ]);
   });
 
   test("failed status is limited to stages with known partial-handoff failure modes", () => {
     const template = loadTemplate();
     const stages = template.orchestratorConfig.pipeline;
-    const tolerantStages = new Set(["explore", "implementation"]);
+    const tolerantStages = new Set(["implementation"]);
 
     for (const stage of stages) {
       const statuses = stage.handoff?.requiredStatus || [];
