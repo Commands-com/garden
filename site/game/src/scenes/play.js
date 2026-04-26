@@ -933,6 +933,12 @@ export class PlayScene extends Phaser.Scene {
       enemy.sprite.setTint(0x8fd8ff);
       return;
     }
+    if (enemy.armorWindup === true) {
+      // R2 mitigation: re-apply windup red after the 70 ms hit-flash white tint
+      // expires, so the vulnerability cue is never permanently clobbered.
+      enemy.sprite.setTint(0xff5555);
+      return;
+    }
     if (enemy.definition.tint != null) {
       enemy.sprite.setTint(enemy.definition.tint);
     } else {
@@ -994,7 +1000,7 @@ export class PlayScene extends Phaser.Scene {
 
       if (projectile.piercing) {
         projectile.hitEnemies.add(target);
-        this.damageEnemy(target, projectile.damage);
+        this.damageEnemy(target, projectile.damage, { delivery: "direct" });
       } else if (projectile.splash === true) {
         projectile.destroyed = true;
         projectile.sprite.destroy();
@@ -1002,7 +1008,7 @@ export class PlayScene extends Phaser.Scene {
       } else {
         projectile.destroyed = true;
         projectile.sprite.destroy();
-        this.damageEnemy(target, projectile.damage);
+        this.damageEnemy(target, projectile.damage, { delivery: "direct" });
       }
     }
   }
@@ -1044,12 +1050,13 @@ export class PlayScene extends Phaser.Scene {
     const impactLane = options.lane ?? primaryEnemy?.lane ?? projectile.lane;
     const centerY = options.centerY ?? getLaneY(impactLane);
     const sameLaneOnly = options.sameLaneOnly === true;
+    const delivery = projectile.arc === true ? "arc" : "direct";
     const splashHits = [];
 
     // Primary target always takes the projectile's primary damage (AC-5:
     // two-shot lethality is locked on projectileDamage alone, no double-dip).
     if (primaryEnemy && !primaryEnemy.destroyed && primaryEnemy.invulnerable !== true) {
-      this.damageEnemy(primaryEnemy, projectile.damage);
+      this.damageEnemy(primaryEnemy, projectile.damage, { delivery });
     }
 
     for (const enemy of this.enemies) {
@@ -1064,7 +1071,7 @@ export class PlayScene extends Phaser.Scene {
 
       const enemyId = enemy.id;
       const damage = projectile.splashDamage;
-      this.damageEnemy(enemy, damage);
+      this.damageEnemy(enemy, damage, { delivery });
       splashHits.push({ enemyId, damage });
     }
 
@@ -1217,17 +1224,39 @@ export class PlayScene extends Phaser.Scene {
   }
 
   updateWalkerEnemy(enemy, deltaMs, options = {}) {
+    const def = enemy.definition;
+    const hasVulnWindow = typeof def.vulnerabilityWindowMs === "number";
+    const priorWindup = enemy.armorWindup === true;
     const ignoreBlockers = options.ignoreBlockers === true;
     const blocker = ignoreBlockers ? null : this.getBlockingDefender(enemy);
     if (blocker) {
+      if (hasVulnWindow && !enemy.contactBlockerActive) {
+        // AC-3: first-tick contact resets cooldown so the full
+        // vulnerabilityWindowMs window is observable before the strike lands.
+        enemy.attackCooldownMs = getEffectiveCadence(enemy, def.attackCadenceMs);
+      }
+      enemy.contactBlockerActive = true;
+
       enemy.attackCooldownMs -= deltaMs;
-      enemy.x = Math.max(enemy.x, blocker.x + enemy.definition.contactRange);
+      enemy.x = Math.max(enemy.x, blocker.x + def.contactRange);
 
       if (enemy.attackCooldownMs <= 0) {
-        enemy.attackCooldownMs = getEffectiveCadence(enemy, enemy.definition.attackCadenceMs);
-        this.damageDefender(blocker, enemy.definition.attackDamage);
+        enemy.attackCooldownMs = getEffectiveCadence(enemy, def.attackCadenceMs);
+        this.damageDefender(blocker, def.attackDamage);
+        if (hasVulnWindow) enemy.armorWindup = false;
+      } else if (hasVulnWindow) {
+        enemy.armorWindup = enemy.attackCooldownMs <= def.vulnerabilityWindowMs;
       }
+      if (hasVulnWindow && enemy.armorWindup !== priorWindup) {
+        this.restoreEnemyTint(enemy);
+      }
+      this.updateArmorPlate(enemy);
       return;
+    }
+
+    if (enemy.contactBlockerActive) {
+      enemy.contactBlockerActive = false;
+      if (hasVulnWindow) enemy.armorWindup = false;
     }
 
     enemy.attackCooldownMs = Math.max(0, enemy.attackCooldownMs - deltaMs);
@@ -1235,7 +1264,21 @@ export class PlayScene extends Phaser.Scene {
 
     if (enemy.x <= BREACH_X) {
       this.resolveBreach(enemy);
+      return;
     }
+    if (hasVulnWindow && enemy.armorWindup !== priorWindup) {
+      this.restoreEnemyTint(enemy);
+    }
+    this.updateArmorPlate(enemy);
+  }
+
+  updateArmorPlate(enemy) {
+    const plate = enemy.plateSprite;
+    if (!plate || plate.active === false) return;
+    const offsetY = enemy.armorWindup ? -4 : 0;
+    plate.x = enemy.x;
+    plate.y = enemy.y + offsetY;
+    plate.scaleY = enemy.armorWindup ? 0.85 : 1.0;
   }
 
   updateBurrowEnemy(enemy, deltaMs) {
@@ -2066,6 +2109,22 @@ export class PlayScene extends Phaser.Scene {
               surfaceAtCol: enemy.definition.surfaceAtCol,
             };
           }
+          if (enemy.definition.armor || typeof enemy.definition.vulnerabilityWindowMs === "number") {
+            base.armor = {
+              armorWindup: enemy.armorWindup === true,
+              vulnerabilityWindowMs: enemy.definition.vulnerabilityWindowMs || 0,
+              attackCooldownMs: Math.max(0, Math.round(enemy.attackCooldownMs || 0)),
+              frontDamageMultiplier: enemy.definition.armor?.frontDamageMultiplier ?? 1,
+              plateScaleY:
+                enemy.plateSprite && typeof enemy.plateSprite.scaleY === "number"
+                  ? enemy.plateSprite.scaleY
+                  : null,
+              plateY:
+                enemy.plateSprite && typeof enemy.plateSprite.y === "number"
+                  ? Math.round(enemy.plateSprite.y)
+                  : null,
+            };
+          }
           return base;
         });
 
@@ -2384,7 +2443,16 @@ export class PlayScene extends Phaser.Scene {
       burrowSurfaceMarker: null,
       burrowShadow: null,
       burrowDustBurst: null,
+      armorWindup: false,
+      contactBlockerActive: false,
+      plateSprite: null,
     };
+
+    if (definition.plateTextureKey && this.textures?.exists?.(definition.plateTextureKey)) {
+      const plate = this.add.image(enemy.x, enemy.y, definition.plateTextureKey);
+      plate.setDepth(7);
+      enemy.plateSprite = plate;
+    }
 
     if (definition.behavior === "flying") {
       sprite.setPosition(enemy.x, enemy.y - enemy.altitude);
@@ -2566,26 +2634,32 @@ export class PlayScene extends Phaser.Scene {
     return count;
   }
 
-  getEffectiveProjectileDamage(enemy, damage) {
+  getEffectiveProjectileDamage(enemy, damage, ctx = {}) {
+    let working = damage;
+    const armorMult = enemy.definition.armor?.frontDamageMultiplier;
+    if (armorMult != null && enemy.armorWindup !== true && ctx.delivery !== "arc") {
+      working = Math.max(1, Math.round(working * armorMult));
+    }
+
     const requiredDefenders = enemy.definition.requiredDefendersInLane || 0;
     if (requiredDefenders <= 1) {
-      return damage;
+      return working;
     }
 
     const defenderCount = this.getCombatDefenderCountInLane(enemy.lane);
     if (defenderCount >= requiredDefenders) {
-      return damage;
+      return working;
     }
 
     const multiplier = enemy.definition.underDefendedDamageMultiplier ?? 1;
-    return Math.max(1, Math.round(damage * multiplier));
+    return Math.max(1, Math.round(working * multiplier));
   }
 
-  damageEnemy(enemy, damage) {
+  damageEnemy(enemy, damage, ctx = {}) {
     if (!enemy || enemy.destroyed || enemy.invulnerable === true) {
       return;
     }
-    const effectiveDamage = this.getEffectiveProjectileDamage(enemy, damage);
+    const effectiveDamage = this.getEffectiveProjectileDamage(enemy, damage, ctx);
     enemy.hp -= effectiveDamage;
     enemy.sprite.setTint(0xffffff).setTintMode(Phaser.TintModes.FILL);
     this.time.delayedCall(70, () => {
@@ -2609,6 +2683,10 @@ export class PlayScene extends Phaser.Scene {
 
     enemy.destroyed = true;
     enemy.sprite.destroy();
+    if (enemy.plateSprite) {
+      enemy.plateSprite.destroy();
+      enemy.plateSprite = null;
+    }
     if (enemy.slowRenderer) {
       if (enemy.slowRenderer.destroy) {
         enemy.slowRenderer.destroy();

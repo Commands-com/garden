@@ -103,6 +103,30 @@ export const ENEMY_DEFINITIONS = [
     animationFrameDurationMs: 118,
   },
   {
+    id: "huskWalker",
+    label: "Husk Walker",
+    textureKey: "husk-walker",
+    behavior: "armored",
+    armor: { frontDamageMultiplier: 0.25 },
+    vulnerabilityWindowMs: 600,
+    radius: 24,
+    maxHealth: 140,
+    speed: 34,
+    attackDamage: 14,
+    attackCadenceMs: 1100,
+    contactRange: 56,
+    breachDamage: 1,
+    score: 30,
+    spawnWeight: 0,
+    tint: null,
+    displayWidth: 76,
+    displayHeight: 76,
+    // animationFrames intentionally omitted while the body texture is the
+    // static SVG. When the 4x4 PNG spritesheet ships (mirroring loamspike /
+    // glass-ram), restore [12, 13, 14, 15] + animationFrameDurationMs: 120.
+    plateTextureKey: "husk-walker-plate",
+  },
+  {
     id: "loamspikeBurrower",
     label: "Loamspike Burrower",
     textureKey: "loamspike-walk",

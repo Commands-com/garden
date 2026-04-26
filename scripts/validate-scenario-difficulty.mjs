@@ -724,6 +724,8 @@ class ScenarioSimulator {
       burrowState: definition.behavior === "burrow" ? "approach" : null,
       telegraphTimerMs: 0,
       underpassTimerMs: 0,
+      armorWindup: false,
+      contactBlockerActive: false,
       destroyed: false,
     });
     return true;
@@ -905,7 +907,7 @@ class ScenarioSimulator {
           const hitRadius = projectile.radius + enemy.definition.radius * 0.8;
           if (Math.abs(enemy.x - projectile.x) <= hitRadius) {
             projectile.hitEnemies.add(enemy);
-            this.damageEnemy(enemy, projectile.damage);
+            this.damageEnemy(enemy, projectile.damage, { delivery: "direct" });
           }
         }
       } else if (projectile.splash === true) {
@@ -921,7 +923,7 @@ class ScenarioSimulator {
           continue;
         }
         projectile.destroyed = true;
-        this.damageEnemy(target, projectile.damage);
+        this.damageEnemy(target, projectile.damage, { delivery: "direct" });
       }
     }
   }
@@ -961,17 +963,33 @@ class ScenarioSimulator {
   // duplicating logic. `options.ignoreBlockers` is set while a burrower is in
   // its approach phase so defenders do not block it pre-dive.
   updateWalkerEnemy(enemy, deltaMs, options = {}) {
+    const def = enemy.definition;
+    const hasVulnWindow = typeof def.vulnerabilityWindowMs === "number";
     const ignoreBlockers = options.ignoreBlockers === true;
     const blocker = ignoreBlockers ? null : this.getBlockingDefender(enemy);
     if (blocker) {
+      // AC-3: first-tick contact resets cooldown so the full
+      // vulnerabilityWindowMs window is observable before the strike lands.
+      if (hasVulnWindow && !enemy.contactBlockerActive) {
+        enemy.attackCooldownMs = getEffectiveCadence(enemy, def.attackCadenceMs);
+      }
+      enemy.contactBlockerActive = true;
+
       enemy.attackCooldownMs -= deltaMs;
-      enemy.x = Math.max(enemy.x, blocker.x + enemy.definition.contactRange);
+      enemy.x = Math.max(enemy.x, blocker.x + def.contactRange);
 
       if (enemy.attackCooldownMs <= 0) {
-        enemy.attackCooldownMs = getEffectiveCadence(enemy, enemy.definition.attackCadenceMs);
-        this.damageDefender(blocker, enemy.definition.attackDamage);
+        enemy.attackCooldownMs = getEffectiveCadence(enemy, def.attackCadenceMs);
+        this.damageDefender(blocker, def.attackDamage);
+        if (hasVulnWindow) enemy.armorWindup = false;
+      } else if (hasVulnWindow) {
+        enemy.armorWindup = enemy.attackCooldownMs <= def.vulnerabilityWindowMs;
       }
     } else {
+      if (enemy.contactBlockerActive) {
+        enemy.contactBlockerActive = false;
+        if (hasVulnWindow) enemy.armorWindup = false;
+      }
       enemy.attackCooldownMs = Math.max(0, enemy.attackCooldownMs - deltaMs);
       enemy.x -= getEffectiveSpeed(enemy) * (deltaMs / 1000);
 
@@ -1250,9 +1268,10 @@ class ScenarioSimulator {
     const impactLane = options.lane ?? primaryEnemy?.lane ?? projectile.lane;
     const centerY = options.centerY ?? getLaneY(impactLane);
     const sameLaneOnly = options.sameLaneOnly === true;
+    const delivery = projectile.arc === true ? "arc" : "direct";
 
     if (primaryEnemy && !primaryEnemy.destroyed && primaryEnemy.invulnerable !== true) {
-      this.damageEnemy(primaryEnemy, projectile.damage);
+      this.damageEnemy(primaryEnemy, projectile.damage, { delivery });
     }
 
     for (const enemy of this.enemies) {
@@ -1265,7 +1284,7 @@ class ScenarioSimulator {
       const dy = getLaneY(enemy.lane) - centerY;
       if (Math.sqrt(dx * dx + dy * dy) > radiusPx) continue;
 
-      this.damageEnemy(enemy, projectile.splashDamage);
+      this.damageEnemy(enemy, projectile.splashDamage, { delivery });
     }
   }
 
@@ -1383,28 +1402,34 @@ class ScenarioSimulator {
     return count;
   }
 
-  getEffectiveProjectileDamage(enemy, damage) {
+  getEffectiveProjectileDamage(enemy, damage, ctx = {}) {
+    let working = damage;
+    const armorMult = enemy.definition.armor?.frontDamageMultiplier;
+    if (armorMult != null && enemy.armorWindup !== true && ctx.delivery !== "arc") {
+      working = Math.max(1, Math.round(working * armorMult));
+    }
+
     const requiredDefenders = enemy.definition.requiredDefendersInLane || 0;
     if (requiredDefenders <= 1) {
-      return damage;
+      return working;
     }
 
     const defenderCount = this.getCombatDefenderCountInLane(enemy.lane);
     if (defenderCount >= requiredDefenders) {
-      return damage;
+      return working;
     }
 
     const multiplier = enemy.definition.underDefendedDamageMultiplier ?? 1;
-    return Math.max(1, Math.round(damage * multiplier));
+    return Math.max(1, Math.round(working * multiplier));
   }
 
-  damageEnemy(enemy, damage) {
+  damageEnemy(enemy, damage, ctx = {}) {
     // Defensive guard: callers already skip invulnerable enemies, but this
     // matches play.js so a stray damage call can't blow through the gate.
     if (enemy.invulnerable === true) {
       return;
     }
-    enemy.hp -= this.getEffectiveProjectileDamage(enemy, damage);
+    enemy.hp -= this.getEffectiveProjectileDamage(enemy, damage, ctx);
     if (enemy.hp <= 0) {
       enemy.destroyed = true;
     }

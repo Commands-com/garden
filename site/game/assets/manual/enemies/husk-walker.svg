@@ -1,0 +1,34 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" role="img" aria-labelledby="title desc">
+  <title id="title">Husk Walker reference</title>
+  <desc id="desc">Front-armored heavy ground enemy with a thick chitin plate over the chest. Plate is the soft target during the 600 ms vulnerability windup. Reference portrait for the husk-walker sprite; runtime composes a separate husk-walker-plate decal over this body so the windup tell (scaleY 0.85, y -4) is readable.</desc>
+  <defs>
+    <linearGradient id="huskBody" x1="0" x2="0" y1="0" y2="1">
+      <stop offset="0%" stop-color="#5a4032"/>
+      <stop offset="100%" stop-color="#221511"/>
+    </linearGradient>
+    <linearGradient id="huskPlate" x1="0" x2="0" y1="0" y2="1">
+      <stop offset="0%" stop-color="#9a7050"/>
+      <stop offset="100%" stop-color="#4a2a1a"/>
+    </linearGradient>
+    <radialGradient id="huskEye" cx="50%" cy="50%" r="60%">
+      <stop offset="0%" stop-color="#ffd070"/>
+      <stop offset="100%" stop-color="#7a3010"/>
+    </radialGradient>
+  </defs>
+  <ellipse cx="64" cy="112" rx="40" ry="9" fill="#0a0506" opacity=".5"/>
+  <path d="M34 86 C30 60 44 38 64 38 C84 38 98 60 94 86 C94 102 82 112 64 112 C46 112 34 102 34 86 Z"
+        fill="url(#huskBody)" stroke="#160a06" stroke-width="3"/>
+  <path d="M40 84 C38 64 50 50 64 50 C78 50 90 64 88 84 C86 92 78 96 64 96 C50 96 42 92 40 84 Z"
+        fill="url(#huskPlate)" stroke="#1f0e07" stroke-width="2"/>
+  <g stroke="#2a160c" stroke-width="2" fill="none" opacity="0.7">
+    <path d="M50 60 L52 86"/>
+    <path d="M64 56 L64 92"/>
+    <path d="M78 60 L76 86"/>
+  </g>
+  <circle cx="54" cy="68" r="4" fill="url(#huskEye)"/>
+  <circle cx="74" cy="68" r="4" fill="url(#huskEye)"/>
+  <circle cx="54" cy="68" r="1.4" fill="#1c0a04"/>
+  <circle cx="74" cy="68" r="1.4" fill="#1c0a04"/>
+  <path d="M40 100 L34 112 L48 112 Z" fill="#221511" stroke="#0e0603" stroke-width="2"/>
+  <path d="M88 100 L94 112 L80 112 Z" fill="#221511" stroke="#0e0603" stroke-width="2"/>
+</svg>

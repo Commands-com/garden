@@ -184,6 +184,39 @@ export function installGameTestHooks(game, bootstrap) {
       return playScene.getObservation();
     },
 
+    // Read-only armor state for Playwright assertions on the Husk Walker windup
+    // visuals (AC-2/AC-3). Returns one entry per live armored enemy with the
+    // observable signals: armorWindup flag and plate sprite scaleY/y.
+    getArmorStates() {
+      const playScene = getPlayScene();
+      if (!playScene?.scene?.isActive() || !Array.isArray(playScene.enemies)) {
+        return [];
+      }
+
+      return playScene.enemies
+        .filter(
+          (enemy) =>
+            !enemy.destroyed &&
+            (enemy.definition?.armor ||
+              typeof enemy.definition?.vulnerabilityWindowMs === "number")
+        )
+        .map((enemy) => ({
+          enemyId: enemy.id,
+          row: enemy.lane,
+          x: Math.round(enemy.x),
+          armorWindup: enemy.armorWindup === true,
+          attackCooldownMs: Math.max(0, Math.round(enemy.attackCooldownMs || 0)),
+          plateScaleY:
+            enemy.plateSprite && typeof enemy.plateSprite.scaleY === "number"
+              ? enemy.plateSprite.scaleY
+              : null,
+          plateY:
+            enemy.plateSprite && typeof enemy.plateSprite.y === "number"
+              ? enemy.plateSprite.y
+              : null,
+        }));
+    },
+
     getRecordedReplay(options = {}) {
       const playScene = getPlayScene();
       if (playScene?.scene?.isActive() && typeof playScene.getRecordedReplay === "function") {

@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "updatedAt": "2026-04-20T00:00:00.000Z",
+  "updatedAt": "2026-04-26T00:00:00.000Z",
   "assets": [
     {
       "id": "amber-wall",
@@ -479,6 +479,36 @@
         "format": "svg",
         "width": 64,
         "height": 32
+      }
+    },
+    {
+      "id": "husk-walker",
+      "type": "sprite",
+      "kind": "sprite",
+      "provider": "repo",
+      "path": "/game/assets/manual/enemies/husk-walker.svg",
+      "prompt": "Hand-authored Husk Walker body for the April 26 front-armored ground enemy. Static SVG loaded as a single image (animation loop is overkill per brief — runtime motion plus the husk-walker-plate decal's scaleY 0.85 and y -4 offset convey the 600 ms vulnerability windup). When the matching PNG spritesheet (4x4, 64x64 frames; gameplay row indices [12,13,14,15] mirroring loamspike/glass-ram) ships from the asset pipeline, swap path/format and add metadata.phaser.frameWidth/frameHeight=64; until then applyEnemyAnimationFrame's setFrame call no-ops harmlessly on the single-image texture.",
+      "generatedAt": "2026-04-26T00:00:00.000Z",
+      "metadata": {
+        "category": "enemy",
+        "format": "svg",
+        "width": 128,
+        "height": 128
+      }
+    },
+    {
+      "id": "husk-walker-plate",
+      "type": "sprite",
+      "kind": "sprite",
+      "provider": "repo",
+      "path": "/game/assets/manual/enemies/husk-walker-plate.svg",
+      "prompt": "Hand-authored repo asset for the April 26 Husk Walker plate decal. Single-frame plate-only overlay aligned over the husk-walker body; runtime sets scaleY=0.85 and y -=4 during the vulnerability windup so the plate visibly retracts and the soft chest is exposed.",
+      "generatedAt": "2026-04-26T00:00:00.000Z",
+      "metadata": {
+        "category": "decal",
+        "format": "svg",
+        "width": 128,
+        "height": 128
       }
     },
     {
