@@ -76,7 +76,7 @@ const scenario_2026_04_26 = {
         events: [
           { offsetMs: 3000, lane: 2, enemyId: "briarBeetle" },
           { offsetMs: 7800, lane: 2, enemyId: "huskWalker" },
-          { offsetMs: 12500, lane: 0, enemyId: "shardMite" },
+          { offsetMs: 14200, lane: 2, enemyId: "huskWalker" },
           { offsetMs: 15400, lane: 4, enemyId: "briarBeetle" },
         ],
       },
@@ -89,7 +89,6 @@ const scenario_2026_04_26 = {
           { offsetMs: 1200, lane: 1, enemyId: "huskWalker" },
           { offsetMs: 4200, lane: 3, enemyId: "briarBeetle" },
           { offsetMs: 7600, lane: 3, enemyId: "huskWalker" },
-          { offsetMs: 10400, lane: 0, enemyId: "shardMite" },
           { offsetMs: 13800, lane: 4, enemyId: "briarBeetle" },
         ],
       },
@@ -101,7 +100,6 @@ const scenario_2026_04_26 = {
         events: [
           { offsetMs: 1500, lane: 2, enemyId: "glassRam" },
           { offsetMs: 5200, lane: 2, enemyId: "huskWalker" },
-          { offsetMs: 6900, lane: 0, enemyId: "shardMite" },
           { offsetMs: 8800, lane: 4, enemyId: "shardMite" },
           { offsetMs: 12600, lane: 1, enemyId: "huskWalker" },
           { offsetMs: 15300, lane: 3, enemyId: "briarBeetle" },
@@ -117,7 +115,6 @@ const scenario_2026_04_26 = {
           { offsetMs: 2600, lane: 3, enemyId: "huskWalker" },
           { offsetMs: 5200, lane: 2, enemyId: "glassRam" },
           { offsetMs: 7600, lane: 2, enemyId: "huskWalker" },
-          { offsetMs: 9800, lane: 0, enemyId: "briarBeetle" },
           { offsetMs: 12400, lane: 4, enemyId: "shardMite" },
           { offsetMs: 15200, lane: 2, enemyId: "briarBeetle" },
         ],

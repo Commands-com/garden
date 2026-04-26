@@ -64,6 +64,7 @@ const dom = {
   scoutPlants: document.getElementById("game-scout-plants"),
   scoutWaves: document.getElementById("game-scout-waves"),
   scoutDetail: document.getElementById("game-scout-detail"),
+  toastContainer: document.querySelector(".toast-container"),
 };
 
 let game = null;
@@ -239,18 +240,56 @@ function syncInventorySelection(selectedPlantId) {
   });
 }
 
-function syncInventoryAvailability(availablePlantIds = null) {
+function announceInventorySelection(plantId) {
+  if (!dom.toastContainer) {
+    return;
+  }
+
+  const plant = PLANT_DEFINITIONS[plantId];
+  const label = plant?.label || "Selected plant";
+  dom.toastContainer.replaceChildren(
+    el(
+      "div",
+      { className: "toast toast--info" },
+      el(
+        "div",
+        { className: "toast__content" },
+        el("div", { className: "toast__title" }, "Plant selected"),
+        el("div", { className: "toast__message" }, `${label} selected and ready to plant.`)
+      )
+    )
+  );
+}
+
+function syncInventoryAvailability(runtimeState = null) {
   if (!dom.inventory) {
     return;
   }
 
+  const availablePlantIds = Array.isArray(runtimeState)
+    ? runtimeState
+    : runtimeState?.availablePlantIds;
   const allowedPlants = Array.isArray(availablePlantIds) && availablePlantIds.length > 0
     ? new Set(availablePlantIds)
     : null;
+  const resources = Number(runtimeState?.resources);
+  const inventoryAvailability = new Map(
+    (runtimeState?.hudInventory || []).map((item) => [
+      item.plantId,
+      item.affordable === true && item.limitReached !== true,
+    ])
+  );
 
   dom.inventory.querySelectorAll(".game-inventory__item").forEach((item) => {
     const plantId = item.dataset.plantId || "";
-    const isAvailable = !allowedPlants || allowedPlants.has(plantId);
+    const plant = PLANT_DEFINITIONS[plantId];
+    const isAllowed = !allowedPlants || allowedPlants.has(plantId);
+    const isAffordableByResources =
+      !Number.isFinite(resources) || !plant || resources >= Number(plant.cost || 0);
+    const isAffordable = inventoryAvailability.has(plantId)
+      ? inventoryAvailability.get(plantId)
+      : isAffordableByResources;
+    const isAvailable = isAllowed && isAffordable;
     item.classList.toggle("game-inventory__item--disabled", !isAvailable);
     item.setAttribute("aria-disabled", String(!isAvailable));
   });
@@ -389,6 +428,11 @@ function renderBoardScout(dayDate, assetCatalog) {
     if (enemy.behavior === "burrow") {
       badges.push(
         el("span", { className: "game-scout__badge game-scout__badge--burrow" }, "Burrow")
+      );
+    }
+    if (enemy.behavior === "armored" || enemy.armor) {
+      badges.push(
+        el("span", { className: "game-scout__badge game-scout__badge--armored" }, "Armored")
       );
     }
     const card = el(
@@ -643,6 +687,43 @@ function selectScoutCard(card, type, data, scenario) {
           el("dd", {}, "Support > Piercing attacker > Attacker"),
           el("dt", {}, "Counterplay"),
           el("dd", {}, "Screen it — plant an attacker or a defender/wall between sniper and target"),
+          el("dt", {}, "Appears In"),
+          el("dd", {}, wavePresence.join(", ") || "No scripted waves")
+        )
+      );
+    } else if (data.behavior === "armored" || data.armor) {
+      const frontDamageMultiplier = data.armor?.frontDamageMultiplier ?? 1;
+      detail.append(
+        el("h4", { className: "game-scout__detail-title", id: "game-scout-detail-title" }, data.label),
+        el(
+          "dl",
+          { className: "game-scout__detail-stats" },
+          el("dt", {}, "HP"),
+          el("dd", {}, String(data.maxHealth)),
+          el("dt", {}, "Speed"),
+          el("dd", {}, String(data.speed)),
+          el("dt", {}, "Attack Damage"),
+          el("dd", {}, String(data.attackDamage)),
+          el("dt", {}, "Attack Cadence"),
+          el("dd", {}, `${data.attackCadenceMs}ms`),
+          el("dt", {}, "Front armor"),
+          el(
+            "dd",
+            {},
+            `Closed plate takes ${Math.round(frontDamageMultiplier * 100)}% direct-shot damage`
+          ),
+          el("dt", {}, "Windup window"),
+          el(
+            "dd",
+            {},
+            `${data.vulnerabilityWindowMs || 0}ms vulnerable windup before each strike`
+          ),
+          el("dt", {}, "Counterplay"),
+          el(
+            "dd",
+            {},
+            "Use walls to hold the plate in place; arc shots bypass the armor, and direct shots hit the exposed body during windup"
+          ),
           el("dt", {}, "Appears In"),
           el("dd", {}, wavePresence.join(", ") || "No scripted waves")
         )
@@ -949,7 +1030,7 @@ function updateRuntimeReadout(state) {
   if (dom.wallValue) dom.wallValue.textContent = `${state.gardenHP ?? 0} / ${state.maxGardenHealth ?? 0}`;
   if (dom.defendersValue) dom.defendersValue.textContent = String(state.defenderCount ?? 0);
   if (dom.enemyValue) dom.enemyValue.textContent = String(state.enemyCount ?? 0);
-  syncInventoryAvailability(state.scene === "play" ? state.availablePlantIds : null);
+  syncInventoryAvailability(state.scene === "play" ? state : null);
 
   if (!dom.runNote) return;
 
@@ -1120,6 +1201,7 @@ async function init() {
 
   const handlePlantSelected = (plantId) => {
     syncInventorySelection(plantId);
+    announceInventorySelection(plantId);
   };
 
   game.events.on("plantSelected", handlePlantSelected);

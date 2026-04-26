@@ -1,0 +1,60 @@
+{
+  "schemaVersion": 1,
+  "runDate": "2026-04-26",
+  "generatedAt": "2026-04-26T15:50:00.000Z",
+  "summary": {
+    "totalScenarios": 6,
+    "passed": 6,
+    "failed": 0,
+    "passRate": 100
+  },
+  "duration": "49.4s",
+  "scenarios": [
+    {
+      "name": "decision.json schema validation for 2026-04-26",
+      "persona": "validator",
+      "status": "pass",
+      "description": "Validates the served Husk Walker decision artifact and internal day-detail links.",
+      "duration": "0.9s"
+    },
+    {
+      "name": "Husk Walker texture and plate assets load from the manifest",
+      "persona": "validator",
+      "status": "pass",
+      "description": "Verifies the Husk Walker body and plate decal are manifest-backed textures, not procedural fallbacks.",
+      "duration": "1.1s"
+    },
+    {
+      "name": "Tutorial rolls into Crackplate challenge and gates endless",
+      "persona": "visitor",
+      "status": "pass",
+      "description": "Checks tutorial teaching, automatic challenge handoff, and endless unlock only after challenge clear.",
+      "duration": "2.9s"
+    },
+    {
+      "name": "Board Scout panel reveals Husk Walker card with armor/windup detail",
+      "persona": "visitor",
+      "status": "pass",
+      "description": "The card renders with armor and windup detail, keyboard focus, and stable card layout.",
+      "duration": "1.6s"
+    },
+    {
+      "name": "Game inventory and Board Scout keyboard accessibility on day-26 board",
+      "persona": "visitor",
+      "status": "pass",
+      "description": "Verifies skip link, tab order, inventory ARIA state, Board Scout traversal, live regions, and ARIA hygiene.",
+      "duration": "2.0s"
+    },
+    {
+      "name": "Scenario difficulty validator passes for Crackplate",
+      "persona": "validator",
+      "status": "pass",
+      "description": "Runs the deterministic validator for 2026-04-26 and confirms a narrow one-breach clear, no naive wins, Cottonburr arc usage, and full endless grace follow-through.",
+      "duration": "48.1s"
+    }
+  ],
+  "testPersonas": [
+    "validator",
+    "visitor"
+  ]
+}

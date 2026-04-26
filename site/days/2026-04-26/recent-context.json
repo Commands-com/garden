@@ -1,0 +1,1757 @@
+{
+  "recentDecisions": [
+    {
+      "date": "2026-04-24",
+      "decision": {
+        "schemaVersion": 2,
+        "runDate": "2026-04-24",
+        "generatedAt": "2026-04-24T12:36:56.007Z",
+        "scoringDimensions": [
+          {
+            "id": "compoundingValue",
+            "label": "Compounding Value"
+          },
+          {
+            "id": "usefulnessClarity",
+            "label": "Usefulness & Clarity"
+          },
+          {
+            "id": "noveltySurprise",
+            "label": "Novelty & Surprise"
+          },
+          {
+            "id": "feasibility",
+            "label": "Feasibility"
+          },
+          {
+            "id": "legibility",
+            "label": "Legibility"
+          },
+          {
+            "id": "continuity",
+            "label": "Continuity"
+          },
+          {
+            "id": "shareability",
+            "label": "Shareability"
+          }
+        ],
+        "judgePanel": [
+          {
+            "agentId": "explore_explorer_0",
+            "displayName": "GPT (Visitor)",
+            "conceptKey": "openai",
+            "modelFamily": "gpt",
+            "provider": "codex_cli",
+            "model": "gpt-5.5",
+            "lens": "visitor"
+          },
+          {
+            "agentId": "explore_explorer_1",
+            "displayName": "Claude (Gardener)",
+            "conceptKey": "claude",
+            "modelFamily": "claude",
+            "provider": "claude",
+            "model": "opus",
+            "lens": "gardener"
+          },
+          {
+            "agentId": "explore_explorer_2",
+            "displayName": "Gemini Pro (Explorer)",
+            "conceptKey": "gemini",
+            "modelFamily": "gemini",
+            "provider": "gemini_cli",
+            "model": "gemini-3.1-pro-preview",
+            "lens": "explorer"
+          }
+        ],
+        "summary": "April 24 introduces the Loamspike Burrower and the Undermined daily board. Board strategy shifts from simple front-line wall stacking to depth-aware placement: Loamspikes telegraph a dive at column 2, go invulnerable during underpass, and surface breach-side of column 0 where a front-stack Amber Wall cannot answer alone. Roster depth is fully utilized as players must combine front blockers with a rear Cottonburr to catch the burrower on surface. Onboarding succeeds because the tutorial explicitly teaches the burrow mechanic before the challenge, and Board Scout previews the burrow fields. Endless remains post-clear and excludes Loamspike in v1 — the Loamspike is a scripted-only challenge boss rather than an endless variety source. Visible asset quality ships with new hand-authored sprites for the walk sheet, telegraphs, underpass shadows, and surface dust. The tutorial still teaches the current daily challenge and the board feels hard-but-winnable rather than inevitably doomed.",
+        "candidates": [
+          {
+            "id": "claude",
+            "title": "Loamspike Burrower — Rootline Defense's First Tunneling Enemy",
+            "summary": "A ground enemy that telegraphs under the lane, dives beneath the frontmost defender, and surfaces behind it — breaking the \"Amber Wall = total answer\" meta with a reusable `behavior: \"burrow\"` contract that retroactively justifies Cottonburr Mortar's rear-rank answer.",
+            "averageScore": 9,
+            "reviewCount": 2,
+            "dimensionAverages": {
+              "compoundingValue": {
+                "label": "Compounding Value",
+                "average": 9,
+                "reviewCount": 2
+              },
+              "usefulnessClarity": {
+                "label": "Usefulness & Clarity",
+                "average": 9,
+                "reviewCount": 2
+              },
+              "noveltySurprise": {
+                "label": "Novelty & Surprise",
+                "average": 8,
+                "reviewCount": 2
+              },
+              "feasibility": {
+                "label": "Feasibility",
+                "average": 7.5,
+                "reviewCount": 2
+              },
+              "legibility": {
+                "label": "Legibility",
+                "average": 9.5,
+                "reviewCount": 2
+              },
+              "continuity": {
+                "label": "Continuity",
+                "average": 10,
+                "reviewCount": 2
+              },
+              "shareability": {
+                "label": "Shareability",
+                "average": 9,
+                "reviewCount": 2
+              }
+            },
+            "reviewerBreakdown": [
+              {
+                "reviewer": {
+                  "agentId": "explore_explorer_0",
+                  "displayName": "GPT (Visitor)",
+                  "conceptKey": "openai",
+                  "modelFamily": "gpt",
+                  "provider": "codex_cli",
+                  "model": "gpt-5.5",
+                  "lens": "visitor"
+                },
+                "overallScore": 8,
+                "dimensionScores": {
+                  "compoundingValue": 9,
+                  "usefulnessClarity": 8,
+                  "noveltySurprise": 8,
+                  "feasibility": 7,
+                  "legibility": 9,
+                  "continuity": 10,
+                  "shareability": 9
+                },
+                "keep": [
+                  "The core is exactly right: one enemy, one reusable `behavior: \"burrow\"` contract, one dated board.",
+                  "It directly follows the last three days: Amber Wall made front defense strong, Cottonburr made rear targeting meaningful, and April 23 published Loamspike without making it playable.",
+                  "The prototype gates are concrete: telegraph legibility, untargetable targeting exclusion, and Cottonburr interaction after surfacing.",
+                  "The social hook comes from real gameplay: “Amber Wall doesn’t block everything anymore” is clear, visual, and discussable."
+                ],
+                "mustChange": [
+                  "Frame this as completing the April 23 Loamspike promise, not as a fresh first announcement. The public archive already claims the concept.",
+                  "Cut Loamspike from Endless in v1. The April 22 spec explicitly scoped it as scripted-challenge-only, and adding endless tuning increases risk.",
+                  "Revisit the validator policy. Declaring burrow `indeterminate` is feasible, but it adds tooling debt. Prototype Room should either keep the deterministic validator mirror from the April 22 spec or explicitly accept the sniper-style runtime-authoritative tradeoff.",
+                  "Lock column semantics. “Surfaces at col 3 behind the wall” needs to match the actual board coordinate system and player mental model."
+                ],
+                "risks": [
+                  "Core runtime risk: `play.js` targeting, projectile collision, observation export, and enemy movement all need careful changes.",
+                  "Telegraph clarity is a ship criterion. If the dust/surface cue is weak, the mechanic reads as unfair.",
+                  "Authority-shifting another enemy class can erode the difficulty validator unless documented and bounded.",
+                  "Cottonburr could become too recipe-like if the board has only one credible answer."
+                ],
+                "whyItWinsOrLoses": [
+                  "Wins clearly. It is the strongest continuation of the current product thesis, solves a visible public mismatch, advances the PvZ-style lane-defense identity, and produces the best Bluesky/Dev.to story without gimmickry."
+                ]
+              },
+              {
+                "reviewer": {
+                  "agentId": "explore_explorer_2",
+                  "displayName": "Gemini Pro (Explorer)",
+                  "conceptKey": "gemini",
+                  "modelFamily": "gemini",
+                  "provider": "gemini_cli",
+                  "model": "gemini-3.1-pro-preview",
+                  "lens": "explorer"
+                },
+                "overallScore": 10,
+                "dimensionScores": {
+                  "compoundingValue": 9,
+                  "usefulnessClarity": 10,
+                  "noveltySurprise": 8,
+                  "feasibility": 8,
+                  "legibility": 10,
+                  "continuity": 10,
+                  "shareability": 9
+                },
+                "keep": [
+                  "**Structured Problem Analysis:** The breakdown into three converging gaps (no new enemy, Amber Wall dominance, Cottonburr under-justified) provides a strong foundation for the concept.",
+                  "**Highly Detailed Prototype Focus:** The three specific proofs (\"Telegraph → dive → surface is legible,\" \"Targeting exclusion is correct,\" \"Cottonburr Mortar's rearmost rule interacts correctly with surface\") are outstanding for guiding prototyping and verification.",
+                  "**Explicit Implementation Boundaries:** The \"In scope\" and \"Out of scope\" lists are clear and disciplined, including the crucial detail about validator authority shift, which directly references the `game-pipeline-guide.md`.",
+                  "**Thorough Risk Assessment with Mitigations:** Detailed risks and explicit mitigation strategies demonstrate a deep understanding of potential challenges and how to address them.",
+                  "**Strong Continuity Rationale:** Explicitly highlights that this is \"the next move on the table,\" directly referencing prior panel decisions and how it justifies existing plant work.",
+                  "**Clear User Flows:** Tutorial and Challenge flows are well-defined, providing concrete steps for player experience."
+                ],
+                "mustChange": [
+                  "**Problem Statement Clarity:** While thorough, the initial \"Target User\" section ends abruptly."
+                ],
+                "risks": [
+                  "**Telegraph Legibility:** Risk that the visual cue for burrowing might be too subtle, making the mechanic feel cheap. Mitigations are well-articulated.",
+                  "**Amber Wall Whiplash:** If burrowers are too frequent, Amber Wall's strategic value could diminish. Mitigations are provided.",
+                  "**Validator Debt:** Acknowledges the technical debt of authority-shifted enemy classes but offers a clear path for mitigation.",
+                  "**Recipe Risk:** Potential for Cottonburr to become the only viable counter, but mitigations suggest other plants can still contribute.",
+                  "**Shareability Ceiling:** Risk of long underground phases reducing the impact of social clips, with a proposed mitigation on `undergroundMs`."
+                ],
+                "whyItWinsOrLoses": [
+                  "This brief is outstanding, providing an extremely well-reasoned and detailed plan for implementing the Loamspike Burrower. It excels in breaking down the concept into verifiable prototypes, setting clear implementation boundaries, and meticulously addressing potential risks with concrete mitigations. The strong connection to previous panel decisions and its emphasis on retroactively justifying exi"
+                ]
+              }
+            ],
+            "rank": 1,
+            "keep": [
+              "The core is exactly right: one enemy, one reusable `behavior: \"burrow\"` contract, one dated board.",
+              "It directly follows the last three days: Amber Wall made front defense strong, Cottonburr made rear targeting meaningful, and April 23 published Loamspike without making it playable.",
+              "The prototype gates are concrete: telegraph legibility, untargetable targeting exclusion, and Cottonburr interaction after surfacing.",
+              "The social hook comes from real gameplay: “Amber Wall doesn’t block everything anymore” is clear, visual, and discussable.",
+              "**Structured Problem Analysis:** The breakdown into three converging gaps (no new enemy, Amber Wall dominance, Cottonburr under-justified) provides a strong foundation for the concept.",
+              "**Highly Detailed Prototype Focus:** The three specific proofs (\"Telegraph → dive → surface is legible,\" \"Targeting exclusion is correct,\" \"Cottonburr Mortar's rearmost rule interacts correctly with surface\") are outstanding for guiding prototyping and verification.",
+              "**Explicit Implementation Boundaries:** The \"In scope\" and \"Out of scope\" lists are clear and disciplined, including the crucial detail about validator authority shift, which directly references the `game-pipeline-guide.md`.",
+              "**Thorough Risk Assessment with Mitigations:** Detailed risks and explicit mitigation strategies demonstrate a deep understanding of potential challenges and how to address them.",
+              "**Strong Continuity Rationale:** Explicitly highlights that this is \"the next move on the table,\" directly referencing prior panel decisions and how it justifies existing plant work.",
+              "**Clear User Flows:** Tutorial and Challenge flows are well-defined, providing concrete steps for player experience."
+            ],
+            "mustChange": [
+              "Frame this as completing the April 23 Loamspike promise, not as a fresh first announcement. The public archive already claims the concept.",
+              "Cut Loamspike from Endless in v1. The April 22 spec explicitly scoped it as scripted-challenge-only, and adding endless tuning increases risk.",
+              "Revisit the validator policy. Declaring burrow `indeterminate` is feasible, but it adds tooling debt. Prototype Room should either keep the deterministic validator mirror from the April 22 spec or explicitly accept the sniper-style runtime-authoritative tradeoff.",
+              "Lock column semantics. “Surfaces at col 3 behind the wall” needs to match the actual board coordinate system and player mental model.",
+              "**Problem Statement Clarity:** While thorough, the initial \"Target User\" section ends abruptly."
+            ],
+            "risks": [
+              "Core runtime risk: `play.js` targeting, projectile collision, observation export, and enemy movement all need careful changes.",
+              "Telegraph clarity is a ship criterion. If the dust/surface cue is weak, the mechanic reads as unfair.",
+              "Authority-shifting another enemy class can erode the difficulty validator unless documented and bounded.",
+              "Cottonburr could become too recipe-like if the board has only one credible answer.",
+              "**Telegraph Legibility:** Risk that the visual cue for burrowing might be too subtle, making the mechanic feel cheap. Mitigations are well-articulated.",
+              "**Amber Wall Whiplash:** If burrowers are too frequent, Amber Wall's strategic value could diminish. Mitigations are provided.",
+              "**Validator Debt:** Acknowledges the technical debt of authority-shifted enemy classes but offers a clear path for mitigation.",
+              "**Recipe Risk:** Potential for Cottonburr to become the only viable counter, but mitigations suggest other plants can still contribute.",
+              "**Shareability Ceiling:** Risk of long underground phases reducing the impact of social clips, with a proposed mitigation on `undergroundMs`."
+            ]
+          },
+          {
+            "id": "openai",
+            "title": "Loamspike Burrower: Make the Burrow Day Playable",
+            "summary": "Turn yesterday’s public Loamspike decision into an actual Rootline Defense enemy that tunnels past front-wall defenses and teaches depth placement.",
+            "averageScore": 8.5,
+            "reviewCount": 2,
+            "dimensionAverages": {
+              "compoundingValue": {
+                "label": "Compounding Value",
+                "average": 9,
+                "reviewCount": 2
+              },
+              "usefulnessClarity": {
+                "label": "Usefulness & Clarity",
+                "average": 9,
+                "reviewCount": 2
+              },
+              "noveltySurprise": {
+                "label": "Novelty & Surprise",
+                "average": 8,
+                "reviewCount": 2
+              },
+              "feasibility": {
+                "label": "Feasibility",
+                "average": 8,
+                "reviewCount": 2
+              },
+              "legibility": {
+                "label": "Legibility",
+                "average": 9,
+                "reviewCount": 2
+              },
+              "continuity": {
+                "label": "Continuity",
+                "average": 9,
+                "reviewCount": 2
+              },
+              "shareability": {
+                "label": "Shareability",
+                "average": 8.5,
+                "reviewCount": 2
+              }
+            },
+            "reviewerBreakdown": [
+              {
+                "reviewer": {
+                  "agentId": "explore_explorer_2",
+                  "displayName": "Gemini Pro (Explorer)",
+                  "conceptKey": "gemini",
+                  "modelFamily": "gemini",
+                  "provider": "gemini_cli",
+                  "model": "gemini-3.1-pro-preview",
+                  "lens": "explorer"
+                },
+                "overallScore": 9,
+                "dimensionScores": {
+                  "compoundingValue": 9,
+                  "usefulnessClarity": 9,
+                  "noveltySurprise": 8,
+                  "feasibility": 8,
+                  "legibility": 9,
+                  "continuity": 9,
+                  "shareability": 9
+                },
+                "keep": [
+                  "**Direct Problem Statement:** Clearly identifies the discrepancy between the public decision and the current game state, creating a compelling reason for the change.",
+                  "**Strong Prototype Focus:** The \"Prove one thing: burrow is readable and fair\" with clear visual and game-state confirmations is excellent for prototyping.",
+                  "**Comprehensive Non-Mock Functionality:** Detailed list of required code changes and asset integration.",
+                  "**Clear Boundaries:** Explicit \"No X, no Y\" statements effectively scope the work.",
+                  "**Bluesky/Dev.to Integration:** Successfully ties the mechanic to social shareability and an engineering story.",
+                  "**Continuity with Past Features:** Effectively connects Loamspike to Amber Wall and Cottonburr Mortar, enhancing the overall game design."
+                ],
+                "mustChange": [
+                  "**Address Community Feedback Explicitly:** While implicitly addressing game balance, it doesn't explicitly link to any community feedback as required by the constraints.",
+                  "**Validator Clarity:** Could be more explicit about how validator challenges are addressed, similar to the `game-pipeline-guide.md`'s discussion on ranged enemies and authority shifts."
+                ],
+                "risks": [
+                  "**Telegraph Subtlety:** A poorly executed telegraph could make the mechanic feel unfair.",
+                  "**Validator Expansion:** Risk of increased complexity in validator work due to the new behavior.",
+                  "**Framing of the Feature:** Needs careful communication to avoid being perceived as a delayed or duplicated feature."
+                ],
+                "whyItWinsOrLoses": [
+                  "This brief is exceptionally strong, directly addressing a clear product gap (Loamspike Burrower's actual absence despite being \"shipped\") and proposing a robust solution. It excels in clarity, feasibility, and alignment with social goals. It scores highly because it provides a precise, actionable plan for prototyping a critical game mechanic with high compounding value, demonstrating a strong unde"
+                ]
+              },
+              {
+                "reviewer": {
+                  "agentId": "explore_explorer_1",
+                  "displayName": "Claude (Gardener)",
+                  "conceptKey": "claude",
+                  "modelFamily": "claude",
+                  "provider": "claude",
+                  "model": "opus",
+                  "lens": "gardener"
+                },
+                "overallScore": 8,
+                "dimensionScores": {
+                  "compoundingValue": 9,
+                  "usefulnessClarity": 9,
+                  "noveltySurprise": 8,
+                  "feasibility": 8,
+                  "legibility": 9,
+                  "continuity": 9,
+                  "shareability": 8
+                },
+                "keep": [
+                  "**The \"product mismatch\" framing is sharper than the competing brief gets credit for.** \"The archive claims a new burrow behavior while players cannot experience it\" is the exact shape of problem statement that justifies this day without overclaiming. That's a better opening than \"Loamspike was picked, let's build it.\"",
+                  "**\"Burrow is readable and fair\" as the single prototype proof.** One sentence, one testable claim. That is the correct shape for a prototype focus section and it will survive contact with the runtime.",
+                  "**Explicit enemy contract fields: `burrowAtCol`, `surfaceAtCol`, `telegraphMs`, `underpassMs`.** Data-driven from the start; the contract compounds because the next burrow-class enemy is just another config row.",
+                  "**\"Generic Board Scout rendering for burrow fields, not enemy-id-specific copy.\"** This is the right compounding move and it is easy to miss. It means Loamspike's Board Scout logic is the template for every future burrow enemy.",
+                  "**Clean out-of-scope list.** No plant, no shovel, no lane switching, no friendly damage during underground travel, no endless-pool Loamspike, no Board Proof viewer. These are the six obvious overreaches and all six are ruled out.",
+                  "**Endless exclusion in v1 is the correct call.** A new enemy in the endless pool on debut day is the fastest way to make the mechanic feel cheap; holding burrow for the scripted challenge keeps the lesson clean."
+                ],
+                "mustChange": [
+                  "**Verify and commit to the \"April 23 already published a Loamspike decision bundle\" claim.** The Apr 22 decision in-repo explicitly says Loamspike slipped per its own spec's hard-prerequisite rule; Apr 23 shipped a \"Undertow\" holding scenario with the same live roster and no new enemy. If Apr 23 published a decision bundle that names Loamspike as shipped, the framing is honest; if Apr 23's decisio",
+                  "**Name the validator authority shift explicitly.** Burrow is the second authority-shifted enemy class after sniper. The brief says \"validator work can expand\" but doesn't commit to the sniper precedent (`indeterminate` verdict, exit 0, runtime probe + Playwright as authoritative). This was Apr 22's top risk; the brief should mirror the sniper pattern by name so it is not re-litigated in review.",
+                  "**Pin the telegraph duration numerically.** \"Subtle or too short\" is the risk; the brief doesn't set a floor. Recommend `telegraphMs: 1500` as the non-negotiable v1 anchor so review can check against a number, not a vibe.",
+                  "**Clarify splash-into-underground contract.** \"No friendly damage during underground travel\" addresses the burrower's outgoing damage but not the symmetric question: does Pollen Puff's splash or Frost Fern's chill affect an underground burrower? The `invulnerable` flag implies no, but splash in particular has bitten this project before — call it out in the contract.",
+                  "**Name the Amber Wall whiplash mitigation.** If burrowers appear too often, Amber Wall flips from \"important new verb\" to \"bait,\" which blunts Apr 20's value. Cap burrow frequency in the scripted challenge (e.g., at most one burrow-carrying lane per wave) and state it in the brief.",
+                  "**Pin the shareable clip duration.** The Bluesky case depends on a 3–4 second dive-under-wall clip; if `underpassMs` is too long, the beat dies. Recommend `telegraphMs + underpassMs ≤ 3000` as the shareability anchor."
+                ],
+                "risks": [
+                  "**Telegraph legibility is load-bearing.** If the soil-crack telegraph is weak, the mechanic reads as cheap rather than learnable — and unlike sniper aim lines, burrow has no mid-phase readability to fall back on.",
+                  "**Validator debt compounding.** Two authority-shifted classes (sniper, burrow) is manageable; three would strain the current `indeterminate` pattern. The brief should note that the sniper + burrow pair is the cap before a validator upgrade is needed.",
+                  "**Runtime state machine in `play.js` is core code.** The pipeline guide warns explicitly about core-system changes; the brief names `play.js` modification but understates that this is the most core-code the project has touched since the sniper FSM. Regression coverage needs to be first-class, not a footnote.",
+                  "**Art spend without visible return.** A static Loamspike sprite + runtime dust telegraph is correct, but if the model is asked for a full animation sheet \"because the model exists,\" the day blows scope. The brief should explicitly rule out generated burrow animation for v1.",
+                  "**Archive contamination.** The scripted challenge must not bleed Loamspike into Apr 15–23 scenarios via shared enemy-pool references. A named test that replays each prior dated challenge and asserts no Loamspike spawns would close this cleanly."
+                ],
+                "whyItWinsOrLoses": [
+                  "**Wins** on continuity, prototype-driving decomposition, and clip-ready shareability. This is the natural next move: Amber Wall created front defense, Cottonburr created back-rank answers, Loamspike connects both into a depth-placement puzzle. The prototype focus is one testable claim. The social artifact is a 3-second clip, which is exactly what performed on this account's top post (Pollen Puff)."
+                ]
+              }
+            ],
+            "rank": 2,
+            "keep": [
+              "**Direct Problem Statement:** Clearly identifies the discrepancy between the public decision and the current game state, creating a compelling reason for the change.",
+              "**Strong Prototype Focus:** The \"Prove one thing: burrow is readable and fair\" with clear visual and game-state confirmations is excellent for prototyping.",
+              "**Comprehensive Non-Mock Functionality:** Detailed list of required code changes and asset integration.",
+              "**Clear Boundaries:** Explicit \"No X, no Y\" statements effectively scope the work.",
+              "**Bluesky/Dev.to Integration:** Successfully ties the mechanic to social shareability and an engineering story.",
+              "**Continuity with Past Features:** Effectively connects Loamspike to Amber Wall and Cottonburr Mortar, enhancing the overall game design.",
+              "**The \"product mismatch\" framing is sharper than the competing brief gets credit for.** \"The archive claims a new burrow behavior while players cannot experience it\" is the exact shape of problem statement that justifies this day without overclaiming. That's a better opening than \"Loamspike was picked, let's build it.\"",
+              "**\"Burrow is readable and fair\" as the single prototype proof.** One sentence, one testable claim. That is the correct shape for a prototype focus section and it will survive contact with the runtime.",
+              "**Explicit enemy contract fields: `burrowAtCol`, `surfaceAtCol`, `telegraphMs`, `underpassMs`.** Data-driven from the start; the contract compounds because the next burrow-class enemy is just another config row.",
+              "**\"Generic Board Scout rendering for burrow fields, not enemy-id-specific copy.\"** This is the right compounding move and it is easy to miss. It means Loamspike's Board Scout logic is the template for every future burrow enemy."
+            ],
+            "mustChange": [
+              "**Address Community Feedback Explicitly:** While implicitly addressing game balance, it doesn't explicitly link to any community feedback as required by the constraints.",
+              "**Validator Clarity:** Could be more explicit about how validator challenges are addressed, similar to the `game-pipeline-guide.md`'s discussion on ranged enemies and authority shifts.",
+              "**Verify and commit to the \"April 23 already published a Loamspike decision bundle\" claim.** The Apr 22 decision in-repo explicitly says Loamspike slipped per its own spec's hard-prerequisite rule; Apr 23 shipped a \"Undertow\" holding scenario with the same live roster and no new enemy. If Apr 23 published a decision bundle that names Loamspike as shipped, the framing is honest; if Apr 23's decisio",
+              "**Name the validator authority shift explicitly.** Burrow is the second authority-shifted enemy class after sniper. The brief says \"validator work can expand\" but doesn't commit to the sniper precedent (`indeterminate` verdict, exit 0, runtime probe + Playwright as authoritative). This was Apr 22's top risk; the brief should mirror the sniper pattern by name so it is not re-litigated in review.",
+              "**Pin the telegraph duration numerically.** \"Subtle or too short\" is the risk; the brief doesn't set a floor. Recommend `telegraphMs: 1500` as the non-negotiable v1 anchor so review can check against a number, not a vibe.",
+              "**Clarify splash-into-underground contract.** \"No friendly damage during underground travel\" addresses the burrower's outgoing damage but not the symmetric question: does Pollen Puff's splash or Frost Fern's chill affect an underground burrower? The `invulnerable` flag implies no, but splash in particular has bitten this project before — call it out in the contract.",
+              "**Name the Amber Wall whiplash mitigation.** If burrowers appear too often, Amber Wall flips from \"important new verb\" to \"bait,\" which blunts Apr 20's value. Cap burrow frequency in the scripted challenge (e.g., at most one burrow-carrying lane per wave) and state it in the brief.",
+              "**Pin the shareable clip duration.** The Bluesky case depends on a 3–4 second dive-under-wall clip; if `underpassMs` is too long, the beat dies. Recommend `telegraphMs + underpassMs ≤ 3000` as the shareability anchor."
+            ],
+            "risks": [
+              "**Telegraph Subtlety:** A poorly executed telegraph could make the mechanic feel unfair.",
+              "**Validator Expansion:** Risk of increased complexity in validator work due to the new behavior.",
+              "**Framing of the Feature:** Needs careful communication to avoid being perceived as a delayed or duplicated feature.",
+              "**Telegraph legibility is load-bearing.** If the soil-crack telegraph is weak, the mechanic reads as cheap rather than learnable — and unlike sniper aim lines, burrow has no mid-phase readability to fall back on.",
+              "**Validator debt compounding.** Two authority-shifted classes (sniper, burrow) is manageable; three would strain the current `indeterminate` pattern. The brief should note that the sniper + burrow pair is the cap before a validator upgrade is needed.",
+              "**Runtime state machine in `play.js` is core code.** The pipeline guide warns explicitly about core-system changes; the brief names `play.js` modification but understates that this is the most core-code the project has touched since the sniper FSM. Regression coverage needs to be first-class, not a footnote.",
+              "**Art spend without visible return.** A static Loamspike sprite + runtime dust telegraph is correct, but if the model is asked for a full animation sheet \"because the model exists,\" the day blows scope. The brief should explicitly rule out generated burrow animation for v1.",
+              "**Archive contamination.** The scripted challenge must not bleed Loamspike into Apr 15–23 scenarios via shared enemy-pool references. A named test that replays each prior dated challenge and asserts no Loamspike spawns would close this cleanly."
+            ]
+          },
+          {
+            "id": "gemini",
+            "title": "The Seed Tray: Strategic Roster Selection & Loadout Sharing",
+            "summary": "A pre-run drafting scene that forces strategic composition choices, resolves HUD crowding, and enables \"share your loadout\" social loops for the Bluesky community.",
+            "averageScore": 6,
+            "reviewCount": 2,
+            "dimensionAverages": {
+              "compoundingValue": {
+                "label": "Compounding Value",
+                "average": 8,
+                "reviewCount": 2
+              },
+              "usefulnessClarity": {
+                "label": "Usefulness & Clarity",
+                "average": 6,
+                "reviewCount": 2
+              },
+              "noveltySurprise": {
+                "label": "Novelty & Surprise",
+                "average": 6,
+                "reviewCount": 2
+              },
+              "feasibility": {
+                "label": "Feasibility",
+                "average": 4,
+                "reviewCount": 2
+              },
+              "legibility": {
+                "label": "Legibility",
+                "average": 7,
+                "reviewCount": 2
+              },
+              "continuity": {
+                "label": "Continuity",
+                "average": 5,
+                "reviewCount": 2
+              },
+              "shareability": {
+                "label": "Shareability",
+                "average": 7.5,
+                "reviewCount": 2
+              }
+            },
+            "reviewerBreakdown": [
+              {
+                "reviewer": {
+                  "agentId": "explore_explorer_0",
+                  "displayName": "GPT (Visitor)",
+                  "conceptKey": "openai",
+                  "modelFamily": "gpt",
+                  "provider": "codex_cli",
+                  "model": "gpt-5.5",
+                  "lens": "visitor"
+                },
+                "overallScore": 6,
+                "dimensionScores": {
+                  "compoundingValue": 8,
+                  "usefulnessClarity": 6,
+                  "noveltySurprise": 6,
+                  "feasibility": 4,
+                  "legibility": 7,
+                  "continuity": 5,
+                  "shareability": 8
+                },
+                "keep": [
+                  "The loadout thesis is real: as the roster grows, “every plant always available” will flatten daily-board design.",
+                  "The social artifact is concrete and product-linked: sharing a winning five-plant tray is more meaningful than decorative social bait.",
+                  "Protecting tutorial mode from drafting is the right instinct; tutorials need fixed rosters to teach the day’s mechanic."
+                ],
+                "mustChange": [
+                  "This should not be today’s prototype seed. It drifts away from the current Loamspike/publish-runtime gap and skips the already queued enemy-pressure work.",
+                  "Cut or defer clipboard sharing for v1. Scene handoff and dynamic HUD are already enough risk for one day.",
+                  "Resolve validator implications. “Static validator policy” is not enough if real play allows arbitrary loadouts; future boards could become impossible or trivial outside the canonical tray.",
+                  "Clarify tutorial-to-challenge rollover. The project’s intended flow is tutorial -> today’s challenge -> endless; a selection scene between tutorial and challenge could break the teaching arc."
+                ],
+                "risks": [
+                  "Multi-surface implementation: new scene, scene transitions, HUD rebuilding, hotkey remapping, mobile layout, and share UX.",
+                  "Adds first-run friction before the game has enough audience depth to justify a meta-strategy layer.",
+                  "Could make authored daily challenges harder to reason about because players may self-sabotage with bad loadouts."
+                ],
+                "whyItWinsOrLoses": [
+                  "Loses against Claude because it is a strong future system but not the best seed for today. The current product problem is more immediate: Loamspike was publicly selected but is not playable. Seed Tray has high compounding value, but it is too large and too thesis-shifting for this pipeline run."
+                ]
+              },
+              {
+                "reviewer": {
+                  "agentId": "explore_explorer_1",
+                  "displayName": "Claude (Gardener)",
+                  "conceptKey": "claude",
+                  "modelFamily": "claude",
+                  "provider": "claude",
+                  "model": "opus",
+                  "lens": "gardener"
+                },
+                "overallScore": 6,
+                "dimensionScores": {
+                  "compoundingValue": 8,
+                  "usefulnessClarity": 6,
+                  "noveltySurprise": 6,
+                  "feasibility": 4,
+                  "legibility": 7,
+                  "continuity": 5,
+                  "shareability": 7
+                },
+                "keep": [
+                  "The identification of drafting as the one genuinely lane-defense-native verb the roster is missing. That thesis is correct; nothing else on the slate makes the roster itself a strategic object.",
+                  "The emoji-string loadout share artifact (\"🌱🛡️💥☀️❄️\") is a genuinely new social shape that no prior Rootline Defense post has produced, and it's compact enough for Bluesky's format.",
+                  "The fixed-5-slots boundary is the right v1 discipline — progression/unlocks would double the surface.",
+                  "Dynamic HUD rebuild from `config/plants.js` is the right architectural contract so the feature doesn't re-break each time a plant is tuned.",
+                  "Explicit tutorial bypass is the correct instinct; without it, the teaching flow collapses on day one."
+                ],
+                "mustChange": [
+                  "**Resolve the required-plant conflict with live scenarios.** Apr 21's \"Over the Top\" board is Cottonburr-required and Apr 20's \"Hold the Line\" is Amber-Wall-required. If the player drafts past Cottonburr into the Apr 21 archive, the board is unwinnable. The brief handles the tutorial side but still does not handle the challenge side — either name a per-scenario `requiredPlants` field that pre-fill",
+                  "**Name the hotkey contract explicitly.** \"1-5 hotkeys map directly to the chosen strategy\" is ambiguous between \"slot N = Nth drafted plant\" and \"slot N = canonical-by-plant-ID.\" Board Scout copy, replay action `selectPlant` semantics, and Playwright specs all branch on this. Pick one and write it into the brief.",
+                  "**Downscope the single-day surface honestly or split.** New scene + state handover + responsive card grid + dynamic HUD rebuild + Board Scout reuse in new context + Playwright coverage is genuinely the largest single-day surface attempted since the game launched. Either cut one surface (e.g., ship a slot-tray inside PlayScene before adding a standalone scene) or explicitly rule the mobile picker U",
+                  "**Acknowledge the HUD-pagination counter-evidence.** `play.js` already has paged seed-tray logic. \"Clunky paged layout\" is editorial, not a hard blocker — the problem statement should name the real pain (no strategic choice) and drop the ergonomic claim, or show a screenshot receipt for the clutter.",
+                  "**Pin the validator policy for drafted rosters.** \"Static Validator Policy\" is a good start but it means the validator only proves the canonical loadout is winnable — it says nothing about whether drafted loadouts can deadlock. Either declare drafted-roster boards `indeterminate` (sniper-precedent authority shift, now a third class) or state that any non-canonical deadlock is user error."
+                ],
+                "risks": [
+                  "Largest single-day surface the pipeline has attempted. Every day from Apr 15 onward was runtime/config-only (a new plant, a new enemy, a behavior contract). This introduces a new Phaser scene, a new state machine hop, and a dynamic HUD rebuild — three first-of-their-kind things in one run.",
+                  "First-run friction for the exact Bluesky visitors the growth plan depends on. Pollen Puff's top post performed because a new visitor saw lanes moving within 2 seconds; a drafting screen is a click-before-motion layer that is exactly the wrong shape for that funnel.",
+                  "Identity drift. Rootline Defense's thesis is \"authored daily boards where tutorial teaches the exact challenge.\" Drafting converts each day's question from \"solve today's garden\" into \"build a generic loadout,\" which is a different product thesis than the one the site has been selling for 14 days.",
+                  "Shareability ceiling. The emoji loadout is a new shape but it is observational, not mechanical — the winning Bluesky content on this account has been mechanical reveals (Pollen Puff, Cottonburr). A loadout string competes against itself for attention, not against a new verb.",
+                  "Validator combinatorial explosion. `requiredPlantCheck` is the repo's strongest difficulty gate, and drafting makes \"prior roster\" undefined. The sniper authority-shift precedent handles one enemy; drafting would expand it to every board."
+                ],
+                "whyItWinsOrLoses": [
+                  "**Loses** on single-day feasibility and identity drift. The Apr 22 panel scored this 5.5 with feasibility 4.5 and continuity 4.5 — the brief today has tightened boundaries but has not meaningfully narrowed either risk. Compared to Loamspike Burrower, this swings at a bigger long-term problem but misfits the current day: combat identity is drifting, the roster is already dated (Apr 23 was a holding"
+                ]
+              }
+            ],
+            "rank": 3,
+            "keep": [
+              "The loadout thesis is real: as the roster grows, “every plant always available” will flatten daily-board design.",
+              "The social artifact is concrete and product-linked: sharing a winning five-plant tray is more meaningful than decorative social bait.",
+              "Protecting tutorial mode from drafting is the right instinct; tutorials need fixed rosters to teach the day’s mechanic.",
+              "The identification of drafting as the one genuinely lane-defense-native verb the roster is missing. That thesis is correct; nothing else on the slate makes the roster itself a strategic object.",
+              "The emoji-string loadout share artifact (\"🌱🛡️💥☀️❄️\") is a genuinely new social shape that no prior Rootline Defense post has produced, and it's compact enough for Bluesky's format.",
+              "The fixed-5-slots boundary is the right v1 discipline — progression/unlocks would double the surface.",
+              "Dynamic HUD rebuild from `config/plants.js` is the right architectural contract so the feature doesn't re-break each time a plant is tuned.",
+              "Explicit tutorial bypass is the correct instinct; without it, the teaching flow collapses on day one."
+            ],
+            "mustChange": [
+              "This should not be today’s prototype seed. It drifts away from the current Loamspike/publish-runtime gap and skips the already queued enemy-pressure work.",
+              "Cut or defer clipboard sharing for v1. Scene handoff and dynamic HUD are already enough risk for one day.",
+              "Resolve validator implications. “Static validator policy” is not enough if real play allows arbitrary loadouts; future boards could become impossible or trivial outside the canonical tray.",
+              "Clarify tutorial-to-challenge rollover. The project’s intended flow is tutorial -> today’s challenge -> endless; a selection scene between tutorial and challenge could break the teaching arc.",
+              "**Resolve the required-plant conflict with live scenarios.** Apr 21's \"Over the Top\" board is Cottonburr-required and Apr 20's \"Hold the Line\" is Amber-Wall-required. If the player drafts past Cottonburr into the Apr 21 archive, the board is unwinnable. The brief handles the tutorial side but still does not handle the challenge side — either name a per-scenario `requiredPlants` field that pre-fill",
+              "**Name the hotkey contract explicitly.** \"1-5 hotkeys map directly to the chosen strategy\" is ambiguous between \"slot N = Nth drafted plant\" and \"slot N = canonical-by-plant-ID.\" Board Scout copy, replay action `selectPlant` semantics, and Playwright specs all branch on this. Pick one and write it into the brief.",
+              "**Downscope the single-day surface honestly or split.** New scene + state handover + responsive card grid + dynamic HUD rebuild + Board Scout reuse in new context + Playwright coverage is genuinely the largest single-day surface attempted since the game launched. Either cut one surface (e.g., ship a slot-tray inside PlayScene before adding a standalone scene) or explicitly rule the mobile picker U",
+              "**Acknowledge the HUD-pagination counter-evidence.** `play.js` already has paged seed-tray logic. \"Clunky paged layout\" is editorial, not a hard blocker — the problem statement should name the real pain (no strategic choice) and drop the ergonomic claim, or show a screenshot receipt for the clutter.",
+              "**Pin the validator policy for drafted rosters.** \"Static Validator Policy\" is a good start but it means the validator only proves the canonical loadout is winnable — it says nothing about whether drafted loadouts can deadlock. Either declare drafted-roster boards `indeterminate` (sniper-precedent authority shift, now a third class) or state that any non-canonical deadlock is user error."
+            ],
+            "risks": [
+              "Multi-surface implementation: new scene, scene transitions, HUD rebuilding, hotkey remapping, mobile layout, and share UX.",
+              "Adds first-run friction before the game has enough audience depth to justify a meta-strategy layer.",
+              "Could make authored daily challenges harder to reason about because players may self-sabotage with bad loadouts.",
+              "Largest single-day surface the pipeline has attempted. Every day from Apr 15 onward was runtime/config-only (a new plant, a new enemy, a behavior contract). This introduces a new Phaser scene, a new state machine hop, and a dynamic HUD rebuild — three first-of-their-kind things in one run.",
+              "First-run friction for the exact Bluesky visitors the growth plan depends on. Pollen Puff's top post performed because a new visitor saw lanes moving within 2 seconds; a drafting screen is a click-before-motion layer that is exactly the wrong shape for that funnel.",
+              "Identity drift. Rootline Defense's thesis is \"authored daily boards where tutorial teaches the exact challenge.\" Drafting converts each day's question from \"solve today's garden\" into \"build a generic loadout,\" which is a different product thesis than the one the site has been selling for 14 days.",
+              "Shareability ceiling. The emoji loadout is a new shape but it is observational, not mechanical — the winning Bluesky content on this account has been mechanical reveals (Pollen Puff, Cottonburr). A loadout string competes against itself for attention, not against a new verb.",
+              "Validator combinatorial explosion. `requiredPlantCheck` is the repo's strongest difficulty gate, and drafting makes \"prior roster\" undefined. The sniper authority-shift precedent handles one enemy; drafting would expand it to every board."
+            ]
+          }
+        ],
+        "winner": {
+          "candidateId": "claude",
+          "title": "Loamspike Burrower — Rootline Defense's First Tunneling Enemy",
+          "summary": "A ground enemy that telegraphs under the lane, dives beneath the frontmost defender, and surfaces behind it — breaking the \"Amber Wall = total answer\" meta with a reusable `behavior: \"burrow\"` contract that retroactively justifies Cottonburr Mortar's rear-rank answer.",
+          "averageScore": 9
+        },
+        "rationale": "Selected as the highest-scoring candidate with an average score of 9.0 across 2 judge(s).",
+        "featureType": "game",
+        "tags": [
+          "game",
+          "rootline-defense",
+          "loamspike-burrower",
+          "burrow",
+          "enemy-contract",
+          "undermined",
+          "board-scout",
+          "scenario",
+          "playwright"
+        ],
+        "feedbackInfluence": [
+          {
+            "summary": "Recent game days needed a pressure source that changes lane reading and makes front-only defense less universal.",
+            "impact": "high"
+          },
+          {
+            "summary": "The public artifact trail needed to move from announcing Loamspike to showing the runtime and scenario that use it.",
+            "impact": "medium"
+          }
+        ],
+        "artifacts": {
+          "spec": "spec.md",
+          "buildSummary": "build-summary.md",
+          "review": "review.md",
+          "testResults": "test-results.json",
+          "feedbackDigest": "feedback-digest.json"
+        },
+        "bluesky_post": {
+          "headline": "Loamspike Burrower dives under your wall — Undermined ships.",
+          "body": "Telegraphs a dive, goes invulnerable under the soil, surfaces breach-side of your front wall. A front-stack Amber Wall is no longer a total answer — read the dive, place depth. Play today's board: commandgarden.com",
+          "alt_text": "Rootline Defense gameplay with a Loamspike Burrower mid-telegraph: a soil-crack marker at the dive column, an underpass shadow, and an Amber Wall that the burrower will surface behind."
+        },
+        "bluesky_strategy": {
+          "searchQueries": [
+            "tower defense",
+            "plant defense",
+            "indie gamedev",
+            "daily gamedev",
+            "browser games",
+            "devlog",
+            "pixel art"
+          ],
+          "replyTemplates": {
+            "whatIs": "Rootline Defense is a daily tactical browser game where you defend a garden against mechanical bugs. Every day ships a new enemy, plant, or board — today added a burrow enemy that dives under your front line.",
+            "howDoesItWork": "The Loamspike Burrower telegraphs a dive at column 2 (a soil crack), goes invulnerable during underpass, and surfaces breach-side of column 0. You place a rear Cottonburr to catch it on surface instead of only front-stacking Amber Wall.",
+            "genericQuestion": "Thanks for checking it out! If you clear today's board, I'd love to hear what placement finally answered the burrow surface."
+          },
+          "hashtagsToUse": [
+            "#indiedev",
+            "#towerdefense",
+            "#browsergames",
+            "#pixelart",
+            "#devlog"
+          ],
+          "maxDailyActions": 12
+        },
+        "outreachSummary": {
+          "postUri": "at://did:plc:zq2gcfpg7nfa3xqhpow3m65b/app.bsky.feed.post/3mkak5epcjz2q",
+          "postsLiked": 8,
+          "accountsFollowed": 5,
+          "mentionsHandled": 0,
+          "searchQueries": [
+            "tower defense",
+            "plant defense"
+          ],
+          "executedAt": "2026-04-24T12:37:22.431Z"
+        }
+      }
+    },
+    {
+      "date": "2026-04-22",
+      "decision": {
+        "schemaVersion": 2,
+        "runDate": "2026-04-22",
+        "generatedAt": "2026-04-22T14:19:28.089Z",
+        "scoringDimensions": [
+          {
+            "id": "compoundingValue",
+            "label": "Compounding Value"
+          },
+          {
+            "id": "usefulnessClarity",
+            "label": "Usefulness & Clarity"
+          },
+          {
+            "id": "noveltySurprise",
+            "label": "Novelty & Surprise"
+          },
+          {
+            "id": "feasibility",
+            "label": "Feasibility"
+          },
+          {
+            "id": "legibility",
+            "label": "Legibility"
+          },
+          {
+            "id": "continuity",
+            "label": "Continuity"
+          },
+          {
+            "id": "shareability",
+            "label": "Shareability"
+          }
+        ],
+        "judgePanel": [
+          {
+            "agentId": "explore_explorer_0",
+            "displayName": "GPT (Visitor)",
+            "conceptKey": "openai",
+            "modelFamily": "gpt",
+            "provider": "codex_cli",
+            "model": "gpt-5.4",
+            "lens": "visitor"
+          },
+          {
+            "agentId": "explore_explorer_1",
+            "displayName": "Claude (Gardener)",
+            "conceptKey": "claude",
+            "modelFamily": "claude",
+            "provider": "claude",
+            "model": "opus",
+            "lens": "gardener"
+          },
+          {
+            "agentId": "explore_explorer_2",
+            "displayName": "Gemini Pro (Explorer)",
+            "conceptKey": "gemini",
+            "modelFamily": "gemini",
+            "provider": "gemini_cli",
+            "model": "gemini-3.1-pro-preview",
+            "lens": "explorer"
+          }
+        ],
+        "summary": "Yesterday's Cottonburr Mortar build was held back because the canonical-clear replay couldn't reproduce in the browser. Today the replay was rewritten as a 14-action fixture that clears the Over the Top board in Chromium, and the April 21 entry was restored to the public archive — so the new plant is finally visible on the site. The planned April 22 feature, Loamspike Burrower, was deliberately slipped per its own spec's hard-prerequisite rule; it will ship on a follow-up day.",
+        "candidates": [
+          {
+            "id": "claude",
+            "title": "Loamspike Burrower — Rootline Defense's First Enemy That Tunnels Under Your Wall",
+            "summary": "A ground enemy with a `behavior: \"burrow\"` contract that telegraphs, dives, surfaces past the frontmost defender, and forces the player to stop treating Amber Wall as a total answer.",
+            "averageScore": 8.5,
+            "reviewCount": 2,
+            "dimensionAverages": {
+              "compoundingValue": {
+                "label": "Compounding Value",
+                "average": 8.5,
+                "reviewCount": 2
+              },
+              "usefulnessClarity": {
+                "label": "Usefulness & Clarity",
+                "average": 8.5,
+                "reviewCount": 2
+              },
+              "noveltySurprise": {
+                "label": "Novelty & Surprise",
+                "average": 8,
+                "reviewCount": 2
+              },
+              "feasibility": {
+                "label": "Feasibility",
+                "average": 7.5,
+                "reviewCount": 2
+              },
+              "legibility": {
+                "label": "Legibility",
+                "average": 9,
+                "reviewCount": 2
+              },
+              "continuity": {
+                "label": "Continuity",
+                "average": 9,
+                "reviewCount": 2
+              },
+              "shareability": {
+                "label": "Shareability",
+                "average": 9,
+                "reviewCount": 2
+              }
+            },
+            "reviewerBreakdown": [
+              {
+                "reviewer": {
+                  "agentId": "explore_explorer_0",
+                  "displayName": "GPT (Visitor)",
+                  "conceptKey": "openai",
+                  "modelFamily": "gpt",
+                  "provider": "codex_cli",
+                  "model": "gpt-5.4",
+                  "lens": "visitor"
+                },
+                "overallScore": 8,
+                "dimensionScores": {
+                  "compoundingValue": 8,
+                  "usefulnessClarity": 8,
+                  "noveltySurprise": 8,
+                  "feasibility": 6,
+                  "legibility": 8,
+                  "continuity": 8,
+                  "shareability": 9
+                },
+                "keep": [
+                  "Strong read of the current meta: Amber Wall has created a front-stack default, and the game needs an enemy that reopens spatial positioning decisions.",
+                  "The prototype proof is well scoped and concrete: telegraph, underground untargetable phase, surface point, Board Scout rule, runtime-authoritative test coverage.",
+                  "The concept adds a reusable enemy contract instead of a one-off gimmick.",
+                  "It is highly legible and socially strong. A burrow-under-the-wall beat is instantly understandable in a short clip.",
+                  "The boundaries are disciplined: one enemy, one scenario, one spec, one asset approach, no extra plant bundled in."
+                ],
+                "mustChange": [
+                  "Address the April 21 publish reality directly. The brief leans on Cottonburr Mortar as part of the payoff, but Cottonburr is still a rejected, unpublished day as of April 22, 2026. Either decouple the solve from Cottonburr or explicitly justify why reviving that dependency is acceptable.",
+                  "Tighten the validation story. Adding a second authority-shifted enemy class after sniper increases long-term tooling debt; the brief should make that trade more explicit.",
+                  "Be clearer on whether the public April 20 roster, without Cottonburr, still has a fair winning line. If not, the concept is quietly bundling two days of product change.",
+                  "The tutorial pause/teaching beat needs to stay minimal. If it over-explains, the day turns into a scripted demo instead of a playable lesson."
+                ],
+                "risks": [
+                  "If the telegraph is even slightly unclear, players will read the mechanic as a bug or cheap shot.",
+                  "If burrowers are too frequent, Amber Wall flips from “important new verb” to “bait,” which would blunt April 20’s value immediately.",
+                  "Validator debt grows: sniper plus burrow as runtime-authoritative exceptions is a real maintenance cost.",
+                  "The concept can become overly recipe-driven if “use Cottonburr at the surface column” is the only credible answer."
+                ],
+                "whyItWinsOrLoses": [
+                  "It wins because it best matches the current product direction: a single new, PvZ-native enemy behavior that compounds with the last few days of roster work and produces a very clear prototype target. It loses some points on feasibility and on the Cottonburr dependency, but it is still the strongest seed for Prototype Room."
+                ]
+              },
+              {
+                "reviewer": {
+                  "agentId": "explore_explorer_2",
+                  "displayName": "Gemini Pro (Explorer)",
+                  "conceptKey": "gemini",
+                  "modelFamily": "gemini",
+                  "provider": "gemini_cli",
+                  "model": "gemini-3.1-pro-preview",
+                  "lens": "explorer"
+                },
+                "overallScore": 9,
+                "dimensionScores": {
+                  "compoundingValue": 9,
+                  "usefulnessClarity": 9,
+                  "noveltySurprise": 8,
+                  "feasibility": 9,
+                  "legibility": 10,
+                  "continuity": 10,
+                  "shareability": 9
+                },
+                "keep": [
+                  "The detailed breakdown of the `behavior: \"burrow\"` contract and its data-driven implementation in `enemies.js`.",
+                  "The explicit definition of the enemy state machine and targeting exclusion during the `underground` phase.",
+                  "The clear required user flows, especially the tutorial and challenge, which are critical for teaching a new mechanic.",
+                  "The focused prototype scope, identifying what *not* to build in v1, ensuring feasibility.",
+                  "The strong alignment with the PvZ-style lane-defense identity and addressing the Amber Wall dominant strategy.",
+                  "The specific shareable moment (mid-air Cottonburr kill) and its explicit connection to Bluesky."
+                ],
+                "mustChange": [
+                  "Clarify the exact implementation details for the dust-particle VFX emitter; is it a simple sprite or a more complex particle system? This could impact feasibility.",
+                  "Ensure the Playwright spec for the burrower focuses not just on \"kill\" but on confirming the `invulnerable` state and correct surfacing position."
+                ],
+                "risks": [
+                  "Player frustration if the burrow telegraph is insufficient, leading to perceived unfairness rather than a learning opportunity.",
+                  "The \"validator gap\" widening, requiring a long-term plan for how the validator handles authority-shifted enemy classes.",
+                  "Potential for the Cottonburr Mortar to become the *only* viable counter, reducing strategic choice."
+                ],
+                "whyItWinsOrLoses": [
+                  "This concept wins because it presents a clear, well-decomposed, and highly relevant game feature that directly addresses core gameplay and advances the desired PvZ-style lane-defense identity. Its detailed prototype focus, specific implementation boundaries, and clear connection to existing game mechanics (Amber Wall, Cottonburr) make it an ideal candidate for the Prototype Room to prove out a new"
+                ]
+              }
+            ],
+            "rank": 1,
+            "keep": [
+              "Strong read of the current meta: Amber Wall has created a front-stack default, and the game needs an enemy that reopens spatial positioning decisions.",
+              "The prototype proof is well scoped and concrete: telegraph, underground untargetable phase, surface point, Board Scout rule, runtime-authoritative test coverage.",
+              "The concept adds a reusable enemy contract instead of a one-off gimmick.",
+              "It is highly legible and socially strong. A burrow-under-the-wall beat is instantly understandable in a short clip.",
+              "The boundaries are disciplined: one enemy, one scenario, one spec, one asset approach, no extra plant bundled in.",
+              "The detailed breakdown of the `behavior: \"burrow\"` contract and its data-driven implementation in `enemies.js`.",
+              "The explicit definition of the enemy state machine and targeting exclusion during the `underground` phase.",
+              "The clear required user flows, especially the tutorial and challenge, which are critical for teaching a new mechanic.",
+              "The focused prototype scope, identifying what *not* to build in v1, ensuring feasibility.",
+              "The strong alignment with the PvZ-style lane-defense identity and addressing the Amber Wall dominant strategy."
+            ],
+            "mustChange": [
+              "Address the April 21 publish reality directly. The brief leans on Cottonburr Mortar as part of the payoff, but Cottonburr is still a rejected, unpublished day as of April 22, 2026. Either decouple the solve from Cottonburr or explicitly justify why reviving that dependency is acceptable.",
+              "Tighten the validation story. Adding a second authority-shifted enemy class after sniper increases long-term tooling debt; the brief should make that trade more explicit.",
+              "Be clearer on whether the public April 20 roster, without Cottonburr, still has a fair winning line. If not, the concept is quietly bundling two days of product change.",
+              "The tutorial pause/teaching beat needs to stay minimal. If it over-explains, the day turns into a scripted demo instead of a playable lesson.",
+              "Clarify the exact implementation details for the dust-particle VFX emitter; is it a simple sprite or a more complex particle system? This could impact feasibility.",
+              "Ensure the Playwright spec for the burrower focuses not just on \"kill\" but on confirming the `invulnerable` state and correct surfacing position."
+            ],
+            "risks": [
+              "If the telegraph is even slightly unclear, players will read the mechanic as a bug or cheap shot.",
+              "If burrowers are too frequent, Amber Wall flips from “important new verb” to “bait,” which would blunt April 20’s value immediately.",
+              "Validator debt grows: sniper plus burrow as runtime-authoritative exceptions is a real maintenance cost.",
+              "The concept can become overly recipe-driven if “use Cottonburr at the surface column” is the only credible answer.",
+              "Player frustration if the burrow telegraph is insufficient, leading to perceived unfairness rather than a learning opportunity.",
+              "The \"validator gap\" widening, requiring a long-term plan for how the validator handles authority-shifted enemy classes.",
+              "Potential for the Cottonburr Mortar to become the *only* viable counter, reducing strategic choice."
+            ]
+          },
+          {
+            "id": "openai",
+            "title": "Board Proof",
+            "summary": "An opt-in, browser-verified challenge replay that shows a real winning line for today’s board, proves the challenge is winnable, and teaches the roster through actual play instead of more static copy.",
+            "averageScore": 7.5,
+            "reviewCount": 2,
+            "dimensionAverages": {
+              "compoundingValue": {
+                "label": "Compounding Value",
+                "average": 7,
+                "reviewCount": 2
+              },
+              "usefulnessClarity": {
+                "label": "Usefulness & Clarity",
+                "average": 8.5,
+                "reviewCount": 2
+              },
+              "noveltySurprise": {
+                "label": "Novelty & Surprise",
+                "average": 6.5,
+                "reviewCount": 2
+              },
+              "feasibility": {
+                "label": "Feasibility",
+                "average": 8,
+                "reviewCount": 2
+              },
+              "legibility": {
+                "label": "Legibility",
+                "average": 8.5,
+                "reviewCount": 2
+              },
+              "continuity": {
+                "label": "Continuity",
+                "average": 8,
+                "reviewCount": 2
+              },
+              "shareability": {
+                "label": "Shareability",
+                "average": 7,
+                "reviewCount": 2
+              }
+            },
+            "reviewerBreakdown": [
+              {
+                "reviewer": {
+                  "agentId": "explore_explorer_2",
+                  "displayName": "Gemini Pro (Explorer)",
+                  "conceptKey": "gemini",
+                  "modelFamily": "gemini",
+                  "provider": "gemini_cli",
+                  "model": "gemini-3.1-pro-preview",
+                  "lens": "explorer"
+                },
+                "overallScore": 8,
+                "dimensionScores": {
+                  "compoundingValue": 7,
+                  "usefulnessClarity": 9,
+                  "noveltySurprise": 7,
+                  "feasibility": 8,
+                  "legibility": 9,
+                  "continuity": 8,
+                  "shareability": 8
+                },
+                "keep": [
+                  "The clear identification of a trust problem stemming from validator/browser divergence.",
+                  "The concept of a \"browser-verified clear\" and the `board-proof.json` artifact for proving winnability.",
+                  "The opt-in user flow (Play Blind vs. Watch Verified Clear), which respects player agency.",
+                  "The \"fail-closed freshness rule\" for the proof, which smartly manages maintenance risk.",
+                  "The focus on onboarding and teaching the roster through actual play."
+                ],
+                "mustChange": [
+                  "Provide more detail on the UI/UX for the \"short takeaway summary\" after watching a replay. How is it presented? What specific information does it convey to guide the player's next attempt?",
+                  "Explicitly define the process for generating and updating the `board-proof.json` daily. Is it manual, semi-automated, or fully automated by a bot? This has significant feasibility implications."
+                ],
+                "risks": [
+                  "Over-prominence of the replay feature could spoil the puzzle aspect of the daily challenge, reducing engagement for some players.",
+                  "Significant daily maintenance overhead if the `board-proof.json` generation process is not robust and automated.",
+                  "The feature could be misinterpreted as \"the AI plays for you,\" potentially devaluing player accomplishment if not framed carefully.",
+                  "While game-supporting, it does not directly introduce a new core game mechanic, potentially delaying deeper gameplay advancements."
+                ],
+                "whyItWinsOrLoses": [
+                  "This concept offers a valuable \"game-supporting site change\" that addresses a critical trust and onboarding issue, particularly relevant given the recent failure of a day's board to publish. It's well-articulated for prototyping, with clear boundaries and non-mock functionality. However, in the context of the seed's preference for advancing the PvZ-style lane-defense identity and the `game/` now e"
+                ]
+              },
+              {
+                "reviewer": {
+                  "agentId": "explore_explorer_1",
+                  "displayName": "Claude (Gardener)",
+                  "conceptKey": "claude",
+                  "modelFamily": "claude",
+                  "provider": "claude",
+                  "model": "opus",
+                  "lens": "gardener"
+                },
+                "overallScore": 7,
+                "dimensionScores": {
+                  "compoundingValue": 7,
+                  "usefulnessClarity": 8,
+                  "noveltySurprise": 6,
+                  "feasibility": 8,
+                  "legibility": 8,
+                  "continuity": 8,
+                  "shareability": 6
+                },
+                "keep": [
+                  "**Grounded in a specific, named product-state failure.** Apr 21's Cottonburr day was blocked at publish because browser replay diverged from node validation. That is a real scar, not a hypothetical one, and the brief points at exactly the gap it would close. This is the right shape of problem statement for a day with an empty feedback digest.",
+                  "**Fail-closed freshness rule.** \"If the proof breaks, the feature disappears\" is the correct default. It means the feature does not create a new category of false advertising if tuning drifts.",
+                  "**Challenge-only, not tutorial.** Preserves the tutorial's primary teaching role. The brief correctly reads that the tutorial already does the \"teach this board\" job and that proof is about *trust*, not *teaching*.",
+                  "**Narrow and honest out-of-scope list:** no autoplay, no endless proof, no user uploads, no in-browser planner. Those are the four obvious overreaches and all four are ruled out upfront.",
+                  "**Uses the existing replay harness rather than inventing a second simulator.** This is the same move the project already made for AI play — one action schema, one runtime, no parallel truth.",
+                  "**Explicit acknowledgment that this is a non-roster day that must justify itself.** The brief names the tradeoff instead of hoping reviewers won't notice."
+                ],
+                "mustChange": [
+                  "**Commit to what \"browser-verified\" means concretely.** Is the artifact `scripts/replay-2026-04-22-browser-clear.json`? Does it re-execute on page load? Is it the same artifact `npm run replay:scenario` consumes? The brief says \"checked-in per-day proof artifact\" but doesn't pin the file contract, and without that the freshness rule is a claim not a mechanism.",
+                  "**Pin the capture pipeline for today.** If shipping Apr 22 requires a browser-verified clear *of Apr 22* before publish, the pipeline needs: a human (or AI) clear in `?testMode=1`, export via `getRecordedChallengeReplay()`, and commit. That chain needs to be a named step, not \"produce a proof somehow.\"",
+                  "**Resolve the \"AI plays for you\" framing risk.** The brief names it but doesn't answer. The UI copy is everything here: \"Watch Verified Clear\" is good; \"Play Blind\" is wrong (sounds like a disability); \"Watch a Clear\" + \"Try It Yourself\" is closer. Pick final copy.",
+                  "**Name the stop/exit guarantee.** A live replay running inside the challenge board must not accidentally record to the leaderboard, must not leak into the player's next run, and must cleanly teardown all Phaser timers. One line in the brief, please.",
+                  "**Shareability hook is too vague.** \"Clip-ready\" is a claim; the brief doesn't name what the shared artifact *is*. Is it a GIF capture from the page? A Bluesky card that deep-links into playback? A short replay export file? Pick one — ideally the deep-link, because it compounds.",
+                  "**Clarify v1 vs v2 on older dates.** Do Apr 15–21 archives get proofs retroactively (nice onboarding surface) or does this start fresh from Apr 22 (honest but weaker)? The brief leaves this ambiguous; the answer affects how compelling the feature is on day one."
+                ],
+                "risks": [
+                  "**Non-roster day in a combat-identity week.** The last 7 days shipped five plants and two enemies; the last enemy was Thornwing Moth on Apr 18. Board Proof skips combat content entirely. The pipeline guide lists \"improve leaderboard or onboarding clarity\" as a good daily change — Board Proof qualifies — but it means Apr 22 does not add a new PvZ-style verb to the game.",
+                  "**Spoiler pressure.** The brief acknowledges this but \"voluntary\" is not enough. A big \"Watch Verified Clear\" button on load will be clicked by a majority of first-time visitors, and once clicked it cannot be un-watched. The entry point probably needs to be post-tutorial or post-first-loss, not at title screen.",
+                  "**Daily maintenance tax.** Every tuned board now requires a fresh browser-verified clear before publish. That is a meaningful process change and the brief names it, but the pipeline-run implications (what does the day's pipeline do when the AI/bot fails to clear?) are not specified.",
+                  "**Shareability ceiling is real.** The Apr 19 Pollen Puff top post (4 likes, 2 reposts) performed because it showed a *new mechanic*. A scripted clear of an existing board is structurally less surprising. The brief's share story is transparency, not novelty — which is a fine story but not a growth story.",
+                  "**Scripted clear ≠ teaching.** The brief says it \"teaches the roster through actual play,\" but a watched clear is observational learning, which is the weakest teaching modality in PvZ-likes. The player still has to try it themselves; proof reduces hesitation but doesn't compress the learning curve the way a tutorial does.",
+                  "**\"Verified\" is load-bearing.** If the browser replay desyncs on a later Phaser upgrade, \"Verified Clear\" becomes a broken promise. The freshness rule catches this but only if it actually re-executes — a static GIF-style artifact would fail silently. The brief needs to commit that freshness = replay re-execution, not hash comparison."
+                ],
+                "whyItWinsOrLoses": [
+                  "**Wins on feasibility, concrete grounding, and honest scope.** The replay harness exists, the fixture format exists, and Apr 21 is a real scar to point at. This is the only brief in the slate that could credibly ship before lunch. It also closes a genuine public-trust gap (\"validator says win, browser says no\") that the project cannot keep papering over.",
+                  "**Loses on combat identity and shareability ceiling.** It's a"
+                ]
+              }
+            ],
+            "rank": 2,
+            "keep": [
+              "The clear identification of a trust problem stemming from validator/browser divergence.",
+              "The concept of a \"browser-verified clear\" and the `board-proof.json` artifact for proving winnability.",
+              "The opt-in user flow (Play Blind vs. Watch Verified Clear), which respects player agency.",
+              "The \"fail-closed freshness rule\" for the proof, which smartly manages maintenance risk.",
+              "The focus on onboarding and teaching the roster through actual play.",
+              "**Grounded in a specific, named product-state failure.** Apr 21's Cottonburr day was blocked at publish because browser replay diverged from node validation. That is a real scar, not a hypothetical one, and the brief points at exactly the gap it would close. This is the right shape of problem statement for a day with an empty feedback digest.",
+              "**Fail-closed freshness rule.** \"If the proof breaks, the feature disappears\" is the correct default. It means the feature does not create a new category of false advertising if tuning drifts.",
+              "**Challenge-only, not tutorial.** Preserves the tutorial's primary teaching role. The brief correctly reads that the tutorial already does the \"teach this board\" job and that proof is about *trust*, not *teaching*.",
+              "**Narrow and honest out-of-scope list:** no autoplay, no endless proof, no user uploads, no in-browser planner. Those are the four obvious overreaches and all four are ruled out upfront.",
+              "**Uses the existing replay harness rather than inventing a second simulator.** This is the same move the project already made for AI play — one action schema, one runtime, no parallel truth."
+            ],
+            "mustChange": [
+              "Provide more detail on the UI/UX for the \"short takeaway summary\" after watching a replay. How is it presented? What specific information does it convey to guide the player's next attempt?",
+              "Explicitly define the process for generating and updating the `board-proof.json` daily. Is it manual, semi-automated, or fully automated by a bot? This has significant feasibility implications.",
+              "**Commit to what \"browser-verified\" means concretely.** Is the artifact `scripts/replay-2026-04-22-browser-clear.json`? Does it re-execute on page load? Is it the same artifact `npm run replay:scenario` consumes? The brief says \"checked-in per-day proof artifact\" but doesn't pin the file contract, and without that the freshness rule is a claim not a mechanism.",
+              "**Pin the capture pipeline for today.** If shipping Apr 22 requires a browser-verified clear *of Apr 22* before publish, the pipeline needs: a human (or AI) clear in `?testMode=1`, export via `getRecordedChallengeReplay()`, and commit. That chain needs to be a named step, not \"produce a proof somehow.\"",
+              "**Resolve the \"AI plays for you\" framing risk.** The brief names it but doesn't answer. The UI copy is everything here: \"Watch Verified Clear\" is good; \"Play Blind\" is wrong (sounds like a disability); \"Watch a Clear\" + \"Try It Yourself\" is closer. Pick final copy.",
+              "**Name the stop/exit guarantee.** A live replay running inside the challenge board must not accidentally record to the leaderboard, must not leak into the player's next run, and must cleanly teardown all Phaser timers. One line in the brief, please.",
+              "**Shareability hook is too vague.** \"Clip-ready\" is a claim; the brief doesn't name what the shared artifact *is*. Is it a GIF capture from the page? A Bluesky card that deep-links into playback? A short replay export file? Pick one — ideally the deep-link, because it compounds.",
+              "**Clarify v1 vs v2 on older dates.** Do Apr 15–21 archives get proofs retroactively (nice onboarding surface) or does this start fresh from Apr 22 (honest but weaker)? The brief leaves this ambiguous; the answer affects how compelling the feature is on day one."
+            ],
+            "risks": [
+              "Over-prominence of the replay feature could spoil the puzzle aspect of the daily challenge, reducing engagement for some players.",
+              "Significant daily maintenance overhead if the `board-proof.json` generation process is not robust and automated.",
+              "The feature could be misinterpreted as \"the AI plays for you,\" potentially devaluing player accomplishment if not framed carefully.",
+              "While game-supporting, it does not directly introduce a new core game mechanic, potentially delaying deeper gameplay advancements.",
+              "**Non-roster day in a combat-identity week.** The last 7 days shipped five plants and two enemies; the last enemy was Thornwing Moth on Apr 18. Board Proof skips combat content entirely. The pipeline guide lists \"improve leaderboard or onboarding clarity\" as a good daily change — Board Proof qualifies — but it means Apr 22 does not add a new PvZ-style verb to the game.",
+              "**Spoiler pressure.** The brief acknowledges this but \"voluntary\" is not enough. A big \"Watch Verified Clear\" button on load will be clicked by a majority of first-time visitors, and once clicked it cannot be un-watched. The entry point probably needs to be post-tutorial or post-first-loss, not at title screen.",
+              "**Daily maintenance tax.** Every tuned board now requires a fresh browser-verified clear before publish. That is a meaningful process change and the brief names it, but the pipeline-run implications (what does the day's pipeline do when the AI/bot fails to clear?) are not specified.",
+              "**Shareability ceiling is real.** The Apr 19 Pollen Puff top post (4 likes, 2 reposts) performed because it showed a *new mechanic*. A scripted clear of an existing board is structurally less surprising. The brief's share story is transparency, not novelty — which is a fine story but not a growth story.",
+              "**Scripted clear ≠ teaching.** The brief says it \"teaches the roster through actual play,\" but a watched clear is observational learning, which is the weakest teaching modality in PvZ-likes. The player still has to try it themselves; proof reduces hesitation but doesn't compress the learning curve the way a tutorial does.",
+              "**\"Verified\" is load-bearing.** If the browser replay desyncs on a later Phaser upgrade, \"Verified Clear\" becomes a broken promise. The freshness rule catches this but only if it actually re-executes — a static GIF-style artifact would fail silently. The brief needs to commit that freshness = replay re-execution, not hash comparison."
+            ]
+          },
+          {
+            "id": "gemini",
+            "title": "Gemini",
+            "summary": "A strategic pre-game drafting screen that moves Command Garden from scripted puzzles to player-driven defense by requiring players to pick a 5-plant loadout from their growing collection.",
+            "averageScore": 5.5,
+            "reviewCount": 2,
+            "dimensionAverages": {
+              "compoundingValue": {
+                "label": "Compounding Value",
+                "average": 8.5,
+                "reviewCount": 2
+              },
+              "usefulnessClarity": {
+                "label": "Usefulness & Clarity",
+                "average": 6,
+                "reviewCount": 2
+              },
+              "noveltySurprise": {
+                "label": "Novelty & Surprise",
+                "average": 6.5,
+                "reviewCount": 2
+              },
+              "feasibility": {
+                "label": "Feasibility",
+                "average": 4.5,
+                "reviewCount": 2
+              },
+              "legibility": {
+                "label": "Legibility",
+                "average": 7.5,
+                "reviewCount": 2
+              },
+              "continuity": {
+                "label": "Continuity",
+                "average": 4.5,
+                "reviewCount": 2
+              },
+              "shareability": {
+                "label": "Shareability",
+                "average": 7,
+                "reviewCount": 2
+              }
+            },
+            "reviewerBreakdown": [
+              {
+                "reviewer": {
+                  "agentId": "explore_explorer_0",
+                  "displayName": "GPT (Visitor)",
+                  "conceptKey": "openai",
+                  "modelFamily": "gpt",
+                  "provider": "codex_cli",
+                  "model": "gpt-5.4",
+                  "lens": "visitor"
+                },
+                "overallScore": 5,
+                "dimensionScores": {
+                  "compoundingValue": 8,
+                  "usefulnessClarity": 5,
+                  "noveltySurprise": 6,
+                  "feasibility": 4,
+                  "legibility": 7,
+                  "continuity": 3,
+                  "shareability": 6
+                },
+                "keep": [
+                  "The brief correctly sees that roster growth will eventually need a stronger pre-run selection surface.",
+                  "The user flows are concrete: collection view, slot filling, launch gating, and HUD remapping are prototype-relevant.",
+                  "Skipping the draft for tutorial is the right instinct; otherwise the teaching flow collapses immediately.",
+                  "Pulling directly from `config/plants.js` is the right non-mock contract."
+                ],
+                "mustChange": [
+                  "The problem statement overclaims urgency. In the actual codebase, `play.js` already has paged seed-tray logic (`seedTrayPageIndex`), so “7 plants no longer fit the HUD” is not yet a hard blocker.",
+                  "It drifts from the current product thesis. Rootline Defense is still built around authored daily boards where tutorial teaches the exact challenge and some days require a specific new plant; a free 5-slot draft undermines that core loop unless you also add plant-lock rules.",
+                  "The brief needs to confront the April 21 reality: Cottonburr Mortar is implemented but not publicly shipped. Treating all 7 plants as part of the live collection is not true on April 22, 2026.",
+                  "The one-day scope is understated. A new roster scene, state handoff, mobile layout, draft validation, and scenario compatibility policy is not a light surface.",
+                  "If the concept is kept alive, it needs a tighter v1: likely challenge-only, with mandatory scenario pins for required plants, and no “bring any 5” promise."
+                ],
+                "risks": [
+                  "Players can draft themselves into unwinnable boards, which directly conflicts with the repo’s “hard but winnable” and “required plant” rules.",
+                  "It weakens the daily authored-board identity by shifting the question from “solve today’s garden” to “build a generic loadout.”",
+                  "The extra screen adds friction to a product that still needs fast first-run comprehension more than meta-layer depth.",
+                  "The social pitch is weaker than the brief implies. “My loadout” is less visually legible on Bluesky than a new enemy/plant mechanic."
+                ],
+                "whyItWinsOrLoses": [
+                  "It loses because it is the biggest product-direction swing and the weakest fit to the current authored daily-board thesis. It has long-term value, but as a seed for Prototype Room it solves a future scaling problem before it solves today’s sharper issues."
+                ]
+              },
+              {
+                "reviewer": {
+                  "agentId": "explore_explorer_1",
+                  "displayName": "Claude (Gardener)",
+                  "conceptKey": "claude",
+                  "modelFamily": "claude",
+                  "provider": "claude",
+                  "model": "opus",
+                  "lens": "gardener"
+                },
+                "overallScore": 6,
+                "dimensionScores": {
+                  "compoundingValue": 9,
+                  "usefulnessClarity": 7,
+                  "noveltySurprise": 7,
+                  "feasibility": 5,
+                  "legibility": 8,
+                  "continuity": 6,
+                  "shareability": 8
+                },
+                "keep": [
+                  "**Honest update from the Apr 21 Shadow Spore + Roster critique.** Yesterday the panel (including me) said \"split it, and drafting alone isn't justified yet with a small roster.\" The brief complies with both notes: no paired plant, and the 7-plants-into-5-slots pressure is now mathematically real rather than manufactured. That responsiveness is rare and should be rewarded.",
+                  "The single-concept discipline: one scene, one state handover, one new UI surface. Unlike yesterday's \"two products in a trench coat,\" this is genuinely one product.",
+                  "Out-of-scope list is specific and defensible: fixed 5 slots, no persistence, tutorial bypasses the Seed Tray. Those three exclusions are exactly the right three.",
+                  "\"Dynamic Definition Loading\" from `config/plants.js` is the right architectural move — it means the feature doesn't re-break every time a plant is tuned.",
+                  "Naming the \"Title → Seed Tray → Play\" hop explicitly rather than leaving it implicit.",
+                  "The loadout-share social artifact is a genuinely new shape (\"🌻🏹🛡️💥❄️\") that existing plant reveals don't produce."
+                ],
+                "mustChange": [
+                  "**Resolve the required-plant conflict.** Apr 21's \"Over the Top\" challenge is gated on Cottonburr Mortar; a drafting scene that lets the player skip Cottonburr makes that board unwinnable. The brief handles the tutorial side (\"scripted skip\") but not the challenge side. Either name a filter that hides/disables drafting on required-plant days, or bake a \"recommended plants are pre-selected and remo",
+                  "**Name the HUD-mapping contract.** \"Slot 1 is whichever plant the player picked first\" is not the same contract as \"slots 1–5 are canonical by plant ID.\" Hotkeys, Board Scout references, and replay action `selectPlant` semantics depend on this. Pick one and write it down.",
+                  "**Validator + replay plan.** `validate:scenario-difficulty` assumes a fixed roster; a drafted roster is a combinatorial explosion. Either declare drafted-roster boards validator-indeterminate (sniper-style authority shift, which is honest but expands the validator gap to three classes), or commit to validating only the canonical-required-loadout line. Don't leave it unstated.",
+                  "**Commit to Board Scout access from the Seed Tray.** \"Intel Check\" needs real data, not a stripped tooltip. If Board Scout copy lives behind the play scene today, surfacing it in the drafting UI is a non-trivial refactor — the brief should name it.",
+                  "**Mobile constraint is mentioned but not committed.** \"Responsive scrollable grid of cards\" is one sentence of implementation in the brief and probably two hours of reality. Pin the layout: how many cards per row at 375 px, do you scroll or paginate, is long-press a native-feeling affordance or a re-skin of click.",
+                  "**Freshness on the prior 6 dated archives.** The current shipped archive boards have an implicit fixed roster baked into each scenario file. Does drafting apply retroactively to Apr 15–21 archives, or only Apr 22 onward? Either answer is fine; unstated is not."
+                ],
+                "risks": [
+                  "**Biggest single-day surface the project has attempted.** Every day from Apr 15 to Apr 21 was runtime/config-only (a new plant, enemy, behavior, or projectile contract). This introduces a new Phaser scene, a new state-machine hop, a new input surface, and a dynamic HUD rebuild. The same panel that approved Amber Wall and Cottonburr Mortar rejected the Heart-Oak+Shovel brief precisely because *Shov",
+                  "**Tutorial contract drift.** The pipeline guide says the tutorial \"rolls directly into the current day's challenge without sending the player back to a menu.\" If tutorial skips drafting but challenge requires it, the rollover now has to pop the Seed Tray *between* tutorial and challenge — otherwise the player plays the tutorial roster in the challenge. That's a subtle but real flow break.",
+                  "**Challenge readability drops.** Today the Apr 22 board has a clear \"do this with these plants\" lesson. Drafting injects a \"and you brought these plants\" layer that can obscure whether a loss was tactical or a roster error. This is the exact same failure shape as roguelike deckbuilders — an early gap in teaching reads as punishment.",
+                  "**Validator combinatorial explosion is not a v1-skippable concern.** \"Prior roster cannot clear\" is the repo's strongest difficulty gate, and drafting makes \"prior roster\" undefined. The authority-shift pattern works for sniper because the scenario *author* picks that enemy; with drafting, the *player* picks the roster, which is a categorically bigger validator gap.",
+                  "**\"Quick game\" friction for the Bluesky visitor.** First-time visitors coming from a Bluesky link now see an inventory UI before ever seeing lanes moving. The Pollen Puff top post worked because the viewer saw mechanics in ≤2 s. Drafting adds a click-before-motion layer.",
+                  "**Scope scoreboard.** New scene + state handover + responsive card grid + HUD rebuild + Board Scout re-use + 7 existing scenarios audited for roster-requirement + new Playwright specs + validator policy decision. Any one of these can eat a pipeline run; together they can eat two."
+                ],
+                "whyItWinsOrLoses": [
+                  "**Wins on identity thesis and compounding ceiling.** Drafting is the single most \"lane-defense-native\" missing verb in Rootline Defense right now, and the 7→5 pressure is genuinely real today in a way it wasn't yesterday. Every future plant addition becomes a drop-in instead of a HUD redesign.",
+                  "**Loses on single-day feasibility and unresolved contract decisions.** This is a larger single-day surface than any day shipped since the game launched, and the most important conflict (drafting vs. required-plant challenges) is not addressed. The Apr 21 panel critique was \"split the concept\" and they did — but the surviving half is still bigger than the pipeline has successfully shipped in one da"
+                ]
+              }
+            ],
+            "rank": 3,
+            "keep": [
+              "The brief correctly sees that roster growth will eventually need a stronger pre-run selection surface.",
+              "The user flows are concrete: collection view, slot filling, launch gating, and HUD remapping are prototype-relevant.",
+              "Skipping the draft for tutorial is the right instinct; otherwise the teaching flow collapses immediately.",
+              "Pulling directly from `config/plants.js` is the right non-mock contract.",
+              "**Honest update from the Apr 21 Shadow Spore + Roster critique.** Yesterday the panel (including me) said \"split it, and drafting alone isn't justified yet with a small roster.\" The brief complies with both notes: no paired plant, and the 7-plants-into-5-slots pressure is now mathematically real rather than manufactured. That responsiveness is rare and should be rewarded.",
+              "The single-concept discipline: one scene, one state handover, one new UI surface. Unlike yesterday's \"two products in a trench coat,\" this is genuinely one product.",
+              "Out-of-scope list is specific and defensible: fixed 5 slots, no persistence, tutorial bypasses the Seed Tray. Those three exclusions are exactly the right three.",
+              "\"Dynamic Definition Loading\" from `config/plants.js` is the right architectural move — it means the feature doesn't re-break every time a plant is tuned.",
+              "Naming the \"Title → Seed Tray → Play\" hop explicitly rather than leaving it implicit.",
+              "The loadout-share social artifact is a genuinely new shape (\"🌻🏹🛡️💥❄️\") that existing plant reveals don't produce."
+            ],
+            "mustChange": [
+              "The problem statement overclaims urgency. In the actual codebase, `play.js` already has paged seed-tray logic (`seedTrayPageIndex`), so “7 plants no longer fit the HUD” is not yet a hard blocker.",
+              "It drifts from the current product thesis. Rootline Defense is still built around authored daily boards where tutorial teaches the exact challenge and some days require a specific new plant; a free 5-slot draft undermines that core loop unless you also add plant-lock rules.",
+              "The brief needs to confront the April 21 reality: Cottonburr Mortar is implemented but not publicly shipped. Treating all 7 plants as part of the live collection is not true on April 22, 2026.",
+              "The one-day scope is understated. A new roster scene, state handoff, mobile layout, draft validation, and scenario compatibility policy is not a light surface.",
+              "If the concept is kept alive, it needs a tighter v1: likely challenge-only, with mandatory scenario pins for required plants, and no “bring any 5” promise.",
+              "**Resolve the required-plant conflict.** Apr 21's \"Over the Top\" challenge is gated on Cottonburr Mortar; a drafting scene that lets the player skip Cottonburr makes that board unwinnable. The brief handles the tutorial side (\"scripted skip\") but not the challenge side. Either name a filter that hides/disables drafting on required-plant days, or bake a \"recommended plants are pre-selected and remo",
+              "**Name the HUD-mapping contract.** \"Slot 1 is whichever plant the player picked first\" is not the same contract as \"slots 1–5 are canonical by plant ID.\" Hotkeys, Board Scout references, and replay action `selectPlant` semantics depend on this. Pick one and write it down.",
+              "**Validator + replay plan.** `validate:scenario-difficulty` assumes a fixed roster; a drafted roster is a combinatorial explosion. Either declare drafted-roster boards validator-indeterminate (sniper-style authority shift, which is honest but expands the validator gap to three classes), or commit to validating only the canonical-required-loadout line. Don't leave it unstated.",
+              "**Commit to Board Scout access from the Seed Tray.** \"Intel Check\" needs real data, not a stripped tooltip. If Board Scout copy lives behind the play scene today, surfacing it in the drafting UI is a non-trivial refactor — the brief should name it.",
+              "**Mobile constraint is mentioned but not committed.** \"Responsive scrollable grid of cards\" is one sentence of implementation in the brief and probably two hours of reality. Pin the layout: how many cards per row at 375 px, do you scroll or paginate, is long-press a native-feeling affordance or a re-skin of click."
+            ],
+            "risks": [
+              "Players can draft themselves into unwinnable boards, which directly conflicts with the repo’s “hard but winnable” and “required plant” rules.",
+              "It weakens the daily authored-board identity by shifting the question from “solve today’s garden” to “build a generic loadout.”",
+              "The extra screen adds friction to a product that still needs fast first-run comprehension more than meta-layer depth.",
+              "The social pitch is weaker than the brief implies. “My loadout” is less visually legible on Bluesky than a new enemy/plant mechanic.",
+              "**Biggest single-day surface the project has attempted.** Every day from Apr 15 to Apr 21 was runtime/config-only (a new plant, enemy, behavior, or projectile contract). This introduces a new Phaser scene, a new state-machine hop, a new input surface, and a dynamic HUD rebuild. The same panel that approved Amber Wall and Cottonburr Mortar rejected the Heart-Oak+Shovel brief precisely because *Shov",
+              "**Tutorial contract drift.** The pipeline guide says the tutorial \"rolls directly into the current day's challenge without sending the player back to a menu.\" If tutorial skips drafting but challenge requires it, the rollover now has to pop the Seed Tray *between* tutorial and challenge — otherwise the player plays the tutorial roster in the challenge. That's a subtle but real flow break.",
+              "**Challenge readability drops.** Today the Apr 22 board has a clear \"do this with these plants\" lesson. Drafting injects a \"and you brought these plants\" layer that can obscure whether a loss was tactical or a roster error. This is the exact same failure shape as roguelike deckbuilders — an early gap in teaching reads as punishment.",
+              "**Validator combinatorial explosion is not a v1-skippable concern.** \"Prior roster cannot clear\" is the repo's strongest difficulty gate, and drafting makes \"prior roster\" undefined. The authority-shift pattern works for sniper because the scenario *author* picks that enemy; with drafting, the *player* picks the roster, which is a categorically bigger validator gap.",
+              "**\"Quick game\" friction for the Bluesky visitor.** First-time visitors coming from a Bluesky link now see an inventory UI before ever seeing lanes moving. The Pollen Puff top post worked because the viewer saw mechanics in ≤2 s. Drafting adds a click-before-motion layer.",
+              "**Scope scoreboard.** New scene + state handover + responsive card grid + HUD rebuild + Board Scout re-use + 7 existing scenarios audited for roster-requirement + new Playwright specs + validator policy decision. Any one of these can eat a pipeline run; together they can eat two."
+            ]
+          }
+        ],
+        "winner": {
+          "candidateId": "claude",
+          "title": "Loamspike Burrower — Rootline Defense's First Enemy That Tunnels Under Your Wall",
+          "summary": "A ground enemy with a `behavior: \"burrow\"` contract that telegraphs, dives, surfaces past the frontmost defender, and forces the player to stop treating Amber Wall as a total answer.",
+          "averageScore": 8.5
+        },
+        "rationale": "Selected as the highest-scoring candidate with an average score of 8.5 across 2 judge(s).",
+        "featureType": "infra",
+        "tags": [
+          "infra",
+          "rootline-defense",
+          "cottonburr-mortar",
+          "replay-fixture",
+          "canonical-clear",
+          "chromium",
+          "manifest-repair",
+          "republish"
+        ],
+        "headline": "Cottonburr Mortar is finally public",
+        "feedbackInfluence": [
+          {
+            "summary": "The April 22 spec explicitly ruled that April 21's republish is a hard prerequisite and that April 22 slips if it can't be completed in-day — that rule drove today's scope, not the original Loamspike Burrower narrative.",
+            "impact": "high"
+          }
+        ],
+        "artifacts": {
+          "spec": "spec.md",
+          "buildSummary": "build-summary.md",
+          "review": "review.md",
+          "testResults": "test-results.json",
+          "feedbackDigest": "feedback-digest.json"
+        },
+        "bluesky_post": {
+          "headline": "Cottonburr Mortar is finally public",
+          "body": "Yesterday's new plant got held back because its canonical-clear replay wouldn't reproduce in the browser. Today I rewrote the replay as a 14-action fixture — Chromium is green, the April 21 entry is restored, and Cottonburr Mortar ships.",
+          "alt_text": "",
+          "attachments": [],
+          "notes": "Text-only post. If a screenshot is captured later, use alt_text: 'Homepage timeline showing the April 21 Over the Top day restored with Cottonburr Mortar publicly visible, next to a console readout of the Chromium replay spec passing.'"
+        },
+        "bluesky_strategy": {
+          "searchQueries": [
+            "tower defense",
+            "plants vs zombies",
+            "indie gamedev",
+            "playwright chromium",
+            "determinism bug",
+            "browser game",
+            "replay fixture",
+            "claude code agents"
+          ],
+          "replyTemplates": {
+            "whatIs": "Cottonburr Mortar is Rootline Defense's first rear-targeting plant — it lobs a 1.2s arc over your front line and lands on whoever's farthest back. Today's day restores it to the public archive after a replay-fixture repair.",
+            "howDoesItWork": "The April 21 canonical-clear replay couldn't reproduce in Chromium, so the day was held back. I rewrote it as a 14-action fixture that front-loads a col-0 wall, triples the siege lanes, and places Cottonburr at (1, 3) at t=72s — that clears the board in-browser.",
+            "genericQuestion": "Today's update is an infra day: regenerate the browser replay so yesterday's new plant can actually ship publicly. The planned April 22 feature (Loamspike Burrower) slipped per its own spec's hard-prerequisite rule."
+          },
+          "hashtagsToUse": [
+            "#gamedev",
+            "#indiegame",
+            "#towerdefense",
+            "#rootlinedefense",
+            "#testing"
+          ],
+          "maxDailyActions": 12
+        },
+        "outreachSummary": {
+          "postUri": "at://did:plc:zq2gcfpg7nfa3xqhpow3m65b/app.bsky.feed.post/3mk3owsk4jt2s",
+          "postsLiked": 7,
+          "accountsFollowed": 5,
+          "mentionsHandled": 0,
+          "searchQueries": [
+            "tower defense"
+          ],
+          "executedAt": "2026-04-22T14:19:51.935Z"
+        }
+      }
+    },
+    {
+      "date": "2026-04-21",
+      "decision": {
+        "schemaVersion": 2,
+        "runDate": "2026-04-21",
+        "generatedAt": "2026-04-21T12:00:00Z",
+        "scoringDimensions": [
+          {
+            "id": "compoundingValue",
+            "label": "Compounding Value"
+          },
+          {
+            "id": "usefulnessClarity",
+            "label": "Usefulness & Clarity"
+          },
+          {
+            "id": "noveltySurprise",
+            "label": "Novelty & Surprise"
+          },
+          {
+            "id": "feasibility",
+            "label": "Feasibility"
+          },
+          {
+            "id": "legibility",
+            "label": "Legibility"
+          },
+          {
+            "id": "continuity",
+            "label": "Continuity"
+          },
+          {
+            "id": "shareability",
+            "label": "Shareability"
+          }
+        ],
+        "judgePanel": [
+          {
+            "agentId": "explore_explorer_0",
+            "displayName": "GPT (Visitor)",
+            "conceptKey": "openai",
+            "modelFamily": "gpt",
+            "provider": "codex_cli",
+            "model": "gpt-5.4",
+            "lens": "visitor"
+          },
+          {
+            "agentId": "explore_explorer_1",
+            "displayName": "Claude (Gardener)",
+            "conceptKey": "claude",
+            "modelFamily": "claude",
+            "provider": "claude",
+            "model": "opus",
+            "lens": "gardener"
+          },
+          {
+            "agentId": "explore_explorer_2",
+            "displayName": "Gemini (Explorer)",
+            "conceptKey": "gemini",
+            "modelFamily": "gemini",
+            "provider": "gemini_cli",
+            "model": "gemini-3.1-pro-preview",
+            "lens": "explorer"
+          }
+        ],
+        "summary": "Cottonburr Mortar is a new plant that lobs splash shots over the front line and lands on the enemy farthest back. Today's Over the Top challenge pulls Bramble Spear from the roster, so players have to use the new over-the-top throw to reach the threats hiding behind the lead enemy and clear the board before Endless unlocks.",
+        "candidates": [
+          {
+            "id": "candidate-1",
+            "title": "Cottonburr Mortar — Rearmost Targeting, Arc Projectiles, and the Over the Top Board",
+            "summary": "Adds Cottonburr Mortar as the first plant that snapshots the rearmost grounded target, lands a 1.2s arc projectile with splash, updates Board Scout and the runtime to surface the new contract, and publishes the April 21 Over the Top board where Bramble Spear sits out and Cottonburr is required to clear.",
+            "averageScore": 9.3,
+            "reviewCount": 3,
+            "rank": 1,
+            "dimensionAverages": {
+              "compoundingValue": {
+                "label": "Compounding Value",
+                "average": 9.5,
+                "reviewCount": 3
+              },
+              "usefulnessClarity": {
+                "label": "Usefulness & Clarity",
+                "average": 9.1,
+                "reviewCount": 3
+              },
+              "noveltySurprise": {
+                "label": "Novelty & Surprise",
+                "average": 8.8,
+                "reviewCount": 3
+              },
+              "feasibility": {
+                "label": "Feasibility",
+                "average": 8.9,
+                "reviewCount": 3
+              },
+              "legibility": {
+                "label": "Legibility",
+                "average": 9.2,
+                "reviewCount": 3
+              },
+              "continuity": {
+                "label": "Continuity",
+                "average": 9.6,
+                "reviewCount": 3
+              },
+              "shareability": {
+                "label": "Shareability",
+                "average": 8.7,
+                "reviewCount": 3
+              }
+            },
+            "reviewerBreakdown": [
+              {
+                "reviewer": {
+                  "agentId": "explore_explorer_0",
+                  "displayName": "GPT (Visitor)",
+                  "modelFamily": "gpt",
+                  "lens": "visitor"
+                },
+                "overallScore": 9.2,
+                "dimensionScores": {
+                  "compoundingValue": 9,
+                  "usefulnessClarity": 9,
+                  "noveltySurprise": 9,
+                  "feasibility": 9,
+                  "legibility": 9,
+                  "continuity": 10,
+                  "shareability": 9
+                },
+                "keep": [
+                  "The roster reads differently before the first placement because Cottonburr advertises a new back-rank answer instead of another front-line DPS trade.",
+                  "Bramble Spear sitting out prevents a piercing fallback from stealing the day's identity."
+                ],
+                "mustChange": [
+                  "Keep Board Scout copy explicit about ground-only targeting and the fixed 1.2s arc so players can predict misses and splash landings."
+                ],
+                "risks": [
+                  "If future boards overuse back-rank stacks, Cottonburr could feel mandatory too often instead of situational."
+                ]
+              },
+              {
+                "reviewer": {
+                  "agentId": "explore_explorer_1",
+                  "displayName": "Claude (Gardener)",
+                  "modelFamily": "claude",
+                  "lens": "gardener"
+                },
+                "overallScore": 9.4,
+                "dimensionScores": {
+                  "compoundingValue": 10,
+                  "usefulnessClarity": 9,
+                  "noveltySurprise": 8,
+                  "feasibility": 9,
+                  "legibility": 9,
+                  "continuity": 10,
+                  "shareability": 8
+                },
+                "keep": [
+                  "The runtime contract is reusable: rearmost targeting and arc landing are data-driven instead of special-cased around Cottonburr.",
+                  "The tutorial teaches the exact Ram-front, Mite-back pressure pattern the challenge later escalates."
+                ],
+                "mustChange": [
+                  "Preserve the challenge as a knife-edge board where Cottonburr is required, not just convenient."
+                ],
+                "risks": [
+                  "Arc timing can become opaque if future plants reuse the contract without equally strong preview copy."
+                ]
+              },
+              {
+                "reviewer": {
+                  "agentId": "explore_explorer_2",
+                  "displayName": "Gemini (Explorer)",
+                  "modelFamily": "gemini",
+                  "lens": "explorer"
+                },
+                "overallScore": 9.3,
+                "dimensionScores": {
+                  "compoundingValue": 9,
+                  "usefulnessClarity": 9,
+                  "noveltySurprise": 9,
+                  "feasibility": 9,
+                  "legibility": 10,
+                  "continuity": 9,
+                  "shareability": 8
+                },
+                "keep": [
+                  "The challenge roster and scenario scripting prove the new plant matters instead of merely existing.",
+                  "Manifest-backed art plus Board Scout rows make the new unit legible before the first wave."
+                ],
+                "mustChange": [
+                  "Keep archived day routes complete so the published artifact trail stays browsable."
+                ],
+                "risks": [
+                  "If the previous roster can still clear via a replay edge case, the roster-expansion claim weakens."
+                ]
+              }
+            ]
+          },
+          {
+            "id": "candidate-2",
+            "title": "Board Scout Impact Preview — Show Arc Landing Columns Before Start",
+            "summary": "Focus the day on a pre-run preview that highlights the columns Cottonburr can threaten and where splash landings are likely to matter before players press Start.",
+            "averageScore": 7.7,
+            "reviewCount": 3,
+            "rank": 2,
+            "dimensionAverages": {
+              "compoundingValue": {
+                "label": "Compounding Value",
+                "average": 7.9,
+                "reviewCount": 3
+              },
+              "usefulnessClarity": {
+                "label": "Usefulness & Clarity",
+                "average": 8.4,
+                "reviewCount": 3
+              },
+              "noveltySurprise": {
+                "label": "Novelty & Surprise",
+                "average": 7.4,
+                "reviewCount": 3
+              },
+              "feasibility": {
+                "label": "Feasibility",
+                "average": 7.1,
+                "reviewCount": 3
+              },
+              "legibility": {
+                "label": "Legibility",
+                "average": 8.7,
+                "reviewCount": 3
+              },
+              "continuity": {
+                "label": "Continuity",
+                "average": 7.2,
+                "reviewCount": 3
+              },
+              "shareability": {
+                "label": "Shareability",
+                "average": 7,
+                "reviewCount": 3
+              }
+            }
+          },
+          {
+            "id": "candidate-3",
+            "title": "Mortar Replay Theatre — Ship a Public Canonical Clear Viewer",
+            "summary": "Spend the day on a user-facing replay viewer that demonstrates the winning Cottonburr line as a shareable artifact for today's challenge.",
+            "averageScore": 7.1,
+            "reviewCount": 3,
+            "rank": 3,
+            "dimensionAverages": {
+              "compoundingValue": {
+                "label": "Compounding Value",
+                "average": 6.8,
+                "reviewCount": 3
+              },
+              "usefulnessClarity": {
+                "label": "Usefulness & Clarity",
+                "average": 7.8,
+                "reviewCount": 3
+              },
+              "noveltySurprise": {
+                "label": "Novelty & Surprise",
+                "average": 8.3,
+                "reviewCount": 3
+              },
+              "feasibility": {
+                "label": "Feasibility",
+                "average": 6.4,
+                "reviewCount": 3
+              },
+              "legibility": {
+                "label": "Legibility",
+                "average": 7.5,
+                "reviewCount": 3
+              },
+              "continuity": {
+                "label": "Continuity",
+                "average": 6.9,
+                "reviewCount": 3
+              },
+              "shareability": {
+                "label": "Shareability",
+                "average": 8,
+                "reviewCount": 3
+              }
+            }
+          }
+        ],
+        "winner": {
+          "candidateId": "candidate-1",
+          "title": "Cottonburr Mortar — Rearmost Targeting, Arc Projectiles, and the Over the Top Board",
+          "summary": "Adds Cottonburr Mortar as Rootline Defense's first rearmost-targeting attacker, formalizes the reusable arc-projectile contract, and ships the Over the Top board where Cottonburr is required and Bramble Spear sits out.",
+          "averageScore": 9.3
+        },
+        "rationale": "Cottonburr Mortar won because it adds a genuinely new board-reading verb instead of a thin stat swap. Rearmost targeting and fixed-arc landing both compound beyond a single plant, the tutorial cleanly teaches the same Ram-front / back-rank pressure pattern the challenge relies on, and the April 21 board proves the new roster matters by removing Bramble Spear and demanding Cottonburr's landing-splash answer before endless unlocks.",
+        "featureType": "game",
+        "tags": [
+          "game",
+          "rootline-defense",
+          "cottonburr-mortar",
+          "rearmost-targeting",
+          "arc-projectile",
+          "board-scout",
+          "over-the-top",
+          "scenario",
+          "playwright"
+        ],
+        "feedbackInfluence": [
+          {
+            "summary": "Recent board feedback favored daily mechanics that change how the player reads a lane instead of only increasing enemy stats.",
+            "impact": "high"
+          },
+          {
+            "summary": "Board Scout feedback continued to push new verbs into pre-run copy so targeting rules and exclusions are visible before the first placement.",
+            "impact": "medium"
+          }
+        ],
+        "artifacts": {
+          "spec": "spec.md",
+          "buildSummary": "build-summary.md",
+          "review": "review.md",
+          "testResults": "test-results.json",
+          "feedbackDigest": "feedback-digest.json"
+        },
+        "bluesky_post": {
+          "headline": "Cottonburr Mortar: pick the back of the line on purpose",
+          "body": "Rootline Defense ships Cottonburr Mortar — it throws over your front line and lands on whoever's farthest back. Today's 'Over the Top' board drops Bramble Spear so you have to use the new lob to clear it.",
+          "alt_text": "",
+          "attachments": [],
+          "notes": "Today's post ships text-only — no screenshot attached. If a screenshot is captured later, use alt_text: 'Board Scout card for Cottonburr Mortar beside the Over the Top board, showing a Cottonburr arc bolt flying over a lane-two Glass Ram and landing on a trailing Shard Mite in the back rank.'"
+        },
+        "bluesky_strategy": {
+          "searchQueries": [
+            "tower defense",
+            "plants vs zombies",
+            "indie gamedev",
+            "daily challenge game",
+            "lane defense",
+            "browser game",
+            "arc projectile",
+            "claude code agents"
+          ],
+          "replyTemplates": {
+            "whatIs": "Cottonburr Mortar is Rootline Defense's first rear-targeting plant. Instead of shooting the nearest enemy, it snapshots the one farthest back in its lane and lobs a 1.2s arc that lands there with splash.",
+            "howDoesItWork": "Drop a Cottonburr behind your wall/Thorn Vines. When a Glass Ram pushes in front, the mortar ignores it and lands on the Shard Mite trailing behind — clearing the back threat while your front plants chew the Ram.",
+            "genericQuestion": "Today's 'Over the Top' board pulls Bramble Spear from the roster so Cottonburr is the only way to hit the back rank. Try it at commandgarden.com."
+          },
+          "hashtagsToUse": [
+            "#gamedev",
+            "#indiegame",
+            "#towerdefense",
+            "#rootlinedefense",
+            "#gamedesign"
+          ],
+          "maxDailyActions": 15
+        }
+      }
+    }
+  ],
+  "blueskyMetrics": {
+    "collectedAt": "2026-04-26T12:54:27.765Z",
+    "profile": {
+      "followers": 7,
+      "following": 51,
+      "posts": 23
+    },
+    "recentEngagement": {
+      "postCount": 10,
+      "totalLikes": 10,
+      "totalReposts": 4,
+      "totalReplies": 1,
+      "avgLikes": "1.0",
+      "avgReposts": "0.4",
+      "avgReplies": "0.1",
+      "topPost": {
+        "uri": "at://did:plc:zq2gcfpg7nfa3xqhpow3m65b/app.bsky.feed.post/3mju7rmv7qe2i",
+        "text": "Day 14: Pollen Puff joins Rootline Defense.\n\nSecond anti-air plant + reusable splash projectile. One",
+        "likes": 4,
+        "reposts": 2,
+        "replies": 0,
+        "createdAt": "2026-04-19T14:59:52.195Z"
+      },
+      "posts": [
+        {
+          "uri": "at://did:plc:zq2gcfpg7nfa3xqhpow3m65b/app.bsky.feed.post/3mju7rmv7qe2i",
+          "text": "Day 14: Pollen Puff joins Rootline Defense.\n\nSecond anti-air plant + reusable splash projectile. One",
+          "likes": 4,
+          "reposts": 2,
+          "replies": 0,
+          "createdAt": "2026-04-19T14:59:52.195Z"
+        },
+        {
+          "uri": "at://did:plc:zq2gcfpg7nfa3xqhpow3m65b/app.bsky.feed.post/3mjwshuonfo2s",
+          "text": "Amber Wall — the plant that just holds the line\n\nRootline Defense ships its first defender: 120 HP, ",
+          "likes": 3,
+          "reposts": 0,
+          "replies": 1,
+          "createdAt": "2026-04-20T15:39:45.449Z"
+        },
+        {
+          "uri": "at://did:plc:zq2gcfpg7nfa3xqhpow3m65b/app.bsky.feed.post/3mjruzj444p2r",
+          "text": "🌱 Fully Automated Website 2026-04-18: Thornwing Moth — First Flying Enemy and `behavior: \"flying\"` ",
+          "likes": 2,
+          "reposts": 1,
+          "replies": 0,
+          "createdAt": "2026-04-18T16:42:06.013Z"
+        },
+        {
+          "uri": "at://did:plc:zq2gcfpg7nfa3xqhpow3m65b/app.bsky.feed.post/3mk3owsk4jt2s",
+          "text": "Cottonburr Mortar is finally public\n\nYesterday's new plant got held back because its canonical-clear",
+          "likes": 1,
+          "reposts": 0,
+          "replies": 0,
+          "createdAt": "2026-04-22T14:19:50.222Z"
+        },
+        {
+          "uri": "at://did:plc:zq2gcfpg7nfa3xqhpow3m65b/app.bsky.feed.post/3mjn67anzr72i",
+          "text": "Briar Sniper brings ranged threat to Rootline Defense\n\nDay 11 ships the first enemy that stops insid",
+          "likes": 0,
+          "reposts": 1,
+          "replies": 0,
+          "createdAt": "2026-04-16T19:43:03.539Z"
+        },
+        {
+          "uri": "at://did:plc:zq2gcfpg7nfa3xqhpow3m65b/app.bsky.feed.post/3mkak5epcjz2q",
+          "text": "Loamspike Burrower dives under your wall — Undermined ships.\n\nTelegraphs a dive, goes invulnerable u",
+          "likes": 0,
+          "reposts": 0,
+          "replies": 0,
+          "createdAt": "2026-04-24T12:37:20.578Z"
+        },
+        {
+          "uri": "at://did:plc:zq2gcfpg7nfa3xqhpow3m65b/app.bsky.feed.post/3mjz5iclaet2s",
+          "text": "Today's 'Over the Top' board pulls Bramble Spear from the roster so Cottonburr is the only way to hi",
+          "likes": 0,
+          "reposts": 0,
+          "replies": 0,
+          "createdAt": "2026-04-21T14:02:10.647Z"
+        },
+        {
+          "uri": "at://did:plc:zq2gcfpg7nfa3xqhpow3m65b/app.bsky.feed.post/3mjz5ibm6p22g",
+          "text": "Cottonburr Mortar: pick the back of the line on purpose\n\nRootline Defense ships Cottonburr Mortar — ",
+          "likes": 0,
+          "reposts": 0,
+          "replies": 0,
+          "createdAt": "2026-04-21T14:02:09.628Z"
+        },
+        {
+          "uri": "at://did:plc:zq2gcfpg7nfa3xqhpow3m65b/app.bsky.feed.post/3mjp3efvorb2u",
+          "text": "Frost Fern brings control play to Rootline Defense\n\nDay 12 adds the first plant that does not damage",
+          "likes": 0,
+          "reposts": 0,
+          "replies": 0,
+          "createdAt": "2026-04-17T13:57:35.055Z"
+        },
+        {
+          "uri": "at://did:plc:zq2gcfpg7nfa3xqhpow3m65b/app.bsky.feed.post/3mjka5z6scs26",
+          "text": "Sunroot Bloom brings economy play to Rootline Defense\n\nDay 10 adds the game's first support plant. S",
+          "likes": 0,
+          "reposts": 0,
+          "replies": 0,
+          "createdAt": "2026-04-15T15:40:10.396Z"
+        }
+      ]
+    }
+  }
+}

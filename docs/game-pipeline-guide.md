@@ -81,6 +81,7 @@ If you modify a core system, include regression coverage for the behavior you ar
 - The validator uses a deterministic simulation plus beam search to find a winning plan, then perturbs that plan with small timing, row, column, and omission mistakes.
 - By default it now checks not only the scripted clear, but also a short post-clear endless follow-through window so boards that instantly collapse after unlock are flagged.
 - On roster-expansion days it should also prove the new plant is required, not merely available. The previous dated challenge roster should no longer clear the board.
+- Only apply the previous-roster required-plant gate when the current challenge actually adds a plant compared with the previous dated challenge. New enemies, board rules, or economy/mechanic changes should instead prove that the new mechanic is load-bearing through the canonical plan, targeted replay/runtime probes, and UI/mechanic assertions. Do not invent a "new plant required" test when no new plant shipped.
 - Treat validator output as a gate:
   - a non-zero exit means validation did not pass, even if other tests are green
   - no winning plan found means the board is likely unwinnable or the search is still incomplete

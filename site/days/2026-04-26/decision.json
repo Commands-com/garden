@@ -1,0 +1,291 @@
+{
+  "schemaVersion": 2,
+  "runDate": "2026-04-26",
+  "generatedAt": "2026-04-26T12:00:00.000Z",
+  "scoringDimensions": [
+    {
+      "id": "compoundingValue",
+      "label": "Compounding Value"
+    },
+    {
+      "id": "usefulnessClarity",
+      "label": "Usefulness & Clarity"
+    },
+    {
+      "id": "noveltySurprise",
+      "label": "Novelty & Surprise"
+    },
+    {
+      "id": "feasibility",
+      "label": "Feasibility"
+    },
+    {
+      "id": "legibility",
+      "label": "Legibility"
+    },
+    {
+      "id": "continuity",
+      "label": "Continuity"
+    },
+    {
+      "id": "shareability",
+      "label": "Shareability"
+    }
+  ],
+  "judgePanel": [
+    {
+      "agentId": "explore_explorer_0",
+      "displayName": "GPT (Visitor)",
+      "conceptKey": "openai",
+      "modelFamily": "gpt",
+      "provider": "codex_cli",
+      "model": "gpt-5.5",
+      "lens": "visitor"
+    },
+    {
+      "agentId": "explore_explorer_1",
+      "displayName": "Claude (Gardener)",
+      "conceptKey": "claude",
+      "modelFamily": "claude",
+      "provider": "claude",
+      "model": "opus",
+      "lens": "gardener"
+    },
+    {
+      "agentId": "explore_explorer_2",
+      "displayName": "Gemini Pro (Explorer)",
+      "conceptKey": "gemini",
+      "modelFamily": "gemini",
+      "provider": "gemini_cli",
+      "model": "gemini-3.1-pro-preview",
+      "lens": "explorer"
+    }
+  ],
+  "summary": "April 26 introduces Husk Walker and the Crackplate board for Rootline Defense. Husk Walker is a scripted front-armored ground enemy: direct shots are reduced while the front plate is closed, but the body becomes vulnerable during a short windup window. The day makes Cottonburr Mortar's arc read as the clean armor answer while preserving a costlier direct-shot fallback through stacking and timing.",
+  "candidates": [
+    {
+      "id": "candidate-1",
+      "title": "Husk Walker - Front Armor, Windup Window, and the Crackplate Board",
+      "summary": "Ship the reusable armor and vulnerability-window enemy contract, add Husk Walker as a scripted armored threat, and publish the April 26 Crackplate board where Cottonburr Mortar cleanly bypasses the front plate.",
+      "averageScore": 8.7,
+      "reviewCount": 3,
+      "rank": 1,
+      "dimensionAverages": {
+        "compoundingValue": {
+          "label": "Compounding Value",
+          "average": 9.0,
+          "reviewCount": 3
+        },
+        "usefulnessClarity": {
+          "label": "Usefulness & Clarity",
+          "average": 8.6,
+          "reviewCount": 3
+        },
+        "noveltySurprise": {
+          "label": "Novelty & Surprise",
+          "average": 8.5,
+          "reviewCount": 3
+        },
+        "feasibility": {
+          "label": "Feasibility",
+          "average": 8.1,
+          "reviewCount": 3
+        },
+        "legibility": {
+          "label": "Legibility",
+          "average": 8.7,
+          "reviewCount": 3
+        },
+        "continuity": {
+          "label": "Continuity",
+          "average": 9.1,
+          "reviewCount": 3
+        },
+        "shareability": {
+          "label": "Shareability",
+          "average": 8.9,
+          "reviewCount": 3
+        }
+      },
+      "reviewerBreakdown": [
+        {
+          "reviewer": {
+            "agentId": "explore_explorer_0",
+            "displayName": "GPT (Visitor)",
+            "modelFamily": "gpt",
+            "lens": "visitor"
+          },
+          "overallScore": 8.6,
+          "dimensionScores": {
+            "compoundingValue": 9,
+            "usefulnessClarity": 8,
+            "noveltySurprise": 9,
+            "feasibility": 8,
+            "legibility": 9,
+            "continuity": 9,
+            "shareability": 8
+          },
+          "keep": [
+            "The mechanic is easy to see: a plate closes, a red windup opens, and arc damage ignores the armor tax.",
+            "The board gives Cottonburr a clear job without adding another plant."
+          ],
+          "mustChange": [
+            "Board Scout must explain armor and windup from data so the mechanic is inspectable before play."
+          ],
+          "risks": [
+            "If the public artifact bundle is missing, the archive will show a shipped day without the decision trail."
+          ]
+        }
+      ],
+      "keep": [
+        "Use a data-driven armor contract instead of a one-off Husk Walker branch.",
+        "Align tutorial, challenge, Board Scout, validator, and assets around the same armor read."
+      ],
+      "mustChange": [
+        "Publish the full day artifact bundle so the source page can render without fallback states."
+      ],
+      "risks": [
+        "The windup can feel unfair if the plate animation or Board Scout copy fails to communicate the damage window."
+      ]
+    },
+    {
+      "id": "candidate-2",
+      "title": "Crackplate Board Scout Primer",
+      "summary": "Focus the day on Board Scout education for armor, plate state, and Cottonburr counterplay while deferring the full runtime challenge board.",
+      "averageScore": 7.4,
+      "reviewCount": 3,
+      "rank": 2,
+      "dimensionAverages": {
+        "compoundingValue": {
+          "label": "Compounding Value",
+          "average": 7.2,
+          "reviewCount": 3
+        },
+        "usefulnessClarity": {
+          "label": "Usefulness & Clarity",
+          "average": 8.4,
+          "reviewCount": 3
+        },
+        "noveltySurprise": {
+          "label": "Novelty & Surprise",
+          "average": 6.8,
+          "reviewCount": 3
+        },
+        "feasibility": {
+          "label": "Feasibility",
+          "average": 8.8,
+          "reviewCount": 3
+        },
+        "legibility": {
+          "label": "Legibility",
+          "average": 8.1,
+          "reviewCount": 3
+        },
+        "continuity": {
+          "label": "Continuity",
+          "average": 6.9,
+          "reviewCount": 3
+        },
+        "shareability": {
+          "label": "Shareability",
+          "average": 5.6,
+          "reviewCount": 3
+        }
+      },
+      "reviewerBreakdown": [],
+      "keep": [
+        "This would be safer to ship and would improve pre-run clarity."
+      ],
+      "mustChange": [
+        "It does not add the promised armored enemy runtime, so it should not be the winning feature."
+      ],
+      "risks": [
+        "A UI-only day would leave Cottonburr's live gameplay role unchanged."
+      ]
+    },
+    {
+      "id": "candidate-3",
+      "title": "Armored Endless Variety Pass",
+      "summary": "Add a light armor modifier to endless waves without a dated tutorial or scripted challenge board.",
+      "averageScore": 6.6,
+      "reviewCount": 3,
+      "rank": 3,
+      "dimensionAverages": {
+        "compoundingValue": {
+          "label": "Compounding Value",
+          "average": 6.5,
+          "reviewCount": 3
+        },
+        "usefulnessClarity": {
+          "label": "Usefulness & Clarity",
+          "average": 6.1,
+          "reviewCount": 3
+        },
+        "noveltySurprise": {
+          "label": "Novelty & Surprise",
+          "average": 7.2,
+          "reviewCount": 3
+        },
+        "feasibility": {
+          "label": "Feasibility",
+          "average": 7.3,
+          "reviewCount": 3
+        },
+        "legibility": {
+          "label": "Legibility",
+          "average": 5.8,
+          "reviewCount": 3
+        },
+        "continuity": {
+          "label": "Continuity",
+          "average": 6.9,
+          "reviewCount": 3
+        },
+        "shareability": {
+          "label": "Shareability",
+          "average": 6.4,
+          "reviewCount": 3
+        }
+      },
+      "reviewerBreakdown": [],
+      "keep": [
+        "Endless variety matters once the mechanic is proven."
+      ],
+      "mustChange": [
+        "Armor needs a tutorial and a scripted board before it belongs in endless."
+      ],
+      "risks": [
+        "Dropping armor directly into endless would make the first encounter feel arbitrary."
+      ]
+    }
+  ],
+  "winner": {
+    "candidateId": "candidate-1",
+    "title": "Husk Walker - Front Armor, Windup Window, and the Crackplate Board",
+    "summary": "Ship the reusable armor and vulnerability-window enemy contract, add Husk Walker as a scripted armored threat, and publish the April 26 Crackplate board where Cottonburr Mortar cleanly bypasses the front plate.",
+    "averageScore": 8.7
+  },
+  "rationale": "Husk Walker wins because it adds a reusable combat contract, gives Cottonburr Mortar a visible strategic job, and ships the dated Crackplate board so visitors can inspect and play the new mechanic today. The alternatives either delay the runtime or move armor into endless before the player has been taught what the plate and windup mean.",
+  "featureType": "game",
+  "tags": [
+    "game",
+    "rootline-defense",
+    "husk-walker",
+    "armor",
+    "windup",
+    "cottonburr-mortar",
+    "crackplate",
+    "board-scout",
+    "scenario",
+    "playwright"
+  ],
+  "artifacts": {
+    "spec": "spec.md",
+    "buildSummary": "build-summary.md",
+    "review": "review.md",
+    "testResults": "test-results.json",
+    "feedbackDigest": "feedback-digest.json",
+    "recentContext": "recent-context.json"
+  },
+  "feedbackInfluence": []
+}

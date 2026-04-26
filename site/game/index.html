@@ -15,6 +15,7 @@
   <link rel="stylesheet" href="/css/components.css">
 </head>
 <body class="game-page-body">
+  <a class="skip-link" href="#game-stage">Skip to game</a>
 
   <nav class="nav" role="navigation" aria-label="Main navigation">
     <div class="container nav__inner">
@@ -36,18 +37,11 @@
   </nav>
 
   <main class="game-page">
-    <section class="game-shell" id="game-stage">
+    <section class="game-shell" id="game-stage" tabindex="-1">
       <div class="container">
         <h2 class="sr-only">Game controls and live updates</h2>
         <div class="game-shell__topbar">
           <h1 class="game-shell__title">Rootline Defense</h1>
-          <div class="game-shell__controls">
-            <button class="game-audio-toggle" id="game-audio-toggle" type="button" aria-label="Toggle sound" title="Toggle sound">
-              <svg class="game-audio-toggle__icon game-audio-toggle__icon--on" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/></svg>
-              <svg class="game-audio-toggle__icon game-audio-toggle__icon--off" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:none"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><line x1="23" y1="9" x2="17" y2="15"/><line x1="17" y1="9" x2="23" y2="15"/></svg>
-            </button>
-            <input class="game-volume-slider" id="game-volume-slider" type="range" min="0" max="100" value="80" aria-label="Volume">
-          </div>
           <dl class="game-shell__chips">
             <div class="game-shell__chip">
               <dt>Sap</dt>
@@ -103,18 +97,6 @@
           </section>
 
           <section class="game-panel">
-            <h3 class="game-panel__title">Daily Board</h3>
-            <ol class="game-leaderboard" id="game-leaderboard-list">
-              <li class="game-leaderboard__empty">Loading…</li>
-            </ol>
-            <label class="game-field" for="game-alias-input">
-              <span class="game-field__label">Your alias</span>
-              <input class="game-field__input" id="game-alias-input" type="text" maxlength="24" placeholder="Garden guest" autocomplete="nickname">
-            </label>
-            <p class="game-panel__note" id="game-leaderboard-note">Challenge and endless runs submit on game over.</p>
-          </section>
-
-          <section class="game-panel">
             <h3 class="game-panel__title">Run</h3>
             <dl class="game-readout">
               <div class="game-readout__item">
@@ -164,6 +146,25 @@
               hidden
             ></div>
           </div>
+        </section>
+
+        <section class="game-panel game-leaderboard-panel">
+          <h3 class="game-panel__title">Daily Board</h3>
+          <ol class="game-leaderboard" id="game-leaderboard-list">
+            <li class="game-leaderboard__empty">Loading…</li>
+          </ol>
+          <label class="game-field" for="game-alias-input">
+            <span class="game-field__label">Your alias</span>
+            <input class="game-field__input" id="game-alias-input" type="text" maxlength="24" placeholder="Garden guest" autocomplete="nickname">
+          </label>
+          <div class="game-shell__controls game-shell__controls--panel" role="group" aria-label="Audio controls">
+            <button class="game-audio-toggle" id="game-audio-toggle" type="button" aria-label="Toggle sound" title="Toggle sound">
+              <svg class="game-audio-toggle__icon game-audio-toggle__icon--on" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/></svg>
+              <svg class="game-audio-toggle__icon game-audio-toggle__icon--off" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:none"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><line x1="23" y1="9" x2="17" y2="15"/><line x1="17" y1="9" x2="23" y2="15"/></svg>
+            </button>
+            <input class="game-volume-slider" id="game-volume-slider" type="range" min="0" max="100" value="80" aria-label="Volume">
+          </div>
+          <p class="game-panel__note" id="game-leaderboard-note">Challenge and endless runs submit on game over.</p>
         </section>
 
         <section class="game-panel game-feedback">

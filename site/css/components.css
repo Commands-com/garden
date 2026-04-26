@@ -203,6 +203,29 @@
   border: 0;
 }
 
+.skip-link {
+  position: fixed;
+  top: var(--space-3);
+  left: var(--space-3);
+  z-index: 1000;
+  padding: var(--space-2) var(--space-4);
+  border-radius: var(--radius-md);
+  background: var(--color-deep-green);
+  color: var(--color-cream);
+  font-weight: var(--weight-semibold);
+  text-decoration: none;
+  box-shadow: var(--shadow-md);
+  transform: translateY(calc(-100% - var(--space-5)));
+  transition: transform var(--duration-fast) var(--ease-default);
+}
+
+.skip-link:focus,
+.skip-link:focus-visible {
+  transform: translateY(0);
+  outline: 2px solid var(--color-accent-gold);
+  outline-offset: 2px;
+}
+
 .hero__title {
   font-size: var(--text-5xl);
   font-weight: var(--weight-bold);
@@ -2456,6 +2479,13 @@ kbd {
   gap: var(--space-2);
 }
 
+.game-shell__controls--panel {
+  justify-content: flex-start;
+  margin: var(--space-3) 0 var(--space-4);
+  padding-top: var(--space-3);
+  border-top: 1px solid var(--color-border);
+}
+
 .game-audio-toggle {
   display: grid;
   place-items: center;
@@ -2471,6 +2501,16 @@ kbd {
 
 .game-audio-toggle:hover {
   background: rgba(245, 240, 232, 0.1);
+}
+
+.game-shell__controls--panel .game-audio-toggle {
+  border-color: var(--color-border);
+  background: var(--color-cream);
+  color: var(--color-deep-green);
+}
+
+.game-shell__controls--panel .game-audio-toggle:hover {
+  background: var(--surface-card);
 }
 
 .game-audio-toggle:focus-visible {
@@ -2492,6 +2532,18 @@ kbd {
 .game-volume-slider:focus-visible {
   outline: 2px solid var(--color-accent-gold);
   outline-offset: 3px;
+}
+
+.game-shell__controls--panel .game-volume-slider {
+  background: var(--color-border);
+}
+
+.game-shell__controls--panel .game-volume-slider::-webkit-slider-thumb {
+  background: var(--color-deep-green);
+}
+
+.game-shell__controls--panel .game-volume-slider::-moz-range-thumb {
+  background: var(--color-deep-green);
 }
 
 .game-volume-slider::-webkit-slider-thumb {
@@ -2598,7 +2650,7 @@ kbd {
 
 .game-cards {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: var(--space-4);
   margin-top: var(--space-5);
 }
@@ -2648,6 +2700,10 @@ kbd {
   border-radius: var(--radius-xl);
   background: rgba(255, 255, 255, 0.86);
   box-shadow: var(--shadow-lg);
+}
+
+.game-leaderboard-panel {
+  margin-top: var(--space-5);
 }
 
 .game-panel__title {
@@ -3176,6 +3232,11 @@ kbd {
 .game-scout__badge--burrow {
   background: #5a3a1a;
   color: #f4d9a8;
+}
+
+.game-scout__badge--armored {
+  background: var(--color-earth);
+  color: var(--color-warm-white);
 }
 
 .game-scout__waves {
