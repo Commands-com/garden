@@ -129,18 +129,6 @@ test.describe("Game shell accessibility + console cleanliness (2026-04-21)", () 
 
     await resetFocusToDocumentStart(page);
 
-    const reachedAudioToggle = await tabUntilFocused(page, "#game-audio-toggle");
-    expect(reachedAudioToggle).toBe(true);
-    const audioToggle = page.locator("#game-audio-toggle");
-    await expect(audioToggle).toBeFocused();
-    expect(await hasVisibleOutline(audioToggle)).toBe(true);
-
-    const reachedVolumeSlider = await tabUntilFocused(page, "#game-volume-slider");
-    expect(reachedVolumeSlider).toBe(true);
-    const volumeSlider = page.locator("#game-volume-slider");
-    await expect(volumeSlider).toBeFocused();
-    expect(await hasVisibleOutline(volumeSlider)).toBe(true);
-
     const reachedFirstInventory = await tabUntilFocused(
       page,
       "#game-inventory .game-inventory__item",
@@ -162,6 +150,18 @@ test.describe("Game shell accessibility + console cleanliness (2026-04-21)", () 
     const secondInventory = page.locator("#game-inventory .game-inventory__item").nth(1);
     await expect(secondInventory).toBeFocused();
     expect(await hasVisibleOutline(secondInventory)).toBe(true);
+
+    const reachedAudioToggle = await tabUntilFocused(page, "#game-audio-toggle");
+    expect(reachedAudioToggle).toBe(true);
+    const audioToggle = page.locator("#game-audio-toggle");
+    await expect(audioToggle).toBeFocused();
+    expect(await hasVisibleOutline(audioToggle)).toBe(true);
+
+    const reachedVolumeSlider = await tabUntilFocused(page, "#game-volume-slider");
+    expect(reachedVolumeSlider).toBe(true);
+    const volumeSlider = page.locator("#game-volume-slider");
+    await expect(volumeSlider).toBeFocused();
+    expect(await hasVisibleOutline(volumeSlider)).toBe(true);
   });
 
   test("boots and transitions into tutorial without console errors or texture-fallback warnings", async ({

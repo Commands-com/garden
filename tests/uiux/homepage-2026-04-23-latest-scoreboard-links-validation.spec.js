@@ -3,8 +3,13 @@ const path = require("node:path");
 const { test, expect } = require("@playwright/test");
 
 const REACTION_TYPES = ["sprout", "fire", "thinking", "heart", "rocket"];
-const EXPECTED_DAY_DATE = "2026-04-23";
 const repoRoot = path.join(__dirname, "../..");
+const manifestForLatest = JSON.parse(
+  fs.readFileSync(path.join(repoRoot, "site/days/manifest.json"), "utf8")
+);
+const EXPECTED_DAY_DATE = [...manifestForLatest.days].sort(
+  (left, right) => new Date(right.date) - new Date(left.date)
+)[0].date;
 
 function readJsonIfExists(filePath) {
   if (!fs.existsSync(filePath)) {
@@ -121,8 +126,8 @@ async function waitForHomepageHydration(page) {
   expect(await page.locator(".garden-viz__plant").count()).toBeGreaterThan(0);
 }
 
-test.describe("Homepage latest day and internal link validation for 2026-04-23", () => {
-  test("homepage hydrates the latest 2026-04-23 entry, renders scoreboard rows in judge order, and stays console-clean", async ({
+test.describe("Homepage latest day and internal link validation", () => {
+  test("homepage hydrates the latest entry, renders scoreboard rows in judge order, and stays console-clean", async ({
     page,
   }) => {
     const consoleErrors = [];
@@ -175,7 +180,11 @@ test.describe("Homepage latest day and internal link validation for 2026-04-23",
 
     await waitForHomepageHydration(page);
 
-    await expect(page.locator("#todays-date")).toHaveText("Thursday, April 23, 2026");
+    const expectedDateLabel = new Date(`${EXPECTED_DAY_DATE}T00:00:00`).toLocaleDateString(
+      "en-US",
+      { weekday: "long", month: "long", day: "numeric", year: "numeric" }
+    );
+    await expect(page.locator("#todays-date")).toHaveText(expectedDateLabel);
     await expect(
       page.locator("#todays-winner .winner-highlight__title")
     ).toHaveText(expected.decision.winner.title);

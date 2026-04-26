@@ -3,7 +3,27 @@ const {
   USE_ROUTED_SITE,
   installLocalSiteRoutes,
   getAppUrl,
+  repoRoot,
 } = require("./helpers/local-site");
+const fs = require("node:fs");
+const path = require("node:path");
+
+const manifest = JSON.parse(
+  fs.readFileSync(path.join(repoRoot, "site/days/manifest.json"), "utf8")
+);
+const latestDay = [...manifest.days].sort(
+  (a, b) => new Date(b.date) - new Date(a.date)
+)[0];
+const decision = JSON.parse(
+  fs.readFileSync(
+    path.join(repoRoot, `site/days/${latestDay.date}/decision.json`),
+    "utf8"
+  )
+);
+const winner = decision.candidates.find(
+  (candidate) => candidate.id === decision.winner.candidateId
+);
+const reviewerCount = winner.reviewerBreakdown.length;
 
 /**
  * Navigate to homepage at the given viewport and wait for the scoreboard
@@ -62,11 +82,11 @@ test.describe("Scoreboard responsive — mobile viewports", () => {
       const labels = section.locator(".scoreboard__row:not(.scoreboard__overall) .scoreboard__dim-label");
       await expect(labels).toHaveCount(7);
 
-      // All 21 bars exist (7 dimensions × 3 judges)
+      // Bars exist for every dimension × scored reviewer
       const bars = section.locator(
         ".scoreboard__grid .scoreboard__bars .scoreboard__bar"
       );
-      await expect(bars).toHaveCount(21);
+      await expect(bars).toHaveCount(7 * reviewerCount);
 
       // Spot-check first label has text content
       const firstLabelText = await labels.first().textContent();
@@ -193,17 +213,16 @@ test.describe("Scoreboard responsive — desktop viewport (1024px × 768px)", ()
     );
     expect(flexDir).toBe("row");
 
-    // All 3 legend items should be on the same horizontal line —
+    // Legend items should be on the same horizontal line —
     // verify by checking they share the same top offset
     const legendItems = section.locator(".scoreboard__legend-item");
-    await expect(legendItems).toHaveCount(3);
+    await expect(legendItems).toHaveCount(reviewerCount);
 
     const tops = await legendItems.evaluateAll((items) =>
       items.map((item) => item.getBoundingClientRect().top)
     );
-    // On desktop with enough width, all 3 items should be on the same row
-    // (same top value within 1px tolerance for subpixel rendering)
-    expect(Math.abs(tops[0] - tops[1])).toBeLessThanOrEqual(1);
-    expect(Math.abs(tops[1] - tops[2])).toBeLessThanOrEqual(1);
+    for (let index = 1; index < tops.length; index += 1) {
+      expect(Math.abs(tops[index - 1] - tops[index])).toBeLessThanOrEqual(1);
+    }
   });
 });

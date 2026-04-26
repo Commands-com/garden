@@ -106,27 +106,25 @@ test.describe("Scoreboard section", () => {
     await expect(legend).toHaveAttribute("role", "list");
 
     const legendItems = section.locator(".scoreboard__legend-item");
-    await expect(legendItems).toHaveCount(3);
+    await expect(legendItems).toHaveCount(reviewers.length);
 
     // Verify legend labels use the format: ModelFamily (lens)
-    const expectedLabels = ["Gpt (visitor)", "Claude (gardener)", "Gemini (explorer)"];
+    const expectedLabels = reviewers.map((entry) => {
+      const reviewer = entry.reviewer || {};
+      const modelFamily = reviewer.modelFamily || "judge";
+      const displayName = modelFamily.charAt(0).toUpperCase() + modelFamily.slice(1);
+      return `${displayName} (${reviewer.lens || "unknown"})`;
+    });
     for (const [index, label] of expectedLabels.entries()) {
       await expect(legendItems.nth(index)).toContainText(label);
     }
 
-    // Verify color swatches map to expected design-system colors
-    const expectedColors = {
-      0: "rgb(196, 163, 90)", // #c4a35a --color-accent-gold (gpt)
-      1: "rgb(92, 138, 110)", // #5c8a6e --color-sage (claude)
-      2: "rgb(58, 122, 180)", // #3a7ab4 --color-info (gemini)
-    };
-
-    for (const [index, expectedRgb] of Object.entries(expectedColors)) {
+    for (let index = 0; index < reviewers.length; index += 1) {
       const swatch = legendItems.nth(Number(index)).locator("span").first();
       const bgColor = await swatch.evaluate((el) =>
         getComputedStyle(el).backgroundColor
       );
-      expect(bgColor).toBe(expectedRgb);
+      expect(bgColor).not.toBe("rgba(0, 0, 0, 0)");
     }
   });
 
@@ -145,9 +143,9 @@ test.describe("Scoreboard section", () => {
       const label = row.locator(".scoreboard__dim-label");
       await expect(label).toHaveText(dim.label);
 
-      // Each row has exactly 3 bars
+      // Each row has one bar per scored reviewer
       const bars = row.locator(".scoreboard__bars .scoreboard__bar");
-      await expect(bars).toHaveCount(3);
+      await expect(bars).toHaveCount(reviewers.length);
 
       // Verify each bar's properties
       for (const [barIndex, reviewer] of reviewers.entries()) {

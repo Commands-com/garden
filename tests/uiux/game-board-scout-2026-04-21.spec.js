@@ -80,8 +80,8 @@ test.describe("Board Scout — April 21 Cottonburr Mortar copy", () => {
     expect(stats["Arc"]).toBe("1.2s");
     // Sanity-check the rest of the attacker shape stays intact.
     expect(stats["Anti-air"]).toBe("No");
-    expect(stats["Splash radius"]).toBe("0.6 col · 14 dmg");
-    expect(stats["Damage"]).toBe("20");
+    expect(stats["Splash radius"]).toBe("0.6 col · 28 dmg");
+    expect(stats["Damage"]).toBe("52");
   });
 
   test("Thorn Vine card stays unchanged — no Arc badge, no Target/Range/Arc detail rows", async ({

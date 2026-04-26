@@ -85,9 +85,9 @@ test.describe("Scoreboard — bars: counts, widths, colors, and ARIA labels", ()
   });
 
   // ---------------------------------------------------------------------------
-  // 4. Each row contains exactly 3 .scoreboard__bar elements
+  // 4. Each row contains one .scoreboard__bar per scored reviewer
   // ---------------------------------------------------------------------------
-  test("each dimension row contains exactly 3 bars inside .scoreboard__bars", async ({
+  test("each dimension row contains one bar per reviewer inside .scoreboard__bars", async ({
     page,
   }) => {
     const section = await waitForScoreboardGrid(page);
@@ -95,7 +95,7 @@ test.describe("Scoreboard — bars: counts, widths, colors, and ARIA labels", ()
 
     for (let i = 0; i < 7; i++) {
       const bars = rows.nth(i).locator(".scoreboard__bars .scoreboard__bar");
-      await expect(bars).toHaveCount(3);
+      await expect(bars).toHaveCount(reviewers.length);
     }
   });
 
@@ -108,9 +108,8 @@ test.describe("Scoreboard — bars: counts, widths, colors, and ARIA labels", ()
       ".scoreboard__grid .scoreboard__bars .scoreboard__bar"
     );
 
-    // 7 dimensions × 3 reviewers = 21 bars
     const barCount = await allBars.count();
-    expect(barCount).toBe(21);
+    expect(barCount).toBe(dimensions.length * reviewers.length);
 
     for (let i = 0; i < barCount; i++) {
       await expect(allBars.nth(i)).toHaveAttribute("role", "img");
@@ -199,9 +198,9 @@ test.describe("Scoreboard — bars: counts, widths, colors, and ARIA labels", ()
   });
 
   // ---------------------------------------------------------------------------
-  // 6. Legend: role='list', 3 items with role='listitem', correct text
+  // 6. Legend: role='list', one item per scored reviewer, correct text
   // ---------------------------------------------------------------------------
-  test("legend has role='list' and contains 3 items with correct 'ModelFamily (lens)' text", async ({
+  test("legend has role='list' and contains one item per reviewer with correct 'ModelFamily (lens)' text", async ({
     page,
   }) => {
     const section = await waitForScoreboardGrid(page);
@@ -210,12 +209,11 @@ test.describe("Scoreboard — bars: counts, widths, colors, and ARIA labels", ()
     const legend = section.locator(".scoreboard__legend");
     await expect(legend).toHaveAttribute("role", "list");
 
-    // Legend items count
     const legendItems = section.locator(".scoreboard__legend-item");
-    await expect(legendItems).toHaveCount(3);
+    await expect(legendItems).toHaveCount(reviewers.length);
 
     // Each legend item has role='listitem'
-    for (let i = 0; i < 3; i++) {
+    for (let i = 0; i < reviewers.length; i++) {
       await expect(legendItems.nth(i)).toHaveAttribute("role", "listitem");
     }
 
@@ -233,9 +231,9 @@ test.describe("Scoreboard — bars: counts, widths, colors, and ARIA labels", ()
   });
 
   // ---------------------------------------------------------------------------
-  // Cross-check: total bar count = 7 dimensions × 3 reviewers = 21
+  // Cross-check: total bar count = dimensions × scored reviewers
   // ---------------------------------------------------------------------------
-  test("total bar count across all rows equals dimensions × reviewers (21)", async ({
+  test("total bar count across all rows equals dimensions × reviewers", async ({
     page,
   }) => {
     const section = await waitForScoreboardGrid(page);

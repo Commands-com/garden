@@ -157,11 +157,29 @@ test.describe("Husk Walker manifest-backed texture validation", () => {
     });
 
     await prepareGamePage(page);
+    await startChallenge(page);
+    await page.waitForFunction(
+      ({ bodyKey, plateKey }) => {
+        const scene = window.__phaserGame?.scene?.getScene("play");
+        return Boolean(
+          scene?.textures?.exists?.(bodyKey) &&
+            scene?.textures?.exists?.(plateKey)
+        );
+      },
+      {
+        bodyKey: HUSK_BODY_TEXTURE_KEY,
+        plateKey: HUSK_PLATE_TEXTURE_KEY,
+      },
+      { timeout: 10000 }
+    );
 
     const probeTexture = async (textureKey, manifestPath) =>
       page.evaluate(
         ({ textureKey, manifestPath }) => {
-          const scene = window.__phaserGame.scene.getScene("boot");
+          const scene =
+            window.__phaserGame.scene.getScene("play") ||
+            window.__phaserGame.scene.getScene("title") ||
+            window.__phaserGame.scene.getScene("boot");
           const exists = scene.textures.exists(textureKey);
           const texture = scene.textures.get(textureKey);
           const sourceImage =

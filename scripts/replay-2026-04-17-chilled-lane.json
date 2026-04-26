@@ -93,21 +93,21 @@
       "note": "Late center spear closes the chilled lane safely before the last ram stack."
     },
     {
-      "timeMs": 74000,
+      "timeMs": 70000,
       "row": 0,
       "col": 4,
       "plantId": "thornVine",
       "note": "Top lane depth for the final outer-lane cleanup."
     },
     {
-      "timeMs": 84000,
+      "timeMs": 75000,
       "row": 1,
       "col": 6,
       "plantId": "thornVine",
       "note": "Late upper support as the challenge finishes draining."
     },
     {
-      "timeMs": 84000,
+      "timeMs": 80000,
       "row": 3,
       "col": 6,
       "plantId": "thornVine",
@@ -119,13 +119,6 @@
       "col": 5,
       "plantId": "thornVine",
       "note": "Final lower-lane reinforcement right before the natural clear."
-    },
-    {
-      "timeMs": 86000,
-      "row": 1,
-      "col": 5,
-      "plantId": "thornVine",
-      "note": "Final upper-lane reinforcement right before endless unlocks."
     }
   ]
 }

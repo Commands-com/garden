@@ -11,7 +11,6 @@ const {
 
 const DAY_DATE = "2026-04-24";
 const PREV_DATE = "2026-04-23";
-const NEXT_DATE = "2026-04-25";
 const DAY_QUERY_PATH = `/days/?date=${DAY_DATE}`;
 const EXPECTED_ARTIFACT_FILES = [
   "decision.json",
@@ -190,14 +189,18 @@ test.describe("2026-04-24 day detail artifacts and decision schema", () => {
     const manifest = await fetchJson(page, "/days/manifest.json");
     expect(manifest.status, "GET /days/manifest.json must return 200").toBe(200);
     expect(manifest.parseError, manifest.parseError || "").toBeNull();
-    const hasNextDay = Array.isArray(manifest.json?.days)
-      ? manifest.json.days.some((day) => day.date === NEXT_DATE)
-      : false;
+    const sortedDates = Array.isArray(manifest.json?.days)
+      ? manifest.json.days
+          .map((day) => day.date)
+          .filter(Boolean)
+          .sort()
+      : [];
+    const nextDate = sortedDates.find((date) => date > DAY_DATE) || null;
 
-    if (hasNextDay) {
-      const nextLink = page.locator(`#day-nav a[href="/days/?date=${NEXT_DATE}"]`);
+    if (nextDate) {
+      const nextLink = page.locator(`#day-nav a[href="/days/?date=${nextDate}"]`);
       await expect(nextLink).toBeVisible();
-      await expect(nextLink).toContainText(NEXT_DATE);
+      await expect(nextLink).toContainText(nextDate);
     } else {
       await expect(page.locator("#day-nav .day-nav__link--disabled").last()).toContainText(
         "Next"

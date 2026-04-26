@@ -127,11 +127,11 @@ test.describe("Scoreboard graceful degradation", () => {
     await expect(feasibilityRow).toHaveCount(1);
     await expect(
       feasibilityRow.locator(".scoreboard__bars > *"),
-      "AC-7 expects all three judge slots to remain visible even when one dimension score is missing."
-    ).toHaveCount(3);
+      "AC-7 expects every reviewer slot to remain visible even when one dimension score is missing."
+    ).toHaveCount(getWinnerCandidate(decision).reviewerBreakdown.length);
     await expect(
       feasibilityRow,
-      "AC-7 expects a visible dash placeholder for the missing GPT feasibility score, but the current renderer appears to omit the bar entirely."
+      "AC-7 expects a visible dash placeholder for the missing reviewer score, but the current renderer appears to omit the slot entirely."
     ).toContainText("–");
   });
 

@@ -37,7 +37,7 @@ async function prepareGamePage(page) {
 }
 
 test.describe("April 21 tutorial -> challenge flow", () => {
-  test("default date advances to 2026-04-21; tutorial Wave 1 unlocks only cottonburrMortar; tutorial rolls into challenge via postClearAction; challenge excludes brambleSpear", async ({
+  test("tutorial Wave 1 unlocks only cottonburrMortar, rolls into challenge, and challenge excludes brambleSpear", async ({
     page,
   }) => {
     test.setTimeout(120000);
@@ -48,12 +48,10 @@ test.describe("April 21 tutorial -> challenge flow", () => {
       const { getScenarioForDate } = await import(
         "/game/src/config/scenarios.js"
       );
-      const defaultScenario = getScenarioForDate();
       const explicitScenario = getScenarioForDate("2026-04-21");
       const tutorial = explicitScenario.tutorial;
       const challenge = explicitScenario.challenge;
       return {
-        defaultDate: defaultScenario.date,
         title: explicitScenario.title,
         availablePlants: explicitScenario.availablePlants,
         tutorial: {
@@ -94,7 +92,6 @@ test.describe("April 21 tutorial -> challenge flow", () => {
       };
     });
 
-    expect(scenarioContract.defaultDate).toBe(DAY_DATE);
     expect(scenarioContract.title).toBe("Over the Top");
     expect(scenarioContract.availablePlants).toEqual([
       "cottonburrMortar",

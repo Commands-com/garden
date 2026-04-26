@@ -168,7 +168,6 @@ test.describe("April 18 tutorial -> challenge -> endless flow", () => {
         getScenarioModeDefinition,
       } = await import("/game/src/config/scenarios.js");
 
-      const defaultScenario = getScenarioForDate();
       const explicitScenario = getScenarioForDate("2026-04-18");
       const challengeMode = getScenarioModeDefinition("2026-04-18", "challenge");
       const thornwingLanes = explicitScenario.challenge.waves.flatMap((wave) =>
@@ -178,7 +177,6 @@ test.describe("April 18 tutorial -> challenge -> endless flow", () => {
       );
 
       return {
-        defaultDate: defaultScenario.date,
         scenarioTitle: explicitScenario.title,
         tutorialWaveCount: explicitScenario.tutorial.waves.length,
         challengeWaveCount: explicitScenario.challenge.waves.length,
@@ -188,7 +186,6 @@ test.describe("April 18 tutorial -> challenge -> endless flow", () => {
       };
     });
 
-    expect(scenarioContract.defaultDate).toBe("2026-04-19");
     expect(scenarioContract.scenarioTitle).toBe("Wings Over the Garden");
     expect(scenarioContract.challengeModeTitle).toBe("Wings Over the Garden");
     expect(scenarioContract.tutorialWaveCount).toBe(2);

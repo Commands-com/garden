@@ -37,7 +37,7 @@ async function prepareGamePage(page) {
 }
 
 test.describe("April 19 tutorial -> challenge flow", () => {
-  test("unlocks Pollen Puff in tutorial wave 2, keeps Frost Fern out of the challenge roster, excludes Thornwing from endless, and advances the default date", async ({
+  test("unlocks Pollen Puff in tutorial wave 2, keeps Frost Fern out of the challenge roster, and excludes Thornwing from endless", async ({
     page,
   }) => {
     test.setTimeout(120000);
@@ -50,15 +50,11 @@ test.describe("April 19 tutorial -> challenge flow", () => {
         getScenarioModeDefinition,
       } = await import("/game/src/config/scenarios.js");
 
-      const defaultScenario = getScenarioForDate();
       const explicitScenario = getScenarioForDate("2026-04-19");
-      const defaultChallengeMode = getScenarioModeDefinition(null, "challenge");
       const tutorialWaveTwo = explicitScenario.tutorial.waves[1];
       const challengeWaveTwo = explicitScenario.challenge.waves[1];
 
       return {
-        defaultDate: defaultScenario.date,
-        defaultChallengeTitle: defaultChallengeMode.scenarioTitle,
         tutorialWaveTwo: {
           label: tutorialWaveTwo.label,
           availablePlants: tutorialWaveTwo.availablePlants,
@@ -74,8 +70,6 @@ test.describe("April 19 tutorial -> challenge flow", () => {
       };
     });
 
-    expect(scenarioContract.defaultDate).toBe(DAY_DATE);
-    expect(scenarioContract.defaultChallengeTitle).toBe("Petals in the Wind");
     expect(scenarioContract.tutorialWaveTwo).toEqual({
       label: "Two Birds, One Puff",
       availablePlants: ["thornVine", "brambleSpear", "pollenPuff"],

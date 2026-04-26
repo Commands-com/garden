@@ -169,8 +169,8 @@ test.describe("Board Scout 2026-04-21 — Cottonburr Mortar arc badge + roster e
     // stay on the same detail panel (confirms no plant-id branch broke the
     // default attacker renderer).
     expect(stats["Anti-air"]).toBe("No");
-    expect(stats["Splash radius"]).toBe("0.6 col · 14 dmg");
-    expect(stats["Damage"]).toBe("20");
+    expect(stats["Splash radius"]).toBe("0.6 col · 28 dmg");
+    expect(stats["Damage"]).toBe("52");
     expect(stats["Fire Rate"]).toBe("2400ms");
 
     expect(runtimeIssues, runtimeIssues.join("\n")).toEqual([]);

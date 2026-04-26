@@ -1167,13 +1167,23 @@ function renderScoreboard(decision) {
     gemini: 'scoreboard__bar--gemini',
   };
 
+  const reviewerNames = orderedReviewers.map((entry) => {
+    const modelFamily = entry.reviewer?.modelFamily || 'judge';
+    return modelFamily.charAt(0).toUpperCase() + modelFamily.slice(1);
+  });
+  const reviewerSummary = reviewerNames.length === 1
+    ? reviewerNames[0]
+    : reviewerNames.length === 2
+      ? `${reviewerNames[0]} and ${reviewerNames[1]}`
+      : `${reviewerNames.slice(0, -1).join(', ')}, and ${reviewerNames[reviewerNames.length - 1]}`;
+
   const header = el('div', { className: 'section__header' },
     el('span', { className: 'section__label' }, 'Judging'),
     el('h2', { id: 'scoreboard-heading', className: 'scoreboard__title' }, 'The Scoreboard'),
     el(
       'p',
       { className: 'section__subtitle' },
-      'How GPT, Claude, and Gemini scored today\'s winning candidate across the seven judging dimensions.'
+      `How ${reviewerSummary} scored today's winning candidate across the seven judging dimensions.`
     )
   );
 
@@ -1226,10 +1236,11 @@ function renderScoreboard(decision) {
     });
 
     const scoredSlots = slots.filter((slot) => typeof slot.score === 'number');
-    if (scoredSlots.length === 0) return;
 
-    const spread = Math.max(...scoredSlots.map((slot) => slot.score)) -
-      Math.min(...scoredSlots.map((slot) => slot.score));
+    const spread = scoredSlots.length > 0
+      ? Math.max(...scoredSlots.map((slot) => slot.score)) -
+        Math.min(...scoredSlots.map((slot) => slot.score))
+      : 0;
     const isDivergent = spread >= 3;
     const barsContainer = el('div', { className: 'scoreboard__bars' });
 

@@ -85,8 +85,18 @@ async function waitForActionReady(page, action, timeoutMs = 60000) {
         const step = () => {
           const state = window.__gameTestHooks.getState();
           const observation = window.__gameTestHooks.getObservation();
+          const gameEnded =
+            state?.scene === "gameover" || observation?.scene === "gameover";
+          const playActive =
+            !gameEnded &&
+            (state?.scene === "play" || observation?.scene === "play");
 
-          if (state?.scene !== "play") {
+          if (!playActive) {
+            if (!gameEnded) {
+              requestAnimationFrame(step);
+              return;
+            }
+
             resolve({
               ready: false,
               reason: "scene-ended",
