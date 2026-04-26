@@ -27,6 +27,7 @@ Use this document when you are deciding, specifying, implementing, or validating
 - Preserve **deterministic test hooks** and **silent runtime fallbacks**.
 - Treat fallback visuals as a safety net, not a ship criterion. A new roster unit or enemy should have a real manifest-backed art asset, not only the generic BootScene placeholder.
 - Use generated assets deliberately. Do not generate art or animation just because a model exists.
+- New moving lane enemies need a real walk/idle animation sheet, not just static portrait art plus runtime bob. Static-only enemy art is acceptable only for explicitly non-moving hazards or decals, and the spec/review must say why.
 
 ## Game Map
 
@@ -124,6 +125,7 @@ If you modify a core system, include regression coverage for the behavior you ar
 - If a change adds a new defender, enemy, projectile, pickup, or other visible gameplay unit, add the matching art to `site/game/assets-manifest.json`.
 - The manifest entry should point at a real file under `site/game/assets/` or `site/game/assets/generated/`.
 - Do not count BootScene's procedural fallback textures as shipped unit art. They are there so the game still boots when assets are missing, but a roster-expansion day should fail review if the new unit only exists through fallback art.
+- If the change adds a moving enemy, the shipped art must include a manifest-backed animation or spritesheet plus config-level `animationFrames`. A static SVG/PNG body alone is incomplete unless the enemy is explicitly a stationary hazard.
 
 ## Asset Backends
 
@@ -134,7 +136,7 @@ Use the right generator for the right job.
 Use for:
 
 - static defenders
-- static enemy source art
+- static enemy source art, portraits, or non-moving hazards
 - projectiles
 - pickups
 - UI icons
@@ -145,6 +147,7 @@ Why:
 - best high-detail source art
 - good for polished contemporary pixel art
 - works well when runtime motion can carry the rest
+- for moving enemies, use this only as reference/source art; the shipped gameplay body still needs an animation sheet
 
 Example:
 
@@ -168,6 +171,7 @@ Use for:
 Why:
 
 - much better frame-to-frame consistency than forcing `rd-plus` to fake a sheet
+- required for new moving lane enemies unless a committed hand-authored spritesheet is supplied instead
 
 Hard constraints:
 
@@ -271,6 +275,8 @@ For animation or spritesheet assets, include Phaser-ready metadata:
 - `metadata.phaser.frameHeight`
 
 The current Boot scene will preload any asset with `metadata.phaser` as a spritesheet.
+
+The unit definition should then point at the spritesheet asset id and store the intended frame row, for example `animationFrames: [12, 13, 14, 15]`.
 
 ## Animation Rules
 

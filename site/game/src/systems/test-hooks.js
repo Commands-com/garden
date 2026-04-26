@@ -184,9 +184,9 @@ export function installGameTestHooks(game, bootstrap) {
       return playScene.getObservation();
     },
 
-    // Read-only armor state for Playwright assertions on the Husk Walker windup
-    // visuals (AC-2/AC-3). Returns one entry per live armored enemy with the
-    // observable signals: armorWindup flag and plate sprite scaleY/y.
+    // Read-only armor state for Playwright assertions on armored enemy windup.
+    // Returns one entry per live armored enemy. plateScaleY/plateY remain null
+    // for units that do not use a separate overlay sprite.
     getArmorStates() {
       const playScene = getPlayScene();
       if (!playScene?.scene?.isActive() || !Array.isArray(playScene.enemies)) {

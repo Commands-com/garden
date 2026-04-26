@@ -1,6 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" role="img" aria-labelledby="title desc">
   <title id="title">Husk Walker reference</title>
-  <desc id="desc">Front-armored heavy ground enemy with a thick chitin plate over the chest. Plate is the soft target during the 600 ms vulnerability windup. Reference portrait for the husk-walker sprite; runtime composes a separate husk-walker-plate decal over this body so the windup tell (scaleY 0.85, y -4) is readable.</desc>
+  <desc id="desc">Front-armored heavy ground enemy reference portrait for the Husk Walker. Runtime now uses the Replicate husk-walker-walk animation sheet directly without a separate front-plate decal overlay.</desc>
   <defs>
     <linearGradient id="huskBody" x1="0" x2="0" y1="0" y2="1">
       <stop offset="0%" stop-color="#5a4032"/>

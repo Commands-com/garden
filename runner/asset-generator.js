@@ -369,12 +369,16 @@ function buildSpritesheetPrompt(prompt, category, style, dimensions, sheetSpec) 
   const animationDirection =
     ANIMATION_PRESETS[sheetSpec.animation] ||
     `${sheetSpec.animation} gameplay motion that reads clearly from one frame to the next`;
+  const laneEnemyDirection =
+    category === 'enemy'
+      ? 'For lane-defense enemies, keep gameplay frames facing left and moving right-to-left toward the wall; do not mix directions inside the gameplay row.'
+      : '';
   const modernDirection =
     'modern high-detail pixel art, nuanced shading, crisp edges, visually rich but gameplay-readable, designed for a contemporary indie game';
   const antiRetroDirection =
     'avoid chunky 8-bit nostalgia, avoid intentionally primitive low-detail treatment, avoid exaggerated CRT or old-console aesthetics';
 
-  return `Create a ${category} spritesheet of ${prompt}. ${preset.direction}. Render a single gameplay-ready spritesheet with ${sheetSpec.frames} frames arranged in ${sheetSpec.columns} columns and ${sheetSpec.rows} rows. The frames must read in ${sheetSpec.order} order. ${animationDirection}. Keep the same subject, camera angle, scale, palette, lighting, and ground plane in every frame. This is for one coherent animation sequence, not a mood board, contact sheet, or labeled turnaround. Use clean grid spacing with no text, borders, UI panels, or extra stray poses outside the frame grid. ${modernDirection}. Style mode: ${style}. Final sheet size ${dimensions.width}x${dimensions.height}, with each frame reading at roughly ${sheetSpec.frameWidth}x${sheetSpec.frameHeight}. Transparent or removable background. ${antiRetroDirection}.`;
+  return `Create a ${category} spritesheet of ${prompt}. ${preset.direction}. Render a single gameplay-ready spritesheet with ${sheetSpec.frames} frames arranged in ${sheetSpec.columns} columns and ${sheetSpec.rows} rows. The frames must read in ${sheetSpec.order} order. ${animationDirection}. ${laneEnemyDirection} Keep the same subject, camera angle, scale, palette, lighting, and ground plane in every frame. This is for one coherent animation sequence, not a mood board, contact sheet, or labeled turnaround. Use clean grid spacing with no text, borders, UI panels, or extra stray poses outside the frame grid. ${modernDirection}. Style mode: ${style}. Final sheet size ${dimensions.width}x${dimensions.height}, with each frame reading at roughly ${sheetSpec.frameWidth}x${sheetSpec.frameHeight}. Transparent or removable background. ${antiRetroDirection}.`;
 }
 
 function resolveRdAnimationStyle(requestedStyle) {
@@ -420,12 +424,16 @@ function buildAnimationPrompt(prompt, category, style, dimensions) {
     style === 'vfx'
       ? 'Render a compact gameplay effect animation with clean silhouette progression and no camera drift.'
       : 'Render a cohesive low-framerate gameplay animation with consistent character volume, palette, and positioning across frames.';
+  const laneEnemyDirection =
+    category === 'enemy'
+      ? 'For lane-defense enemies, keep the subject facing left and advancing right-to-left toward the wall throughout the gameplay frames.'
+      : '';
   const modernDirection =
     'modern polished pixel art, crisp readable silhouettes, consistent shading, and strong gameplay clarity';
   const antiRetroDirection =
     'avoid muddy low-contrast frames, avoid random pose drift, avoid noisy background detail, avoid deliberately primitive 8-bit nostalgia';
 
-  return `Create an animated ${category} sprite of ${prompt}. ${preset.direction}. ${styleDirection} Use the rd-animation style ${style}. Each frame must keep the same subject identity, palette, and camera angle while showing one coherent gameplay action. Target frame size ${dimensions.width}x${dimensions.height}. No text, labels, borders, UI panels, or background scene dressing. ${modernDirection}. ${antiRetroDirection}.`;
+  return `Create an animated ${category} sprite of ${prompt}. ${preset.direction}. ${styleDirection} ${laneEnemyDirection} Use the rd-animation style ${style}. Each frame must keep the same subject identity, palette, and camera angle while showing one coherent gameplay action. Target frame size ${dimensions.width}x${dimensions.height}. No text, labels, borders, UI panels, or background scene dressing. ${modernDirection}. ${antiRetroDirection}.`;
 }
 
 function resolveRdTileStyle(kind, requestedStyle) {

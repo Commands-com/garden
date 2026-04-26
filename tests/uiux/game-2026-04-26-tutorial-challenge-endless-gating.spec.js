@@ -12,13 +12,12 @@ const {
 //   2. Clicking "Tutorial First" enters the play scene in mode=tutorial
 //      against the 2026-04-26 scenario, with the wave-1 drill plant roster
 //      (amberWall + thornVine + cottonburrMortar) — the kit needed to read
-//      Husk Walker's plate windup.
-//   3. The runtime knows about Husk Walker plate state — getArmorStates()
+//      Husk Walker's armor windup.
+//   3. The runtime knows about Husk Walker armor state — getArmorStates()
 //      reports a live entry for a spawned huskWalker carrying the
-//      armorWindup boolean and concrete plateScaleY / plateY values that
-//      drive the 600 ms vulnerability tell. (The plate decal sprite is
-//      created by play.js when definition.plateTextureKey resolves; the
-//      observation surface is what proves "tutorial teaches the windup".)
+//      armorWindup boolean and attack cooldown values that drive the 600 ms
+//      vulnerability tell. The Replicate sheet now supplies the full visible
+//      body, so no separate front-plate decal should be present.
 //   4. finishScenario() rolls the tutorial straight into the Crackplate
 //      challenge (mode=challenge, dayDate=2026-04-26, scenarioPhase NOT
 //      'endless', challengeCleared=false) with the full Crackplate plant
@@ -112,7 +111,7 @@ async function clickTutorialFirstButton(page) {
 }
 
 test.describe("April 26 Crackplate — tutorial → challenge → endless gating workflow", () => {
-  test("tutorial click teaches Husk Walker plate state, rolls into Crackplate, and only unlocks endless after challenge clear", async ({
+  test("tutorial click teaches Husk Walker armor state, rolls into Crackplate, and only unlocks endless after challenge clear", async ({
     page,
   }) => {
     test.setTimeout(45000);
@@ -183,7 +182,7 @@ test.describe("April 26 Crackplate — tutorial → challenge → endless gating
     expect(tutorialState.challengeCleared).toBe(false);
     expect(tutorialState.scenarioPhase).not.toBe("endless");
 
-    // ---- (3) Confirm the runtime carries Husk Walker plate state. Speed up
+    // ---- (3) Confirm the runtime carries Husk Walker armor state. Speed up
     //          time so any built-in scripted spawn lands quickly, then
     //          deterministically inject a Husk Walker via the test hook so
     //          this test does not depend on the tutorial's scripted timing.
@@ -193,14 +192,13 @@ test.describe("April 26 Crackplate — tutorial → challenge → endless gating
     );
     expect(spawned).toBe(true);
 
-    // The plate decal sprite is created in play.createEnemy() when
-    // definition.plateTextureKey resolves. getArmorStates() returns the
-    // observable signals: armorWindup boolean and the live plate scaleY/y
-    // that drive the 600ms vulnerability tell.
+    // getArmorStates() returns the observable armorWindup boolean that drives
+    // the 600ms vulnerability tell. The old plate decal is intentionally not
+    // wired because the Replicate animation sheet is the full visible body.
     await page.waitForFunction(
       () => {
         const states = window.__gameTestHooks.getArmorStates() || [];
-        return states.length > 0 && states[0].plateScaleY != null;
+        return states.length > 0;
       },
       undefined,
       { timeout: 8000 }
@@ -216,19 +214,11 @@ test.describe("April 26 Crackplate — tutorial → challenge → endless gating
       expect.objectContaining({
         row: 2,
         armorWindup: expect.any(Boolean),
-        plateScaleY: expect.any(Number),
-        plateY: expect.any(Number),
         attackCooldownMs: expect.any(Number),
       })
     );
-    // updateArmorPlate() drives plate.scaleY between 1.0 (idle) and 0.85
-    // (during the 600ms windup). Anything outside that band would mean
-    // the runtime is not actually wiring the plate to armorWindup.
-    expect(huskState.plateScaleY).toBeGreaterThanOrEqual(0.85);
-    expect(huskState.plateScaleY).toBeLessThanOrEqual(1.0);
-    // plateY tracks the body y plus an offset of -4 during windup, 0
-    // otherwise; either value is a finite number, never null/undefined.
-    expect(Number.isFinite(huskState.plateY)).toBe(true);
+    expect(huskState.plateScaleY).toBe(null);
+    expect(huskState.plateY).toBe(null);
 
     // ---- (4) Tutorial → Crackplate challenge auto-roll via finishScenario.
     //          play.beginChallengeFromTutorial() restarts play with

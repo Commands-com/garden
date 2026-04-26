@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "updatedAt": "2026-04-26T00:00:00.000Z",
+  "updatedAt": "2026-04-26T18:09:53.440Z",
   "assets": [
     {
       "id": "amber-wall",
@@ -15,66 +15,6 @@
         "format": "svg",
         "width": 128,
         "height": 128
-      }
-    },
-    {
-      "id": "cottonburr-mortar",
-      "type": "sprite",
-      "kind": "sprite",
-      "provider": "repo",
-      "path": "/game/assets/manual/plants/cottonburr-mortar.svg",
-      "prompt": "Hand-authored repo asset for the April 21 Cottonburr Mortar plant. A rooted green mortar cup holding a pale cottonburr payload so the new arc-and-rearmost plant reads as a back-rank siege piece instead of a straight-line shooter.",
-      "generatedAt": "2026-04-21T00:00:00.000Z",
-      "metadata": {
-        "category": "player",
-        "format": "svg",
-        "width": 128,
-        "height": 128
-      }
-    },
-    {
-      "id": "cottonburr-mortar-projectile",
-      "type": "sprite",
-      "kind": "sprite",
-      "provider": "repo",
-      "path": "/game/assets/manual/projectiles/cottonburr-mortar-projectile.svg",
-      "prompt": "Hand-authored repo asset for the April 21 Cottonburr Mortar projectile. A spiked cottonburr seed with a warm core so arc shots read as a lobbed impact pod instead of a thorn bolt.",
-      "generatedAt": "2026-04-21T00:00:00.000Z",
-      "metadata": {
-        "category": "projectile",
-        "format": "svg",
-        "width": 96,
-        "height": 32
-      }
-    },
-    {
-      "id": "pollen-puff",
-      "type": "sprite",
-      "kind": "sprite",
-      "provider": "repo",
-      "path": "/game/assets/manual/plants/pollen-puff.svg",
-      "prompt": "Hand-authored repo asset for the April 19 Pollen Puff splash plant. Warm yellow puffball bloom with a soft pollen halo so the second anti-air plant reads as radius rather than a piercing line.",
-      "generatedAt": "2026-04-19T00:00:00.000Z",
-      "metadata": {
-        "category": "player",
-        "format": "svg",
-        "width": 128,
-        "height": 128
-      }
-    },
-    {
-      "id": "pollen-puff-projectile",
-      "type": "sprite",
-      "kind": "sprite",
-      "provider": "repo",
-      "path": "/game/assets/manual/projectiles/pollen-puff-projectile.svg",
-      "prompt": "Hand-authored repo asset for the April 19 Pollen Puff projectile. Glowing amber pollen orb with a dusty trail so splash bolts are visually distinct from Bramble Spear lances and Thorn Vine thorns.",
-      "generatedAt": "2026-04-19T00:00:00.000Z",
-      "metadata": {
-        "category": "projectile",
-        "format": "svg",
-        "width": 96,
-        "height": 32
       }
     },
     {
@@ -215,6 +155,36 @@
       }
     },
     {
+      "id": "cottonburr-mortar",
+      "type": "sprite",
+      "kind": "sprite",
+      "provider": "repo",
+      "path": "/game/assets/manual/plants/cottonburr-mortar.svg",
+      "prompt": "Hand-authored repo asset for the April 21 Cottonburr Mortar plant. A rooted green mortar cup holding a pale cottonburr payload so the new arc-and-rearmost plant reads as a back-rank siege piece instead of a straight-line shooter.",
+      "generatedAt": "2026-04-21T00:00:00.000Z",
+      "metadata": {
+        "category": "player",
+        "format": "svg",
+        "width": 128,
+        "height": 128
+      }
+    },
+    {
+      "id": "cottonburr-mortar-projectile",
+      "type": "sprite",
+      "kind": "sprite",
+      "provider": "repo",
+      "path": "/game/assets/manual/projectiles/cottonburr-mortar-projectile.svg",
+      "prompt": "Hand-authored repo asset for the April 21 Cottonburr Mortar projectile. A spiked cottonburr seed with a warm core so arc shots read as a lobbed impact pod instead of a thorn bolt.",
+      "generatedAt": "2026-04-21T00:00:00.000Z",
+      "metadata": {
+        "category": "projectile",
+        "format": "svg",
+        "width": 96,
+        "height": 32
+      }
+    },
+    {
       "id": "frost-fern",
       "type": "sprite",
       "kind": "sprite",
@@ -282,6 +252,138 @@
           "frameWidth": 48,
           "frameHeight": 48
         }
+      }
+    },
+    {
+      "id": "husk-walker-walk",
+      "type": "sprite",
+      "kind": "animation",
+      "provider": "replicate",
+      "path": "/game/assets/manual/enemies/husk-walker-walk-sheet.png",
+      "prompt": "Create an animated enemy sprite of front-armored Husk Walker for a Plants-vs-Zombies-style lane-defense game, heavy beetle-like garden siege enemy, thick retractable shield plate over a soft amber chest core, segmented bark-brown chitin body, thorny jointed legs, slow heavy marching walk cycle, always facing left, advancing right-to-left toward the garden wall, readable at small gameplay size, no extra directions, no UI, no background. hostile lane-pushing creature for a top-down lane-defense game, readable attack silhouette, visually distinct body shape, premium indie-game finish. Render a cohesive low-framerate gameplay animation with consistent character volume, palette, and positioning across frames. For lane-defense enemies, keep the subject facing left and advancing right-to-left toward the wall throughout the gameplay frames. Use the rd-animation style walking_and_idle. Each frame must keep the same subject identity, palette, and camera angle while showing one coherent gameplay action. Target frame size 48x48. No text, labels, borders, UI panels, or background scene dressing. modern polished pixel art, crisp readable silhouettes, consistent shading, and strong gameplay clarity. avoid muddy low-contrast frames, avoid random pose drift, avoid noisy background detail, avoid deliberately primitive 8-bit nostalgia.",
+      "generatedAt": "2026-04-26T18:09:53.432Z",
+      "metadata": {
+        "predictionId": "zane48c54srmy0cxsbxvnrnpsg",
+        "modelVersion": "2e4eabbc836578423e151ba27352a1d8a566c6f1186c0da3ddf66c54deacf28b",
+        "model": "rd-animation",
+        "category": "enemy",
+        "style": "walking_and_idle",
+        "width": 48,
+        "height": 48,
+        "returnSpritesheet": true,
+        "phaser": {
+          "frameWidth": 48,
+          "frameHeight": 48
+        }
+      }
+    },
+    {
+      "id": "loamspike-surface-dust",
+      "type": "sprite",
+      "kind": "sprite",
+      "provider": "repo",
+      "path": "/game/assets/manual/particles/loamspike-surface-dust.svg",
+      "prompt": "Hand-authored repo asset for the April 24 Loamspike surface dust burst. One-shot puffball decal emitted when the burrower emerges from underpass.",
+      "generatedAt": "2026-04-24T00:00:00.000Z",
+      "metadata": {
+        "category": "particle",
+        "format": "svg",
+        "width": 48,
+        "height": 48
+      }
+    },
+    {
+      "id": "loamspike-surface-marker",
+      "type": "sprite",
+      "kind": "sprite",
+      "provider": "repo",
+      "path": "/game/assets/manual/enemies/loamspike-surface-marker.svg",
+      "prompt": "Hand-authored repo asset for the April 24 Loamspike surface marker. Subtle ground-crack at the surface column, visible from telegraph through underpass so surface prediction is readable.",
+      "generatedAt": "2026-04-24T00:00:00.000Z",
+      "metadata": {
+        "category": "decal",
+        "format": "svg",
+        "width": 64,
+        "height": 64
+      }
+    },
+    {
+      "id": "loamspike-telegraph",
+      "type": "sprite",
+      "kind": "sprite",
+      "provider": "repo",
+      "path": "/game/assets/manual/enemies/loamspike-telegraph.svg",
+      "prompt": "Hand-authored repo asset for the April 24 Loamspike dive telegraph. Soil-crack decal anchored at the dive column so the player can read where the burrower is about to go under.",
+      "generatedAt": "2026-04-24T00:00:00.000Z",
+      "metadata": {
+        "category": "decal",
+        "format": "svg",
+        "width": 64,
+        "height": 64
+      }
+    },
+    {
+      "id": "loamspike-underpass-shadow",
+      "type": "sprite",
+      "kind": "sprite",
+      "provider": "repo",
+      "path": "/game/assets/manual/enemies/loamspike-underpass-shadow.svg",
+      "prompt": "Hand-authored repo asset for the April 24 Loamspike underpass shadow. Semi-transparent tracking shadow that follows the burrower's x-position while underground so the player can see where it is.",
+      "generatedAt": "2026-04-24T00:00:00.000Z",
+      "metadata": {
+        "category": "decal",
+        "format": "svg",
+        "width": 64,
+        "height": 32
+      }
+    },
+    {
+      "id": "loamspike-walk",
+      "type": "sprite",
+      "kind": "animation",
+      "provider": "repo",
+      "path": "/game/assets/manual/enemies/loamspike-walk-sheet.png",
+      "prompt": "Hand-authored Loamspike Burrower walk+burrow spritesheet for the April 24 runtime. 4x4 grid of 64x64 frames; gameplay-facing walk row indices [12,13,14,15] match the existing walker enemy pattern (briar-beetle, shard-mite). Portrait reference lives at loamspike-walk.svg; the PNG is produced by the asset pipeline. Boot procedural fallback covers the texture until the PNG ships.",
+      "generatedAt": "2026-04-24T00:00:00.000Z",
+      "metadata": {
+        "category": "enemy",
+        "format": "png",
+        "width": 256,
+        "height": 256,
+        "phaser": {
+          "frameWidth": 64,
+          "frameHeight": 64
+        }
+      }
+    },
+    {
+      "id": "pollen-puff",
+      "type": "sprite",
+      "kind": "sprite",
+      "provider": "repo",
+      "path": "/game/assets/manual/plants/pollen-puff.svg",
+      "prompt": "Hand-authored repo asset for the April 19 Pollen Puff splash plant. Warm yellow puffball bloom with a soft pollen halo so the second anti-air plant reads as radius rather than a piercing line.",
+      "generatedAt": "2026-04-19T00:00:00.000Z",
+      "metadata": {
+        "category": "player",
+        "format": "svg",
+        "width": 128,
+        "height": 128
+      }
+    },
+    {
+      "id": "pollen-puff-projectile",
+      "type": "sprite",
+      "kind": "sprite",
+      "provider": "repo",
+      "path": "/game/assets/manual/projectiles/pollen-puff-projectile.svg",
+      "prompt": "Hand-authored repo asset for the April 19 Pollen Puff projectile. Glowing amber pollen orb with a dusty trail so splash bolts are visually distinct from Bramble Spear lances and Thorn Vine thorns.",
+      "generatedAt": "2026-04-19T00:00:00.000Z",
+      "metadata": {
+        "category": "projectile",
+        "format": "svg",
+        "width": 96,
+        "height": 32
       }
     },
     {
@@ -415,115 +517,6 @@
           "frameWidth": 64,
           "frameHeight": 64
         }
-      }
-    },
-    {
-      "id": "loamspike-walk",
-      "type": "sprite",
-      "kind": "animation",
-      "provider": "repo",
-      "path": "/game/assets/manual/enemies/loamspike-walk-sheet.png",
-      "prompt": "Hand-authored Loamspike Burrower walk+burrow spritesheet for the April 24 runtime. 4x4 grid of 64x64 frames; gameplay-facing walk row indices [12,13,14,15] match the existing walker enemy pattern (briar-beetle, shard-mite). Portrait reference lives at loamspike-walk.svg; the PNG is produced by the asset pipeline. Boot procedural fallback covers the texture until the PNG ships.",
-      "generatedAt": "2026-04-24T00:00:00.000Z",
-      "metadata": {
-        "category": "enemy",
-        "format": "png",
-        "width": 256,
-        "height": 256,
-        "phaser": {
-          "frameWidth": 64,
-          "frameHeight": 64
-        }
-      }
-    },
-    {
-      "id": "loamspike-telegraph",
-      "type": "sprite",
-      "kind": "sprite",
-      "provider": "repo",
-      "path": "/game/assets/manual/enemies/loamspike-telegraph.svg",
-      "prompt": "Hand-authored repo asset for the April 24 Loamspike dive telegraph. Soil-crack decal anchored at the dive column so the player can read where the burrower is about to go under.",
-      "generatedAt": "2026-04-24T00:00:00.000Z",
-      "metadata": {
-        "category": "decal",
-        "format": "svg",
-        "width": 64,
-        "height": 64
-      }
-    },
-    {
-      "id": "loamspike-surface-marker",
-      "type": "sprite",
-      "kind": "sprite",
-      "provider": "repo",
-      "path": "/game/assets/manual/enemies/loamspike-surface-marker.svg",
-      "prompt": "Hand-authored repo asset for the April 24 Loamspike surface marker. Subtle ground-crack at the surface column, visible from telegraph through underpass so surface prediction is readable.",
-      "generatedAt": "2026-04-24T00:00:00.000Z",
-      "metadata": {
-        "category": "decal",
-        "format": "svg",
-        "width": 64,
-        "height": 64
-      }
-    },
-    {
-      "id": "loamspike-underpass-shadow",
-      "type": "sprite",
-      "kind": "sprite",
-      "provider": "repo",
-      "path": "/game/assets/manual/enemies/loamspike-underpass-shadow.svg",
-      "prompt": "Hand-authored repo asset for the April 24 Loamspike underpass shadow. Semi-transparent tracking shadow that follows the burrower's x-position while underground so the player can see where it is.",
-      "generatedAt": "2026-04-24T00:00:00.000Z",
-      "metadata": {
-        "category": "decal",
-        "format": "svg",
-        "width": 64,
-        "height": 32
-      }
-    },
-    {
-      "id": "husk-walker",
-      "type": "sprite",
-      "kind": "sprite",
-      "provider": "repo",
-      "path": "/game/assets/manual/enemies/husk-walker.svg",
-      "prompt": "Hand-authored Husk Walker body for the April 26 front-armored ground enemy. Static SVG loaded as a single image (animation loop is overkill per brief — runtime motion plus the husk-walker-plate decal's scaleY 0.85 and y -4 offset convey the 600 ms vulnerability windup). When the matching PNG spritesheet (4x4, 64x64 frames; gameplay row indices [12,13,14,15] mirroring loamspike/glass-ram) ships from the asset pipeline, swap path/format and add metadata.phaser.frameWidth/frameHeight=64; until then applyEnemyAnimationFrame's setFrame call no-ops harmlessly on the single-image texture.",
-      "generatedAt": "2026-04-26T00:00:00.000Z",
-      "metadata": {
-        "category": "enemy",
-        "format": "svg",
-        "width": 128,
-        "height": 128
-      }
-    },
-    {
-      "id": "husk-walker-plate",
-      "type": "sprite",
-      "kind": "sprite",
-      "provider": "repo",
-      "path": "/game/assets/manual/enemies/husk-walker-plate.svg",
-      "prompt": "Hand-authored repo asset for the April 26 Husk Walker plate decal. Single-frame plate-only overlay aligned over the husk-walker body; runtime sets scaleY=0.85 and y -=4 during the vulnerability windup so the plate visibly retracts and the soft chest is exposed.",
-      "generatedAt": "2026-04-26T00:00:00.000Z",
-      "metadata": {
-        "category": "decal",
-        "format": "svg",
-        "width": 128,
-        "height": 128
-      }
-    },
-    {
-      "id": "loamspike-surface-dust",
-      "type": "sprite",
-      "kind": "sprite",
-      "provider": "repo",
-      "path": "/game/assets/manual/particles/loamspike-surface-dust.svg",
-      "prompt": "Hand-authored repo asset for the April 24 Loamspike surface dust burst. One-shot puffball decal emitted when the burrower emerges from underpass.",
-      "generatedAt": "2026-04-24T00:00:00.000Z",
-      "metadata": {
-        "category": "particle",
-        "format": "svg",
-        "width": 48,
-        "height": 48
       }
     }
   ]

@@ -131,6 +131,7 @@ Before changing Phaser runtime code specifically, also read `docs/phaser-4-runti
 - Use `node runner/asset-generator.js animation ...` with `rd-animation` for true gameplay loops such as walking, idle, attack, hurt, spawn, or compact VFX sheets.
 - Keep `rd-animation` outputs gameplay-sized. Its styles have hard size constraints; for example, `walking_and_idle` and `four_angle_walking` are 48x48, `small_sprites` is 32x32, and `vfx` is 24-96.
 - Prefer runtime motion for anything that does not need hand-drawn frame changes. Defenders that mostly sit in place should usually stay static and use tweens, recoil, bob, tint, or scale rather than a full generated spritesheet.
+- New moving lane enemies must ship with a manifest-backed animation/spritesheet and config-level `animationFrames`. Static-only enemy art is incomplete unless the enemy is explicitly a stationary hazard or decal and the spec/review calls that out.
 - If a generated sheet contains multiple facing directions, never cycle all rows blindly. Explicitly choose the row that matches gameplay direction in config, such as `animationFrames: [12, 13, 14, 15]` for a right-to-left enemy that should always face the wall.
 - Record animation choices in config files (`site/game/src/config/enemies.js`, later `plants.js` if needed), not as ad hoc magic numbers buried in scene code.
 - Generated sheets should carry `metadata.phaser.frameWidth` and `metadata.phaser.frameHeight` in `site/game/assets-manifest.json` so Boot can preload them as spritesheets.

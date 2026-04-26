@@ -98,6 +98,7 @@ The pipeline should treat animation as a first-class asset type, but not every g
 - **Use `rd-plus` for static source art**: defenders, enemy portraits, board props, UI icons, and environment pieces that benefit from higher-detail source images.
 - **Use `rd-animation` for actual gameplay loops**: short walking, idle, attack, hurt, spawn, or VFX sheets that need frame-to-frame consistency.
 - **Prefer runtime motion for low-verb units**: if a defender mostly sits in one tile and shoots, start with a static sprite plus recoil, bob, hit-flash, scale, and tint before paying for a generated animation sheet.
+- **Require animation for moving enemies**: a new lane enemy that advances across the board must ship a manifest-backed animation/spritesheet and config-level `animationFrames`. Static-only enemy art is only acceptable for explicitly stationary hazards, decals, or source/reference art.
 - **Treat facing as gameplay logic, not an art accident**: lane enemies march right-to-left toward the wall, so their frame selection must stay locked to the left-facing row. Do not cycle every row in a multi-direction sheet just because it exists.
 - **Store frame choices in config**: if a sheet has multiple rows, `config/enemies.js` or `config/plants.js` should explicitly say which frame indices to use for the live animation sequence.
 - **Keep runtime loading generic**: `site/game/assets-manifest.json` should include `metadata.phaser.frameWidth` and `metadata.phaser.frameHeight` so Boot can preload any generated sheet as a Phaser spritesheet without hand-editing the loader for each asset.
@@ -198,6 +199,7 @@ These are caught by human review (the Review stage) and community feedback via B
   - Avoid: chunky 8-bit nostalgia, intentionally primitive low-detail treatment, CRT/old-console affectation
 - **Animation-specific guardrails**:
   - Use `rd-animation` only for assets that truly benefit from frame-to-frame consistency
+  - New moving lane enemies always count as needing frame-to-frame gameplay animation unless the design explicitly says they are stationary
   - Keep animation sheets compact and engine-readable; `walking_and_idle` and `four_angle_walking` are 48×48, `small_sprites` is 32×32, and `vfx` can range from 24-96
   - For lane enemies, choose the row that faces the wall and animate only that row in gameplay
   - If the sheet contains extra facings or turnaround rows, those are reference material unless the design actually needs directional switching
@@ -265,6 +267,7 @@ When the tool returns a spritesheet, implementation should wire it in deliberate
 - point the unit definition at the sheet's asset id
 - choose a single facing row in config if the unit only ever moves one direction
 - do not blindly animate all directions in a loop
+- for moving enemies, treat a static-only body as incomplete even if runtime tweens make it wiggle
 
 ## DynamoDB schema
 
