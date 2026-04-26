@@ -2,6 +2,26 @@
   "schemaVersion": 1,
   "days": [
     {
+      "date": "2026-04-26",
+      "title": "Husk Walker — Front Armor, Windup Window, and the Crackplate Board",
+      "summary": "Adds Husk Walker as a scripted front-armored ground enemy and publishes the Crackplate board, where direct fire is reduced until the body flashes during a 600ms windup and Cottonburr Mortar's arc becomes the reliable armor-bypass answer.",
+      "status": "shipped",
+      "featureType": "game",
+      "tags": [
+        "game",
+        "rootline-defense",
+        "husk-walker",
+        "armor",
+        "windup",
+        "cottonburr-mortar",
+        "crackplate",
+        "board-scout",
+        "scenario",
+        "playwright"
+      ],
+      "publishedAt": "2026-04-26T12:00:00.000Z"
+    },
+    {
       "date": "2026-04-24",
       "title": "Loamspike Burrower — Burrow Runtime and the Undermined Board",
       "summary": "Lands the Loamspike Burrower runtime and publishes the Undermined daily board, where a telegraphed burrow enemy dives under the front line, surfaces behind it, and forces depth-aware defense before endless unlocks.",
