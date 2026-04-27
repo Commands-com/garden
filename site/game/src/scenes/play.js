@@ -198,7 +198,8 @@ export class PlayScene extends Phaser.Scene {
 
     this.encounterSystem = new EncounterSystem({
       random: this.random,
-      spawnEnemy: (enemyId, lane) => this.spawnEnemy(enemyId, lane),
+      spawnEnemy: (enemyId, lane, eventMeta) =>
+        this.spawnEnemy(enemyId, lane, eventMeta),
       modeDefinition: this.modeDefinition,
     });
     this.syncSelectedPlantAvailability();
@@ -2109,6 +2110,16 @@ export class PlayScene extends Phaser.Scene {
               surfaceAtCol: enemy.definition.surfaceAtCol,
             };
           }
+          if (
+            enemy.definition.behavior === "swarm" &&
+            enemy.swarmGroupId != null
+          ) {
+            base.swarm = {
+              swarmGroupId: enemy.swarmGroupId,
+              swarmIndex: enemy.swarmIndex,
+              swarmCount: enemy.swarmCount,
+            };
+          }
           if (enemy.definition.armor || typeof enemy.definition.vulnerabilityWindowMs === "number") {
             base.armor = {
               armorWindup: enemy.armorWindup === true,
@@ -2380,7 +2391,7 @@ export class PlayScene extends Phaser.Scene {
     }
   }
 
-  spawnEnemy(enemyId, lane = 0) {
+  spawnEnemy(enemyId, lane = 0, eventMeta = {}) {
     if (this.gameEnding) {
       return false;
     }
@@ -2446,6 +2457,11 @@ export class PlayScene extends Phaser.Scene {
       armorWindup: false,
       contactBlockerActive: false,
       plateSprite: null,
+      swarmGroupId: eventMeta?.swarmGroupId ?? null,
+      swarmIndex:
+        typeof eventMeta?.swarmIndex === "number" ? eventMeta.swarmIndex : null,
+      swarmCount:
+        typeof eventMeta?.swarmCount === "number" ? eventMeta.swarmCount : null,
     };
 
     if (definition.plateTextureKey && this.textures?.exists?.(definition.plateTextureKey)) {

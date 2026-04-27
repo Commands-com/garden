@@ -3239,6 +3239,11 @@ kbd {
   color: var(--color-warm-white);
 }
 
+.game-scout__badge--swarm {
+  background: #4a2a55;
+  color: #f0e0ff;
+}
+
 .game-scout__waves {
   display: flex;
   flex-direction: column;

@@ -435,6 +435,11 @@ function renderBoardScout(dayDate, assetCatalog) {
         el("span", { className: "game-scout__badge game-scout__badge--armored" }, "Armored")
       );
     }
+    if (enemy.behavior === "swarm") {
+      badges.push(
+        el("span", { className: "game-scout__badge game-scout__badge--swarm" }, "Swarm")
+      );
+    }
     const card = el(
       "button",
       {
@@ -723,6 +728,51 @@ function selectScoutCard(card, type, data, scenario) {
             "dd",
             {},
             "Use walls to hold the plate in place; arc shots bypass the armor, and direct shots hit the exposed body during windup"
+          ),
+          el("dt", {}, "Appears In"),
+          el("dd", {}, wavePresence.join(", ") || "No scripted waves")
+        )
+      );
+    } else if (data.behavior === "swarm") {
+      // Pull swarm sizing from a representative wave event so the panel is
+      // data-driven and never special-cases the literal enemy id.
+      let representativeSwarm = null;
+      const swarmCounts = new Map();
+      for (const mode of [scenario.tutorial, scenario.challenge]) {
+        for (const wave of mode?.waves || []) {
+          for (const evt of wave.events || []) {
+            if (evt.enemyId !== data.id || !evt.swarmGroup) continue;
+            if (!representativeSwarm) representativeSwarm = evt.swarmGroup;
+            const key = `${evt.swarmGroup.count}:${evt.swarmGroup.staggerMs}`;
+            swarmCounts.set(key, (swarmCounts.get(key) || 0) + 1);
+          }
+        }
+      }
+      const swarmSizeText = representativeSwarm
+        ? `${representativeSwarm.count} per group, ${representativeSwarm.staggerMs}ms stagger${
+            swarmCounts.size > 1 ? " (varies)" : ""
+          }`
+        : "Scripted-only; no swarm in this scenario";
+      detail.append(
+        el("h4", { className: "game-scout__detail-title", id: "game-scout-detail-title" }, data.label),
+        el(
+          "dl",
+          { className: "game-scout__detail-stats" },
+          el("dt", {}, "HP"),
+          el("dd", {}, String(data.maxHealth)),
+          el("dt", {}, "Speed"),
+          el("dd", {}, String(data.speed)),
+          el("dt", {}, "Attack Damage"),
+          el("dd", {}, String(data.attackDamage)),
+          el("dt", {}, "Attack Cadence"),
+          el("dd", {}, `${data.attackCadenceMs}ms`),
+          el("dt", {}, "Swarm size"),
+          el("dd", {}, swarmSizeText),
+          el("dt", {}, "Counterplay"),
+          el(
+            "dd",
+            {},
+            "Pollen Puff splash clears clusters in one bolt. Cottonburr Mortar's arc is a costlier alternative. Single-target Thorn Vine cannot keep up with a fresh cluster."
           ),
           el("dt", {}, "Appears In"),
           el("dd", {}, wavePresence.join(", ") || "No scripted waves")

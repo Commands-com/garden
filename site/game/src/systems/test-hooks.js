@@ -143,13 +143,87 @@ export function installGameTestHooks(game, bootstrap) {
       return playScene.forceScenarioClear();
     },
 
-    spawnEnemy(lane = 0, enemyId = "briarBeetle") {
+    spawnEnemy(lane = 0, enemyId = "briarBeetle", eventMeta = {}) {
       const playScene = getPlayScene();
       if (!playScene?.scene?.isActive() || typeof playScene.spawnEnemy !== "function") {
         return false;
       }
 
-      return playScene.spawnEnemy(enemyId, lane);
+      return playScene.spawnEnemy(enemyId, lane, eventMeta || {});
+    },
+
+    // Stagger-spawn N enemies of the same type into a single lane, stamping a
+    // shared swarmGroupId and sequential swarmIndex 0..count-1. Mirrors the
+    // scenario-build expansion so Playwright specs do not need to drive the
+    // scenario timeline to exercise swarm behavior.
+    spawnSwarmGroup({
+      enemyId = "sporeTick",
+      lane = 0,
+      count = 5,
+      staggerMs = 150,
+      swarmGroupId,
+    } = {}) {
+      const playScene = getPlayScene();
+      if (
+        !playScene?.scene?.isActive() ||
+        typeof playScene.spawnEnemy !== "function"
+      ) {
+        return false;
+      }
+
+      const groupId =
+        swarmGroupId ||
+        `test:${Date.now().toString(36)}:${Math.floor(Math.random() * 1e6).toString(
+          36
+        )}`;
+
+      for (let i = 0; i < count; i += 1) {
+        const meta = { swarmGroupId: groupId, swarmIndex: i, swarmCount: count };
+        if (i === 0) {
+          playScene.spawnEnemy(enemyId, lane, meta);
+        } else if (typeof playScene.time?.delayedCall === "function") {
+          playScene.time.delayedCall(i * staggerMs, () => {
+            if (playScene?.scene?.isActive()) {
+              playScene.spawnEnemy(enemyId, lane, meta);
+            }
+          });
+        } else {
+          setTimeout(() => {
+            if (playScene?.scene?.isActive()) {
+              playScene.spawnEnemy(enemyId, lane, meta);
+            }
+          }, i * staggerMs);
+        }
+      }
+
+      return groupId;
+    },
+
+    // Read-only swarm state: alive enemies whose definition.behavior === "swarm"
+    // and that carry a swarmGroupId. Tests assert on `alive count drops to 0`
+    // after splash; destroyed members are filtered out by the runtime each
+    // frame so they never appear here.
+    getSwarmStates() {
+      const playScene = getPlayScene();
+      if (!playScene?.scene?.isActive() || !Array.isArray(playScene.enemies)) {
+        return [];
+      }
+
+      return playScene.enemies
+        .filter(
+          (enemy) =>
+            !enemy.destroyed &&
+            enemy.definition?.behavior === "swarm" &&
+            enemy.swarmGroupId != null
+        )
+        .map((enemy, enemyIndex) => ({
+          enemyIndex,
+          swarmGroupId: enemy.swarmGroupId,
+          swarmIndex: enemy.swarmIndex,
+          swarmCount: enemy.swarmCount,
+          x: Math.round(enemy.x),
+          y: Math.round(enemy.y),
+        }));
     },
 
     forceBreach(amount = 1) {
@@ -281,7 +355,14 @@ export function installGameTestHooks(game, bootstrap) {
       }
 
       if (type === "spawnEnemy") {
-        return { ok: hooks.spawnEnemy(action.row ?? action.lane, action.enemyId), type };
+        return {
+          ok: hooks.spawnEnemy(
+            action.row ?? action.lane,
+            action.enemyId,
+            action.eventMeta || {}
+          ),
+          type,
+        };
       }
 
       if (type === "forceBreach") {

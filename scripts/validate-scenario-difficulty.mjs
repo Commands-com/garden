@@ -655,7 +655,11 @@ class ScenarioSimulator {
         this.events[this.eventIndex].atMs <= this.elapsedMs
       ) {
         const event = this.events[this.eventIndex];
-        this.spawnEnemy(event.enemyId, event.lane);
+        this.spawnEnemy(event.enemyId, event.lane, {
+          swarmGroupId: event.swarmGroupId || null,
+          swarmIndex: event.swarmIndex,
+          swarmCount: event.swarmCount,
+        });
         this.wave = event.wave;
         this.eventIndex += 1;
       }
@@ -686,7 +690,7 @@ class ScenarioSimulator {
     }
   }
 
-  spawnEnemy(enemyId, lane) {
+  spawnEnemy(enemyId, lane, eventMeta = {}) {
     const definition = ENEMY_BY_ID[enemyId];
     if (!definition) {
       return false;
@@ -727,6 +731,11 @@ class ScenarioSimulator {
       armorWindup: false,
       contactBlockerActive: false,
       destroyed: false,
+      swarmGroupId: eventMeta?.swarmGroupId ?? null,
+      swarmIndex:
+        typeof eventMeta?.swarmIndex === "number" ? eventMeta.swarmIndex : null,
+      swarmCount:
+        typeof eventMeta?.swarmCount === "number" ? eventMeta.swarmCount : null,
     });
     return true;
   }
@@ -3189,9 +3198,53 @@ function evaluateRequiredPlantCheck(modeDefinition, canonicalPlan, options) {
   };
 }
 
+// AC-3: byte-identical parity between scenarios.js expansion and a local
+// recomputation. For every swarmGroup-bearing authored event we recompute the
+// expected per-index atMs (startAtMs + offsetMs + i * staggerMs) and assert
+// the buildScenarioEvents output matches exactly. Any drift throws here so the
+// validator never silently disagrees with runtime spawn timing.
+function assertSwarmExpansionParity(modeDefinition) {
+  const expandedByGroupId = new Map();
+  for (const event of buildScenarioEvents(modeDefinition)) {
+    if (!event.swarmGroupId) continue;
+    const bucket = expandedByGroupId.get(event.swarmGroupId) || [];
+    bucket.push(event);
+    expandedByGroupId.set(event.swarmGroupId, bucket);
+  }
+
+  for (const wave of modeDefinition.waves || []) {
+    const events = wave.events || [];
+    for (let eventIndex = 0; eventIndex < events.length; eventIndex += 1) {
+      const event = events[eventIndex];
+      if (!event.swarmGroup) continue;
+      const groupId = `${modeDefinition.scenarioDate || "scenario"}:w${wave.wave}:e${eventIndex}`;
+      const expanded = expandedByGroupId.get(groupId) || [];
+      const { count, staggerMs } = event.swarmGroup;
+      if (expanded.length !== count) {
+        throw new Error(
+          `swarm-parity: expected ${count} expanded events for ${groupId}, got ${expanded.length}`
+        );
+      }
+      for (let i = 0; i < count; i += 1) {
+        const expectedAtMs = wave.startAtMs + event.offsetMs + i * staggerMs;
+        const built = expanded.find((entry) => entry.swarmIndex === i);
+        if (!built) {
+          throw new Error(`swarm-parity: missing swarmIndex ${i} for ${groupId}`);
+        }
+        if (built.atMs !== expectedAtMs) {
+          throw new Error(
+            `swarm-parity: ${groupId} index ${i} atMs ${built.atMs} != expected ${expectedAtMs}`
+          );
+        }
+      }
+    }
+  }
+}
+
 function main() {
   const options = parseArgs(process.argv.slice(2));
   const modeDefinition = getScenarioModeDefinition(options.date, options.mode);
+  assertSwarmExpansionParity(modeDefinition);
 
   const bestSimulator = findBestWinningSimulator(modeDefinition, options);
 

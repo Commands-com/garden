@@ -262,6 +262,49 @@ window during which projectiles are wasted. Timing values
 (`telegraphMs`, `underpassSpeed`, `underpassTimeoutMs`) are read from
 `ENEMY_DEFINITIONS` in both places so runtime and validator cannot drift.
 
+### Swarm
+
+Swarm enemies (`behavior: "swarm"`) arrive in clusters via the `swarmGroup` wave-event
+field. Authored events of the form `{ swarmGroup: { count, staggerMs } }` are expanded
+at scenario-build time inside `buildScenarioEvents` (`site/game/src/config/scenarios.js`)
+into `count` flat events with absolute `atMs` values spaced by `staggerMs`. Each built
+event carries `swarmGroupId` (`<scenarioDate>:w<wave>:e<eventIndex>`), `swarmIndex`
+(0..count-1), and `swarmCount`. Bounds: `count ∈ [2, 10]`, `staggerMs ∈ [50, 500]`,
+enforced at registry-build time inside `buildScenarioMap`.
+
+Each lane enemy in `getObservation()` whose definition is `behavior: "swarm"` carries
+an additional `swarm` block:
+
+```json
+{
+  "enemyId": "sporeTick",
+  "swarm": {
+    "swarmGroupId": "2026-04-27:w1:e0",
+    "swarmIndex": 2,
+    "swarmCount": 5
+  }
+}
+```
+
+Use `swarmGroupId` to track cluster membership across observations and
+`swarmIndex`/`swarmCount` to plan splash placement (the leading-to-trailing distance
+at front-row contact is `(count-1) × speed × staggerMs / 1000` px). The block is only
+present on swarm enemies; a missing `swarm` key implies a non-swarm enemy.
+
+Test hooks (`?testMode=1`):
+
+- `spawnSwarmGroup({ enemyId, lane, count, staggerMs, swarmGroupId? })` stagger-spawns
+  N enemies of the same type in one lane with a shared `swarmGroupId` and sequential
+  `swarmIndex`. Returns the chosen `swarmGroupId`.
+- `getSwarmStates()` returns `[{ enemyIndex, swarmGroupId, swarmIndex, swarmCount, x, y }]`
+  for currently-alive swarm members. Destroyed members are filtered out by the runtime
+  each frame so they never appear here; assert "alive count drops to 0" after splash.
+
+Board Scout renders a `Swarm` badge on swarm enemy cards and a detail panel that
+includes `Swarm size`, `Counterplay`, and existing HP/Speed/Attack rows. The
+counterplay copy names the cluster-clear plants (Pollen Puff splash, Cottonburr
+Mortar arc) and the failure mode (single-target Thorn Vine cannot keep up).
+
 ## Local Bot Player
 
 Use the local observation-driven bot as the cheap first pass:

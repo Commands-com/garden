@@ -357,6 +357,25 @@
       }
     },
     {
+      "id": "spore-tick-walk",
+      "type": "sprite",
+      "kind": "animation",
+      "provider": "repo",
+      "path": "/game/assets/manual/enemies/spore-tick-walk-sheet.png",
+      "prompt": "Hand-authored Spore Tick swarm enemy spritesheet for the April 27 runtime. 4x4 grid of 36x36 frames; gameplay-facing walk row indices [12,13,14,15]. Small, fast, low-HP cluster enemy that arrives in 5-at-a-time staggered swarms via the swarmGroup wave-event field.",
+      "generatedAt": "2026-04-27T00:00:00.000Z",
+      "metadata": {
+        "category": "enemy",
+        "format": "png",
+        "width": 144,
+        "height": 144,
+        "phaser": {
+          "frameWidth": 36,
+          "frameHeight": 36
+        }
+      }
+    },
+    {
       "id": "pollen-puff",
       "type": "sprite",
       "kind": "sprite",

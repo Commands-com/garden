@@ -2,6 +2,26 @@
   "schemaVersion": 1,
   "days": [
     {
+      "date": "2026-04-27",
+      "title": "Spore Tick — Swarm Enemy Contract and the Spore Bloom Board",
+      "summary": "Adds Spore Tick as the first swarm-behavior enemy and ships the swarmGroup wave-event field that expands one authored event into N staggered spawns at scenario-build time. Publishes the April 27 Spore Bloom board, where five-at-a-time tick clusters punish single-target defense and Pollen Puff splash is the cleanest cluster-clear path.",
+      "status": "shipped",
+      "featureType": "game",
+      "tags": [
+        "game",
+        "rootline-defense",
+        "spore-tick",
+        "swarm",
+        "enemy-contract",
+        "swarm-group",
+        "spore-bloom",
+        "board-scout",
+        "scenario",
+        "playwright"
+      ],
+      "publishedAt": "2026-04-27T12:00:00.000Z"
+    },
+    {
       "date": "2026-04-26",
       "title": "Husk Walker — Front Armor, Windup Window, and the Crackplate Board",
       "summary": "Adds Husk Walker as a scripted front-armored ground enemy and publishes the Crackplate board, where direct fire is reduced until the body flashes during a 600ms windup and Cottonburr Mortar's arc becomes the reliable armor-bypass answer.",

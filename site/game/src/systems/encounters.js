@@ -40,7 +40,11 @@ export class EncounterSystem {
         this.events[this.eventIndex].atMs <= this.elapsedMs
       ) {
         const nextEvent = this.events[this.eventIndex];
-        this.spawnEnemy(nextEvent.enemyId, nextEvent.lane);
+        this.spawnEnemy(nextEvent.enemyId, nextEvent.lane, {
+          swarmGroupId: nextEvent.swarmGroupId || null,
+          swarmIndex: nextEvent.swarmIndex,
+          swarmCount: nextEvent.swarmCount,
+        });
         this.eventIndex += 1;
       }
 
