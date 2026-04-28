@@ -1277,7 +1277,16 @@ class ScenarioSimulator {
     const impactLane = options.lane ?? primaryEnemy?.lane ?? projectile.lane;
     const centerY = options.centerY ?? getLaneY(impactLane);
     const sameLaneOnly = options.sameLaneOnly === true;
-    const delivery = projectile.arc === true ? "arc" : "direct";
+    // Splash projectiles (PollenPuff direct splash, CottonburrMortar arc)
+    // tag every hit they apply -- both the primary target and the radius
+    // hits -- with delivery "splash" so armor with splashBypass:true
+    // (e.g. SporeTick) can let the burst bypass front armor while still
+    // applying it to direct single-target hits. Arc projectiles keep the
+    // existing "arc" tag so they continue to bypass front armor mults
+    // unconditionally (HuskWalker contract).
+    const isSplashProjectile = projectile.splash === true;
+    const delivery =
+      projectile.arc === true ? "arc" : isSplashProjectile ? "splash" : "direct";
 
     if (primaryEnemy && !primaryEnemy.destroyed && primaryEnemy.invulnerable !== true) {
       this.damageEnemy(primaryEnemy, projectile.damage, { delivery });
@@ -1413,8 +1422,20 @@ class ScenarioSimulator {
 
   getEffectiveProjectileDamage(enemy, damage, ctx = {}) {
     let working = damage;
-    const armorMult = enemy.definition.armor?.frontDamageMultiplier;
-    if (armorMult != null && enemy.armorWindup !== true && ctx.delivery !== "arc") {
+    const armor = enemy.definition.armor;
+    const armorMult = armor?.frontDamageMultiplier;
+    // splashBypass:true lets splash bursts ignore front-armor mults the way
+    // arc lobs already do. This is what makes SporeTick force splash/arc as
+    // the cluster answer: ThornVine's direct shots get armor-shrugged,
+    // PollenPuff splash + Cottonburr arc come through at full damage.
+    const armorBypassedBySplash =
+      armor?.splashBypass === true && ctx.delivery === "splash";
+    if (
+      armorMult != null &&
+      enemy.armorWindup !== true &&
+      ctx.delivery !== "arc" &&
+      !armorBypassedBySplash
+    ) {
       working = Math.max(1, Math.round(working * armorMult));
     }
 

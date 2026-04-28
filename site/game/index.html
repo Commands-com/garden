@@ -40,7 +40,7 @@
     <section class="game-shell" id="game-stage" tabindex="-1">
       <div class="container">
         <h2 class="sr-only">Game controls and live updates</h2>
-        <div class="game-shell__topbar">
+        <header class="game-shell__topbar" role="banner">
           <h1 class="game-shell__title">Rootline Defense</h1>
           <dl class="game-shell__chips">
             <div class="game-shell__chip">
@@ -60,7 +60,7 @@
               <dd id="game-api-status">Checking…</dd>
             </div>
           </dl>
-        </div>
+        </header>
 
         <section class="game-stage" aria-label="Rootline Defense game canvas">
           <div class="game-stage__viewport" id="game-root">
@@ -158,7 +158,7 @@
             <input class="game-field__input" id="game-alias-input" type="text" maxlength="24" placeholder="Garden guest" autocomplete="nickname">
           </label>
           <div class="game-shell__controls game-shell__controls--panel" role="group" aria-label="Audio controls">
-            <button class="game-audio-toggle" id="game-audio-toggle" type="button" aria-label="Toggle sound" title="Toggle sound">
+            <button class="game-audio-toggle" id="game-audio-toggle" type="button" aria-label="Toggle sound" aria-pressed="true" title="Toggle sound">
               <svg class="game-audio-toggle__icon game-audio-toggle__icon--on" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/></svg>
               <svg class="game-audio-toggle__icon game-audio-toggle__icon--off" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:none"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><line x1="23" y1="9" x2="17" y2="15"/><line x1="17" y1="9" x2="23" y2="15"/></svg>
             </button>

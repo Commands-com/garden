@@ -1193,6 +1193,7 @@ async function init() {
     const offIcon = dom.audioToggle?.querySelector(".game-audio-toggle__icon--off");
     if (onIcon) onIcon.style.display = audioController.muted ? "none" : "";
     if (offIcon) offIcon.style.display = audioController.muted ? "" : "none";
+    dom.audioToggle?.setAttribute("aria-pressed", String(!audioController.muted));
   }
 
   if (dom.audioToggle) {

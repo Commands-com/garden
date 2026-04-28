@@ -1051,7 +1051,14 @@ export class PlayScene extends Phaser.Scene {
     const impactLane = options.lane ?? primaryEnemy?.lane ?? projectile.lane;
     const centerY = options.centerY ?? getLaneY(impactLane);
     const sameLaneOnly = options.sameLaneOnly === true;
-    const delivery = projectile.arc === true ? "arc" : "direct";
+    // Tag splash impacts (PollenPuff direct splash, CottonburrMortar arc) with
+    // delivery "splash" so armor.splashBypass enemies (e.g. SporeTick) let the
+    // burst bypass front armor while still applying it to direct sniper /
+    // single-target hits. This mirrors the validator side so beam-search and
+    // runtime read the same damage outcomes.
+    const isSplashProjectile = projectile.splash === true;
+    const delivery =
+      projectile.arc === true ? "arc" : isSplashProjectile ? "splash" : "direct";
     const splashHits = [];
 
     // Primary target always takes the projectile's primary damage (AC-5:
@@ -2652,8 +2659,20 @@ export class PlayScene extends Phaser.Scene {
 
   getEffectiveProjectileDamage(enemy, damage, ctx = {}) {
     let working = damage;
-    const armorMult = enemy.definition.armor?.frontDamageMultiplier;
-    if (armorMult != null && enemy.armorWindup !== true && ctx.delivery !== "arc") {
+    const armor = enemy.definition.armor;
+    const armorMult = armor?.frontDamageMultiplier;
+    // splashBypass:true lets splash bursts ignore front-armor mults the way
+    // arc lobs already do. SporeTick is the canonical user: ThornVine direct
+    // hits get armor-shrugged (forces splash/arc as the cluster answer) but
+    // PollenPuff splash + Cottonburr arc come through at full damage.
+    const armorBypassedBySplash =
+      armor?.splashBypass === true && ctx.delivery === "splash";
+    if (
+      armorMult != null &&
+      enemy.armorWindup !== true &&
+      ctx.delivery !== "arc" &&
+      !armorBypassedBySplash
+    ) {
       working = Math.max(1, Math.round(working * armorMult));
     }
 

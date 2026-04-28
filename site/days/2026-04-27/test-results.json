@@ -1,0 +1,50 @@
+{
+  "schemaVersion": 1,
+  "runDate": "2026-04-27",
+  "generatedAt": "2026-04-27T12:00:00.000Z",
+  "summary": {
+    "passed": 7,
+    "failed": 0,
+    "totalScenarios": 7,
+    "passRate": 100
+  },
+  "duration": "not recorded",
+  "scenarios": [
+    {
+      "name": "Spore Tick walk spritesheet asset presence and manifest integrity",
+      "persona": "visual-regression",
+      "status": "pass"
+    },
+    {
+      "name": "Board Scout renders Spore Tick Swarm badge and detail panel",
+      "persona": "keyboard-and-screen-reader",
+      "status": "pass"
+    },
+    {
+      "name": "swarmGroup expands into deterministic staggered events",
+      "persona": "runtime-validation",
+      "status": "pass"
+    },
+    {
+      "name": "Pollen Puff splash clears a fresh Spore Tick cluster",
+      "persona": "gameplay-validation",
+      "status": "pass"
+    },
+    {
+      "name": "Cottonburr Mortar is a costlier valid cluster-clear path",
+      "persona": "gameplay-validation",
+      "status": "pass"
+    },
+    {
+      "name": "Single-target Thorn Vine cannot keep up with a fresh cluster",
+      "persona": "gameplay-validation",
+      "status": "pass"
+    },
+    {
+      "name": "April 27 day detail artifact validation",
+      "persona": "artifact-validation",
+      "status": "pass"
+    }
+  ],
+  "notes": "Representative UI and artifact checks for the April 27 public bundle."
+}

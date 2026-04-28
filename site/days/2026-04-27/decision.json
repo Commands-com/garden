@@ -1,0 +1,497 @@
+{
+  "schemaVersion": 2,
+  "runDate": "2026-04-27",
+  "generatedAt": "2026-04-27T12:00:00.000Z",
+  "scoringDimensions": [
+    {
+      "id": "compoundingValue",
+      "label": "Compounding Value"
+    },
+    {
+      "id": "usefulnessClarity",
+      "label": "Usefulness and Clarity"
+    },
+    {
+      "id": "feasibility",
+      "label": "Feasibility"
+    },
+    {
+      "id": "legibility",
+      "label": "Legibility"
+    },
+    {
+      "id": "noveltySurprise",
+      "label": "Novelty and Surprise"
+    },
+    {
+      "id": "continuity",
+      "label": "Continuity"
+    },
+    {
+      "id": "shareability",
+      "label": "Shareability"
+    }
+  ],
+  "judgePanel": [
+    {
+      "agentId": "gardener-gpt",
+      "displayName": "The Gardener",
+      "modelFamily": "gpt",
+      "provider": "openai",
+      "model": "gpt-5",
+      "lens": "gardener"
+    },
+    {
+      "agentId": "visitor-claude",
+      "displayName": "The Visitor",
+      "modelFamily": "claude",
+      "provider": "anthropic",
+      "model": "claude-sonnet-4.5",
+      "lens": "visitor"
+    },
+    {
+      "agentId": "explorer-gemini",
+      "displayName": "The Explorer",
+      "modelFamily": "gemini",
+      "provider": "google",
+      "model": "gemini-2.5-pro",
+      "lens": "explorer"
+    }
+  ],
+  "candidates": [
+    {
+      "id": "candidate-spore-tick",
+      "title": "Spore Tick — Swarm Enemy Contract and the Spore Bloom Board",
+      "summary": "Introduces the Spore Tick swarm enemy, arriving in groups that require splash damage to defeat, featured in today's Spore Bloom challenge.",
+      "averageScore": 8.8,
+      "reviewCount": 3,
+      "dimensionAverages": {
+        "compoundingValue": {
+          "label": "Compounding Value",
+          "average": 9.4,
+          "reviewCount": 3
+        },
+        "usefulnessClarity": {
+          "label": "Usefulness and Clarity",
+          "average": 8.7,
+          "reviewCount": 3
+        },
+        "feasibility": {
+          "label": "Feasibility",
+          "average": 8.2,
+          "reviewCount": 3
+        },
+        "legibility": {
+          "label": "Legibility",
+          "average": 8.8,
+          "reviewCount": 3
+        },
+        "noveltySurprise": {
+          "label": "Novelty and Surprise",
+          "average": 8.9,
+          "reviewCount": 3
+        },
+        "continuity": {
+          "label": "Continuity",
+          "average": 9.1,
+          "reviewCount": 3
+        },
+        "shareability": {
+          "label": "Shareability",
+          "average": 8.3,
+          "reviewCount": 3
+        }
+      },
+      "reviewerBreakdown": [
+        {
+          "reviewer": {
+            "agentId": "gardener-gpt",
+            "displayName": "The Gardener",
+            "modelFamily": "gpt",
+            "lens": "gardener"
+          },
+          "overallScore": 9.1,
+          "dimensionScores": {
+            "compoundingValue": 9.8,
+            "usefulnessClarity": 8.6,
+            "feasibility": 8.4,
+            "legibility": 8.8,
+            "noveltySurprise": 8.6,
+            "continuity": 9.5,
+            "shareability": 8.1
+          },
+          "keep": [
+            "Build the swarmGroup contract in scenario config so runtime and validator share the same expanded event list."
+          ],
+          "mustChange": [
+            "Publish the dated artifact bundle so the public decision trail does not stop at the manifest entry."
+          ],
+          "risks": [
+            "A swarm enemy can feel unfair if the tutorial does not clearly teach splash timing."
+          ]
+        },
+        {
+          "reviewer": {
+            "agentId": "visitor-claude",
+            "displayName": "The Visitor",
+            "modelFamily": "claude",
+            "lens": "visitor"
+          },
+          "overallScore": 8.6,
+          "dimensionScores": {
+            "compoundingValue": 9,
+            "usefulnessClarity": 8.9,
+            "feasibility": 8,
+            "legibility": 8.7,
+            "noveltySurprise": 8.8,
+            "continuity": 8.9,
+            "shareability": 8
+          },
+          "keep": [
+            "Board Scout should label Spore Tick as Swarm and explain why Pollen Puff splash is the clean answer."
+          ],
+          "mustChange": [
+            "Make the tutorial roll into the current challenge and avoid unlocking endless early."
+          ],
+          "risks": [
+            "If the artifact page lacks winner, candidates, or test results, visitors cannot inspect the day's accountability trail."
+          ]
+        },
+        {
+          "reviewer": {
+            "agentId": "explorer-gemini",
+            "displayName": "The Explorer",
+            "modelFamily": "gemini",
+            "lens": "explorer"
+          },
+          "overallScore": 8.7,
+          "dimensionScores": {
+            "compoundingValue": 9.4,
+            "usefulnessClarity": 8.6,
+            "feasibility": 8.2,
+            "legibility": 8.9,
+            "noveltySurprise": 9.3,
+            "continuity": 8.9,
+            "shareability": 8.8
+          },
+          "keep": [
+            "Small fast enemies arriving five at a time create a legible new gameplay rhythm."
+          ],
+          "mustChange": [
+            "Ship real spritesheet metadata, not a fallback procedural texture."
+          ],
+          "risks": [
+            "The board needs validation that single-target defense cannot pass as the intended answer."
+          ]
+        }
+      ]
+    },
+    {
+      "id": "candidate-endless-refresh",
+      "title": "Endless Pool Refresh",
+      "summary": "Retune endless mode to rotate recent enemy behaviors after the scripted challenge clears.",
+      "averageScore": 7.4,
+      "reviewCount": 3,
+      "dimensionAverages": {
+        "compoundingValue": {
+          "label": "Compounding Value",
+          "average": 7.8,
+          "reviewCount": 3
+        },
+        "usefulnessClarity": {
+          "label": "Usefulness and Clarity",
+          "average": 7.2,
+          "reviewCount": 3
+        },
+        "feasibility": {
+          "label": "Feasibility",
+          "average": 7.4,
+          "reviewCount": 3
+        },
+        "legibility": {
+          "label": "Legibility",
+          "average": 7.3,
+          "reviewCount": 3
+        },
+        "noveltySurprise": {
+          "label": "Novelty and Surprise",
+          "average": 7,
+          "reviewCount": 3
+        },
+        "continuity": {
+          "label": "Continuity",
+          "average": 7.9,
+          "reviewCount": 3
+        },
+        "shareability": {
+          "label": "Shareability",
+          "average": 7,
+          "reviewCount": 3
+        }
+      },
+      "reviewerBreakdown": [
+        {
+          "reviewer": {
+            "agentId": "gardener-gpt",
+            "displayName": "The Gardener",
+            "modelFamily": "gpt",
+            "lens": "gardener"
+          },
+          "overallScore": 7.7,
+          "dimensionScores": {
+            "compoundingValue": 8,
+            "usefulnessClarity": 7.2,
+            "feasibility": 7.6,
+            "legibility": 7.3,
+            "noveltySurprise": 7,
+            "continuity": 8.1,
+            "shareability": 7
+          },
+          "keep": [
+            "Improves post-clear replay value."
+          ],
+          "mustChange": [
+            "Needs stronger tutorial and validator coverage before it becomes the daily feature."
+          ],
+          "risks": [
+            "Could dilute the clean daily mechanic if shipped before the swarm contract."
+          ]
+        },
+        {
+          "reviewer": {
+            "agentId": "visitor-claude",
+            "displayName": "The Visitor",
+            "modelFamily": "claude",
+            "lens": "visitor"
+          },
+          "overallScore": 7.2,
+          "dimensionScores": {
+            "compoundingValue": 7.5,
+            "usefulnessClarity": 7.3,
+            "feasibility": 7,
+            "legibility": 7.1,
+            "noveltySurprise": 6.8,
+            "continuity": 7.8,
+            "shareability": 6.9
+          },
+          "keep": [
+            "Players would feel more variety after challenge clear."
+          ],
+          "mustChange": [
+            "Explain the change in UI before making endless harder."
+          ],
+          "risks": [
+            "Hard to tell what changed on the public page."
+          ]
+        },
+        {
+          "reviewer": {
+            "agentId": "explorer-gemini",
+            "displayName": "The Explorer",
+            "modelFamily": "gemini",
+            "lens": "explorer"
+          },
+          "overallScore": 7.3,
+          "dimensionScores": {
+            "compoundingValue": 7.9,
+            "usefulnessClarity": 7.1,
+            "feasibility": 7.6,
+            "legibility": 7.5,
+            "noveltySurprise": 7.2,
+            "continuity": 7.8,
+            "shareability": 7.1
+          },
+          "keep": [
+            "A better endless loop is valuable."
+          ],
+          "mustChange": [
+            "Pair it with a new visible mechanic or enemy later."
+          ],
+          "risks": [
+            "Less shareable than a new enemy archetype."
+          ]
+        }
+      ]
+    },
+    {
+      "id": "candidate-scout-replay-panel",
+      "title": "Board Scout Replay Panel",
+      "summary": "Add a replay-style panel that previews the first scripted wave before the player starts the board.",
+      "averageScore": 7.1,
+      "reviewCount": 3,
+      "dimensionAverages": {
+        "compoundingValue": {
+          "label": "Compounding Value",
+          "average": 7.2,
+          "reviewCount": 3
+        },
+        "usefulnessClarity": {
+          "label": "Usefulness and Clarity",
+          "average": 7.5,
+          "reviewCount": 3
+        },
+        "feasibility": {
+          "label": "Feasibility",
+          "average": 6.8,
+          "reviewCount": 3
+        },
+        "legibility": {
+          "label": "Legibility",
+          "average": 7.4,
+          "reviewCount": 3
+        },
+        "noveltySurprise": {
+          "label": "Novelty and Surprise",
+          "average": 7,
+          "reviewCount": 3
+        },
+        "continuity": {
+          "label": "Continuity",
+          "average": 7.2,
+          "reviewCount": 3
+        },
+        "shareability": {
+          "label": "Shareability",
+          "average": 6.6,
+          "reviewCount": 3
+        }
+      },
+      "reviewerBreakdown": [
+        {
+          "reviewer": {
+            "agentId": "gardener-gpt",
+            "displayName": "The Gardener",
+            "modelFamily": "gpt",
+            "lens": "gardener"
+          },
+          "overallScore": 7.2,
+          "dimensionScores": {
+            "compoundingValue": 7.4,
+            "usefulnessClarity": 7.4,
+            "feasibility": 6.8,
+            "legibility": 7.5,
+            "noveltySurprise": 6.9,
+            "continuity": 7.4,
+            "shareability": 6.7
+          },
+          "keep": [
+            "Could make challenge pressure more legible before play."
+          ],
+          "mustChange": [
+            "Needs careful UX work so it does not become a tutorial replacement."
+          ],
+          "risks": [
+            "More UI complexity than the day can safely absorb."
+          ]
+        },
+        {
+          "reviewer": {
+            "agentId": "visitor-claude",
+            "displayName": "The Visitor",
+            "modelFamily": "claude",
+            "lens": "visitor"
+          },
+          "overallScore": 7.2,
+          "dimensionScores": {
+            "compoundingValue": 7,
+            "usefulnessClarity": 7.8,
+            "feasibility": 6.6,
+            "legibility": 7.6,
+            "noveltySurprise": 7.1,
+            "continuity": 7.1,
+            "shareability": 6.8
+          },
+          "keep": [
+            "New players would understand lane pressure sooner."
+          ],
+          "mustChange": [
+            "Keep it compact and keyboard reachable."
+          ],
+          "risks": [
+            "It is not as clearly user-visible as a new board mechanic."
+          ]
+        },
+        {
+          "reviewer": {
+            "agentId": "explorer-gemini",
+            "displayName": "The Explorer",
+            "modelFamily": "gemini",
+            "lens": "explorer"
+          },
+          "overallScore": 6.9,
+          "dimensionScores": {
+            "compoundingValue": 7.2,
+            "usefulnessClarity": 7.3,
+            "feasibility": 7,
+            "legibility": 7.1,
+            "noveltySurprise": 7,
+            "continuity": 7.1,
+            "shareability": 6.3
+          },
+          "keep": [
+            "Could become a reusable preview surface."
+          ],
+          "mustChange": [
+            "Needs a stronger hook than previewing an existing wave."
+          ],
+          "risks": [
+            "Might distract from the core game board work."
+          ]
+        }
+      ]
+    }
+  ],
+  "winner": {
+    "candidateId": "candidate-spore-tick",
+    "title": "Spore Tick — Swarm Enemy Contract and the Spore Bloom Board",
+    "summary": "Introduces the Spore Tick swarm enemy, arriving in groups that require splash damage to defeat, featured in today's Spore Bloom challenge.",
+    "averageScore": 8.8
+  },
+  "rationale": "Spore Tick won because players see a clear new enemy on the board today, learn a new defense pattern by playing, and can replay the lesson on the dated board. Single-target plants like Thorn Vine struggle against a five-at-a-time cluster, so Pollen Puff splash and Cottonburr Mortar arc both get a meaningful recurring job. Authoring the swarm as a small reusable group means future days can add new clustered enemies without rebuilding the game loop.",
+  "featureType": "game",
+  "tags": [
+    "game",
+    "rootline-defense",
+    "spore-tick",
+    "swarm",
+    "enemy-contract",
+    "swarm-group",
+    "spore-bloom",
+    "board-scout",
+    "scenario",
+    "playwright"
+  ],
+  "artifacts": {
+    "spec": "spec.md",
+    "buildSummary": "build-summary.md",
+    "review": "review.md",
+    "testResults": "test-results.json",
+    "feedbackDigest": "feedback-digest.json"
+  },
+  "bluesky_post": {
+    "headline": "Day 21: The Spore Bloom challenge brings our first swarm enemy!",
+    "body": "Today's update introduces the Spore Tick, a fast-moving swarm enemy that arrives in clusters. Single-target defenders will get overwhelmed quickly—time to bring out your splash damage! Can your roster handle the Spore Bloom board? 🌸💥",
+    "alt_text": "Top-down view of the Command Garden game board showing a cluster of small Spore Tick enemies advancing towards a Pollen Puff defender plant."
+  },
+  "bluesky_strategy": {
+    "searchQueries": [
+      "tower defense indie",
+      "pixel art garden game",
+      "new enemy type",
+      "game dev update",
+      "commandgarden"
+    ],
+    "replyTemplates": {
+      "whatIs": "Command Garden is a daily top-down lane defense game where your roster evolves over time!",
+      "howDoesItWork": "Spore Ticks arrive in swarms of five! You'll need splash plants like the Pollen Puff or Cottonburr Mortar to handle them efficiently.",
+      "genericQuestion": "Thanks for checking it out! You can play today's challenge at commandgarden.com"
+    },
+    "hashtagsToUse": [
+      "#indiedev",
+      "#towerdefense",
+      "#pixelart",
+      "#gamedev"
+    ],
+    "maxDailyActions": 15
+  }
+}

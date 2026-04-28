@@ -133,16 +133,26 @@ export const ENEMY_DEFINITIONS = [
     maxHealth: 10,
     speed: 85,
     attackDamage: 3,
-    attackCadenceMs: 1100,
+    attackCadenceMs: 700,
     contactRange: 36,
-    breachDamage: 2,
+    breachDamage: 1,
     score: 6,
     spawnWeight: 0,
     tint: null,
     displayWidth: 36,
     displayHeight: 36,
     animationFrames: [12, 13, 14, 15],
-    animationFrameDurationMs: 140,
+    animationFrameDurationMs: 90,
+    // Spore Tick wears chitin armor that hard-shrugs off direct
+    // single-target shots (frontDamageMultiplier 0.15 -> ThornVine 14 -> 2)
+    // but lets splash and arc bypass the armor entirely. This is the
+    // mechanism that makes "naive single-target ThornVine" fail the
+    // scenario-difficulty validator while keeping PollenPuff splash and
+    // Cottonburr arc as valid clear paths.
+    armor: {
+      frontDamageMultiplier: 0.15,
+      splashBypass: true,
+    },
   },
   {
     id: "loamspikeBurrower",

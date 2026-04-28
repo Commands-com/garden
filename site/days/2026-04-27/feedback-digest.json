@@ -1,0 +1,32 @@
+{
+  "schemaVersion": 1,
+  "runDate": "2026-04-27",
+  "generatedAt": "2026-04-27T10:08:46.187Z",
+  "summary": {
+    "totalItems": 0,
+    "byType": {
+      "suggestion": 0,
+      "bug": 0,
+      "confusion": 0
+    }
+  },
+  "suggestions": [],
+  "bugs": [],
+  "confusion": [],
+  "recurringThemes": [],
+  "recentReactions": {
+    "2026-04-26": {
+      "heart": 1,
+      "sprout": 1,
+      "thinking": 1
+    },
+    "2026-04-22": {
+      "thinking": 1
+    },
+    "2026-04-21": {
+      "fire": 1,
+      "heart": 1,
+      "sprout": 1
+    }
+  }
+}
