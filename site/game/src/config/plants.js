@@ -133,6 +133,30 @@ export const PLANT_DEFINITIONS = {
     displayWidth: 48,
     displayHeight: 52,
   },
+  briarPod: {
+    id: "briarPod",
+    label: "Briar Pod",
+    description:
+      "Single-use seed-pod. Arms in 1.5s, then detonates the first time an enemy enters its tile, dealing heavy damage in a small splash radius. Save it for the moment you can't afford to miss.",
+    role: "attacker",
+    subRole: "trap",
+    triggerType: "contact",
+    consumable: true,
+    armTimeMs: 1500,
+    maxActivePerLane: 1,
+    textureKey: "briar-pod",
+    cost: 80,
+    maxHealth: 18,
+    // no cadenceMs — passive cadence path is skipped via triggerType branch.
+    projectileDamage: 160,
+    splash: true,
+    splashRadiusCols: 0.4,
+    splashDamage: 40,
+    canHitFlying: false,
+    delivery: "trap",
+    displayWidth: 48,
+    displayHeight: 48,
+  },
 };
 
 export const STARTING_PLANT_ID = "thornVine";

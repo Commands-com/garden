@@ -789,9 +789,22 @@ export class PlayScene extends Phaser.Scene {
     }
   }
 
+  // R1 (Apr 28): updateDefenders runs before updateEnemies inside the fixed
+  // step (see fixed-step ordering above). Briar Pod's contact trigger reads
+  // enemy.x as left by the previous frame's updateEnemies, fires synchronously
+  // in this phase, and detonation/splash damage lands before enemies advance.
+  // Reordering this loop will desync Pod replays — keep updateDefenders first.
   updateDefenders(deltaMs) {
     for (const defender of this.defenders) {
       if (defender.destroyed) {
+        continue;
+      }
+
+      // Apr 28: contact-trigger plants (Briar Pod) run an arm-then-trigger
+      // state machine instead of cadence fire. Branch keys off the data field
+      // so future contact-trigger plants need only config, not an engine edit.
+      if (defender.definition.triggerType === "contact") {
+        this.updateContactTriggerDefender(defender, deltaMs);
         continue;
       }
 
@@ -855,6 +868,72 @@ export class PlayScene extends Phaser.Scene {
       defender.cooldownMs = defender.definition.cadenceMs;
       this.spawnProjectile(defender, target);
     }
+  }
+
+  // Apr 28: arm-then-trigger lifecycle for contact-trigger plants.
+  //   arming   — pulse window, ticks armingMsRemaining toward 0.
+  //   armed    — idle; on first frame an in-lane ground enemy crosses the
+  //              pod's tile-center X, detonates synchronously this phase.
+  //   triggered — set immediately before destroyDefender so any same-frame
+  //              observation reads "triggered" rather than missing entirely.
+  updateContactTriggerDefender(defender, deltaMs) {
+    if (defender.destroyed) return;
+    if (defender.triggerState === "arming") {
+      defender.armingMsRemaining -= deltaMs;
+      if (defender.armingMsRemaining <= 0) {
+        defender.triggerState = "armed";
+        defender.armingMsRemaining = 0;
+        if (defender.sprite?.active) {
+          defender.sprite.setScale(defender.baseScaleX, defender.baseScaleY);
+          defender.sprite.setTint(0xffd47a);
+        }
+      }
+      return;
+    }
+    if (defender.triggerState !== "armed") return;
+    const trigger = this.findInLaneEnemyCrossingX(defender.row, defender.x);
+    if (!trigger) return;
+    this.detonateContactTrigger(defender, trigger);
+  }
+
+  findInLaneEnemyCrossingX(row, x) {
+    for (const enemy of this.enemies) {
+      if (enemy.destroyed) continue;
+      if (enemy.lane !== row) continue;
+      if (enemy.invulnerable === true) continue;
+      if (enemy.definition.flying === true) continue;
+      if (enemy.x <= x) return enemy;
+    }
+    return null;
+  }
+
+  detonateContactTrigger(defender, primaryEnemy) {
+    const def = defender.definition;
+    const syntheticProjectile = {
+      damage: def.projectileDamage,
+      splash: true,
+      splashDamage: def.splashDamage,
+      splashRadiusCols: def.splashRadiusCols,
+      canHitFlying: !!def.canHitFlying,
+      arc: false,
+      delivery: "trap",
+      lane: defender.row,
+      x: defender.x,
+    };
+    this.resolveSplashImpact(syntheticProjectile, primaryEnemy, {
+      centerX: defender.x,
+      lane: defender.row,
+      sameLaneOnly: true,
+      impactType: "trap",
+    });
+    // Order matters: flip triggerState first so any same-frame readers see
+    // "triggered" before destroyDefender clears the sprite. consumable: true
+    // is the data-driven destroy gate so future non-pod consumables reuse it.
+    defender.triggerState = "triggered";
+    if (def.consumable) {
+      this.destroyDefender(defender);
+    }
+    this.audioController?.playEffect?.("hurt");
   }
 
   updateControlPlants(deltaMs) {
@@ -1058,7 +1137,8 @@ export class PlayScene extends Phaser.Scene {
     // runtime read the same damage outcomes.
     const isSplashProjectile = projectile.splash === true;
     const delivery =
-      projectile.arc === true ? "arc" : isSplashProjectile ? "splash" : "direct";
+      projectile.delivery
+      || (projectile.arc === true ? "arc" : isSplashProjectile ? "splash" : "direct");
     const splashHits = [];
 
     // Primary target always takes the projectile's primary damage (AC-5:
@@ -2055,6 +2135,15 @@ export class PlayScene extends Phaser.Scene {
             base.chillAttackMagnitude = def.chillAttackMagnitude || 0;
             base.chillDurationMs = def.chillDurationMs || 0;
           }
+          // Apr 28: contact-trigger plants emit their lifecycle so harness
+          // and tests can read arming/armed/triggered without scene access.
+          if (def.triggerType === "contact") {
+            base.trigger = {
+              triggerType: "contact",
+              state: defender.triggerState || "arming",
+              armingMsRemaining: Math.max(0, Math.round(defender.armingMsRemaining || 0)),
+            };
+          }
           return base;
         });
       const enemies = this.enemies
@@ -2255,12 +2344,31 @@ export class PlayScene extends Phaser.Scene {
     );
   }
 
-  isPlantLimitReached(plantId) {
+  isPlantLimitReached(plantId, row = null) {
     const definition = PLANT_DEFINITIONS[plantId];
-    return Boolean(
-      definition?.maxActive &&
-        this.getActivePlantCount(plantId) >= definition.maxActive
-    );
+    if (!definition) return false;
+    if (
+      definition.maxActive &&
+      this.getActivePlantCount(plantId) >= definition.maxActive
+    ) {
+      return true;
+    }
+    // Apr 28: per-lane cap is checked only when a row is supplied (placement
+    // path). Tray-card affordability stays lane-agnostic — Pod is "available"
+    // if any lane has open capacity; placement enforces the cap per row.
+    if (row != null && definition.maxActivePerLane) {
+      const inLane = this.defenders.reduce(
+        (count, defender) =>
+          !defender.destroyed &&
+          defender.definition.id === plantId &&
+          defender.row === row
+            ? count + 1
+            : count,
+        0
+      );
+      if (inLane >= definition.maxActivePerLane) return true;
+    }
+    return false;
   }
 
   placeDefender(row, col, plantId = undefined) {
@@ -2282,7 +2390,7 @@ export class PlayScene extends Phaser.Scene {
       col >= BOARD_COLS ||
       this.defendersByTile.has(tileKey) ||
       this.resources < definition.cost ||
-      this.isPlantLimitReached(plantId) ||
+      this.isPlantLimitReached(plantId, row) ||
       !availablePlantIds.includes(plantId)
     ) {
       return false;
@@ -2306,10 +2414,32 @@ export class PlayScene extends Phaser.Scene {
       baseScaleX,
       baseScaleY,
       definition,
-      cooldownMs: definition.initialCooldownMs ?? Math.max(180, definition.cadenceMs * 0.45),
+      // Cadence plants seed cooldown from cadenceMs; contact-trigger plants
+      // (Apr 28 Briar Pod) intentionally have no cadenceMs — keep cooldownMs
+      // at 0 so observation never reads NaN. Defender-role/support plants
+      // continue to ignore this field via their own role branches.
+      cooldownMs:
+        definition.initialCooldownMs
+        ?? (definition.cadenceMs ? Math.max(180, definition.cadenceMs * 0.45) : 0),
       sprite,
       destroyed: false,
     };
+
+    if (definition.triggerType === "contact") {
+      defender.triggerState = "arming";
+      defender.armingMsRemaining = definition.armTimeMs || 0;
+      // Visual pulse during the arm window — yoyo scale at ~250ms cadence so
+      // the pod reads as "active in N seconds" without copy.
+      const repeat = Math.max(0, Math.floor((definition.armTimeMs || 0) / 500) - 1);
+      this.tweens.add({
+        targets: sprite,
+        scaleX: baseScaleX * 1.15,
+        scaleY: baseScaleY * 1.15,
+        duration: 250,
+        yoyo: true,
+        repeat,
+      });
+    }
 
     this.resources -= definition.cost;
     this.defenders.push(defender);
@@ -2667,10 +2797,14 @@ export class PlayScene extends Phaser.Scene {
     // PollenPuff splash + Cottonburr arc come through at full damage.
     const armorBypassedBySplash =
       armor?.splashBypass === true && ctx.delivery === "splash";
+    // Apr 28: delivery "trap" (Briar Pod contact-trigger burst) joins "arc"
+    // in the armor-bypass set so a Pod one-shots Husk Walker through the
+    // 0.25 frontDamageMultiplier the same way Cottonburr's arc does.
     if (
       armorMult != null &&
       enemy.armorWindup !== true &&
       ctx.delivery !== "arc" &&
+      ctx.delivery !== "trap" &&
       !armorBypassedBySplash
     ) {
       working = Math.max(1, Math.round(working * armorMult));
