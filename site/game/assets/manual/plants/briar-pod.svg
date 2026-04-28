@@ -1,0 +1,59 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" role="img" aria-labelledby="title desc">
+  <title id="title">Briar Pod trap plant</title>
+  <desc id="desc">A thorny green seed-pod trap with maroon seams and sharp barbs, ready to detonate on contact.</desc>
+  <defs>
+    <linearGradient id="bp-husk" x1="0" x2="1" y1="0" y2="1">
+      <stop offset="0%" stop-color="#5f8d54"/>
+      <stop offset="58%" stop-color="#2d5c38"/>
+      <stop offset="100%" stop-color="#14281c"/>
+    </linearGradient>
+    <linearGradient id="bp-briar" x1="0" x2="1" y1="0" y2="1">
+      <stop offset="0%" stop-color="#a34a57"/>
+      <stop offset="100%" stop-color="#4a1727"/>
+    </linearGradient>
+    <radialGradient id="bp-core" cx="42%" cy="34%" r="68%">
+      <stop offset="0%" stop-color="#a7c96a"/>
+      <stop offset="62%" stop-color="#315f39"/>
+      <stop offset="100%" stop-color="#13251a"/>
+    </radialGradient>
+  </defs>
+
+  <ellipse cx="24" cy="40" rx="15" ry="5" fill="#102218" opacity=".34"/>
+  <ellipse cx="24" cy="38" rx="12" ry="4" fill="#224631" opacity=".78"/>
+
+  <g fill="url(#bp-briar)" stroke="#1a2418" stroke-width="1.4" stroke-linejoin="round">
+    <path d="M24 6 L27 14 L21 14 Z"/>
+    <path d="M36 11 L34 20 L29 16 Z"/>
+    <path d="M42 23 L34 26 L35 20 Z"/>
+    <path d="M37 35 L29 32 L34 28 Z"/>
+    <path d="M24 39 L21 31 L27 31 Z"/>
+    <path d="M11 35 L14 27 L19 32 Z"/>
+    <path d="M6 23 L14 20 L13 27 Z"/>
+    <path d="M12 11 L19 16 L14 20 Z"/>
+  </g>
+
+  <path d="M24 10 C33 10 39 16 39 24 C39 32 33 37 24 37 C15 37 9 32 9 24 C9 16 15 10 24 10 Z"
+        fill="url(#bp-husk)" stroke="#102218" stroke-width="2.2"/>
+  <path d="M24 13 C30 14 34 18 34 24 C34 30 30 34 24 35 C18 34 14 30 14 24 C14 18 18 14 24 13 Z"
+        fill="url(#bp-core)" opacity=".92"/>
+
+  <g fill="none" stroke="#641f32" stroke-linecap="round" stroke-width="1.7">
+    <path d="M24 13 C21 18 21 29 24 35"/>
+    <path d="M17 16 C20 20 20 28 17 32"/>
+    <path d="M31 16 C28 20 28 28 31 32"/>
+  </g>
+
+  <g fill="#d0b36f" stroke="#4a1727" stroke-linejoin="round" stroke-width=".8">
+    <path d="M18 14 L20 19 L16 18 Z"/>
+    <path d="M30 14 L28 19 L32 18 Z"/>
+    <path d="M36 22 L31 24 L33 20 Z"/>
+    <path d="M32 32 L28 29 L33 28 Z"/>
+    <path d="M16 32 L20 29 L15 28 Z"/>
+    <path d="M12 22 L17 24 L15 20 Z"/>
+  </g>
+
+  <path d="M16 37 C13 40 12 43 13 46" fill="none" stroke="#25482f" stroke-width="2.2" stroke-linecap="round"/>
+  <path d="M32 37 C35 40 36 43 35 46" fill="none" stroke="#25482f" stroke-width="2.2" stroke-linecap="round"/>
+  <path d="M24 38 C24 41 24 44 24 46" fill="none" stroke="#17301f" stroke-width="2.5" stroke-linecap="round"/>
+  <path d="M18 18 C21 16 27 16 30 18" fill="none" stroke="#c9d997" stroke-width="1.2" stroke-linecap="round" opacity=".65"/>
+</svg>

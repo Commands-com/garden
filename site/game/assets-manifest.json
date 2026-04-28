@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "updatedAt": "2026-04-26T18:09:53.440Z",
+  "updatedAt": "2026-04-28T00:00:00.000Z",
   "assets": [
     {
       "id": "amber-wall",
@@ -45,6 +45,21 @@
         "format": "svg",
         "width": 96,
         "height": 32
+      }
+    },
+    {
+      "id": "briar-pod",
+      "type": "sprite",
+      "kind": "sprite",
+      "provider": "repo",
+      "path": "/game/assets/manual/plants/briar-pod.svg",
+      "prompt": "Hand-authored repo asset for the April 28 Briar Pod trap plant. Thorny seed-pod silhouette with visible barbs, maroon briar seams, and a deep-green base so the contact-triggered single-use plant reads as armed and explosive without needing animation.",
+      "generatedAt": "2026-04-28T00:00:00.000Z",
+      "metadata": {
+        "category": "player",
+        "format": "svg",
+        "width": 48,
+        "height": 48
       }
     },
     {
