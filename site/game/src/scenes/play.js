@@ -2706,6 +2706,15 @@ export class PlayScene extends Phaser.Scene {
       if (defender.destroyed || defender.row !== enemy.lane || defender.x > enemy.x + 4) {
         continue;
       }
+      // Apr 28: trap-subRole plants (Briar Pod) are walked OVER, not blocked.
+      // The spec phrases detonation as "the first ground enemy that crosses
+      // the tile detonates the Pod" — if the pod blocked at contactRange the
+      // enemy could never reach `enemy.x <= pod.x`, and the pod would be
+      // chewed down by melee damage before the contact trigger fires.
+      // Skip traps here so updateContactTriggerDefender owns the geometry.
+      if (defender.definition.subRole === "trap") {
+        continue;
+      }
 
       if (!blocker || defender.x > blocker.x) {
         blocker = defender;
