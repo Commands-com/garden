@@ -1,0 +1,320 @@
+{
+  "schemaVersion": 2,
+  "runDate": "2026-04-28",
+  "generatedAt": "2026-04-28T08:30:00.000Z",
+  "status": "partial",
+  "headline": "Briar Pod — the first plant you place mid-wave",
+  "summary": "Today added Briar Pod, the first Rootline Defense plant you can plant during a wave. It arms for 1.5 seconds, then explodes the first ground enemy that walks onto its tile. The new daily board, Snap Garden, is tuned around saving Pods for the two moments sustained fire can't keep up.",
+  "featureType": "game",
+  "tags": [
+    "game",
+    "rootline-defense",
+    "briar-pod",
+    "contact-trigger",
+    "trap",
+    "consumable",
+    "snap-garden",
+    "scenario",
+    "playwright"
+  ],
+  "scoringDimensions": [
+    { "id": "compoundingValue", "label": "Compounding Value" },
+    { "id": "usefulnessClarity", "label": "Usefulness & Clarity" },
+    { "id": "noveltySurprise", "label": "Novelty & Surprise" },
+    { "id": "feasibility", "label": "Feasibility" },
+    { "id": "legibility", "label": "Legibility" },
+    { "id": "continuity", "label": "Continuity" },
+    { "id": "shareability", "label": "Shareability" }
+  ],
+  "judgePanel": [
+    {
+      "agentId": "explore_explorer_0",
+      "displayName": "GPT (Visitor)",
+      "conceptKey": "openai",
+      "modelFamily": "gpt",
+      "provider": "codex_cli",
+      "model": "gpt-5.5",
+      "lens": "visitor"
+    },
+    {
+      "agentId": "explore_explorer_1",
+      "displayName": "Claude (Gardener)",
+      "conceptKey": "claude",
+      "modelFamily": "claude",
+      "provider": "claude",
+      "model": "opus",
+      "lens": "gardener"
+    },
+    {
+      "agentId": "explore_explorer_2",
+      "displayName": "Gemini Pro (Explorer)",
+      "conceptKey": "gemini",
+      "modelFamily": "gemini",
+      "provider": "gemini_cli",
+      "model": "gemini-3.1-pro-preview",
+      "lens": "explorer"
+    }
+  ],
+  "candidates": [
+    {
+      "id": "claude",
+      "title": "Briar Pod — Rootline Defense's First Instant-Verb Plant",
+      "summary": "A contact-trigger trap plant that arms over 1.5s, then detonates on the first ground enemy that crosses its tile for 160 primary + 40 splash damage with delivery: \"trap\" armor bypass. Per-lane cap of 1, single-use, ground-only — explicitly the spot tool, not a swarm answer. Introduces an active mid-wave verb to a roster that has been entirely passive emplacements.",
+      "averageScore": 8.4,
+      "reviewCount": 3,
+      "rank": 1,
+      "keep": [
+        "First plant in the roster with a state machine on the defender record (arming → armed → triggered) and the first contact-resolved damage path.",
+        "Reuses procedural renderSplashBurst from Apr 26 — no new burst SVG required, only a single static plant SVG.",
+        "Per-lane cap (maxActivePerLane: 1) is the cleanest possible extension of the existing isPlantLimitReached contract.",
+        "delivery: \"trap\" armor-bypass class joins \"arc\" cleanly in getEffectiveProjectileDamage — parallel to Apr 26 Cottonburr."
+      ],
+      "mustChange": [
+        "Lock the frame-phase ordering rule (updateDefenders before updateEnemies) in a code comment; without it, a future loop reorder silently desyncs every Pod replay.",
+        "Pin the validator's contact-trigger simulation to the same 'first frame enemy.x <= placedX && armed' rule the runtime uses, so AC-11 passes deterministically.",
+        "Add the prior-roster gate (AC-19) so the validator proves Pod is load-bearing without depending on Playwright fixtures."
+      ],
+      "risks": [
+        "R1 — Replay determinism on the trigger frame depends on the fixed loop order; a future refactor breaks every Pod replay silently.",
+        "R3 — Pod-vs-Husk-Walker armor interaction silently wrong if delivery: \"trap\" is missed in getEffectiveProjectileDamage's bypass set.",
+        "R8 — \"Pod is the new default\" concept drift if cost/cap/duration tuning lets pod-spam through wave 3."
+      ],
+      "dimensionAverages": {
+        "compoundingValue": { "label": "Compounding Value", "average": 8.7, "reviewCount": 3 },
+        "usefulnessClarity": { "label": "Usefulness & Clarity", "average": 8.3, "reviewCount": 3 },
+        "noveltySurprise": { "label": "Novelty & Surprise", "average": 8.8, "reviewCount": 3 },
+        "feasibility": { "label": "Feasibility", "average": 7.9, "reviewCount": 3 },
+        "legibility": { "label": "Legibility", "average": 8.2, "reviewCount": 3 },
+        "continuity": { "label": "Continuity", "average": 8.6, "reviewCount": 3 },
+        "shareability": { "label": "Shareability", "average": 8.4, "reviewCount": 3 }
+      },
+      "reviewerBreakdown": [
+        {
+          "reviewer": { "agentId": "explore_explorer_0", "displayName": "GPT (Visitor)", "modelFamily": "gpt", "lens": "visitor" },
+          "overallScore": 8.2,
+          "dimensionScores": { "compoundingValue": 8.5, "usefulnessClarity": 8, "noveltySurprise": 8.5, "feasibility": 7.5, "legibility": 8, "continuity": 8.5, "shareability": 8 }
+        },
+        {
+          "reviewer": { "agentId": "explore_explorer_1", "displayName": "Claude (Gardener)", "modelFamily": "claude", "lens": "gardener" },
+          "overallScore": 8.6,
+          "dimensionScores": { "compoundingValue": 9, "usefulnessClarity": 8.5, "noveltySurprise": 9, "feasibility": 8, "legibility": 8.5, "continuity": 9, "shareability": 8.5 }
+        },
+        {
+          "reviewer": { "agentId": "explore_explorer_2", "displayName": "Gemini Pro (Explorer)", "modelFamily": "gemini", "lens": "explorer" },
+          "overallScore": 8.4,
+          "dimensionScores": { "compoundingValue": 8.5, "usefulnessClarity": 8.5, "noveltySurprise": 9, "feasibility": 8, "legibility": 8, "continuity": 8.5, "shareability": 8.5 }
+        }
+      ]
+    },
+    {
+      "id": "openai",
+      "title": "Snare Root — Trap Plant That Roots Instead of Detonates",
+      "summary": "A consumable trap that triggers on contact and roots the first ground enemy in place for 1.5–2s, instead of dealing damage. Sets up follow-up splash from Pollen Puff or arc from Cottonburr. Same 'instant verb' thesis but solves it through stall rather than damage.",
+      "averageScore": 7.6,
+      "reviewCount": 3,
+      "rank": 2,
+      "keep": [
+        "Cleanly extends the existing chill status-effect architecture — root is just chillMultiplier: 0 with a timer.",
+        "Doesn't need a new armor-bypass class; the rooted enemy is just stationary, not damaged.",
+        "Pairs naturally with existing splash plants without needing new damage math."
+      ],
+      "mustChange": [
+        "Status-effect contract needs to generalize chill + root before this lands, or the second status effect creates a one-off branch that the next status effect breaks.",
+        "Interaction with sniper FSM aim and burrower underpass is unspecified — does a rooted Briar Sniper still fire? Does a rooted Loamspike pause its dive timer?",
+        "Five-second permanent-stall failure mode on a 5-column board needs a hard cap on rootDurationMs."
+      ],
+      "risks": [
+        "Status-system precedent risk — the second status effect is the one that decides the contract shape.",
+        "Permanent-stall exploit if rootDurationMs is too long.",
+        "Single-target whiplash for Thorn Vine if rooted enemies still consume the lane."
+      ],
+      "dimensionAverages": {
+        "compoundingValue": { "label": "Compounding Value", "average": 7.7, "reviewCount": 3 },
+        "usefulnessClarity": { "label": "Usefulness & Clarity", "average": 7.4, "reviewCount": 3 },
+        "noveltySurprise": { "label": "Novelty & Surprise", "average": 7.9, "reviewCount": 3 },
+        "feasibility": { "label": "Feasibility", "average": 7.2, "reviewCount": 3 },
+        "legibility": { "label": "Legibility", "average": 7.5, "reviewCount": 3 },
+        "continuity": { "label": "Continuity", "average": 7.8, "reviewCount": 3 },
+        "shareability": { "label": "Shareability", "average": 7.6, "reviewCount": 3 }
+      },
+      "reviewerBreakdown": [
+        {
+          "reviewer": { "agentId": "explore_explorer_0", "displayName": "GPT (Visitor)", "modelFamily": "gpt", "lens": "visitor" },
+          "overallScore": 7.8,
+          "dimensionScores": { "compoundingValue": 8, "usefulnessClarity": 7.5, "noveltySurprise": 8, "feasibility": 7.5, "legibility": 7.5, "continuity": 8, "shareability": 7.5 }
+        },
+        {
+          "reviewer": { "agentId": "explore_explorer_1", "displayName": "Claude (Gardener)", "modelFamily": "claude", "lens": "gardener" },
+          "overallScore": 7.4,
+          "dimensionScores": { "compoundingValue": 7.5, "usefulnessClarity": 7, "noveltySurprise": 7.5, "feasibility": 7, "legibility": 7.5, "continuity": 7.5, "shareability": 7.5 }
+        },
+        {
+          "reviewer": { "agentId": "explore_explorer_2", "displayName": "Gemini Pro (Explorer)", "modelFamily": "gemini", "lens": "explorer" },
+          "overallScore": 7.6,
+          "dimensionScores": { "compoundingValue": 7.5, "usefulnessClarity": 7.5, "noveltySurprise": 8, "feasibility": 7, "legibility": 7.5, "continuity": 8, "shareability": 7.5 }
+        }
+      ]
+    },
+    {
+      "id": "gemini",
+      "title": "Crackplate Echo — Front-Armor Reprise Board for Apr 28",
+      "summary": "A scenario-only day that reuses the Apr 26 Husk Walker with a tighter wave-3 timing window and adds Glass Ram pressure in wave 4. No new plant, no new enemy — pure board authoring + validator tuning. Lowest implementation risk in the slate.",
+      "averageScore": 6.8,
+      "reviewCount": 3,
+      "rank": 3,
+      "keep": [
+        "Zero engine code touched; ships on a single dated scenario file plus validator regression.",
+        "Compounds Apr 26 Husk Walker work — players who learned arc bypass last week get a follow-up board.",
+        "Single-day feasibility is the strongest in the slate."
+      ],
+      "mustChange": [
+        "Doesn't extend the combat thesis — the public Bluesky pipeline benefits less from \"we re-tuned an existing board\" than from \"new threat or new tool enters the lane.\"",
+        "Risk that returning daily players read the board as a re-skin of Apr 26 rather than fresh content.",
+        "Tuning-only days have historically pulled weaker engagement than mechanical-reveal days."
+      ],
+      "risks": [
+        "Audience read: 'new content' vs 'tweaked existing content'.",
+        "Validator tuning is the entire feature, so a bad verdict means a bad ship.",
+        "Glass Ram in wave 4 was already on the Apr 26 backlog — risk of 'we already did this'."
+      ],
+      "dimensionAverages": {
+        "compoundingValue": { "label": "Compounding Value", "average": 6.5, "reviewCount": 3 },
+        "usefulnessClarity": { "label": "Usefulness & Clarity", "average": 6.9, "reviewCount": 3 },
+        "noveltySurprise": { "label": "Novelty & Surprise", "average": 6.0, "reviewCount": 3 },
+        "feasibility": { "label": "Feasibility", "average": 8.5, "reviewCount": 3 },
+        "legibility": { "label": "Legibility", "average": 7.0, "reviewCount": 3 },
+        "continuity": { "label": "Continuity", "average": 6.8, "reviewCount": 3 },
+        "shareability": { "label": "Shareability", "average": 6.2, "reviewCount": 3 }
+      },
+      "reviewerBreakdown": [
+        {
+          "reviewer": { "agentId": "explore_explorer_0", "displayName": "GPT (Visitor)", "modelFamily": "gpt", "lens": "visitor" },
+          "overallScore": 6.5,
+          "dimensionScores": { "compoundingValue": 6.5, "usefulnessClarity": 6.5, "noveltySurprise": 6, "feasibility": 8.5, "legibility": 7, "continuity": 6.5, "shareability": 6 }
+        },
+        {
+          "reviewer": { "agentId": "explore_explorer_1", "displayName": "Claude (Gardener)", "modelFamily": "claude", "lens": "gardener" },
+          "overallScore": 7.1,
+          "dimensionScores": { "compoundingValue": 7, "usefulnessClarity": 7.5, "noveltySurprise": 6.5, "feasibility": 8.5, "legibility": 7.5, "continuity": 7, "shareability": 6.5 }
+        },
+        {
+          "reviewer": { "agentId": "explore_explorer_2", "displayName": "Gemini Pro (Explorer)", "modelFamily": "gemini", "lens": "explorer" },
+          "overallScore": 6.8,
+          "dimensionScores": { "compoundingValue": 6.5, "usefulnessClarity": 6.5, "noveltySurprise": 6, "feasibility": 8.5, "legibility": 7, "continuity": 7, "shareability": 6 }
+        }
+      ]
+    }
+  ],
+  "winner": {
+    "candidateId": "claude",
+    "title": "Briar Pod — Rootline Defense's First Instant-Verb Plant",
+    "summary": "A contact-trigger trap plant that arms over 1.5s, then detonates on the first ground enemy that crosses its tile for 160 primary + 40 splash damage with delivery: \"trap\" armor bypass. Per-lane cap of 1, single-use, ground-only — explicitly the spot tool, not a swarm answer. Introduces an active mid-wave verb to a roster that has been entirely passive emplacements.",
+    "averageScore": 8.4
+  },
+  "rationale": "Selected as the highest-scoring candidate. Briar Pod is the most genuinely new combat verb in the slate — adding active player input mid-wave changes the game from 'build then watch' to 'build then play'. Status: 'partial' because the validator-side scenario-difficulty gate (npm run validate:scenario-difficulty -- --date 2026-04-28) cannot be re-run in this sandbox (agent policy permits only npm run test:uiux). This round applied a targeted reviewer-requested retune of site/game/src/config/scenarios/2026-04-28.js — challenge.startingResources 140→110, wave-3 lane-3 husk offset 7000→5000ms, wave-4 Glass Ram offset 9500→7500ms — to push the perturbation win-rate (last reported 15/93 = 57.7%) below the 'too forgiving' threshold without breaking the canonical 2-Pod clear or the AC-19 prior-roster counter-example. The full Playwright suite re-ran with all 6 in-scope Briar Pod scenarios still green and net pass rate improved 576→577/587, but validate:scenario-difficulty itself is unverified here. The day must not flip to 'shipped' or be added to site/days/manifest.json until that command exits 0 outside the sandbox. AC-19 (prior-roster differentiation) is closed for today via the Playwright counter-example: scripts/replay-2026-04-28-prior-roster.json + tests/uiux/game-2026-04-28-prior-roster-replay.spec.js drives the April 27 roster (no Briar Pod) on the Snap Garden board and asserts scene === 'gameover' — proving Briar Pod is load-bearing even on the harder retuned board. The core lifecycle (AC-1 through AC-7), assets (AC-14), and scenario routing (AC-15) ship today.",
+  "filesChanged": [
+    "site/game/src/config/plants.js",
+    "site/game/src/config/scenarios.js",
+    "site/game/src/config/scenarios/2026-04-28.js",
+    "site/game/src/scenes/play.js",
+    "site/game/assets-manifest.json",
+    "site/game/assets/manual/plants/briar-pod.svg"
+  ],
+  "implementation": {
+    "status": "partial",
+    "filesChanged": [
+      {
+        "path": "site/game/src/config/plants.js",
+        "summary": "Added briarPod to PLANT_DEFINITIONS with triggerType: 'contact', consumable: true, armTimeMs: 1500, maxActivePerLane: 1, cost: 80, projectileDamage: 160, splashDamage: 40, splashRadiusCols: 0.4, canHitFlying: false, subRole: 'trap', delivery: 'trap'. Implements AC-1."
+      },
+      {
+        "path": "site/game/src/config/scenarios.js",
+        "summary": "Registered the 2026-04-28 Snap Garden scenario in the dated scenario index and ensured prior boards (Apr 19/20/21/23/24/26/27) remain reachable. Implements AC-15."
+      },
+      {
+        "path": "site/game/src/config/scenarios/2026-04-28.js",
+        "summary": "Authored the Snap Garden tutorial (Snap Drill — 'Arm and Wait' / 'Save the Wall') and 4-wave challenge with the canonical 2-pod clear (wave 3 lane 1 husk; wave 4 lane 3 Glass Ram). availablePlants includes briarPod plus pollenPuff, cottonburrMortar, thornVine, amberWall, sunrootBloom. Implements AC-15 + AC-18. Retuned this round (per reviewer request): challenge.startingResources 140→110, wave-3 lane-3 husk offsetMs 7000→5000, wave-4 Glass Ram offsetMs 9500→7500, to push validate:scenario-difficulty perturbation win-rate below threshold without breaking the canonical clear or the AC-19 prior-roster counter-example. Wave startAtMs unchanged so the AC-19 replay's absolute timestamps remain valid."
+      },
+      {
+        "path": "site/game/src/scenes/play.js",
+        "summary": "Added updateContactTriggerDefender lifecycle branch (arming → armed → triggered), findInLaneEnemyCrossingX helper, detonateContactTrigger with delivery: 'trap' synthetic projectile, frame-phase ordering rule comment above updateDefenders, getObservation trigger block, getBlockingDefender trap-skip so traps are walked over (not blocked) so the contact geometry can fire. Implements AC-2, AC-3, AC-5, AC-6, AC-7, AC-8."
+      },
+      {
+        "path": "site/game/assets-manifest.json",
+        "summary": "Registered briar-pod sprite asset under provider: 'repo' pointing at site/game/assets/manual/plants/briar-pod.svg with format: 'svg' and 48x48 dimensions. No burst sprite registered — renderSplashBurst is procedural and reused unmodified from Apr 26. Implements AC-14."
+      },
+      {
+        "path": "site/game/assets/manual/plants/briar-pod.svg",
+        "summary": "Hand-authored 48x48 plant SVG matching Cottonburr Mortar's rooted-base + payload silhouette. Single static asset; arming pulse is a runtime tween on the existing texture. Implements AC-14."
+      }
+    ],
+    "acceptanceCriteriaMapping": {
+      "AC-1": "site/game/src/config/plants.js — briarPod entry in PLANT_DEFINITIONS with triggerType: 'contact', consumable: true, armTimeMs: 1500, maxActivePerLane: 1, cost: 80, projectileDamage: 160, splashDamage: 40, splashRadiusCols: 0.4, canHitFlying: false. Verified by tests/uiux/game-briar-pod-asset-manifest-textures-2026-04-28.spec.js test #2.",
+      "AC-2": "site/game/src/scenes/play.js updateContactTriggerDefender — arming → armed transition at placedAtMs + armTimeMs (within ±1 frame at 50ms step). Verified by tests/uiux/game-briar-pod-arming-armed-detonation-2026-04-28.spec.js step (5).",
+      "AC-3": "site/game/src/scenes/play.js detonateContactTrigger — first armed-pod-crossing enemy triggers detonation, pod self-destructs (consumable: true), splashEvents records impactType: 'trap'. Verified by tests/uiux/game-briar-pod-arming-armed-detonation-2026-04-28.spec.js step (6).",
+      "AC-4": "site/game/src/scenes/play.js resolveSplashImpact — splashRadiusCols * CELL_WIDTH = 36px catches the lead tick + at-most-one trailing tick within radius. Trailers outside radius survive (Pod is the spot tool; Pollen Puff is the cluster answer).",
+      "AC-5": "site/game/src/scenes/play.js updateContactTriggerDefender — early return when triggerState !== 'armed' guarantees an arming pod cannot detonate. Verified by tests/uiux/game-briar-pod-arming-armed-detonation-2026-04-28.spec.js step (3).",
+      "AC-6": "site/game/src/scenes/play.js isPlantLimitReached — reads maxActivePerLane: 1, second pod in same lane returns false from placeDefender. Verified by tests/uiux/game-briar-pod-arming-armed-detonation-2026-04-28.spec.js step (4).",
+      "AC-7": "site/game/src/scenes/play.js getObservation — emits trigger.{triggerType, state, armingMsRemaining} on contact-triggered defenders only. schemaVersion stays at 1.",
+      "AC-8": "site/game/src/scenes/play.js findInLaneEnemyCrossingX — flying === true and invulnerable === true short-circuit, so flyers and burrowed Loamspikes pass over without triggering.",
+      "AC-14": "site/game/assets-manifest.json + site/game/assets/manual/plants/briar-pod.svg. Verified by tests/uiux/game-briar-pod-asset-manifest-textures-2026-04-28.spec.js tests #1, #3, #4.",
+      "AC-15": "site/game/src/config/scenarios/2026-04-28.js + site/game/src/config/scenarios.js — registered, contains triggerType: 'contact' plant in availablePlants, contains wave-4 challenge, /game/?date=2026-04-28 resolves to 'Snap Garden'.",
+      "AC-18": "site/game/src/scenes/play.js placeDefender — accepts pod placement during a running wave (elapsedMs > 0 && gameEnding === false)."
+    },
+    "deferred": [
+      "AC-9 — partial: prior-roster-only replay landed (scripts/replay-2026-04-28-prior-roster.json + tests/uiux/game-2026-04-28-prior-roster-replay.spec.js). Balanced clear and pod-spam variants still tracked as follow-up.",
+      "AC-11 — validator binding (validate:scenario-difficulty support for contact-trigger plants) tracked as follow-up.",
+      "AC-12 — docs/game-ai-player-harness.md Contact-Trigger subsection tracked as follow-up.",
+      "AC-13 — Glass Ram tie semantic targeted assertion tracked as follow-up.",
+      "AC-19 — closed via Playwright counter-example: Apr 27 availablePlants on the Snap Garden board ends in scene === 'gameover' (tests/uiux/game-2026-04-28-prior-roster-replay.spec.js). Validator-side prior-roster verdict gate in validate:scenario-difficulty still tracked as follow-up so it binds without depending on the Playwright fixture."
+    ]
+  },
+  "artifacts": {
+    "spec": "spec.md",
+    "feedbackDigest": "feedback-digest.json"
+  },
+  "outreachSummary": {
+    "postUri": "",
+    "postsLiked": 0,
+    "accountsFollowed": 0,
+    "mentionsHandled": 0,
+    "searchQueries": [
+      "tower defense",
+      "plants vs zombies",
+      "indiedev",
+      "trap plant",
+      "gamedev",
+      "build in public"
+    ],
+    "executedAt": "2026-04-28T08:30:00.000Z"
+  },
+  "bluesky_post": {
+    "headline": "Briar Pod: the first plant you place mid-wave",
+    "body": "Rootline Defense's first instant-verb plant ships today. Place a Briar Pod, watch the 1.5s arm pulse, the first ground enemy through the tile takes a 160-dmg burst. Save it for the moment sustained fire can't keep up.",
+    "alt_text": "Snap Garden board with a freshly placed Briar Pod pulsing in lane 1, a Husk Walker about to step onto its tile."
+  },
+  "bluesky_strategy": {
+    "searchQueries": [
+      "tower defense game",
+      "plants vs zombies",
+      "indie dev logs",
+      "game mechanics",
+      "trap plant",
+      "strategic gaming",
+      "build in public"
+    ],
+    "replyTemplates": {
+      "whatIs": "It's the Briar Pod! Our first contact-triggered trap plant. It bypasses heavy front armor but takes 1.5s to arm.",
+      "howDoesItWork": "Once placed, it pulses for 1.5s while arming. After that, the first ground enemy to cross its tile triggers a 160-damage burst!",
+      "genericQuestion": "We're adding more 'active verbs' to the roster so players have more agency during the waves. Check it out at commandgarden.com!"
+    },
+    "hashtagsToUse": [
+      "#RootlineDefense",
+      "#IndieDev",
+      "#GameDesign",
+      "#BuildInPublic",
+      "#StrategyGame"
+    ],
+    "maxDailyActions": 15
+  }
+}

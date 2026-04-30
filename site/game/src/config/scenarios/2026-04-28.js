@@ -65,7 +65,7 @@ const scenario_2026_04_28 = {
       "Pollen Puff handles the Spore Tick clusters; Cottonburr Mortar wears down husks over time. Two moments — a Husk Walker one tile from your wall in wave 3, and a Glass Ram in wave 4 — where sustained fire isn't enough. Save a Briar Pod for each.",
     objective:
       "Survive four scripted waves with 2 wall HP. The canonical clear is exactly two Pods — one on the leading wave-3 husk, one on the wave-4 Glass Ram — alongside sustained splash on tick lanes.",
-    startingResources: 140,
+    startingResources: 110,
     resourcePerTick: 18,
     resourceTickMs: 4000,
     gardenHealth: 2,
@@ -123,7 +123,7 @@ const scenario_2026_04_28 = {
             enemyId: "sporeTick",
             swarmGroup: { count: 5, staggerMs: 150 },
           },
-          { offsetMs: 7000, lane: 3, enemyId: "huskWalker" },
+          { offsetMs: 5000, lane: 3, enemyId: "huskWalker" },
         ],
       },
       {
@@ -157,7 +157,7 @@ const scenario_2026_04_28 = {
             swarmGroup: { count: 5, staggerMs: 150 },
           },
           { offsetMs: 5500, lane: 1, enemyId: "huskWalker" },
-          { offsetMs: 9500, lane: 3, enemyId: "glassRam" },
+          { offsetMs: 7500, lane: 3, enemyId: "glassRam" },
         ],
       },
     ],

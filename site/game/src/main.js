@@ -510,6 +510,33 @@ function renderBoardScout(dayDate, assetCatalog) {
           "Wall"
         )
       );
+    } else if (plant.triggerType === "contact") {
+      if (typeof plant.projectileDamage === "number") {
+        statNodes.push(
+          el("span", { className: "game-scout__card-stat-sep" }, "·"),
+          el(
+            "span",
+            { className: "game-scout__card-stat" },
+            `${plant.projectileDamage} DMG`
+          )
+        );
+      }
+      badges.push(
+        el(
+          "span",
+          { className: "game-scout__badge game-scout__badge--contact" },
+          "Contact"
+        )
+      );
+      if (typeof plant.armTimeMs === "number") {
+        badges.push(
+          el(
+            "span",
+            { className: "game-scout__badge game-scout__badge--arm" },
+            `Arm ${formatCadenceSeconds(plant.armTimeMs)}`
+          )
+        );
+      }
     } else {
       if (typeof plant.projectileDamage === "number") {
         statNodes.push(
@@ -890,6 +917,40 @@ function selectScoutCard(card, type, data, scenario) {
         el("dt", {}, "Attacks"),
         el("dd", {}, "—")
       )
+    );
+  } else if (data.triggerType === "contact") {
+    const trapStats = [
+      el("dt", {}, "Cost"),
+      el("dd", {}, String(data.cost)),
+      el("dt", {}, "Trigger"),
+      el("dd", {}, "Contact (first ground enemy on tile)"),
+      el("dt", {}, "Arm time"),
+      el("dd", {}, formatCadenceSeconds(data.armTimeMs)),
+      el("dt", {}, "Trigger DMG"),
+      el("dd", {}, String(data.projectileDamage)),
+    ];
+    if (data.splash === true) {
+      trapStats.push(
+        el("dt", {}, "Splash radius"),
+        el(
+          "dd",
+          {},
+          `${Number(data.splashRadiusCols || 0).toFixed(1)} col · ${Number(data.splashDamage || 0)} dmg`
+        )
+      );
+    }
+    trapStats.push(
+      el("dt", {}, "Anti-air"),
+      el("dd", {}, data.canHitFlying === true ? "Yes" : "Ground only"),
+      el("dt", {}, "Single use"),
+      el("dd", {}, data.consumable ? "Yes — pod is spent on detonation" : "No"),
+      el("dt", {}, "Per-lane cap"),
+      el("dd", {}, data.maxActivePerLane ? String(data.maxActivePerLane) : "None")
+    );
+    detail.append(
+      el("h4", { className: "game-scout__detail-title", id: "game-scout-detail-title" }, data.label),
+      el("p", { className: "game-scout__detail-desc" }, data.description || ""),
+      el("dl", { className: "game-scout__detail-stats" }, ...trapStats)
     );
   } else {
     const statChildren = [

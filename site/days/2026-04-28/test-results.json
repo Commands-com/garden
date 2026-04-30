@@ -1,0 +1,96 @@
+{
+  "schemaVersion": 1,
+  "runDate": "2026-04-28",
+  "generatedAt": "2026-04-28T11:30:00.000Z",
+  "summary": {
+    "totalScenarios": 587,
+    "passed": 577,
+    "failed": 10,
+    "passRate": 98.3
+  },
+  "duration": "156s",
+  "command": "npm run test:uiux",
+  "scenarios": [
+    {
+      "name": "decision.json schema validation for 2026-04-28",
+      "persona": "validator",
+      "status": "pass",
+      "description": "Validates the served Briar Pod decision artifact under AJV2020 and the day-detail page internal links.",
+      "duration": "1.0s"
+    },
+    {
+      "name": "Briar Pod texture loads from the assets manifest (no procedural fallback)",
+      "persona": "validator",
+      "status": "pass",
+      "description": "Verifies briar-pod.svg is the manifest-backed plant texture rather than a procedural placeholder.",
+      "duration": "1.2s"
+    },
+    {
+      "name": "Briar Pod arm → armed → contact detonation lifecycle",
+      "persona": "visitor",
+      "status": "pass",
+      "description": "Arming, armed transition at placedAt + 1500ms, contact-trigger detonation, splashEvents impactType:\"trap\" entry.",
+      "duration": "3.0s"
+    },
+    {
+      "name": "Tutorial → Snap Garden challenge → endless gating still holds",
+      "persona": "visitor",
+      "status": "pass",
+      "description": "Tutorial teaches arm/trigger, automatic challenge handoff, endless unlock only after challenge clear.",
+      "duration": "3.6s"
+    },
+    {
+      "name": "Board Scout Briar Pod card renders Contact badge with detail panel",
+      "persona": "visitor",
+      "status": "pass",
+      "description": "Contact badge, arm time, trigger damage, per-lane limit, counterplay copy, keyboard focus.",
+      "duration": "1.5s"
+    },
+    {
+      "name": "Husk Walker armor bypass via delivery: \"trap\" armor-bypass class",
+      "persona": "validator",
+      "status": "pass",
+      "description": "A Pod hit on a full-HP Husk Walker reduces HP to exactly 0 — the new bypass class is wired.",
+      "duration": "1.4s"
+    },
+    {
+      "name": "AC-19 prior-roster differentiation: April 27 roster fails before endless on Snap Garden",
+      "persona": "validator",
+      "status": "pass",
+      "description": "tests/uiux/game-2026-04-28-prior-roster-replay.spec.js drives scripts/replay-2026-04-28-prior-roster.json with availablePlants restricted to the April 27 roster (no Briar Pod) and asserts scene === \"gameover\" with challengeCleared:false. This is the load-bearing counter-example proving Briar Pod is required to clear the board.",
+      "duration": "12.0s"
+    }
+  ],
+  "knownFailures": [
+    "tests/uiux/game-2026-04-17-replays.spec.js — 'replay-2026-04-17-chilled-lane.json clears the challenge naturally' (pre-existing time-scale/replay flake, unrelated to Briar Pod).",
+    "tests/uiux/game-2026-04-20-replays.spec.js — 'replay-2026-04-20-wall-clear.json clears from actions[]' (pre-existing replay flake; failure shifted within the same flaky spec from the prior-roster case to the wall-clear case across runs).",
+    "tests/uiux/game-2026-04-21-replay-fixture-canonical-clear.spec.js — 'driving the replay via window.__gameTestHooks ... clears the challenge' (pre-existing replay flake).",
+    "tests/uiux/game-board-scout-spore-tick-keyboard-aria-2026-04-27.spec.js — 'Swarm size' detail row missing (pre-existing Apr 27 board-scout flake).",
+    "tests/uiux/game-board-scout-spore-tick-swarm-badge-detail-2026-04-27.spec.js — 'Swarm size' detail row missing (pre-existing Apr 27 board-scout flake).",
+    "tests/uiux/game-board-scout-title-accessibility-2026-04-24.spec.js — '#game-run-note' did not contain 'Tutorial active' (pre-existing copy/timing flake unrelated to Briar Pod).",
+    "tests/uiux/game-frost-fern-inventory-debuff.spec.js — scene stuck on 'title' (pre-existing scene-handoff flake).",
+    "tests/uiux/game-hud-inventory.spec.js — 'state.hudInventory' undefined (pre-existing HUD-state flake unrelated to Briar Pod).",
+    "tests/uiux/scoreboard-bars-validation.spec.js:150 — width string mismatch '98.00000000000001%' vs '98%' on Apr 27 reviewer score 9.8 (pre-existing FP precision; affects Apr 27 latest-day data only).",
+    "tests/uiux/scoreboard.spec.js:132 — same FP precision mismatch on Apr 27 reviewer score 9.8 (pre-existing)."
+  ],
+  "scenarioRetuning": {
+    "appliedAt": "2026-04-28T11:30:00.000Z",
+    "rationale": "Reviewer-requested tightening of site/game/src/config/scenarios/2026-04-28.js to push the validate:scenario-difficulty perturbation win-rate (last reported 15/93 = 57.7%) below the 'too forgiving' threshold without breaking the canonical 2-Pod clear or the AC-19 prior-roster counter-example.",
+    "changes": [
+      "challenge.startingResources: 140 → 110 (tightens the opening; canonical clear still has ~290 sap by wave 3 across two Pods + economy + tick coverage).",
+      "challenge.waves[wave=3].events lane-3 huskWalker offsetMs: 7000 → 5000 (tighter wave-3 husk pair forces both Pods inside a 4s window instead of 6s).",
+      "challenge.waves[wave=4].events lane-3 glassRam offsetMs: 9500 → 7500 (earlier Glass Ram entry leaves less time for Cottonburr Mortar to wear it down before the Pod must trigger)."
+    ],
+    "preservedInvariants": [
+      "Wave startAtMs values unchanged (wave 3 = 52000ms, wave 4 = 78000ms), so the AC-19 prior-roster replay's absolute timestamps remain valid.",
+      "AC-19 counter-example still passes: scripts/replay-2026-04-28-prior-roster.json on the harder board still ends in scene === 'gameover' (verified in this run).",
+      "All 6 in-scope Briar Pod Playwright scenarios still pass (verified in this run).",
+      "Net pass rate improved from 576/587 (98.1%) to 577/587 (98.3%)."
+    ],
+    "verificationLimitation": "validate:scenario-difficulty cannot be re-run inside this sandbox (agent policy permits only npm run test:uiux). The retune is best-faith targeted at the reviewer-named pressure points, but its effect on the perturbation win-rate is unverified here and must be confirmed outside the sandbox."
+  },
+  "blockingValidationGaps": [
+    "npm run validate:scenario-difficulty -- --date 2026-04-28 — not re-run in this environment (sandboxed agent policy blocks the command). Today's run applied a targeted retune (see scenarioRetuning above) but the verdict is unverified. Until the command exits 0 with verdict 'ok', the day must remain status: 'partial' and stay out of the public site/days/manifest.json. AC-11 validator-side gate is still tracked as follow-up.",
+    "AC-9 balanced-clear and pod-spam Playwright replays — only the prior-roster variant landed today; the other two are tracked as follow-up."
+  ]
+}

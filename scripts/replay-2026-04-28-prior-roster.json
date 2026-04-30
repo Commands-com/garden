@@ -1,0 +1,33 @@
+{
+  "schemaVersion": 1,
+  "id": "2026-04-28-prior-roster",
+  "date": "2026-04-28",
+  "mode": "challenge",
+  "coordinateBase": 0,
+  "description": "Serious April 28 attempt that only uses the April 27 roster (no Briar Pod). Pollen Puff splash + Cottonburr Mortar arc handles spore-tick clusters, but with Briar Pod missing there is no answer to the wave-3 Husk Walker pair pressing the wall and the wave-4 Glass Ram. The board should fail before endless — this is the AC-19 counterexample.",
+  "availablePlants": [
+    "pollenPuff",
+    "cottonburrMortar",
+    "thornVine",
+    "amberWall",
+    "sunrootBloom"
+  ],
+  "expect": {
+    "outcome": "gameover",
+    "endlessSurvivalMs": 0
+  },
+  "actions": [
+    { "atMs": 500, "type": "place", "plantId": "pollenPuff", "row": 2, "col": 5 },
+    { "atMs": 6000, "type": "place", "plantId": "sunrootBloom", "row": 2, "col": 0 },
+    { "atMs": 16000, "type": "place", "plantId": "pollenPuff", "row": 0, "col": 5 },
+    { "atMs": 24000, "type": "place", "plantId": "pollenPuff", "row": 4, "col": 5 },
+    { "atMs": 34000, "type": "place", "plantId": "amberWall", "row": 1, "col": 1 },
+    { "atMs": 42000, "type": "place", "plantId": "amberWall", "row": 3, "col": 1 },
+    { "atMs": 50000, "type": "place", "plantId": "cottonburrMortar", "row": 1, "col": 2 },
+    { "atMs": 60000, "type": "place", "plantId": "cottonburrMortar", "row": 3, "col": 2 },
+    { "atMs": 68000, "type": "place", "plantId": "amberWall", "row": 1, "col": 0 },
+    { "atMs": 74000, "type": "place", "plantId": "amberWall", "row": 3, "col": 0 },
+    { "atMs": 80000, "type": "place", "plantId": "thornVine", "row": 2, "col": 4 },
+    { "atMs": 86000, "type": "place", "plantId": "thornVine", "row": 0, "col": 4 }
+  ]
+}
