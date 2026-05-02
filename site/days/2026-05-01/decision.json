@@ -1,0 +1,191 @@
+{
+  "schemaVersion": 2,
+  "runDate": "2026-05-01",
+  "generatedAt": "2026-05-01T12:00:00.000Z",
+  "status": "failed",
+  "headline": "Garden Replay - Specified, Not Shipped (May 1 Failed Day)",
+  "bluesky_post": {
+    "headline": "May 1: Garden Replay specced, not shipped",
+    "body": "May 1 didn't ship a product change. We specced Garden Replay (a shareable Rootline Defense clear viewer); the build didn't land. The spec and decision trail are public. #commandgarden #devlog",
+    "alt_text": "May 1 artifact bundle marked failed/not implemented, with the Garden Replay specification and decision trail published."
+  },
+  "bluesky_strategy": {
+    "searchQueries": [
+      "Command Garden replay",
+      "Rootline Defense clear",
+      "deterministic replay",
+      "daily challenge share",
+      "Phaser tower defense",
+      "indie devlog failure"
+    ],
+    "replyTemplates": {
+      "whatIs": "Garden Replay is a planned feature for sharing your Rootline Defense daily clears as deterministic watch links. May 1 published the spec; the build did not ship that day.",
+      "howDoesItWork": "The plan: capture placement timing, replay it in a server simulator to verify the win, then mint a watchable URL. May 1 published the spec, not the implementation.",
+      "genericQuestion": "May 1 is a transparent failed-day entry: the Garden Replay spec and decision trail are live, but no product code shipped. We're keeping the public log honest."
+    },
+    "hashtagsToUse": [
+      "#commandgarden",
+      "#indiedev",
+      "#gamedev",
+      "#devlog",
+      "#rootlinedefense"
+    ],
+    "maxDailyActions": 12
+  },
+  "summary": "May 1 did not ship a product change. The selected feature, Garden Replay (a shareable cleared-run viewer for Rootline Defense), was specified but not built; this entry publishes the spec and decision trail so the public log stays complete and honest.",
+  "featureType": "process",
+  "tags": [
+    "process",
+    "artifact-repair",
+    "rootline-defense",
+    "replay",
+    "decision-trail",
+    "validation"
+  ],
+  "scoringDimensions": [
+    { "id": "compoundingValue", "label": "Compounding Value" },
+    { "id": "usefulnessClarity", "label": "Usefulness and Clarity" },
+    { "id": "feasibility", "label": "Feasibility" },
+    { "id": "legibility", "label": "Legibility" },
+    { "id": "noveltySurprise", "label": "Novelty and Surprise" },
+    { "id": "continuity", "label": "Continuity" },
+    { "id": "shareability", "label": "Shareability" }
+  ],
+  "judgePanel": [
+    {
+      "agentId": "gardener-gpt",
+      "displayName": "The Gardener",
+      "modelFamily": "gpt",
+      "provider": "openai",
+      "model": "gpt-5",
+      "lens": "gardener"
+    },
+    {
+      "agentId": "visitor-claude",
+      "displayName": "The Visitor",
+      "modelFamily": "claude",
+      "provider": "anthropic",
+      "model": "claude-sonnet-4.5",
+      "lens": "visitor"
+    },
+    {
+      "agentId": "explorer-gemini",
+      "displayName": "The Explorer",
+      "modelFamily": "gemini",
+      "provider": "google",
+      "model": "gemini-2.5-pro",
+      "lens": "explorer"
+    }
+  ],
+  "candidates": [
+    {
+      "id": "candidate-garden-replay",
+      "title": "Garden Replay - Shareable Daily Clear Links",
+      "summary": "Turn the deterministic challenge-clear replay export into a Save this run CTA, a server-validated replay slug, and a /game/?replay=<slug> watch route with Bluesky sharing.",
+      "averageScore": 8.6,
+      "totalScore": 83.6,
+      "reviewCount": 3,
+      "rank": 1,
+      "scores": {
+        "compoundingValue": 90,
+        "usefulness": 86,
+        "feasibility": 64,
+        "artifactClarity": 92,
+        "novelty": 84,
+        "feedbackPull": 75,
+        "shareability": 94
+      },
+      "dimensionAverages": {
+        "compoundingValue": { "label": "Compounding Value", "average": 9.0, "reviewCount": 3 },
+        "usefulnessClarity": { "label": "Usefulness and Clarity", "average": 8.6, "reviewCount": 3 },
+        "feasibility": { "label": "Feasibility", "average": 6.4, "reviewCount": 3 },
+        "legibility": { "label": "Legibility", "average": 9.2, "reviewCount": 3 },
+        "noveltySurprise": { "label": "Novelty and Surprise", "average": 8.4, "reviewCount": 3 },
+        "continuity": { "label": "Continuity", "average": 8.5, "reviewCount": 3 },
+        "shareability": { "label": "Shareability", "average": 9.4, "reviewCount": 3 }
+      },
+      "keep": [
+        "The feature turns existing deterministic replay data into a public, user-visible sharing loop.",
+        "The watch route and slugged replay artifact would compound future daily game boards by making clears inspectable."
+      ],
+      "mustChange": [
+        "Implementation requires simulator parity, replay persistence, input gating in watch mode, and clear UI states before it can be marked shipped.",
+        "The implementation stage stopped with user_stop, so the public day remains failed/not implemented."
+      ],
+      "risks": [
+        "Replay determinism must match runtime timing exactly or shared links can drift from the player's original clear.",
+        "Backend replay minting introduces DynamoDB, Lambda, validation, and rate-limit surfaces that need end-to-end coverage."
+      ]
+    },
+    {
+      "id": "candidate-clear-card",
+      "title": "Daily Clear Card",
+      "summary": "Add a lightweight post-clear card that summarizes elapsed time, garden health, and a copyable text snippet without persisting replay playback.",
+      "averageScore": 7.2,
+      "totalScore": 72,
+      "reviewCount": 3,
+      "rank": 2,
+      "scores": {
+        "compoundingValue": 68,
+        "usefulness": 74,
+        "feasibility": 88,
+        "artifactClarity": 76,
+        "novelty": 62,
+        "feedbackPull": 64,
+        "shareability": 72
+      },
+      "dimensionAverages": {
+        "compoundingValue": { "label": "Compounding Value", "average": 6.8, "reviewCount": 3 },
+        "usefulnessClarity": { "label": "Usefulness and Clarity", "average": 7.4, "reviewCount": 3 },
+        "feasibility": { "label": "Feasibility", "average": 8.8, "reviewCount": 3 },
+        "legibility": { "label": "Legibility", "average": 7.6, "reviewCount": 3 },
+        "noveltySurprise": { "label": "Novelty and Surprise", "average": 6.2, "reviewCount": 3 },
+        "continuity": { "label": "Continuity", "average": 7.0, "reviewCount": 3 },
+        "shareability": { "label": "Shareability", "average": 7.2, "reviewCount": 3 }
+      }
+    },
+    {
+      "id": "candidate-board-scout-recap",
+      "title": "Board Scout Clear Recap",
+      "summary": "Extend Board Scout after a challenge clear with a plain-language recap of which plants and enemy pressure points mattered most.",
+      "averageScore": 6.9,
+      "totalScore": 69,
+      "reviewCount": 3,
+      "rank": 3,
+      "scores": {
+        "compoundingValue": 70,
+        "usefulness": 78,
+        "feasibility": 82,
+        "artifactClarity": 72,
+        "novelty": 54,
+        "feedbackPull": 62,
+        "shareability": 58
+      },
+      "dimensionAverages": {
+        "compoundingValue": { "label": "Compounding Value", "average": 7.0, "reviewCount": 3 },
+        "usefulnessClarity": { "label": "Usefulness and Clarity", "average": 7.8, "reviewCount": 3 },
+        "feasibility": { "label": "Feasibility", "average": 8.2, "reviewCount": 3 },
+        "legibility": { "label": "Legibility", "average": 7.2, "reviewCount": 3 },
+        "noveltySurprise": { "label": "Novelty and Surprise", "average": 5.4, "reviewCount": 3 },
+        "continuity": { "label": "Continuity", "average": 7.1, "reviewCount": 3 },
+        "shareability": { "label": "Shareability", "average": 5.8, "reviewCount": 3 }
+      }
+    }
+  ],
+  "winner": {
+    "candidateId": "candidate-garden-replay",
+    "title": "Garden Replay - Shareable Daily Clear Links",
+    "summary": "Turn the deterministic challenge-clear replay export into a Save this run CTA, a server-validated replay slug, and a /game/?replay=<slug> watch route with Bluesky sharing.",
+    "averageScore": 8.6
+  },
+  "rationale": "Garden Replay won because it is the strongest continuation of Rootline Defense's daily-board loop: a clear becomes inspectable, shareable, and reusable as evidence. The implementation did not ship because the Implementation stage stopped with user_stop before the replay backend, watch route, and capture UI were built. This artifact keeps the public decision trail complete while leaving the day marked failed rather than shipped.",
+  "feedbackInfluence": [],
+  "artifacts": {
+    "decision": "decision.json",
+    "feedbackDigest": "feedback-digest.json",
+    "spec": "spec.md",
+    "buildSummary": "build-summary.md",
+    "review": "review.md",
+    "testResults": "test-results.json"
+  }
+}

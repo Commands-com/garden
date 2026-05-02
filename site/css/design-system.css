@@ -13,6 +13,7 @@
   --color-warm-white: #fafaf7;
   --color-earth: #8b7355;
   --color-earth-light: #a89070;
+  --color-earth-dark: #6f5841; /* WCAG AA-safe earth (>= 4.5:1 over warm-white) */
   --color-accent-gold: #c4a35a;
   --color-accent-gold-light: #d4b96e;
   --color-text-dark: #1a1a1a;

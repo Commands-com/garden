@@ -2,6 +2,30 @@
   "schemaVersion": 1,
   "days": [
     {
+      "date": "2026-05-01",
+      "title": "Garden Replay - Specified, Not Shipped (May 1 Failed Day)",
+      "summary": "May 1 did not ship a product change. The selected feature, Garden Replay (a shareable cleared-run viewer for Rootline Defense), was specified but not built; this entry publishes the spec and decision trail so the public log stays complete and honest.",
+      "status": "failed",
+      "featureType": "process",
+      "tags": [
+        "process",
+        "artifact-repair",
+        "rootline-defense",
+        "replay",
+        "decision-trail",
+        "validation"
+      ],
+      "publishedAt": "2026-05-01T12:00:00.000Z",
+      "artifacts": {
+        "decision": "decision.json",
+        "feedbackDigest": "feedback-digest.json",
+        "spec": "spec.md",
+        "buildSummary": "build-summary.md",
+        "review": "review.md",
+        "testResults": "test-results.json"
+      }
+    },
+    {
       "date": "2026-04-27",
       "title": "Spore Tick — Swarm Enemy Contract and the Spore Bloom Board",
       "summary": "Adds Spore Tick as the first swarm-behavior enemy and ships the swarmGroup wave-event field that expands one authored event into N staggered spawns at scenario-build time. Publishes the April 27 Spore Bloom board, where five-at-a-time tick clusters punish single-target defense and Pollen Puff splash is the cleanest cluster-clear path.",

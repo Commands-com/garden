@@ -1,0 +1,44 @@
+{
+  "schemaVersion": 1,
+  "runDate": "2026-05-01",
+  "generatedAt": "2026-05-01T12:00:00.000Z",
+  "summary": {
+    "totalScenarios": 4,
+    "passed": 2,
+    "failed": 2,
+    "passRate": 50
+  },
+  "duration": "not recorded",
+  "scenarios": [
+    {
+      "name": "Garden Replay implementation acceptance coverage",
+      "persona": "uiux-validation",
+      "status": "fail",
+      "details": "Implementation stage stopped with user_stop before replay capture, replay minting, watch route playback, and share UI were built."
+    },
+    {
+      "name": "Existing game shell remains loadable for May 1",
+      "persona": "returning-player",
+      "status": "pass",
+      "details": "/game/?testMode=1&date=2026-05-01 loads the existing game shell without requiring replay code."
+    },
+    {
+      "name": "May 1 decision artifact publication",
+      "persona": "artifact-validation",
+      "status": "pass",
+      "details": "The repaired artifact bundle includes decision.json, feedback-digest.json, spec.md, build-summary.md, review.md, and test-results.json."
+    },
+    {
+      "name": "Garden Replay product implementation",
+      "persona": "replay-viewer",
+      "status": "fail",
+      "details": "No save-card, replay API, replay slug lookup, 1x/1.5x watch controls, or share-intent row shipped in the May 1 implementation."
+    }
+  ],
+  "testPersonas": [
+    "uiux-validation",
+    "returning-player",
+    "artifact-validation",
+    "replay-viewer"
+  ]
+}
