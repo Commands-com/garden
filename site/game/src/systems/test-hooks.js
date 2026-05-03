@@ -258,6 +258,41 @@ export function installGameTestHooks(game, bootstrap) {
       return playScene.getObservation();
     },
 
+    // Lane Forecast (May 3 2026): same entries as observation.forecast,
+    // augmented per-entry with live render geometry from the marker layer.
+    getForecast() {
+      const playScene = getPlayScene();
+      if (
+        !playScene?.scene?.isActive() ||
+        typeof playScene.getForecastSnapshot !== "function"
+      ) {
+        return [];
+      }
+      const entries = playScene.getForecastSnapshot();
+      const markers = playScene.forecastMarkers;
+      return entries.map((entry) => {
+        const marker = markers?.get(entry.key);
+        if (!marker || marker.dissolving) {
+          return { ...entry, render: { visible: false } };
+        }
+        return {
+          ...entry,
+          render: {
+            x: marker.x,
+            y: marker.y,
+            visible: true,
+            alpha: marker.icon?.alpha ?? 0,
+            labelText: marker.label?.text || "",
+          },
+        };
+      });
+    },
+
+    setDisableForecast(value = true) {
+      bootstrap.testDisableForecast = Boolean(value);
+      return bootstrap.testDisableForecast;
+    },
+
     // Read-only armor state for Playwright assertions on armored enemy windup.
     // Returns one entry per live armored enemy. plateScaleY/plateY remain null
     // for units that do not use a separate overlay sprite.

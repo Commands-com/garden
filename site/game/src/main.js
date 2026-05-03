@@ -1222,6 +1222,10 @@ async function init() {
     endlessUnlocked: false,
     assetCatalog,
     audio: audioController,
+    // Lane Forecast (May 3 2026): testMode-only opt-out for the AC-5
+    // determinism harness. Production bootstrap leaves this undefined.
+    testDisableForecast:
+      testMode && params.get("testDisableForecast") === "1" ? true : undefined,
     setAlias(value) {
       return setStoredAlias(value);
     },

@@ -13,6 +13,7 @@ import {
   BOARD_CENTER_X,
   BOARD_COLS,
   BOARD_HEIGHT,
+  BOARD_LEFT,
   BOARD_ROWS,
   BOARD_TOP,
   BOARD_WIDTH,
@@ -29,6 +30,7 @@ import { ENEMY_BY_ID } from "../config/enemies.js";
 import { PLANT_DEFINITIONS, STARTING_PLANT_ID } from "../config/plants.js";
 import { getScenarioModeDefinition } from "../config/scenarios.js";
 import { EncounterSystem } from "../systems/encounters.js";
+import { LaneForecastSystem } from "../systems/lane-forecast.js";
 import { createSeededRandom } from "../systems/rng.js";
 
 function clamp(value, min, max) {
@@ -202,6 +204,25 @@ export class PlayScene extends Phaser.Scene {
         this.spawnEnemy(enemyId, lane, eventMeta),
       modeDefinition: this.modeDefinition,
     });
+
+    // Lane Forecast (May 3 2026): pure read-only telegraph over the live
+    // encounter timeline. The system never mutates encounter state; the
+    // marker layer renders silhouette + label + countdown at the right edge.
+    this.laneForecast = new LaneForecastSystem({
+      encounterSystem: this.encounterSystem,
+      horizonMs: 6000,
+    });
+    this.forecastLayer = this.add.layer().setDepth(8);
+    this.forecastMarkers = new Map();
+
+    this.events.once("shutdown", () => {
+      this.laneForecast?.destroy();
+      this.forecastLayer?.destroy();
+      this.forecastMarkers?.clear();
+      this.laneForecast = null;
+      this.forecastLayer = null;
+    });
+
     this.syncSelectedPlantAvailability();
 
     this.audioController.playEffect("start");
@@ -772,6 +793,111 @@ export class PlayScene extends Phaser.Scene {
     this.checkModeTransitions();
     this.updateHud();
     this.publishIfNeeded();
+    this.updateForecastMarkers();
+  }
+
+  // Lane Forecast (May 3 2026): the IR9 single gate. Returns [] when any
+  // condition hides the forecast. Called from getObservation(), the test
+  // hook, and updateForecastMarkers — there is no parallel logic.
+  getForecastSnapshot() {
+    if (
+      !this.laneForecast ||
+      this.gameEnding ||
+      this.challengeCleared ||
+      this.endlessActive ||
+      this.transitioningToChallenge ||
+      this.encounterSystem?.phase !== "scripted" ||
+      this.bootstrap?.testDisableForecast === true
+    ) {
+      return [];
+    }
+    return this.laneForecast.getEntries(this.elapsedMs);
+  }
+
+  updateForecastMarkers() {
+    if (!this.forecastLayer) return;
+    const entries = this.getForecastSnapshot();
+    const seen = new Set();
+    const markerX = BOARD_LEFT + BOARD_WIDTH + 24;
+
+    for (const entry of entries) {
+      seen.add(entry.key);
+      let marker = this.forecastMarkers.get(entry.key);
+      // A dissolving marker must not block re-creation: treat it as absent.
+      if (marker && marker.dissolving) {
+        marker = null;
+      }
+      if (!marker) {
+        marker = this.createForecastMarker(entry, markerX);
+        this.forecastMarkers.set(entry.key, marker);
+      }
+      this.updateForecastMarker(marker, entry);
+    }
+
+    for (const [key, marker] of this.forecastMarkers) {
+      if (!seen.has(key) && !marker.dissolving) {
+        this.dissolveForecastMarker(marker, key);
+      }
+    }
+  }
+
+  createForecastMarker(entry, markerX) {
+    const definition = ENEMY_BY_ID[entry.enemyId];
+    const y = getLaneY(entry.row);
+    const icon = this.add.image(markerX, y - 10, definition?.textureKey || "");
+    if (definition?.displayWidth && definition?.displayHeight) {
+      icon.setDisplaySize(definition.displayWidth * 0.6, definition.displayHeight * 0.6);
+    }
+    icon.setAlpha(0.7);
+    if (definition?.tint != null) {
+      icon.setTint(definition.tint);
+    }
+    this.forecastLayer.add(icon);
+
+    const label = this.add.text(markerX, y + 16, "", {
+      fontFamily: "DM Sans",
+      fontSize: "12px",
+      fontStyle: "600",
+      color: "#f5f0e8",
+      align: "center",
+    }).setOrigin(0.5);
+    this.forecastLayer.add(label);
+
+    return {
+      icon,
+      label,
+      x: markerX,
+      y,
+      enemyId: entry.enemyId,
+      dissolving: false,
+    };
+  }
+
+  updateForecastMarker(marker, entry) {
+    const countdown = `${(Math.ceil(entry.inMs / 100) / 10).toFixed(1)}s`;
+    const head =
+      entry.swarmCount > 1
+        ? `${entry.enemyLabel} × ${entry.swarmCount}`
+        : entry.enemyLabel;
+    marker.label.setText(`${head}\n${countdown}`);
+  }
+
+  dissolveForecastMarker(marker, key) {
+    marker.dissolving = true;
+    this.tweens.add({
+      targets: [marker.icon, marker.label],
+      alpha: 0,
+      duration: 200,
+      onComplete: () => {
+        marker.icon.destroy();
+        marker.label.destroy();
+        // Only delete if this dissolving marker is still the one mapped
+        // for this key (a re-add would have replaced it already).
+        if (this.forecastMarkers?.get(key) === marker) {
+          this.forecastMarkers.delete(key);
+        }
+      },
+    });
   }
 
   awardPassiveScore() {
@@ -2285,6 +2411,7 @@ export class PlayScene extends Phaser.Scene {
       },
       lanes,
       upcomingEvents,
+      forecast: this.getForecastSnapshot(),
       projectiles: this.projectiles
         .filter((projectile) => !projectile.destroyed)
         .map((projectile) => ({
