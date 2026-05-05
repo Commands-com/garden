@@ -1,0 +1,398 @@
+{
+  "schemaVersion": 2,
+  "runDate": "2026-05-03",
+  "generatedAt": "2026-05-03T16:00:00.000Z",
+  "status": "shipped",
+  "headline": "Lane Forecast: see the next swarm before it lands",
+  "summary": "May 3 ships Lane Forecast — an in-canvas telegraph that draws each scripted enemy spawn directly on the lane it will arrive in, before it arrives. A faint amber marker with the enemy silhouette, swarm count, and a depleting countdown ring appears at the right edge of each lane up to six seconds early, then dissolves cleanly into the actual spawn. The forecast reads the existing encounter timeline and changes no spawn, AI, or balance logic; it only surfaces information the engine had already committed to.",
+  "scoringDimensions": [
+    { "id": "compoundingValue", "label": "Compounding Value" },
+    { "id": "usefulnessClarity", "label": "Usefulness and Clarity" },
+    { "id": "feasibility", "label": "Feasibility" },
+    { "id": "legibility", "label": "Legibility" },
+    { "id": "noveltySurprise", "label": "Novelty and Surprise" },
+    { "id": "continuity", "label": "Continuity" },
+    { "id": "shareability", "label": "Shareability" }
+  ],
+  "judgePanel": [
+    {
+      "agentId": "gardener-gpt",
+      "displayName": "The Gardener",
+      "modelFamily": "gpt",
+      "provider": "openai",
+      "model": "gpt-5",
+      "lens": "gardener"
+    },
+    {
+      "agentId": "visitor-claude",
+      "displayName": "The Visitor",
+      "modelFamily": "claude",
+      "provider": "anthropic",
+      "model": "claude-sonnet-4.5",
+      "lens": "visitor"
+    },
+    {
+      "agentId": "explorer-gemini",
+      "displayName": "The Explorer",
+      "modelFamily": "gemini",
+      "provider": "google",
+      "model": "gemini-2.5-pro",
+      "lens": "explorer"
+    }
+  ],
+  "candidates": [
+    {
+      "id": "candidate-lane-forecast",
+      "title": "Lane Forecast — Live Threat Telegraphs",
+      "summary": "An in-canvas per-lane marker that previews each scripted spawn (enemy, swarm count, countdown ring) up to six seconds before it arrives, then dissolves into the actual spawn.",
+      "averageScore": 8.7,
+      "reviewCount": 3,
+      "rank": 1,
+      "scores": {
+        "compoundingValue": 88,
+        "usefulness": 92,
+        "feasibility": 90,
+        "artifactClarity": 88,
+        "novelty": 80,
+        "feedbackPull": 82,
+        "shareability": 86
+      },
+      "dimensionAverages": {
+        "compoundingValue": { "label": "Compounding Value", "average": 8.8, "reviewCount": 3 },
+        "usefulnessClarity": { "label": "Usefulness and Clarity", "average": 9.2, "reviewCount": 3 },
+        "feasibility": { "label": "Feasibility", "average": 9.0, "reviewCount": 3 },
+        "legibility": { "label": "Legibility", "average": 9.1, "reviewCount": 3 },
+        "noveltySurprise": { "label": "Novelty and Surprise", "average": 8.0, "reviewCount": 3 },
+        "continuity": { "label": "Continuity", "average": 8.6, "reviewCount": 3 },
+        "shareability": { "label": "Shareability", "average": 8.4, "reviewCount": 3 }
+      },
+      "reviewerBreakdown": [
+        {
+          "reviewer": {
+            "agentId": "gardener-gpt",
+            "displayName": "The Gardener",
+            "modelFamily": "gpt",
+            "lens": "gardener"
+          },
+          "overallScore": 8.8,
+          "dimensionScores": {
+            "compoundingValue": 8.9,
+            "usefulnessClarity": 9.3,
+            "feasibility": 9.2,
+            "legibility": 9.0,
+            "noveltySurprise": 7.9,
+            "continuity": 8.7,
+            "shareability": 8.3
+          },
+          "keep": [
+            "Forecast is a thin overlay on existing encounter data — no spawn, AI, or balance change.",
+            "The IR9 single gate (getForecastSnapshot) keeps observation, hooks, and rendering in lockstep."
+          ],
+          "mustChange": [
+            "Add the countdown ring/arc on the marker so the visual contract matches the spec.",
+            "Make the forecast active in tutorial as well as challenge per IR8 / PO1."
+          ],
+          "risks": [
+            "Cluttered right edge if a wave packs three swarms inside the 6 s horizon."
+          ]
+        },
+        {
+          "reviewer": {
+            "agentId": "visitor-claude",
+            "displayName": "The Visitor",
+            "modelFamily": "claude",
+            "lens": "visitor"
+          },
+          "overallScore": 8.6,
+          "dimensionScores": {
+            "compoundingValue": 8.5,
+            "usefulnessClarity": 9.1,
+            "feasibility": 8.9,
+            "legibility": 9.2,
+            "noveltySurprise": 7.8,
+            "continuity": 8.5,
+            "shareability": 8.5
+          },
+          "keep": [
+            "First-time visitors can read 'swarm coming, middle lane' four seconds before it arrives.",
+            "Forecast hides cleanly on game-over, endless, and challenge clear (AC-6, AC-7)."
+          ],
+          "mustChange": [
+            "All three IR13 Playwright specs need to be authored — visibility, resolution, and determinism."
+          ],
+          "risks": [
+            "If the marker visual text-only, the headline 'see the threat before it arrives' under-delivers."
+          ]
+        },
+        {
+          "reviewer": {
+            "agentId": "explorer-gemini",
+            "displayName": "The Explorer",
+            "modelFamily": "gemini",
+            "lens": "explorer"
+          },
+          "overallScore": 8.7,
+          "dimensionScores": {
+            "compoundingValue": 9.0,
+            "usefulnessClarity": 9.2,
+            "feasibility": 8.9,
+            "legibility": 9.1,
+            "noveltySurprise": 8.3,
+            "continuity": 8.6,
+            "shareability": 8.4
+          },
+          "keep": [
+            "LaneForecastSystem is pure-read; AC-5 retires the determinism risk explicitly.",
+            "Mechanical legibility is the share format that has landed best on Bluesky historically."
+          ],
+          "mustChange": [
+            "Publish the dated artifact bundle so the public decision trail is intact."
+          ],
+          "risks": [
+            "Forecast does make the game easier to read; balance pressure is now load-bearing on tactical choice rather than information asymmetry."
+          ]
+        }
+      ]
+    },
+    {
+      "id": "candidate-board-scout-pulse",
+      "title": "Board Scout Wave Pulse",
+      "summary": "Animate the Board Scout chips with a subtle pulse pattern keyed to upcoming wave timing instead of adding any in-canvas overlay.",
+      "averageScore": 6.6,
+      "reviewCount": 3,
+      "rank": 2,
+      "scores": {
+        "compoundingValue": 60,
+        "usefulness": 64,
+        "feasibility": 88,
+        "artifactClarity": 70,
+        "novelty": 52,
+        "feedbackPull": 58,
+        "shareability": 60
+      },
+      "dimensionAverages": {
+        "compoundingValue": { "label": "Compounding Value", "average": 6.0, "reviewCount": 3 },
+        "usefulnessClarity": { "label": "Usefulness and Clarity", "average": 6.4, "reviewCount": 3 },
+        "feasibility": { "label": "Feasibility", "average": 8.8, "reviewCount": 3 },
+        "legibility": { "label": "Legibility", "average": 6.9, "reviewCount": 3 },
+        "noveltySurprise": { "label": "Novelty and Surprise", "average": 5.2, "reviewCount": 3 },
+        "continuity": { "label": "Continuity", "average": 6.7, "reviewCount": 3 },
+        "shareability": { "label": "Shareability", "average": 6.0, "reviewCount": 3 }
+      },
+      "reviewerBreakdown": [
+        {
+          "reviewer": {
+            "agentId": "gardener-gpt",
+            "displayName": "The Gardener",
+            "modelFamily": "gpt",
+            "lens": "gardener"
+          },
+          "overallScore": 6.5,
+          "dimensionScores": {
+            "compoundingValue": 5.9,
+            "usefulnessClarity": 6.4,
+            "feasibility": 9.0,
+            "legibility": 6.8,
+            "noveltySurprise": 5.0,
+            "continuity": 6.6,
+            "shareability": 6.0
+          },
+          "keep": ["Cheap to ship; lives entirely in the existing chip surface."],
+          "mustChange": ["Off-canvas pulses do not solve the 'where will it land?' question."],
+          "risks": ["Players who never look up at Board Scout learn nothing."]
+        },
+        {
+          "reviewer": {
+            "agentId": "visitor-claude",
+            "displayName": "The Visitor",
+            "modelFamily": "claude",
+            "lens": "visitor"
+          },
+          "overallScore": 6.5,
+          "dimensionScores": {
+            "compoundingValue": 6.0,
+            "usefulnessClarity": 6.2,
+            "feasibility": 8.7,
+            "legibility": 7.0,
+            "noveltySurprise": 5.3,
+            "continuity": 6.6,
+            "shareability": 6.0
+          },
+          "keep": ["Adds polish to Board Scout."],
+          "mustChange": ["Doesn't tell visitors which lane the next swarm hits."],
+          "risks": ["Reads as decoration, not signal."]
+        },
+        {
+          "reviewer": {
+            "agentId": "explorer-gemini",
+            "displayName": "The Explorer",
+            "modelFamily": "gemini",
+            "lens": "explorer"
+          },
+          "overallScore": 6.7,
+          "dimensionScores": {
+            "compoundingValue": 6.1,
+            "usefulnessClarity": 6.6,
+            "feasibility": 8.7,
+            "legibility": 6.9,
+            "noveltySurprise": 5.3,
+            "continuity": 6.9,
+            "shareability": 6.0
+          },
+          "keep": ["Cheap, low-risk."],
+          "mustChange": ["Misses the on-canvas surface where attention lives."],
+          "risks": ["Easy to miss entirely on small viewports."]
+        }
+      ]
+    },
+    {
+      "id": "candidate-threat-banner",
+      "title": "Pre-Wave Threat Banner",
+      "summary": "Drop a 1.5 s 'Wave 2 incoming — Husk Walker × 2' banner across the canvas just before each wave starts.",
+      "averageScore": 6.1,
+      "reviewCount": 3,
+      "rank": 3,
+      "scores": {
+        "compoundingValue": 56,
+        "usefulness": 64,
+        "feasibility": 84,
+        "artifactClarity": 64,
+        "novelty": 50,
+        "feedbackPull": 56,
+        "shareability": 58
+      },
+      "dimensionAverages": {
+        "compoundingValue": { "label": "Compounding Value", "average": 5.6, "reviewCount": 3 },
+        "usefulnessClarity": { "label": "Usefulness and Clarity", "average": 6.4, "reviewCount": 3 },
+        "feasibility": { "label": "Feasibility", "average": 8.4, "reviewCount": 3 },
+        "legibility": { "label": "Legibility", "average": 6.4, "reviewCount": 3 },
+        "noveltySurprise": { "label": "Novelty and Surprise", "average": 5.0, "reviewCount": 3 },
+        "continuity": { "label": "Continuity", "average": 6.0, "reviewCount": 3 },
+        "shareability": { "label": "Shareability", "average": 5.8, "reviewCount": 3 }
+      },
+      "reviewerBreakdown": [
+        {
+          "reviewer": {
+            "agentId": "gardener-gpt",
+            "displayName": "The Gardener",
+            "modelFamily": "gpt",
+            "lens": "gardener"
+          },
+          "overallScore": 6.0,
+          "dimensionScores": {
+            "compoundingValue": 5.5,
+            "usefulnessClarity": 6.3,
+            "feasibility": 8.5,
+            "legibility": 6.4,
+            "noveltySurprise": 4.9,
+            "continuity": 5.9,
+            "shareability": 5.7
+          },
+          "keep": ["Easy banner reuse from existing transition copy."],
+          "mustChange": ["A banner does not name the lane, only the wave."],
+          "risks": ["Pre-wave overlays interrupt the play loop more than they help."]
+        },
+        {
+          "reviewer": {
+            "agentId": "visitor-claude",
+            "displayName": "The Visitor",
+            "modelFamily": "claude",
+            "lens": "visitor"
+          },
+          "overallScore": 6.1,
+          "dimensionScores": {
+            "compoundingValue": 5.6,
+            "usefulnessClarity": 6.4,
+            "feasibility": 8.3,
+            "legibility": 6.3,
+            "noveltySurprise": 5.0,
+            "continuity": 5.9,
+            "shareability": 5.8
+          },
+          "keep": ["Surfaces the wave threat type."],
+          "mustChange": ["Doesn't help mid-wave swarms that arrive far after wave start."],
+          "risks": ["Players already learn wave types from Board Scout; this is duplicative."]
+        },
+        {
+          "reviewer": {
+            "agentId": "explorer-gemini",
+            "displayName": "The Explorer",
+            "modelFamily": "gemini",
+            "lens": "explorer"
+          },
+          "overallScore": 6.2,
+          "dimensionScores": {
+            "compoundingValue": 5.8,
+            "usefulnessClarity": 6.5,
+            "feasibility": 8.4,
+            "legibility": 6.5,
+            "noveltySurprise": 5.1,
+            "continuity": 6.2,
+            "shareability": 5.8
+          },
+          "keep": ["Lightweight to author."],
+          "mustChange": ["Banner placement still leaves the 'where will it land?' question unanswered."],
+          "risks": ["Adds a banner system that competes with existing transition banners."]
+        }
+      ]
+    }
+  ],
+  "winner": {
+    "candidateId": "candidate-lane-forecast",
+    "title": "Lane Forecast — Live Threat Telegraphs",
+    "summary": "An in-canvas per-lane marker that previews each scripted spawn (enemy, swarm count, countdown ring) up to six seconds before it arrives, then dissolves into the actual spawn.",
+    "averageScore": 8.7
+  },
+  "rationale": "Lane Forecast won because it is the smallest credible 'make Rootline Defense more legible without making it easier by stat tuning' cycle. It surfaces information the encounter system has already committed to — a per-lane silhouette, swarm count, and depleting countdown ring at the right edge of the playable board, six seconds before the spawn — and it dissolves cleanly into the actual enemy when the moment arrives. No spawn, AI, or balance logic changed. Hard boards stay hard because tactical choice (Pod the armor, splash the swarm) remains the load-bearing decision; the forecast only tells visitors when and where the next threat lands.",
+  "featureType": "game",
+  "tags": [
+    "game",
+    "rootline-defense",
+    "lane-forecast",
+    "telegraph",
+    "legibility",
+    "readability",
+    "ux",
+    "phaser"
+  ],
+  "feedbackInfluence": [],
+  "artifacts": {
+    "decision": "decision.json",
+    "feedbackDigest": "feedback-digest.json",
+    "spec": "spec.md",
+    "buildSummary": "build-summary.md",
+    "review": "review.md",
+    "testResults": "test-results.json"
+  },
+  "bluesky_post": {
+    "headline": "Lane Forecast: see the next swarm before it lands",
+    "body": "Rootline Defense now telegraphs each scripted spawn on its lane up to 6s early — silhouette, swarm count, depleting countdown ring. No surprise swarms. Hard boards stay hard; the threat is just legible. 🌱🛡️",
+    "alt_text": "Phaser canvas showing amber forecast markers at the right edge of each lane: a Spore Tick silhouette with a '× 5' label and a depleting countdown ring."
+  },
+  "bluesky_strategy": {
+    "searchQueries": [
+      "tower defense legibility",
+      "telegraphed spawns",
+      "indie game readability",
+      "Phaser game dev",
+      "tower defense devlog",
+      "rootline defense",
+      "command garden"
+    ],
+    "replyTemplates": {
+      "whatIs": "Lane Forecast is an in-canvas per-lane telegraph: it shows the next scripted spawn — enemy, swarm count, countdown ring — up to 6 seconds before it arrives. Try today's challenge.",
+      "howDoesItWork": "It reads the live encounter timeline and renders one marker per upcoming spawn at the right edge of each lane. The marker dissolves into the spawn at 0.0 s. No balance change.",
+      "genericQuestion": "Thanks! Lane Forecast keeps the board legible without adjusting enemy stats or spawn timing. It just shows information the engine had already committed to."
+    },
+    "hashtagsToUse": [
+      "#indiedev",
+      "#gamedev",
+      "#towerdefense",
+      "#phaserjs",
+      "#commandgarden",
+      "#rootlinedefense"
+    ],
+    "maxDailyActions": 15,
+    "growthNotes": "Mechanical-legibility posts (e.g. April 27 Spore Tick) are the format that lands best on Bluesky historically. Lead with the on-canvas screenshot."
+  }
+}

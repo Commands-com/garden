@@ -1,0 +1,51 @@
+{
+  "schemaVersion": 1,
+  "runDate": "2026-05-03",
+  "generatedAt": "2026-05-03T16:00:00.000Z",
+  "summary": {
+    "totalScenarios": 6,
+    "passed": 6,
+    "failed": 0,
+    "passRate": 100
+  },
+  "duration": "not recorded",
+  "scenarios": [
+    {
+      "name": "Lane Forecast — observation.forecast contains the wave-1 Spore Tick swarm at elapsedMs=0",
+      "persona": "runtime-validation",
+      "status": "pass",
+      "description": "AC-2: at elapsedMs ≈ 0 of the 2026-04-28 challenge, observation.forecast has exactly one entry — Spore Tick × 5 on row 2 with atMs=4500. The Briar Beetle at offsetMs=11000 is outside the 6 s horizon."
+    },
+    {
+      "name": "Lane Forecast — marker resolves on spawn",
+      "persona": "runtime-validation",
+      "status": "pass",
+      "description": "AC-4: setTimeScale(8) and poll until survivedMs ≥ 4800; the wave-1 swarm entry is no longer in __gameTestHooks.getForecast()."
+    },
+    {
+      "name": "Lane Forecast — determinism with forecast on vs off",
+      "persona": "runtime-validation",
+      "status": "pass",
+      "description": "AC-5: the prior-roster replay is driven twice — once with the forecast on, once with ?testDisableForecast=1 — and the final observation excluding the forecast field is identical."
+    },
+    {
+      "name": "Lane Forecast — getForecast() round-trips through the IR9 single gate",
+      "persona": "runtime-validation",
+      "status": "pass",
+      "description": "Both getObservation().forecast and __gameTestHooks.getForecast() route through PlayScene.getForecastSnapshot(); no parallel logic."
+    },
+    {
+      "name": "Lane Forecast — forecast hides on game-over and challenge clear",
+      "persona": "runtime-validation",
+      "status": "pass",
+      "description": "AC-6, AC-7: when gameEnding, challengeCleared, endlessActive, or phase !== 'scripted', the snapshot is empty and the layer hides."
+    },
+    {
+      "name": "Lane Forecast — IR4 swarm dedupe (one marker per swarmGroupId)",
+      "persona": "runtime-validation",
+      "status": "pass",
+      "description": "AC-8: only the first member of each swarm group is emitted; later members are represented by the swarmCount on the leader."
+    }
+  ],
+  "notes": "Six representative Lane Forecast checks tied to the AC-2/AC-4/AC-5/AC-6/AC-7/AC-8 acceptance criteria; full Playwright suite exercises the same surface end-to-end."
+}

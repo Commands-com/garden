@@ -2,6 +2,33 @@
   "schemaVersion": 1,
   "days": [
     {
+      "date": "2026-05-03",
+      "title": "Lane Forecast — Live In-Canvas Threat Telegraphs",
+      "summary": "Lane Forecast renders an in-canvas marker on each lane for every scripted enemy spawn within a 6-second horizon — silhouette, swarm count, and a depleting countdown ring — that dissolves cleanly into the spawn. Forecast is on by default in tutorial and challenge, hides on endless/clear/game-over, and changes nothing about enemy stats, spawn timing, scoring, or RNG.",
+      "status": "shipped",
+      "featureType": "game",
+      "tags": [
+        "game",
+        "rootline-defense",
+        "lane-forecast",
+        "telegraph",
+        "legibility",
+        "encounter-system",
+        "observation",
+        "playwright",
+        "determinism"
+      ],
+      "publishedAt": "2026-05-03T12:00:00.000Z",
+      "artifacts": {
+        "decision": "decision.json",
+        "feedbackDigest": "feedback-digest.json",
+        "spec": "spec.md",
+        "buildSummary": "build-summary.md",
+        "review": "review.md",
+        "testResults": "test-results.json"
+      }
+    },
+    {
       "date": "2026-05-01",
       "title": "Garden Replay - Specified, Not Shipped (May 1 Failed Day)",
       "summary": "May 1 did not ship a product change. The selected feature, Garden Replay (a shareable cleared-run viewer for Rootline Defense), was specified but not built; this entry publishes the spec and decision trail so the public log stays complete and honest.",

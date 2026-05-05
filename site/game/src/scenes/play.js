@@ -805,7 +805,6 @@ export class PlayScene extends Phaser.Scene {
       this.gameEnding ||
       this.challengeCleared ||
       this.endlessActive ||
-      this.transitioningToChallenge ||
       this.encounterSystem?.phase !== "scripted" ||
       this.bootstrap?.testDisableForecast === true
     ) {
@@ -854,6 +853,11 @@ export class PlayScene extends Phaser.Scene {
     }
     this.forecastLayer.add(icon);
 
+    // IR3: countdown ring/arc around the silhouette. Drawn each frame in
+    // updateForecastMarker proportional to entry.inMs / horizonMs.
+    const ring = this.add.graphics();
+    this.forecastLayer.add(ring);
+
     const label = this.add.text(markerX, y + 16, "", {
       fontFamily: "DM Sans",
       fontSize: "12px",
@@ -865,6 +869,7 @@ export class PlayScene extends Phaser.Scene {
 
     return {
       icon,
+      ring,
       label,
       x: markerX,
       y,
@@ -874,22 +879,41 @@ export class PlayScene extends Phaser.Scene {
   }
 
   updateForecastMarker(marker, entry) {
-    const countdown = `${(Math.ceil(entry.inMs / 100) / 10).toFixed(1)}s`;
+    // Spec §Proposed Approach: literal toFixed(1) of seconds.
+    const countdown = `${(entry.inMs / 1000).toFixed(1)}s`;
     const head =
       entry.swarmCount > 1
         ? `${entry.enemyLabel} × ${entry.swarmCount}`
         : entry.enemyLabel;
     marker.label.setText(`${head}\n${countdown}`);
+
+    const horizonMs = this.laneForecast?.horizonMs || 6000;
+    const remaining = Math.max(0, Math.min(1, entry.inMs / horizonMs));
+    const pulsing = entry.inMs < 500;
+    const ringColor = pulsing ? 0xff5544 : 0xffaa44;
+    const iconAlpha = pulsing ? 0.85 : 0.7;
+    const ringRadius = 18;
+    marker.icon.setAlpha(iconAlpha);
+    marker.ring.clear();
+    marker.ring.lineStyle(2, ringColor, pulsing ? 0.9 : 0.75);
+    marker.ring.beginPath();
+    // Sweep clockwise from 12 o'clock (-π/2) for `remaining` of full circle.
+    const startAngle = -Math.PI / 2;
+    const endAngle = startAngle + remaining * Math.PI * 2;
+    marker.ring.arc(marker.x, marker.y - 10, ringRadius, startAngle, endAngle, false);
+    marker.ring.strokePath();
   }
 
   dissolveForecastMarker(marker, key) {
     marker.dissolving = true;
     this.tweens.add({
-      targets: [marker.icon, marker.label],
+      targets: [marker.icon, marker.ring, marker.label],
       alpha: 0,
+      scale: 0.85,
       duration: 200,
       onComplete: () => {
         marker.icon.destroy();
+        marker.ring.destroy();
         marker.label.destroy();
         // Only delete if this dissolving marker is still the one mapped
         // for this key (a re-add would have replaced it already).

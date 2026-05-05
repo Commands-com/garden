@@ -379,7 +379,7 @@
       const timelineContainer = document.getElementById('recent-timeline');
       timelineContainer.innerHTML = '';
       if (manifest && manifest.days && manifest.days.length > 0) {
-        timelineContainer.appendChild(renderTimeline(manifest, { limit: 7 }));
+        timelineContainer.appendChild(renderTimeline(manifest, { limit: 8 }));
       } else {
         showError(
           timelineContainer,
