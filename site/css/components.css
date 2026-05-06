@@ -3247,6 +3247,11 @@ kbd {
   color: #f0e0ff;
 }
 
+.game-scout__badge--spawner {
+  background: #6e3a8a;
+  color: #f4dcff;
+}
+
 .game-scout__waves {
   display: flex;
   flex-direction: column;

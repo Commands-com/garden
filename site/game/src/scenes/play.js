@@ -188,6 +188,9 @@ export class PlayScene extends Phaser.Scene {
     this.splashEvents = [];
     this.defendersByTile = new Map();
     this.nextDefenderId = 1;
+    // May 6 2026: monotonically-incrementing id stamped onto spawner enemies
+    // so EncounterSystem can scope brood events per-queen and source-kill.
+    this.nextMotherId = 0;
     this.recordedReplayPlacements = [];
     this.recordedChallengeReplayPlacements = null;
     this.recordedChallengeReplayAtMs = null;
@@ -1455,10 +1458,88 @@ export class PlayScene extends Phaser.Scene {
         continue;
       }
 
+      if (enemy.definition.behavior === "spawner") {
+        this.updateSpawnerEnemy(enemy, deltaMs);
+        if (enemy.destroyed) continue;
+        enemy.sprite.setPosition(enemy.x, enemy.y);
+        continue;
+      }
+
       this.updateWalkerEnemy(enemy, deltaMs);
       if (enemy.destroyed) continue;
       enemy.sprite.setPosition(enemy.x, enemy.y);
     }
+  }
+
+  // May 6 2026: spawner state machine. The queen walks like a walker but
+  // also (a) bumps broodsSpawned each time her next-scheduled brood batch
+  // fires, (b) schedules the next batch via EncounterSystem, and (c) plays
+  // a small "swell" tween on the queen ~600ms before each brood lands so
+  // there is an on-canvas cue (P15/AC-16). Source-kill is owned by
+  // destroyEnemy/resolveBreach via cancelBroodEvents.
+  updateSpawnerEnemy(enemy, deltaMs) {
+    this.updateWalkerEnemy(enemy, deltaMs);
+    if (enemy.destroyed) return;
+
+    const cadenceMs = enemy.definition.broodCadenceMs || 0;
+    if (cadenceMs <= 0) return;
+
+    // Detect "the next-scheduled batch just fired": EncounterSystem stripped
+    // those events when elapsedMs caught up to atMs. broodsSpawned tracks how
+    // many batches have been consumed. If our nextBroodAtMs has slipped into
+    // the past, the batch fired this frame.
+    if (
+      enemy.nextBroodAtMs != null &&
+      this.elapsedMs >= enemy.nextBroodAtMs &&
+      enemy.broodsSpawned < enemy.broodsScheduled
+    ) {
+      enemy.broodsSpawned += 1;
+      enemy.broodPulseFiredAtMs = null;
+      const nextAtMs = this.encounterSystem?.scheduleBroodEvents(
+        enemy.motherId,
+        enemy.lane,
+        this.elapsedMs
+      );
+      if (typeof nextAtMs === "number") {
+        enemy.broodsScheduled += 1;
+        enemy.nextBroodAtMs = nextAtMs;
+      } else {
+        enemy.nextBroodAtMs = null;
+      }
+    }
+
+    // Brood-pulse swell tween: small, mobile-safe scale pulse on the queen
+    // sprite roughly 600ms before each scheduled brood fires.
+    const pulseLeadMs = 600;
+    if (
+      enemy.nextBroodAtMs != null &&
+      enemy.broodPulseFiredAtMs == null &&
+      this.elapsedMs >= enemy.nextBroodAtMs - pulseLeadMs
+    ) {
+      enemy.broodPulseFiredAtMs = this.elapsedMs;
+      this.playBroodPulse(enemy);
+    }
+  }
+
+  playBroodPulse(enemy) {
+    const sprite = enemy.sprite;
+    if (!sprite || sprite.active === false) return;
+    if (typeof this.tweens?.add !== "function") return;
+    const baseScaleX = sprite.scaleX;
+    const baseScaleY = sprite.scaleY;
+    this.tweens.add({
+      targets: sprite,
+      scaleX: baseScaleX * 1.08,
+      scaleY: baseScaleY * 1.08,
+      duration: 180,
+      yoyo: true,
+      ease: "Sine.InOut",
+      onComplete: () => {
+        if (sprite.active !== false) {
+          sprite.setScale(baseScaleX, baseScaleY);
+        }
+      },
+    });
   }
 
   updateWalkerEnemy(enemy, deltaMs, options = {}) {
@@ -2260,6 +2341,9 @@ export class PlayScene extends Phaser.Scene {
         row: event.lane,
         enemyId: event.enemyId,
         enemyLabel: ENEMY_BY_ID[event.enemyId]?.label || event.enemyId,
+        swarmGroupId: event.swarmGroupId || null,
+        swarmIndex: event.swarmIndex ?? null,
+        swarmCount: event.swarmCount ?? null,
       }));
     const lanes = Array.from({ length: BOARD_ROWS }, (_, row) => {
       const plants = this.defenders
@@ -2364,6 +2448,20 @@ export class PlayScene extends Phaser.Scene {
               swarmGroupId: enemy.swarmGroupId,
               swarmIndex: enemy.swarmIndex,
               swarmCount: enemy.swarmCount,
+            };
+          }
+          if (enemy.definition.behavior === "spawner") {
+            base.spawner = {
+              motherId: enemy.motherId,
+              broodsScheduled: enemy.broodsScheduled || 0,
+              broodsSpawned: enemy.broodsSpawned || 0,
+              nextBroodAtMs:
+                enemy.nextBroodAtMs != null
+                  ? Math.round(enemy.nextBroodAtMs)
+                  : null,
+              broodCadenceMs: enemy.definition.broodCadenceMs || 0,
+              broodSize: enemy.definition.broodSize || 0,
+              broodEnemyId: enemy.definition.broodEnemyId || null,
             };
           }
           if (enemy.definition.armor || typeof enemy.definition.vulnerabilityWindowMs === "number") {
@@ -2750,7 +2848,28 @@ export class PlayScene extends Phaser.Scene {
         typeof eventMeta?.swarmIndex === "number" ? eventMeta.swarmIndex : null,
       swarmCount:
         typeof eventMeta?.swarmCount === "number" ? eventMeta.swarmCount : null,
+      // May 6 2026: spawner state. motherId is allocated for spawner-behavior
+      // enemies so EncounterSystem.cancelBroodEvents can match on death.
+      motherId: null,
+      broodsScheduled: 0,
+      broodsSpawned: 0,
+      nextBroodAtMs: null,
+      broodPulseFiredAtMs: null,
     };
+
+    if (definition.behavior === "spawner") {
+      this.nextMotherId += 1;
+      enemy.motherId = this.nextMotherId;
+      const scheduledAtMs = this.encounterSystem?.scheduleBroodEvents(
+        enemy.motherId,
+        resolvedLane,
+        this.elapsedMs
+      );
+      if (typeof scheduledAtMs === "number") {
+        enemy.broodsScheduled = 1;
+        enemy.nextBroodAtMs = scheduledAtMs;
+      }
+    }
 
     if (definition.plateTextureKey && this.textures?.exists?.(definition.plateTextureKey)) {
       const plate = this.add.image(enemy.x, enemy.y, definition.plateTextureKey);
@@ -3011,6 +3130,11 @@ export class PlayScene extends Phaser.Scene {
     }
 
     enemy.destroyed = true;
+    // May 6 2026: source-kill — strip future brood events for this queen so
+    // surviving plants don't keep getting punished after she's down (AC-3/4).
+    if (enemy.definition.behavior === "spawner" && enemy.motherId != null) {
+      this.encounterSystem?.cancelBroodEvents(enemy.motherId);
+    }
     enemy.sprite.destroy();
     if (enemy.plateSprite) {
       enemy.plateSprite.destroy();

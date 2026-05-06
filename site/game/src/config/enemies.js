@@ -1,3 +1,23 @@
+// May 6 2026: behavior: "spawner" contract surface.
+//
+// A spawner enemy walks like a walker (movement, contact, breach, HP, score)
+// but ALSO schedules brood batches on EncounterSystem.events while alive:
+//
+//   broodCadenceMs   — ms between consecutive brood batches (first batch is
+//                      scheduled at queen spawn time; baseAtMs is the queen's
+//                      spawn elapsedMs so the first events land at
+//                      baseAtMs + broodCadenceMs).
+//   broodSize        — number of brood enemies per batch (stamped with a
+//                      shared swarmGroupId/swarmIndex/swarmCount so existing
+//                      Lane Forecast and swarm-clear paths pick them up).
+//   broodEnemyId     — the id of the enemy spawned per brood event. Must be
+//                      a registered ENEMY_BY_ID entry.
+//   broodLanes       — "self" means brood spawns only in the queen's lane.
+//                      (Future expansion may add "adjacent" / "all".)
+//
+// Source-kill is the contract: when a spawner enemy is destroyed, the runtime
+// MUST call EncounterSystem.cancelBroodEvents(motherId) so future brood events
+// (those past current elapsedMs) are stripped. eventIndex never regresses.
 export const ENEMY_DEFINITIONS = [
   {
     id: "briarBeetle",
@@ -182,6 +202,35 @@ export const ENEMY_DEFINITIONS = [
     surfaceMarkerTextureKey: "loamspike-surface-marker",
     shadowTextureKey: "loamspike-underpass-shadow",
     dustTextureKey: "loamspike-surface-dust",
+  },
+  {
+    // May 6 2026: Beetlemother. Slow tanky queen who schedules a Spore Tick
+    // brood every broodCadenceMs in her own lane until she dies. Reuses the
+    // Briar Beetle spritesheet — purple tint marks the variant. HP 160 is
+    // tuned so a single Briar Pod (projectileDamage 160) one-shots her.
+    id: "beetlemother",
+    label: "Beetlemother",
+    textureKey: "briar-beetle-walk",
+    behavior: "spawner",
+    radius: 26,
+    maxHealth: 160,
+    speed: 24,
+    attackDamage: 12,
+    attackCadenceMs: 1100,
+    contactRange: 60,
+    breachDamage: 2,
+    score: 60,
+    spawnWeight: 0,
+    tint: 0xb56ad6,
+    displayWidth: 84,
+    displayHeight: 84,
+    animationFrames: [12, 13, 14, 15],
+    animationFrameDurationMs: 110,
+    // Spawner contract fields (see leading comment block).
+    broodCadenceMs: 6000,
+    broodSize: 5,
+    broodEnemyId: "sporeTick",
+    broodLanes: "self",
   },
 ];
 

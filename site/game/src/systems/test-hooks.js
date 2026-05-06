@@ -226,6 +226,39 @@ export function installGameTestHooks(game, bootstrap) {
         }));
     },
 
+    // May 6 2026: read-only spawner state for Playwright. One entry per
+    // alive spawner-behavior enemy with the contract counters Playwright
+    // asserts on (broodsScheduled vs broodsSpawned) per AC-3.
+    getSpawnerStates() {
+      const playScene = getPlayScene();
+      if (!playScene?.scene?.isActive() || !Array.isArray(playScene.enemies)) {
+        return [];
+      }
+
+      return playScene.enemies
+        .filter(
+          (enemy) =>
+            !enemy.destroyed && enemy.definition?.behavior === "spawner"
+        )
+        .map((enemy) => ({
+          enemyId: enemy.id,
+          motherId: enemy.motherId,
+          row: enemy.lane,
+          x: Math.round(enemy.x),
+          hp: Math.round(enemy.hp),
+          maxHealth: enemy.definition.maxHealth,
+          broodsScheduled: enemy.broodsScheduled || 0,
+          broodsSpawned: enemy.broodsSpawned || 0,
+          nextBroodAtMs:
+            enemy.nextBroodAtMs != null
+              ? Math.round(enemy.nextBroodAtMs)
+              : null,
+          broodCadenceMs: enemy.definition.broodCadenceMs || 0,
+          broodSize: enemy.definition.broodSize || 0,
+          broodEnemyId: enemy.definition.broodEnemyId || null,
+        }));
+    },
+
     forceBreach(amount = 1) {
       const playScene = getPlayScene();
       if (!playScene?.scene?.isActive() || typeof playScene.forceBreach !== "function") {

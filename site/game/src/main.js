@@ -440,6 +440,11 @@ function renderBoardScout(dayDate, assetCatalog) {
         el("span", { className: "game-scout__badge game-scout__badge--swarm" }, "Swarm")
       );
     }
+    if (enemy.behavior === "spawner") {
+      badges.push(
+        el("span", { className: "game-scout__badge game-scout__badge--spawner" }, "Spawner")
+      );
+    }
     const card = el(
       "button",
       {
@@ -800,6 +805,37 @@ function selectScoutCard(card, type, data, scenario) {
             "dd",
             {},
             "Pollen Puff splash clears clusters in one bolt. Cottonburr Mortar's arc is a costlier alternative. Single-target Thorn Vine cannot keep up with a fresh cluster."
+          ),
+          el("dt", {}, "Appears In"),
+          el("dd", {}, wavePresence.join(", ") || "No scripted waves")
+        )
+      );
+    } else if (data.behavior === "spawner") {
+      const broodLabel = ENEMY_BY_ID[data.broodEnemyId]?.label || data.broodEnemyId;
+      detail.append(
+        el("h4", { className: "game-scout__detail-title", id: "game-scout-detail-title" }, data.label),
+        el(
+          "dl",
+          { className: "game-scout__detail-stats" },
+          el("dt", {}, "HP"),
+          el("dd", {}, String(data.maxHealth)),
+          el("dt", {}, "Speed"),
+          el("dd", {}, String(data.speed)),
+          el("dt", {}, "Attack Damage"),
+          el("dd", {}, String(data.attackDamage)),
+          el("dt", {}, "Attack Cadence"),
+          el("dd", {}, `${data.attackCadenceMs}ms`),
+          el("dt", {}, "Brood cadence"),
+          el("dd", {}, `${data.broodCadenceMs}ms`),
+          el("dt", {}, "Brood size"),
+          el("dd", {}, `${data.broodSize} × ${broodLabel}`),
+          el("dt", {}, "Brood lane"),
+          el("dd", {}, data.broodLanes === "self" ? "Queen's lane only" : data.broodLanes),
+          el("dt", {}, "Counterplay"),
+          el(
+            "dd",
+            {},
+            "Source-kill: a single Briar Pod (160 damage) one-shots her on contact and stops every future brood. Splash plants like Pollen Puff are the cleanup if she lives long enough to spawn."
           ),
           el("dt", {}, "Appears In"),
           el("dd", {}, wavePresence.join(", ") || "No scripted waves")
