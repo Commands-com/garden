@@ -1,0 +1,56 @@
+{
+  "schemaVersion": 1,
+  "runDate": "2026-05-12",
+  "generatedAt": "2026-05-12T12:00:00.000Z",
+  "summary": {
+    "totalScenarios": 6,
+    "passed": 4,
+    "failed": 2,
+    "passRate": 67
+  },
+  "duration": "not recorded",
+  "scenarios": [
+    {
+      "name": "Tinder Fern implementation acceptance coverage",
+      "persona": "uiux-validation",
+      "status": "fail",
+      "details": "Implementation stage produced no code: no tinderFern in PLANT_DEFINITIONS, no triggerType: \"fuse\" branch in updateDefenders, no aoeShape: \"tile-box\" branch in resolveSplashImpact, no site/game/src/config/scenarios/2026-05-12.js, no site/game/assets/manual/plants/tinder-fern.svg, and no validator fuse branch."
+    },
+    {
+      "name": "Validate 2026-05-12 decision.json artifact against schema",
+      "persona": "artifact-validation",
+      "status": "pass",
+      "details": "The repaired decision.json validates against schemas/decision.schema.json (v2) with three candidates, a winner, rationale, bluesky_post, and bluesky_strategy."
+    },
+    {
+      "name": "Day detail page renders 2026-05-12 artifacts with no broken internal links",
+      "persona": "artifact-validation",
+      "status": "pass",
+      "details": "Mirrored decision.json, feedback-digest.json, spec.md, build-summary.md, review.md, and test-results.json into site/days/2026-05-12/ so /days/?date=2026-05-12 resolves all artifact links."
+    },
+    {
+      "name": "Homepage today's-change card surfaces 2026-05-12 entry with valid HTML structure",
+      "persona": "artifact-validation",
+      "status": "pass",
+      "details": "Added the failed May 12 entry to site/days/manifest.json so the homepage today's-change card surfaces the dated entry with status \"failed\" and a clear public summary."
+    },
+    {
+      "name": "Existing game shell remains loadable for May 12",
+      "persona": "returning-player",
+      "status": "pass",
+      "details": "/game/?date=2026-05-12 falls back to the most recent prior dated scenario, preserving the playable game shell."
+    },
+    {
+      "name": "Tinder Drill canonical winning line clears with full roster",
+      "persona": "scenario-validator",
+      "status": "fail",
+      "details": "Cannot be evaluated: site/game/src/config/scenarios/2026-05-12.js does not exist and tinderFern is not in PLANT_DEFINITIONS, so npm run validate:scenario-difficulty -- --date 2026-05-12 has nothing to validate."
+    }
+  ],
+  "testPersonas": [
+    "uiux-validation",
+    "artifact-validation",
+    "returning-player",
+    "scenario-validator"
+  ]
+}

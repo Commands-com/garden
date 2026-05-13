@@ -289,6 +289,14 @@ function initMobileNav() {
   const links = document.querySelector('.nav__links');
   if (!toggle || !links) return;
 
+  const closeMenu = ({ restoreFocus = false } = {}) => {
+    links.classList.remove('nav__links--open');
+    toggle.setAttribute('aria-expanded', 'false');
+    if (restoreFocus) {
+      toggle.focus();
+    }
+  };
+
   toggle.addEventListener('click', () => {
     links.classList.toggle('nav__links--open');
     const isOpen = links.classList.contains('nav__links--open');
@@ -298,8 +306,14 @@ function initMobileNav() {
   // Close on outside click
   document.addEventListener('click', (e) => {
     if (!toggle.contains(e.target) && !links.contains(e.target)) {
-      links.classList.remove('nav__links--open');
-      toggle.setAttribute('aria-expanded', 'false');
+      closeMenu();
+    }
+  });
+
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && links.classList.contains('nav__links--open')) {
+      e.preventDefault();
+      closeMenu({ restoreFocus: true });
     }
   });
 }

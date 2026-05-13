@@ -1831,6 +1831,13 @@
 
 .rendered-md pre {
   margin: var(--space-4) 0;
+  overflow-x: auto;
+  max-width: 100%;
+}
+
+.rendered-md :not(pre) > code {
+  overflow-wrap: anywhere;
+  word-break: break-word;
 }
 
 .rendered-md a {

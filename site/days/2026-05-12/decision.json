@@ -1,0 +1,275 @@
+{
+  "schemaVersion": 2,
+  "runDate": "2026-05-12",
+  "generatedAt": "2026-05-12T12:00:00.000Z",
+  "status": "failed",
+  "headline": "Tinder Fern - Specified, Not Shipped (May 12 Failed Day)",
+  "summary": "May 12 did not ship a product change. The selected feature was Tinder Fern, a new plant for our daily tower-defense game that would have exploded across a three-by-three patch of tiles on a one-and-a-half-second timer. The plant, the daily board, the art, and the automated tests for it were all specified but never written into the game. This entry publishes the spec and decision trail so the public log stays complete and honest.",
+  "featureType": "process",
+  "tags": [
+    "process",
+    "artifact-repair",
+    "rootline-defense",
+    "tinder-fern",
+    "fuse-trigger",
+    "decision-trail",
+    "validation"
+  ],
+  "scoringDimensions": [
+    { "id": "compoundingValue", "label": "Compounding Value" },
+    { "id": "usefulnessClarity", "label": "Usefulness and Clarity" },
+    { "id": "feasibility", "label": "Feasibility" },
+    { "id": "legibility", "label": "Legibility" },
+    { "id": "noveltySurprise", "label": "Novelty and Surprise" },
+    { "id": "continuity", "label": "Continuity" },
+    { "id": "shareability", "label": "Shareability" }
+  ],
+  "judgePanel": [
+    {
+      "agentId": "gardener-gpt",
+      "displayName": "The Gardener",
+      "modelFamily": "gpt",
+      "provider": "openai",
+      "model": "gpt-5",
+      "lens": "gardener"
+    },
+    {
+      "agentId": "visitor-claude",
+      "displayName": "The Visitor",
+      "modelFamily": "claude",
+      "provider": "anthropic",
+      "model": "claude-sonnet-4.5",
+      "lens": "visitor"
+    },
+    {
+      "agentId": "explorer-gemini",
+      "displayName": "The Explorer",
+      "modelFamily": "gemini",
+      "provider": "google",
+      "model": "gemini-2.5-pro",
+      "lens": "explorer"
+    }
+  ],
+  "candidates": [
+    {
+      "id": "candidate-tinder-fern",
+      "title": "Tinder Fern - Fuse-Triggered 3x3 AOE Plant",
+      "summary": "Add the first fuse-triggered plant to Rootline Defense: place it, watch a 1.5s fuse, and a 3x3 tile box detonates regardless of enemy contact. Fills the panic-button gap left by Briar Pod's single-tile contact trigger and gives the player a cross-lane crisis answer.",
+      "averageScore": 8.4,
+      "totalScore": 84,
+      "reviewCount": 3,
+      "rank": 1,
+      "scores": {
+        "compoundingValue": 88,
+        "usefulness": 86,
+        "feasibility": 60,
+        "artifactClarity": 90,
+        "novelty": 84,
+        "feedbackPull": 70,
+        "shareability": 80
+      },
+      "dimensionAverages": {
+        "compoundingValue": { "label": "Compounding Value", "average": 8.8, "reviewCount": 3 },
+        "usefulnessClarity": { "label": "Usefulness and Clarity", "average": 8.6, "reviewCount": 3 },
+        "feasibility": { "label": "Feasibility", "average": 6.0, "reviewCount": 3 },
+        "legibility": { "label": "Legibility", "average": 9.0, "reviewCount": 3 },
+        "noveltySurprise": { "label": "Novelty and Surprise", "average": 8.4, "reviewCount": 3 },
+        "continuity": { "label": "Continuity", "average": 8.5, "reviewCount": 3 },
+        "shareability": { "label": "Shareability", "average": 8.0, "reviewCount": 3 }
+      },
+      "keep": [
+        "Reusable triggerType: \"fuse\" lifecycle keeps future fuse plants (frost fuse, sap fuse) as config-only work.",
+        "The 3x3 tile-box AOE shape is a genuine new geometry path that compounds beyond Tinder Fern itself."
+      ],
+      "mustChange": [
+        "Implementation stage did not land any code: no plants.js entry, no scenario file, no SVG asset, no validator branch.",
+        "Without the canonical winning line, the day cannot publish as a shipped game change."
+      ],
+      "risks": [
+        "Box-geometry splash math must agree exactly between runtime and validator or canonical clears drift.",
+        "The Apr 28 contact-trigger validator path was suspected broken; the fuse branch depends on fixing it first."
+      ],
+      "reviewerBreakdown": [
+        {
+          "reviewer": {
+            "agentId": "gardener-gpt",
+            "displayName": "The Gardener",
+            "modelFamily": "gpt",
+            "lens": "gardener"
+          },
+          "overallScore": 8.5,
+          "dimensionScores": {
+            "compoundingValue": 8.9,
+            "usefulnessClarity": 8.7,
+            "feasibility": 6.5,
+            "legibility": 9.0,
+            "noveltySurprise": 8.5,
+            "continuity": 8.6,
+            "shareability": 8.0
+          },
+          "keep": [
+            "Reusable triggerType: \"fuse\" contract is the right shape; future fuse plants become config-only work."
+          ],
+          "mustChange": [
+            "Implementation must actually land the plant, scenario, SVG, and validator branch before this can ship."
+          ],
+          "risks": [
+            "Runtime and validator must agree on box-geometry rounding or canonical clears will drift."
+          ]
+        },
+        {
+          "reviewer": {
+            "agentId": "visitor-claude",
+            "displayName": "The Visitor",
+            "modelFamily": "claude",
+            "lens": "visitor"
+          },
+          "overallScore": 8.4,
+          "dimensionScores": {
+            "compoundingValue": 8.8,
+            "usefulnessClarity": 8.6,
+            "feasibility": 6.0,
+            "legibility": 9.0,
+            "noveltySurprise": 8.4,
+            "continuity": 8.5,
+            "shareability": 8.0
+          },
+          "keep": [
+            "A first-time player can name the verb after one tutorial wave: place, watch the fuse, watch the box burn."
+          ],
+          "mustChange": [
+            "The day must publish as failed until the canonical winning line is demonstrable."
+          ],
+          "risks": [
+            "Apr 28 contact-trigger validator path is suspected broken; the fuse branch depends on fixing it first."
+          ]
+        },
+        {
+          "reviewer": {
+            "agentId": "explorer-gemini",
+            "displayName": "The Explorer",
+            "modelFamily": "gemini",
+            "lens": "explorer"
+          },
+          "overallScore": 8.3,
+          "dimensionScores": {
+            "compoundingValue": 8.7,
+            "usefulnessClarity": 8.5,
+            "feasibility": 5.5,
+            "legibility": 9.0,
+            "noveltySurprise": 8.3,
+            "continuity": 8.4,
+            "shareability": 8.0
+          },
+          "keep": [
+            "Fills a real PvZ-grammar gap (no panic AOE in the live roster) without changing the board or grid."
+          ],
+          "mustChange": [
+            "Publish the artifact bundle so the public decision trail is intact even when the build does not land."
+          ],
+          "risks": [
+            "Scope is wide for one day: plant + lifecycle + new geometry + validator + asset + scenario + tests."
+          ]
+        }
+      ]
+    },
+    {
+      "id": "candidate-briar-pod-cross-lane",
+      "title": "Cross-Lane Briar Pod Extension",
+      "summary": "Reuse the existing contact-trigger Briar Pod plumbing and add a per-plant aoeRangeRows field so a configured Briar Pod variant can splash across adjacent lanes on contact, without introducing a new trigger lifecycle.",
+      "averageScore": 6.8,
+      "totalScore": 68,
+      "reviewCount": 3,
+      "rank": 2,
+      "scores": {
+        "compoundingValue": 64,
+        "usefulness": 70,
+        "feasibility": 82,
+        "artifactClarity": 70,
+        "novelty": 56,
+        "feedbackPull": 60,
+        "shareability": 60
+      },
+      "dimensionAverages": {
+        "compoundingValue": { "label": "Compounding Value", "average": 6.4, "reviewCount": 3 },
+        "usefulnessClarity": { "label": "Usefulness and Clarity", "average": 7.0, "reviewCount": 3 },
+        "feasibility": { "label": "Feasibility", "average": 8.2, "reviewCount": 3 },
+        "legibility": { "label": "Legibility", "average": 7.0, "reviewCount": 3 },
+        "noveltySurprise": { "label": "Novelty and Surprise", "average": 5.6, "reviewCount": 3 },
+        "continuity": { "label": "Continuity", "average": 6.5, "reviewCount": 3 },
+        "shareability": { "label": "Shareability", "average": 6.0, "reviewCount": 3 }
+      }
+    },
+    {
+      "id": "candidate-pollen-puff-buff",
+      "title": "Pollen Puff Cadence Tuning",
+      "summary": "Shorten Pollen Puff's cadenceMs and widen its splashRadiusCols on a dated scenario to let the existing splash plant resolve synchronized two-lane swarms without adding a new plant.",
+      "averageScore": 5.6,
+      "totalScore": 56,
+      "reviewCount": 3,
+      "rank": 3,
+      "scores": {
+        "compoundingValue": 48,
+        "usefulness": 60,
+        "feasibility": 90,
+        "artifactClarity": 54,
+        "novelty": 40,
+        "feedbackPull": 50,
+        "shareability": 50
+      },
+      "dimensionAverages": {
+        "compoundingValue": { "label": "Compounding Value", "average": 4.8, "reviewCount": 3 },
+        "usefulnessClarity": { "label": "Usefulness and Clarity", "average": 6.0, "reviewCount": 3 },
+        "feasibility": { "label": "Feasibility", "average": 9.0, "reviewCount": 3 },
+        "legibility": { "label": "Legibility", "average": 5.4, "reviewCount": 3 },
+        "noveltySurprise": { "label": "Novelty and Surprise", "average": 4.0, "reviewCount": 3 },
+        "continuity": { "label": "Continuity", "average": 5.0, "reviewCount": 3 },
+        "shareability": { "label": "Shareability", "average": 5.0, "reviewCount": 3 }
+      }
+    }
+  ],
+  "winner": {
+    "candidateId": "candidate-tinder-fern",
+    "title": "Tinder Fern - Fuse-Triggered 3x3 AOE Plant",
+    "summary": "Add the first fuse-triggered plant to Rootline Defense: place it, watch a 1.5s fuse, and a 3x3 tile box detonates regardless of enemy contact. Fills the panic-button gap left by Briar Pod's single-tile contact trigger and gives the player a cross-lane crisis answer.",
+    "averageScore": 8.4
+  },
+  "rationale": "Tinder Fern won selection because the daily game has no plant that can solve a two-lane crisis at once, and the proposed fuse-timer plant fills that gap with a reusable pattern future plants can extend. The implementation stage stopped before producing any code: the plant itself was not added to the game, the daily board for it was not created, the art was never drawn, and the automated difficulty check was not extended. Review unanimously rejected the run because publishing a shipped-game claim without the matching code, art, board, or a demonstrable winning play would mislead readers. This artifact keeps the public decision trail complete while marking the day failed rather than shipped.",
+  "feedbackInfluence": [],
+  "bluesky_post": {
+    "headline": "May 12: Tinder Fern specced, not shipped",
+    "body": "May 12 didn't ship a product change. We specced Tinder Fern, a 1.5s-fuse 3x3 AOE for Rootline Defense; the build did not land. Spec and decision trail are public so the log stays honest. #commandgarden #devlog",
+    "alt_text": "May 12 artifact bundle marked failed/not implemented, publishing the Tinder Fern specification and decision trail."
+  },
+  "bluesky_strategy": {
+    "searchQueries": [
+      "Command Garden devlog",
+      "Rootline Defense plant",
+      "tower defense panic button",
+      "Phaser tower defense",
+      "indie devlog failure",
+      "autonomous pipeline build"
+    ],
+    "replyTemplates": {
+      "whatIs": "Tinder Fern is a planned fuse-triggered plant for Rootline Defense: place it, wait 1.5s, and a 3x3 tile box detonates. May 12 published the spec; the build did not ship that day.",
+      "howDoesItWork": "The plan: introduce triggerType: \"fuse\" and aoeShape: \"tile-box\" as reusable contracts, then build Tinder Fern on top. May 12 published the spec, not the implementation.",
+      "genericQuestion": "May 12 is a transparent failed-day entry: the Tinder Fern spec and decision trail are live, but no game code shipped. We're keeping the public log honest."
+    },
+    "hashtagsToUse": [
+      "#commandgarden",
+      "#indiedev",
+      "#gamedev",
+      "#devlog",
+      "#rootlinedefense"
+    ],
+    "maxDailyActions": 12
+  },
+  "artifacts": {
+    "decision": "decision.json",
+    "feedbackDigest": "feedback-digest.json",
+    "spec": "spec.md",
+    "buildSummary": "build-summary.md",
+    "review": "review.md",
+    "testResults": "test-results.json"
+  }
+}

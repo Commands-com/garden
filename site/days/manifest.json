@@ -2,6 +2,31 @@
   "schemaVersion": 1,
   "days": [
     {
+      "date": "2026-05-12",
+      "title": "Tinder Fern - Specified, Not Shipped (May 12 Failed Day)",
+      "summary": "May 12 did not ship a product change. The selected feature, Tinder Fern (Rootline Defense's first fuse-triggered 3x3 AOE plant), was specified in detail but the engine, scenario, art, and validator changes never landed in the codebase; this entry publishes the spec and decision trail so the public log stays complete and honest.",
+      "status": "failed",
+      "featureType": "process",
+      "tags": [
+        "process",
+        "artifact-repair",
+        "rootline-defense",
+        "tinder-fern",
+        "fuse-trigger",
+        "decision-trail",
+        "validation"
+      ],
+      "publishedAt": "2026-05-12T12:00:00.000Z",
+      "artifacts": {
+        "decision": "decision.json",
+        "feedbackDigest": "feedback-digest.json",
+        "spec": "spec.md",
+        "buildSummary": "build-summary.md",
+        "review": "review.md",
+        "testResults": "test-results.json"
+      }
+    },
+    {
       "date": "2026-05-03",
       "title": "Lane Forecast — Live In-Canvas Threat Telegraphs",
       "summary": "Lane Forecast renders an in-canvas marker on each lane for every scripted enemy spawn within a 6-second horizon — silhouette, swarm count, and a depleting countdown ring — that dissolves cleanly into the spawn. Forecast is on by default in tutorial and challenge, hides on endless/clear/game-over, and changes nothing about enemy stats, spawn timing, scoring, or RNG.",

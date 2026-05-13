@@ -16,6 +16,7 @@
   <link rel="stylesheet" href="/css/components.css">
 </head>
 <body>
+  <a class="skip-link" href="#main-content">Skip to main content</a>
 
   <!-- Navigation -->
   <nav class="nav" role="navigation" aria-label="Main navigation">
@@ -156,7 +157,7 @@
     </div>
   </section>
 
-  <main>
+  <main id="main-content" tabindex="-1">
     <!-- Today's Change -->
     <section class="section" id="todays-change">
       <div class="container">
@@ -379,7 +380,7 @@
       const timelineContainer = document.getElementById('recent-timeline');
       timelineContainer.innerHTML = '';
       if (manifest && manifest.days && manifest.days.length > 0) {
-        timelineContainer.appendChild(renderTimeline(manifest, { limit: 8 }));
+        timelineContainer.appendChild(renderTimeline(manifest, { limit: 9 }));
       } else {
         showError(
           timelineContainer,

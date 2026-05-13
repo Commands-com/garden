@@ -555,11 +555,19 @@ function renderFeedbackDigest(data) {
     (data.themes && data.themes.length > 0)
   );
 
-  if (!data || !hasFeedback) {
+  if (!data) {
     return el('div', { className: 'empty-state' },
       el('div', { className: 'empty-state__icon' }, '\u{1F4AC}'),
       el('h3', { className: 'empty-state__title' }, 'No feedback data'),
       el('p', { className: 'empty-state__message' }, 'No feedback influenced this day\'s decisions.')
+    );
+  }
+
+  if (!hasFeedback) {
+    return el('div', { className: 'empty-state' },
+      el('div', { className: 'empty-state__icon' }, '\u{1F4AC}'),
+      el('h3', { className: 'empty-state__title' }, '0 feedback items'),
+      el('p', { className: 'empty-state__message' }, 'No user feedback was submitted this cycle.')
     );
   }
 
@@ -803,9 +811,12 @@ function renderReactions(dayDate, reactions = {}) {
     const isActive = !!userReactions[type.key];
 
     const btn = el('button', {
+      type: 'button',
       className: `reaction-bar__btn ${isActive ? 'reaction-bar__btn--active' : ''}`,
       title: type.label,
-      dataset: { reaction: type.key, date: dayDate },
+      'aria-label': `${type.label} reaction, ${count} selected`,
+      'aria-pressed': String(isActive),
+      dataset: { reaction: type.key, date: dayDate, label: type.label },
     },
       el('span', {}, type.emoji),
       el('span', { className: 'reaction-bar__count' }, String(count))
@@ -832,13 +843,17 @@ async function handleReaction(btn, reactionKey, dayDate) {
     btn.classList.remove('reaction-bar__btn--active');
     count = Math.max(0, count - 1);
     delete userReactions[reactionKey];
+    btn.setAttribute('aria-pressed', 'false');
   } else {
     btn.classList.add('reaction-bar__btn--active');
     count += 1;
     userReactions[reactionKey] = true;
+    btn.setAttribute('aria-pressed', 'true');
   }
 
   countEl.textContent = String(count);
+  const label = btn.dataset.label || reactionKey;
+  btn.setAttribute('aria-label', `${label} reaction, ${count} selected`);
   localStorage.setItem(`reactions-${dayDate}`, JSON.stringify(userReactions));
 
   // Send to API (fire-and-forget)
