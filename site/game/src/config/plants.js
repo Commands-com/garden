@@ -157,6 +157,31 @@ export const PLANT_DEFINITIONS = {
     displayWidth: 48,
     displayHeight: 48,
   },
+  sparkPod: {
+    id: "sparkPod",
+    label: "Spark Pod",
+    description:
+      "Crisis-clear panic burst. Arms in 1.5s, then detonates the first time a ground enemy steps onto its tile — bursting in a 3-lane × 3-col panic radius that hits every enemy inside, across lanes. Single-use; one per lane.",
+    role: "control",
+    subRole: "trap",
+    triggerType: "contact",
+    consumable: true,
+    armTimeMs: 1500,
+    maxActivePerLane: 1,
+    delivery: "trap",
+    textureKey: "spark-pod",
+    cost: 100,
+    maxHealth: 18,
+    // no cadenceMs — passive cadence path is skipped via triggerType branch.
+    projectileDamage: 110,
+    splash: true,
+    splashSameLaneOnly: false,
+    splashRadiusCols: 1.3,
+    splashDamage: 50,
+    canHitFlying: false,
+    displayWidth: 48,
+    displayHeight: 48,
+  },
 };
 
 export const STARTING_PLANT_ID = "thornVine";

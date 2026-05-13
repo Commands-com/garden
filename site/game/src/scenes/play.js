@@ -1076,7 +1076,9 @@ export class PlayScene extends Phaser.Scene {
     this.resolveSplashImpact(syntheticProjectile, primaryEnemy, {
       centerX: defender.x,
       lane: defender.row,
-      sameLaneOnly: true,
+      // May 13: opt-in cross-lane via splashSameLaneOnly: false (Spark Pod).
+      // Briar Pod (undefined) preserves legacy same-lane-only behavior.
+      sameLaneOnly: def.splashSameLaneOnly !== false,
       impactType: "trap",
     });
     // Order matters: flip triggerState first so any same-frame readers see

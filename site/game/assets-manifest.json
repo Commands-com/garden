@@ -63,6 +63,21 @@
       }
     },
     {
+      "id": "spark-pod",
+      "type": "sprite",
+      "kind": "sprite",
+      "provider": "repo",
+      "path": "/game/assets/manual/plants/spark-pod.svg",
+      "prompt": "Hand-authored repo asset for the May 13 Spark Pod panic-burst trap plant. Cyan-husked seed-pod with a glowing golden core and electric arc spikes radiating outward so the cross-lane 3×3 panic burst reads as crisis-clear and visually distinct from Briar Pod's maroon thorny silhouette.",
+      "generatedAt": "2026-05-13T00:00:00.000Z",
+      "metadata": {
+        "category": "player",
+        "format": "svg",
+        "width": 48,
+        "height": 48
+      }
+    },
+    {
       "id": "briar-beetle",
       "type": "sprite",
       "kind": "sprite",

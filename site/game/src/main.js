@@ -542,6 +542,17 @@ function renderBoardScout(dayDate, assetCatalog) {
           )
         );
       }
+      // May 13: Spark Pod opts into cross-lane panic burst. Gate strictly on
+      // splashSameLaneOnly === false so Pollen Puff (undefined) is unaffected.
+      if (plant.splashSameLaneOnly === false) {
+        badges.push(
+          el(
+            "span",
+            { className: "game-scout__badge game-scout__badge--cross-lane" },
+            "Cross-lane"
+          )
+        );
+      }
     } else {
       if (typeof plant.projectileDamage === "number") {
         statNodes.push(
@@ -973,6 +984,12 @@ function selectScoutCard(card, type, data, scenario) {
           {},
           `${Number(data.splashRadiusCols || 0).toFixed(1)} col · ${Number(data.splashDamage || 0)} dmg`
         )
+      );
+    }
+    if (data.splashSameLaneOnly === false) {
+      trapStats.push(
+        el("dt", {}, "Cross-lane"),
+        el("dd", {}, "Yes — 3-lane × 3-col panic radius")
       );
     }
     trapStats.push(

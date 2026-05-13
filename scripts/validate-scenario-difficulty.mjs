@@ -563,12 +563,20 @@ class ScenarioSimulator {
       col >= BOARD_COLS ||
       this.defendersByTile.has(tileKey) ||
       this.resources < plant.cost ||
-      this.isPlantLimitReached(plant.id)
+      this.isPlantLimitReached(plant.id, row)
     ) {
       return false;
     }
 
     const center = getCellCenter(row, col);
+    // Mirror play.js: contact-trigger plants have no cadenceMs so cooldown is
+    // 0; cadenced plants keep the legacy 180ms floor. Guarding cadenceMs with
+    // `?? 0` prevents `undefined * 0.45 = NaN` poisoning beam-search state.
+    const baseCooldownMs =
+      plant.initialCooldownMs ??
+      (plant.triggerType === "contact" || !plant.cadenceMs
+        ? 0
+        : Math.max(180, (plant.cadenceMs ?? 0) * 0.45));
     const defender = {
       id: this.nextDefenderId++,
       row,
@@ -577,11 +585,13 @@ class ScenarioSimulator {
       x: center.x,
       y: center.y,
       hp: plant.maxHealth,
-      cooldownMs:
-        plant.initialCooldownMs ??
-        Math.max(180, plant.cadenceMs * 0.45),
+      cooldownMs: baseCooldownMs,
       definition: plant,
     };
+    if (plant.triggerType === "contact") {
+      defender.triggerState = "arming";
+      defender.armingMsRemaining = plant.armTimeMs || 0;
+    }
 
     this.resources -= plant.cost;
     this.defenders.push(defender);
@@ -607,9 +617,29 @@ class ScenarioSimulator {
     return count;
   }
 
-  isPlantLimitReached(plantId) {
+  isPlantLimitReached(plantId, row = null) {
     const plant = PLANT_DEFINITIONS[plantId];
-    return Boolean(plant?.maxActive && this.getActivePlantCount(plantId) >= plant.maxActive);
+    if (!plant) return false;
+    if (plant.maxActive && this.getActivePlantCount(plantId) >= plant.maxActive) {
+      return true;
+    }
+    // Mirror play.js: per-lane cap (contact-trigger pods) enforced when a row
+    // is supplied. Lane-agnostic affordability checks (tray-card style) still
+    // see the plant as available if any lane has open capacity.
+    if (row != null && plant.maxActivePerLane) {
+      let inLane = 0;
+      for (const defender of this.defenders) {
+        if (
+          !defender.destroyed &&
+          defender.definition.id === plantId &&
+          defender.row === row
+        ) {
+          inLane += 1;
+        }
+      }
+      if (inLane >= plant.maxActivePerLane) return true;
+    }
+    return false;
   }
 
   advanceTo(targetMs) {
@@ -746,6 +776,15 @@ class ScenarioSimulator {
         continue;
       }
 
+      // May 13: contact-trigger plants (Briar Pod, Spark Pod) run their own
+      // arm-then-detonate lifecycle, mirroring play.js updateContactTriggerDefender.
+      // Branched before role gates so a 'control'-role panic pod (Spark Pod)
+      // is not silently skipped by the legacy control-plant continue.
+      if (defender.definition.triggerType === "contact") {
+        this.updateContactTriggerDefender(defender, deltaMs);
+        continue;
+      }
+
       if (defender.definition.role === "control") {
         continue;
       }
@@ -821,6 +860,64 @@ class ScenarioSimulator {
         hitEnemies: new Set(),
         destroyed: false,
       });
+    }
+  }
+
+  // Mirror of play.js updateContactTriggerDefender. Two-phase lifecycle:
+  //   arming    — ticks armingMsRemaining toward 0; the pod cannot detonate.
+  //   armed     — on the first frame an in-lane ground enemy crosses the pod's
+  //               tile-center X (enemy.x <= defender.x), synthesize a trap
+  //               splash impact, mark consumable defenders destroyed.
+  // splashSameLaneOnly:false (Spark Pod) lets the burst reach every lane in
+  // splashRadiusCols * CELL_WIDTH; undefined preserves Briar Pod's lane-only
+  // behavior so beam-search reads the same outcomes as the runtime.
+  updateContactTriggerDefender(defender, deltaMs) {
+    if (defender.destroyed) return;
+    if (defender.triggerState === "arming") {
+      defender.armingMsRemaining = (defender.armingMsRemaining || 0) - deltaMs;
+      if (defender.armingMsRemaining <= 0) {
+        defender.triggerState = "armed";
+        defender.armingMsRemaining = 0;
+      }
+      return;
+    }
+    if (defender.triggerState !== "armed") return;
+
+    let trigger = null;
+    for (const enemy of this.enemies) {
+      if (enemy.destroyed) continue;
+      if (enemy.lane !== defender.row) continue;
+      if (enemy.invulnerable === true) continue;
+      if (enemy.definition.flying === true) continue;
+      if (enemy.x <= defender.x) {
+        trigger = enemy;
+        break;
+      }
+    }
+    if (!trigger) return;
+
+    const def = defender.definition;
+    const syntheticProjectile = {
+      damage: def.projectileDamage,
+      splash: true,
+      splashDamage: def.splashDamage,
+      splashRadiusCols: def.splashRadiusCols,
+      canHitFlying: !!def.canHitFlying,
+      arc: false,
+      delivery: "trap",
+      lane: defender.row,
+      x: defender.x,
+    };
+    this.resolveSplashImpact(syntheticProjectile, trigger, {
+      centerX: defender.x,
+      lane: defender.row,
+      sameLaneOnly: def.splashSameLaneOnly !== false,
+    });
+
+    defender.triggerState = "triggered";
+    if (def.consumable) {
+      defender.destroyed = true;
+      this.defendersByTile.delete(defender.tileKey);
     }
   }
 
@@ -1285,8 +1382,13 @@ class ScenarioSimulator {
     // existing "arc" tag so they continue to bypass front armor mults
     // unconditionally (HuskWalker contract).
     const isSplashProjectile = projectile.splash === true;
+    // Mirror play.js: contact-trigger pods stamp `delivery: "trap"` on the
+    // synthetic projectile so getEffectiveProjectileDamage bypasses front-armor
+    // (Husk Walker) the same way Cottonburr's arc does. Without this, beam
+    // search would over-charge Pod placements against armored lanes.
     const delivery =
-      projectile.arc === true ? "arc" : isSplashProjectile ? "splash" : "direct";
+      projectile.delivery
+      || (projectile.arc === true ? "arc" : isSplashProjectile ? "splash" : "direct");
 
     if (primaryEnemy && !primaryEnemy.destroyed && primaryEnemy.invulnerable !== true) {
       this.damageEnemy(primaryEnemy, projectile.damage, { delivery });
@@ -1430,10 +1532,14 @@ class ScenarioSimulator {
     // PollenPuff splash + Cottonburr arc come through at full damage.
     const armorBypassedBySplash =
       armor?.splashBypass === true && ctx.delivery === "splash";
+    // Apr 28 / May 13: delivery "trap" (Briar Pod, Spark Pod contact bursts)
+    // joins "arc" in the armor-bypass set so a Pod one-shots Husk Walker
+    // through the frontDamageMultiplier the same way Cottonburr's arc does.
     if (
       armorMult != null &&
       enemy.armorWindup !== true &&
       ctx.delivery !== "arc" &&
+      ctx.delivery !== "trap" &&
       !armorBypassedBySplash
     ) {
       working = Math.max(1, Math.round(working * armorMult));

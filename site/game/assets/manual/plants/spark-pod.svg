@@ -1,0 +1,61 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" role="img" aria-labelledby="title desc">
+  <title id="title">Spark Pod panic-burst plant</title>
+  <desc id="desc">A bright cyan-and-gold seed-pod sheathed in electric arcs, primed to detonate in a 3-lane × 3-col panic radius on first ground contact.</desc>
+  <defs>
+    <linearGradient id="sp-husk" x1="0" x2="1" y1="0" y2="1">
+      <stop offset="0%" stop-color="#9be5ff"/>
+      <stop offset="55%" stop-color="#2b8fc6"/>
+      <stop offset="100%" stop-color="#13314a"/>
+    </linearGradient>
+    <linearGradient id="sp-arc" x1="0" x2="1" y1="0" y2="1">
+      <stop offset="0%" stop-color="#fff1a8"/>
+      <stop offset="100%" stop-color="#d97a1a"/>
+    </linearGradient>
+    <radialGradient id="sp-core" cx="42%" cy="34%" r="68%">
+      <stop offset="0%" stop-color="#ffffff"/>
+      <stop offset="48%" stop-color="#ffe25a"/>
+      <stop offset="100%" stop-color="#264a78"/>
+    </radialGradient>
+  </defs>
+
+  <ellipse cx="24" cy="40" rx="15" ry="5" fill="#0c1b2e" opacity=".38"/>
+  <ellipse cx="24" cy="38" rx="12" ry="4" fill="#1d4070" opacity=".74"/>
+
+  <g fill="url(#sp-arc)" stroke="#3a1a05" stroke-width="1.4" stroke-linejoin="round">
+    <path d="M24 4 L27 13 L21 13 Z"/>
+    <path d="M37 10 L34 19 L29 15 Z"/>
+    <path d="M44 23 L34 26 L35 19 Z"/>
+    <path d="M37 36 L29 32 L34 28 Z"/>
+    <path d="M24 42 L21 32 L27 32 Z"/>
+    <path d="M11 36 L14 28 L19 32 Z"/>
+    <path d="M4 23 L14 19 L13 26 Z"/>
+    <path d="M11 10 L19 15 L14 19 Z"/>
+  </g>
+
+  <path d="M24 10 C33 10 39 16 39 24 C39 32 33 37 24 37 C15 37 9 32 9 24 C9 16 15 10 24 10 Z"
+        fill="url(#sp-husk)" stroke="#0d2238" stroke-width="2.2"/>
+  <path d="M24 13 C30 14 34 18 34 24 C34 30 30 34 24 35 C18 34 14 30 14 24 C14 18 18 14 24 13 Z"
+        fill="url(#sp-core)" opacity=".95"/>
+
+  <g fill="none" stroke="#fff7c1" stroke-linecap="round" stroke-width="1.4" opacity=".92">
+    <path d="M19 17 L24 22 L21 24 L26 30"/>
+    <path d="M30 17 L26 21 L29 23 L25 28"/>
+    <path d="M16 24 L20 25"/>
+    <path d="M32 24 L28 25"/>
+  </g>
+
+  <g fill="#fff5a0" stroke="#7d4a08" stroke-linejoin="round" stroke-width=".8">
+    <circle cx="24" cy="24" r="2.4"/>
+    <path d="M18 14 L20 18 L16 18 Z"/>
+    <path d="M30 14 L28 18 L32 18 Z"/>
+    <path d="M36 22 L31 24 L33 20 Z"/>
+    <path d="M32 32 L28 29 L33 28 Z"/>
+    <path d="M16 32 L20 29 L15 28 Z"/>
+    <path d="M12 22 L17 24 L15 20 Z"/>
+  </g>
+
+  <path d="M16 37 C13 40 12 43 13 46" fill="none" stroke="#2a4d70" stroke-width="2.2" stroke-linecap="round"/>
+  <path d="M32 37 C35 40 36 43 35 46" fill="none" stroke="#2a4d70" stroke-width="2.2" stroke-linecap="round"/>
+  <path d="M24 38 C24 41 24 44 24 46" fill="none" stroke="#142a40" stroke-width="2.5" stroke-linecap="round"/>
+  <path d="M18 18 C21 16 27 16 30 18" fill="none" stroke="#eaffff" stroke-width="1.2" stroke-linecap="round" opacity=".7"/>
+</svg>
