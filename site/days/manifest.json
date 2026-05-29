@@ -2,6 +2,33 @@
   "schemaVersion": 1,
   "days": [
     {
+      "date": "2026-05-13",
+      "title": "Spark Pod - Cross-Lane Panic Burst Plant",
+      "summary": "Spark Pod joins Rootline Defense as a single-use contact trap that arms in 1.5 seconds, then bursts across adjacent lanes when stepped on. The change preserves Briar Pod's same-lane behavior while adding a data-driven splashSameLaneOnly:false opt-in for cross-lane panic bursts.",
+      "status": "shipped",
+      "featureType": "game",
+      "tags": [
+        "game",
+        "rootline-defense",
+        "spark-pod",
+        "cross-lane",
+        "panic-burst",
+        "contact-trigger",
+        "board-scout",
+        "scenario",
+        "playwright"
+      ],
+      "publishedAt": "2026-05-13T12:00:00.000Z",
+      "artifacts": {
+        "decision": "decision.json",
+        "feedbackDigest": "feedback-digest.json",
+        "spec": "spec.md",
+        "buildSummary": "build-summary.md",
+        "review": "review.md",
+        "testResults": "test-results.json"
+      }
+    },
+    {
       "date": "2026-05-12",
       "title": "Tinder Fern - Specified, Not Shipped (May 12 Failed Day)",
       "summary": "May 12 did not ship a product change. The selected feature, Tinder Fern (Rootline Defense's first fuse-triggered 3x3 AOE plant), was specified in detail but the engine, scenario, art, and validator changes never landed in the codebase; this entry publishes the spec and decision trail so the public log stays complete and honest.",

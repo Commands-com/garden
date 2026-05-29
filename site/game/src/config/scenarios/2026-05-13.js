@@ -115,21 +115,25 @@ const scenario_2026_05_13 = {
       },
       {
         wave: 3,
-        label: "Adjacent-Lane Crisis",
+        label: "Two-Lane Cross",
         startAtMs: 52000,
         unlocks: ["sporeTick", "briarBeetle", "shardMite", "huskWalker"],
         events: [
-          // Husk Walker on lane 1 + Spore Tick cluster on lane 2 = the canonical
-          // Spark Pod placement: drop a Pod on lane 2 mid-cluster and the cross-
-          // lane burst kills the swarm AND damages the husk in one detonation.
-          { offsetMs: 1000, lane: 1, enemyId: "huskWalker" },
+          // Synchronized two-lane Spore Tick cross on rows 2 and 3 — the
+          // canonical Spark Pod placement is (row 2, col 3): the burst's
+          // 117 px radius reaches the lane-3 lead tick 300 ms behind.
           {
-            offsetMs: 4500,
+            offsetMs: 1500,
             lane: 2,
             enemyId: "sporeTick",
             swarmGroup: { count: 5, staggerMs: 150 },
           },
-          { offsetMs: 5000, lane: 3, enemyId: "huskWalker" },
+          {
+            offsetMs: 1800,
+            lane: 3,
+            enemyId: "sporeTick",
+            swarmGroup: { count: 5, staggerMs: 150 },
+          },
         ],
       },
       {

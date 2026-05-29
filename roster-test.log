@@ -1,0 +1,438 @@
+
+Running 1 test using 1 worker
+
+[1A[2K[1/1] [chromium] › tests/uiux/game-spark-pod-tutorial-challenge-endless-gating-2026-05-13.spec.js:681:3 › May 13 Spark Drill — tutorial → challenge → endless gating with Spark Pod roster › roster-expansion proof: running the canonical 9-placement clear plan with the previous dated challenge roster (May 6 — no Spark Pod) does NOT clear the board under intended economy
+[1A[2K  1) [chromium] › tests/uiux/game-spark-pod-tutorial-challenge-endless-gating-2026-05-13.spec.js:681:3 › May 13 Spark Drill — tutorial → challenge → endless gating with Spark Pod roster › roster-expansion proof: running the canonical 9-placement clear plan with the previous dated challenge roster (May 6 — no Spark Pod) does NOT clear the board under intended economy 
+
+    Error: Previous-dated-challenge roster (May 6 Brood Watch) must NOT clear the May 13 board with the canonical 9-placement plan (sparkPod→briarPod). Plan results:
+    [
+      {
+        "placement": {
+          "plantId": "pollenPuff",
+          "row": 2,
+          "col": 1,
+          "atMs": 0
+        },
+        "result": {
+          "ready": true,
+          "applied": {
+            "ok": true,
+            "type": "place"
+          },
+          "placedAtMs": 33
+        }
+      },
+      {
+        "placement": {
+          "plantId": "sunrootBloom",
+          "row": 0,
+          "col": 0,
+          "atMs": 12000
+        },
+        "result": {
+          "ready": true,
+          "applied": {
+            "ok": true,
+            "type": "place"
+          },
+          "placedAtMs": 12033
+        }
+      },
+      {
+        "placement": {
+          "plantId": "pollenPuff",
+          "row": 4,
+          "col": 1,
+          "atMs": 20000
+        },
+        "result": {
+          "ready": true,
+          "applied": {
+            "ok": true,
+            "type": "place"
+          },
+          "placedAtMs": 20033
+        }
+      },
+      {
+        "placement": {
+          "plantId": "pollenPuff",
+          "row": 0,
+          "col": 1,
+          "atMs": 28000
+        },
+        "result": {
+          "ready": true,
+          "applied": {
+            "ok": true,
+            "type": "place"
+          },
+          "placedAtMs": 28033
+        }
+      },
+      {
+        "placement": {
+          "plantId": "cottonburrMortar",
+          "row": 1,
+          "col": 1,
+          "atMs": 48000
+        },
+        "result": {
+          "ready": true,
+          "applied": {
+            "ok": true,
+            "type": "place"
+          },
+          "placedAtMs": 48033
+        }
+      },
+      {
+        "placement": {
+          "plantId": "briarPod",
+          "row": 3,
+          "col": 3,
+          "atMs": 52000
+        },
+        "result": {
+          "ready": true,
+          "applied": {
+            "ok": true,
+            "type": "place"
+          },
+          "placedAtMs": 52033
+        }
+      },
+      {
+        "placement": {
+          "plantId": "pollenPuff",
+          "row": 3,
+          "col": 1,
+          "atMs": 68000
+        },
+        "result": {
+          "ready": true,
+          "applied": {
+            "ok": true,
+            "type": "place"
+          },
+          "placedAtMs": 68033
+        }
+      },
+      {
+        "placement": {
+          "plantId": "briarPod",
+          "row": 3,
+          "col": 4,
+          "atMs": 76000
+        },
+        "result": {
+          "ready": true,
+          "applied": {
+            "ok": true,
+            "type": "place"
+          },
+          "placedAtMs": 76033
+        }
+      },
+      {
+        "placement": {
+          "plantId": "thornVine",
+          "row": 3,
+          "col": 5,
+          "atMs": 84000
+        },
+        "result": {
+          "ready": true,
+          "applied": {
+            "ok": true,
+            "type": "place"
+          },
+          "placedAtMs": 84033
+        }
+      }
+    ]
+    Diagnostics:
+    {
+      "elapsedMs": 84033,
+      "gardenHP": 2,
+      "defenders": [
+        {
+          "plantId": "pollenPuff",
+          "row": 2,
+          "col": 1,
+          "x": 319,
+          "destroyed": false
+        },
+        {
+          "plantId": "sunrootBloom",
+          "row": 0,
+          "col": 0,
+          "x": 229,
+          "destroyed": false
+        },
+        {
+          "plantId": "pollenPuff",
+          "row": 4,
+          "col": 1,
+          "x": 319,
+          "destroyed": false
+        },
+        {
+          "plantId": "pollenPuff",
+          "row": 0,
+          "col": 1,
+          "x": 319,
+          "destroyed": false
+        },
+        {
+          "plantId": "cottonburrMortar",
+          "row": 1,
+          "col": 1,
+          "x": 319,
+          "destroyed": false
+        },
+        {
+          "plantId": "pollenPuff",
+          "row": 3,
+          "col": 1,
+          "x": 319,
+          "destroyed": false
+        },
+        {
+          "plantId": "briarPod",
+          "row": 3,
+          "col": 4,
+          "x": 589,
+          "destroyed": false,
+          "triggerState": "armed"
+        },
+        {
+          "plantId": "thornVine",
+          "row": 3,
+          "col": 5,
+          "x": 679,
+          "destroyed": false
+        }
+      ],
+      "splashEvents": [
+        {
+          "atMs": 5783,
+          "lane": 2,
+          "x": 762,
+          "radiusPx": 90,
+          "primaryEnemyId": "sporeTick",
+          "splashHitCount": 4,
+          "impactType": "splash"
+        },
+        {
+          "atMs": 21250,
+          "lane": 4,
+          "x": 563,
+          "radiusPx": 90,
+          "primaryEnemyId": "briarBeetle",
+          "splashHitCount": 0,
+          "impactType": "splash"
+        },
+        {
+          "atMs": 22617,
+          "lane": 4,
+          "x": 522,
+          "radiusPx": 90,
+          "primaryEnemyId": "briarBeetle",
+          "splashHitCount": 0,
+          "impactType": "splash"
+        },
+        {
+          "atMs": 29667,
+          "lane": 0,
+          "x": 686,
+          "radiusPx": 90,
+          "primaryEnemyId": "sporeTick",
+          "splashHitCount": 4,
+          "impactType": "splash"
+        },
+        {
+          "atMs": 32767,
+          "lane": 4,
+          "x": 762,
+          "radiusPx": 90,
+          "primaryEnemyId": "sporeTick",
+          "splashHitCount": 4,
+          "impactType": "splash"
+        },
+        {
+          "atMs": 37950,
+          "lane": 2,
+          "x": 827,
+          "radiusPx": 90,
+          "primaryEnemyId": "briarBeetle",
+          "splashHitCount": 0,
+          "impactType": "splash"
+        },
+        {
+          "atMs": 39317,
+          "lane": 2,
+          "x": 786,
+          "radiusPx": 90,
+          "primaryEnemyId": "briarBeetle",
+          "splashHitCount": 0,
+          "impactType": "splash"
+        },
+        {
+          "atMs": 50250,
+          "lane": 1,
+          "x": 367,
+          "radiusPx": 54,
+          "primaryEnemyId": "shardMite",
+          "splashHitCount": 0,
+          "impactType": "arc"
+        },
+        {
+          "atMs": 54783,
+          "lane": 2,
+          "x": 762,
+          "radiusPx": 90,
+          "primaryEnemyId": "sporeTick",
+          "splashHitCount": 7,
+          "impactType": "splash"
+        },
+        {
+          "atMs": 58633,
+          "lane": 3,
+          "x": 499,
+          "radiusPx": 36,
+          "primaryEnemyId": "sporeTick",
+          "splashHitCount": 1,
+          "impactType": "trap"
+        },
+        {
+          "atMs": 79783,
+          "lane": 0,
+          "x": 762,
+          "radiusPx": 90,
+          "primaryEnemyId": "sporeTick",
+          "splashHitCount": 4,
+          "impactType": "splash"
+        },
+        {
+          "atMs": 80767,
+          "lane": 4,
+          "x": 762,
+          "radiusPx": 90,
+          "primaryEnemyId": "sporeTick",
+          "splashHitCount": 4,
+          "impactType": "splash"
+        },
+        {
+          "atMs": 83767,
+          "lane": 2,
+          "x": 762,
+          "radiusPx": 90,
+          "primaryEnemyId": "sporeTick",
+          "splashHitCount": 4,
+          "impactType": "splash"
+        }
+      ]
+    }
+    Outcome:
+    {
+      "outcome": "cleared",
+      "elapsedMs": 95233,
+      "gardenHP": 2,
+      "finalState": {
+        "scene": "play",
+        "score": 1168,
+        "wave": 5,
+        "resources": 364,
+        "gardenHP": 2,
+        "maxGardenHealth": 2,
+        "enemyCount": 0,
+        "defenderCount": 8,
+        "seed": "rootline-defense:2026-05-13",
+        "dayDate": "2026-05-13",
+        "survivedMs": 95150,
+        "mode": "challenge",
+        "scenarioTitle": "Spark Drill",
+        "scenarioPhase": "endless",
+        "challengeCleared": true,
+        "selectedPlantId": "briarPod",
+        "availablePlantIds": [
+          "briarPod",
+          "pollenPuff",
+          "cottonburrMortar",
+          "thornVine",
+          "amberWall",
+          "sunrootBloom"
+        ],
+        "hudInventory": [
+          {
+            "plantId": "briarPod",
+            "key": "1",
+            "x": 270,
+            "y": 508,
+            "width": 132,
+            "height": 48,
+            "selected": true,
+            "affordable": true,
+            "limitReached": false
+          },
+          {
+            "plantId": "pollenPuff",
+            "key": "2",
+            "x": 410,
+            "y": 508,
+            "width": 132,
+            "height": 48,
+            "selected": false,
+            "affordable": true,
+            "limitReached": false
+          },
+          {
+            "plantId": "cottonburrMortar",
+            "key": "3",
+            "x": 550,
+            "y": 508,
+            "width": 132,
+            "height": 48,
+            "selected": false,
+            "affordable": true,
+            "limitReached": false
+          },
+          {
+            "plantId": "thornVine",
+            "key": "4",
+            "x": 690,
+            "y": 508,
+            "width": 132,
+            "height": 48,
+            "selected": false,
+            "affordable": true,
+            "limitReached": false
+          }
+        ],
+        "status": "running"
+      }
+    }
+
+    [2mexpect([22m[31mreceived[39m[2m).[22mnot[2m.[22mtoBe[2m([22m[32mexpected[39m[2m) // Object.is equality[22m
+
+    Expected: not [32m"cleared"[39m
+
+      862 |         2
+      863 |       )}\nDiagnostics:\n${JSON.stringify(diagnostics, null, 2)}\nOutcome:\n${JSON.stringify(result, null, 2)}`
+    > 864 |     ).not.toBe("cleared");
+          |           ^
+      865 |     expect(result.finalState.challengeCleared).not.toBe(true);
+      866 |     expect(result.finalState.scenarioPhase).not.toBe("endless");
+      867 |
+        at /Users/dtannen/Code/commandgarden/tests/uiux/game-spark-pod-tutorial-challenge-endless-gating-2026-05-13.spec.js:864:11
+
+    attachment #1: screenshot (image/png) ──────────────────────────────────────────────────────────
+    test-results/game-spark-pod-tutorial-ch-757df-oard-under-intended-economy-chromium/test-failed-1.png
+    ────────────────────────────────────────────────────────────────────────────────────────────────
+
+    Error Context: test-results/game-spark-pod-tutorial-ch-757df-oard-under-intended-economy-chromium/error-context.md
+
+
+[1A[2K  1 failed
+    [chromium] › tests/uiux/game-spark-pod-tutorial-challenge-endless-gating-2026-05-13.spec.js:681:3 › May 13 Spark Drill — tutorial → challenge → endless gating with Spark Pod roster › roster-expansion proof: running the canonical 9-placement clear plan with the previous dated challenge roster (May 6 — no Spark Pod) does NOT clear the board under intended economy 

@@ -130,6 +130,24 @@ function createScoutArt(definition, assetIndex) {
   return wrapper;
 }
 
+function createInventoryArt(definition, assetIndex) {
+  const asset = assetIndex?.get(definition.textureKey);
+  const art = el("span", {
+    className: "game-inventory__art",
+    "aria-hidden": "true",
+  });
+
+  if (asset?.path) {
+    art.style.backgroundImage = `url("${asset.path}")`;
+    art.dataset.assetId = asset.id || definition.textureKey || "";
+    return art;
+  }
+
+  art.classList.add("game-inventory__art--fallback");
+  art.textContent = (definition.label || "?").charAt(0);
+  return art;
+}
+
 function formatCadenceSeconds(cadenceMs) {
   return `${(Number(cadenceMs || 0) / 1000).toFixed(1)}s`;
 }
@@ -295,7 +313,7 @@ function syncInventoryAvailability(runtimeState = null) {
   });
 }
 
-function renderInventory(dayDate) {
+function renderInventory(dayDate, assetCatalog) {
   if (!dom.inventory) {
     return;
   }
@@ -303,6 +321,7 @@ function renderInventory(dayDate) {
   const scenario = getScenarioForDate(dayDate);
   const plantIds = scenario.availablePlants || [];
   const defaultPlantId = plantIds[0] || null;
+  const assetIndex = buildAssetIndex(assetCatalog);
   dom.inventory.replaceChildren();
 
   if (!plantIds.length) {
@@ -334,6 +353,7 @@ function renderInventory(dayDate) {
         el(
           "div",
           { className: "game-inventory__header" },
+          createInventoryArt(plant, assetIndex),
           el("span", { className: "game-inventory__name" }, plant.label),
           el("span", { className: "game-inventory__cost" }, `${plant.cost} sap`)
         ),
@@ -542,17 +562,6 @@ function renderBoardScout(dayDate, assetCatalog) {
           )
         );
       }
-      // May 13: Spark Pod opts into cross-lane panic burst. Gate strictly on
-      // splashSameLaneOnly === false so Pollen Puff (undefined) is unaffected.
-      if (plant.splashSameLaneOnly === false) {
-        badges.push(
-          el(
-            "span",
-            { className: "game-scout__badge game-scout__badge--cross-lane" },
-            "Cross-lane"
-          )
-        );
-      }
     } else {
       if (typeof plant.projectileDamage === "number") {
         statNodes.push(
@@ -591,6 +600,21 @@ function renderBoardScout(dayDate, assetCatalog) {
           )
         );
       }
+    }
+
+    // May 13: Spark Pod opts into cross-lane panic burst. Gate strictly on
+    // splashSameLaneOnly === false so plants whose splash flag is undefined
+    // (Pollen Puff, etc.) are unaffected. Emitted independent of role so the
+    // marker is visible regardless of which branch the role/trigger cascade
+    // routed through (Spark Pod is role="control" + triggerType="contact").
+    if (plant.splashSameLaneOnly === false) {
+      badges.push(
+        el(
+          "span",
+          { className: "game-scout__badge game-scout__badge--cross-lane" },
+          "Cross-lane"
+        )
+      );
     }
 
     const card = el(
@@ -923,6 +947,51 @@ function selectScoutCard(card, type, data, scenario) {
         el("dd", {}, data.maxActive ? String(data.maxActive) : "None")
       )
     );
+  } else if (data.triggerType === "contact") {
+    // Trap-style plants (contact-trigger detonation) are described by the
+    // trap branch below regardless of role. Spark Pod is role="control" but
+    // mechanically a single-use contact trap; routing by triggerType ensures
+    // its detail surfaces Trigger/Arm time/Trigger DMG/Cross-lane/Single use
+    // rather than the slow-zone Control template.
+    const trapStats = [
+      el("dt", {}, "Cost"),
+      el("dd", {}, String(data.cost)),
+      el("dt", {}, "Trigger"),
+      el("dd", {}, "Contact (first ground enemy on tile)"),
+      el("dt", {}, "Arm time"),
+      el("dd", {}, formatCadenceSeconds(data.armTimeMs)),
+      el("dt", {}, "Trigger DMG"),
+      el("dd", {}, String(data.projectileDamage)),
+    ];
+    if (data.splash === true) {
+      trapStats.push(
+        el("dt", {}, "Splash radius"),
+        el(
+          "dd",
+          {},
+          `${Number(data.splashRadiusCols || 0).toFixed(1)} col · ${Number(data.splashDamage || 0)} dmg`
+        )
+      );
+    }
+    if (data.splashSameLaneOnly === false) {
+      trapStats.push(
+        el("dt", {}, "Cross-lane"),
+        el("dd", {}, "Yes — 3-lane × 3-col panic radius")
+      );
+    }
+    trapStats.push(
+      el("dt", {}, "Anti-air"),
+      el("dd", {}, data.canHitFlying === true ? "Yes" : "Ground only"),
+      el("dt", {}, "Single use"),
+      el("dd", {}, data.consumable ? "Yes — pod is spent on detonation" : "No"),
+      el("dt", {}, "Per-lane cap"),
+      el("dd", {}, data.maxActivePerLane ? String(data.maxActivePerLane) : "None")
+    );
+    detail.append(
+      el("h4", { className: "game-scout__detail-title", id: "game-scout-detail-title" }, data.label),
+      el("p", { className: "game-scout__detail-desc" }, data.description || ""),
+      el("dl", { className: "game-scout__detail-stats" }, ...trapStats)
+    );
   } else if (data.role === "control") {
     detail.append(
       el("h4", { className: "game-scout__detail-title", id: "game-scout-detail-title" }, data.label),
@@ -964,46 +1033,6 @@ function selectScoutCard(card, type, data, scenario) {
         el("dt", {}, "Attacks"),
         el("dd", {}, "—")
       )
-    );
-  } else if (data.triggerType === "contact") {
-    const trapStats = [
-      el("dt", {}, "Cost"),
-      el("dd", {}, String(data.cost)),
-      el("dt", {}, "Trigger"),
-      el("dd", {}, "Contact (first ground enemy on tile)"),
-      el("dt", {}, "Arm time"),
-      el("dd", {}, formatCadenceSeconds(data.armTimeMs)),
-      el("dt", {}, "Trigger DMG"),
-      el("dd", {}, String(data.projectileDamage)),
-    ];
-    if (data.splash === true) {
-      trapStats.push(
-        el("dt", {}, "Splash radius"),
-        el(
-          "dd",
-          {},
-          `${Number(data.splashRadiusCols || 0).toFixed(1)} col · ${Number(data.splashDamage || 0)} dmg`
-        )
-      );
-    }
-    if (data.splashSameLaneOnly === false) {
-      trapStats.push(
-        el("dt", {}, "Cross-lane"),
-        el("dd", {}, "Yes — 3-lane × 3-col panic radius")
-      );
-    }
-    trapStats.push(
-      el("dt", {}, "Anti-air"),
-      el("dd", {}, data.canHitFlying === true ? "Yes" : "Ground only"),
-      el("dt", {}, "Single use"),
-      el("dd", {}, data.consumable ? "Yes — pod is spent on detonation" : "No"),
-      el("dt", {}, "Per-lane cap"),
-      el("dd", {}, data.maxActivePerLane ? String(data.maxActivePerLane) : "None")
-    );
-    detail.append(
-      el("h4", { className: "game-scout__detail-title", id: "game-scout-detail-title" }, data.label),
-      el("p", { className: "game-scout__detail-desc" }, data.description || ""),
-      el("dl", { className: "game-scout__detail-stats" }, ...trapStats)
     );
   } else {
     const statChildren = [
@@ -1261,7 +1290,7 @@ async function init() {
   gameDate = params.get("date") || latestDay?.date || todayDate;
   seed = requestedSeed || `${DEFAULT_SEED}:${gameDate}`;
   dom.seedValue.textContent = seed;
-  renderInventory(gameDate);
+  renderInventory(gameDate, assetCatalog);
   renderBoardScout(gameDate, assetCatalog);
   setLatestRunCopy(latestDay);
 

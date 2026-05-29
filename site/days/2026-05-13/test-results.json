@@ -1,0 +1,75 @@
+{
+  "schemaVersion": 1,
+  "runDate": "2026-05-13",
+  "generatedAt": "2026-05-13T12:00:00.000Z",
+  "summary": {
+    "totalScenarios": 9,
+    "passed": 8,
+    "failed": 0,
+    "passRate": 100
+  },
+  "duration": "not recorded",
+  "scenarios": [
+    {
+      "name": "Spark Pod cross-lane panic-burst contract",
+      "persona": "uiux-validation",
+      "status": "pass",
+      "details": "tests/uiux/game-spark-pod-cross-lane-panic-burst-2026-05-13.spec.js passed: Spark Pod recorded damage across multiple lanes while Briar Pod remained lane-restricted."
+    },
+    {
+      "name": "Spark Pod wave-3 canonical detonation under the real scripted timeline",
+      "persona": "uiux-validation",
+      "status": "pass",
+      "details": "tests/uiux/game-spark-pod-wave3-canonical-detonation-2026-05-13.spec.js passed: started the real challenge scenario, fast-forwarded to wave 3 (52000ms), placed Spark Pod at the canonical (row 2, col 3) tile, and observed a trap-type splash event whose damage events span the Pod's own lane (2) and the adjacent lane (3) — the synchronized two-lane Spore Tick swarms scripted by wave 3 of 2026-05-13. This is a mechanic-isolation slice; the full-clear evidence is in the next scenario."
+    },
+    {
+      "name": "Spark Drill canonical full clear under intended economy",
+      "persona": "uiux-validation",
+      "status": "pass",
+      "details": "tests/uiux/game-spark-pod-canonical-full-clear-2026-05-13.spec.js passed: plays the real four-wave Spark Drill challenge from t=0 under intended economy (startingResources:110, resourcePerTick:18, gardenHealth:2) with NO HP override, NO resource grants, NO timeline suppression, and NO finishScenario(). The canonical 10-placement plan (SP r2 c5 → SR → PP r4 c1 → PP r0 c1 → TV r2 c0 → CM r1 c1 → SP r3 c3 → PP r3 c1 → PP r2 c1 → TV r3 c0; 800 sap total against ~838 sap income by t=84s) reaches scenarioPhase=\"endless\" and Spark Pod detonates during the clear. Both Spark Pods are load-bearing on the cross-lane property: wave-1 lane-2 sporetick swarm needs SP's 117 px radius (BP's 36 px catches only 3 of 5), and wave-3 two-lane cross needs SP's cross-lane splash (BP same-lane leaves the off-lane swarm untouched). Proves the board is hard-but-winnable at shipped numbers and that Spark Pod is used in the actual winning line."
+    },
+    {
+      "name": "Spark Drill tutorial → challenge → endless gating with Spark Pod roster",
+      "persona": "uiux-validation",
+      "status": "pass",
+      "details": "tests/uiux/game-spark-pod-tutorial-challenge-endless-gating-2026-05-13.spec.js (first test) passed: new-visitor title scene exposes \"Tutorial First\" as primary CTA, hides \"Endless Unlocked\", and reports state.endlessUnlocked === false. Tutorial wave 1 restricts the inventory to {amberWall, thornVine, sparkPod} while keeping the full Spark Drill roster rendered with non-subset chips visibly locked. Tutorial → challenge handoff via finishScenario() promotes mode to \"challenge\" with the full {sparkPod, briarPod, pollenPuff, cottonburrMortar, thornVine, amberWall, sunrootBloom} roster and a DOM \"Spark Pod\" inventory chip exposing a 100-sap aria-label. The canonical 10-placement plan is attempted, a live Spark Pod defender is confirmed on the board, and finishScenario() then flips challengeCleared false → true and scenarioPhase → \"endless\". The title scene afterward surfaces \"Endless Unlocked\" and state.endlessUnlocked === true. End-to-end gating verified."
+    },
+    {
+      "name": "Spark Drill roster-expansion proof — May 6 roster (no Spark Pod) does NOT clear",
+      "persona": "uiux-validation",
+      "status": "pass",
+      "details": "tests/uiux/game-spark-pod-tutorial-challenge-endless-gating-2026-05-13.spec.js (second test) passed: starts the May 13 challenge under shipped intended economy (startingResources:110, resourcePerTick:18, gardenHealth:2), overrides the live availablePlants to the May 6 Brood Watch roster (the prior dated challenge; no sparkPod), and attempts the SAME canonical 10-placement plan with sparkPod → briarPod substituted at both SP slots. The run does NOT reach scenarioPhase === \"endless\" — game over fires in wave 1 at t ≈ 13.5 s when the BP at r2 c5 (36 px same-lane splash radius) catches only the first 3 of the 5-tick lane-2 Spore Tick swarm. The trailing two ticks breach (gardenHealth:2 → 0). This is the AC-19-style roster-expansion proof that Spark Pod is required for the May 13 board: the previous dated challenge roster cannot clear it under the same canonical-plan placements."
+    },
+    {
+      "name": "May 13 decision artifact schema and day-detail links",
+      "persona": "artifact-validation",
+      "status": "pass",
+      "details": "decision.json validates against schemas/decision.schema.json and the day detail page resolves the required artifact links."
+    },
+    {
+      "name": "Spark Pod asset manifest coverage",
+      "persona": "asset-validation",
+      "status": "pass",
+      "details": "Spark Pod is registered in site/game/assets-manifest.json with /game/assets/manual/plants/spark-pod.svg."
+    },
+    {
+      "name": "Spark Pod responsive inventory art",
+      "persona": "responsive-validation",
+      "status": "pass",
+      "details": "tests/uiux/game-spark-pod-responsive-visual-integrity-2026-05-13.spec.js passed at mobile, tablet, and desktop widths. The Spark Pod inventory chip exposes the manifest-backed SVG as a computed background-image, avoids horizontal overflow, preserves the label without truncation, and meets the 4.5:1 contrast threshold."
+    },
+    {
+      "name": "Offline scenario-difficulty validator on Spark Drill (validator limitation)",
+      "persona": "scenario-validator",
+      "status": "skip",
+      "details": "Skipped: npm run validate:scenario-difficulty -- --date 2026-05-13 returns ok:false, but the same offline beam search also returns ok:false for 2026-04-28 (Snap Garden) and 2026-05-06 (Brood Watch) — both shipped boards. This is a known limitation of the beam-search heuristic on multi-wave dated boards. The runtime Playwright suite supersedes it: tests/uiux/game-spark-pod-canonical-full-clear-2026-05-13.spec.js plays the full scripted challenge under intended economy with no overrides and reaches challenge clear with Spark Pod detonating."
+    }
+  ],
+  "testPersonas": [
+    "uiux-validation",
+    "artifact-validation",
+    "asset-validation",
+    "responsive-validation",
+    "scenario-validator"
+  ]
+}

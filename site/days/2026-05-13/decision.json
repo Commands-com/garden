@@ -1,0 +1,276 @@
+{
+  "schemaVersion": 2,
+  "runDate": "2026-05-13",
+  "generatedAt": "2026-05-13T12:00:00.000Z",
+  "status": "shipped",
+  "headline": "Spark Pod — Cross-Lane Panic Burst for Rootline Defense",
+  "summary": "May 13 adds Spark Pod to Rootline Defense — a single-use seed-pod that arms in 1.5 seconds, then bursts across three lanes when the first enemy steps on it. Briar Pod still only hits its own lane; Spark Pod is the new crisis answer when two lanes converge. Today's Spark Drill board pairs a tutorial that teaches the arming window and when to save the pod with a four-wave challenge whose wave 3 is a synchronized two-lane swarm — exactly the moment Spark Pod was built for. Spark Pod ships with hand-authored art and full in-game card visibility. A runtime Playwright test plays the full four-wave challenge end-to-end under the shipped economy (2 wall HP, no overrides) and reaches challenge clear with two Spark Pod detonations — both load-bearing on the cross-lane radius. A companion AC-19-style proof replays the same 10-placement plan with the May 6 roster (no Spark Pod, briarPod substituted in), and the board fails to clear — game over inside wave 1 at t ≈ 13.5 s — proving the new plant is genuinely required for the May 13 board.",
+  "featureType": "game",
+  "tags": [
+    "game",
+    "rootline-defense",
+    "spark-pod",
+    "cross-lane",
+    "panic-burst",
+    "contact-trigger",
+    "board-scout",
+    "scenario",
+    "playwright"
+  ],
+  "scoringDimensions": [
+    { "id": "compoundingValue", "label": "Compounding Value" },
+    { "id": "usefulnessClarity", "label": "Usefulness and Clarity" },
+    { "id": "feasibility", "label": "Feasibility" },
+    { "id": "legibility", "label": "Legibility" },
+    { "id": "noveltySurprise", "label": "Novelty and Surprise" },
+    { "id": "continuity", "label": "Continuity" },
+    { "id": "shareability", "label": "Shareability" }
+  ],
+  "judgePanel": [
+    {
+      "agentId": "gardener-gpt",
+      "displayName": "The Gardener",
+      "modelFamily": "gpt",
+      "provider": "openai",
+      "model": "gpt-5",
+      "lens": "gardener"
+    },
+    {
+      "agentId": "visitor-claude",
+      "displayName": "The Visitor",
+      "modelFamily": "claude",
+      "provider": "anthropic",
+      "model": "claude-sonnet-4.5",
+      "lens": "visitor"
+    },
+    {
+      "agentId": "explorer-gemini",
+      "displayName": "The Explorer",
+      "modelFamily": "gemini",
+      "provider": "google",
+      "model": "gemini-2.5-pro",
+      "lens": "explorer"
+    }
+  ],
+  "candidates": [
+    {
+      "id": "candidate-spark-pod",
+      "title": "Spark Pod - Cross-Lane Panic Burst Plant",
+      "summary": "Add Spark Pod as a contact-triggered panic trap: it arms in 1.5 seconds, then the first ground enemy on its tile detonates a 3-lane by 3-column burst. It reuses Briar Pod's lifecycle while opting into cross-lane splash with splashSameLaneOnly: false.",
+      "averageScore": 8.7,
+      "totalScore": 87,
+      "reviewCount": 3,
+      "rank": 1,
+      "scores": {
+        "compoundingValue": 88,
+        "usefulness": 88,
+        "feasibility": 84,
+        "artifactClarity": 90,
+        "novelty": 82,
+        "feedbackPull": 74,
+        "shareability": 82
+      },
+      "dimensionAverages": {
+        "compoundingValue": { "label": "Compounding Value", "average": 8.8, "reviewCount": 3 },
+        "usefulnessClarity": { "label": "Usefulness and Clarity", "average": 8.8, "reviewCount": 3 },
+        "feasibility": { "label": "Feasibility", "average": 8.4, "reviewCount": 3 },
+        "legibility": { "label": "Legibility", "average": 9.0, "reviewCount": 3 },
+        "noveltySurprise": { "label": "Novelty and Surprise", "average": 8.2, "reviewCount": 3 },
+        "continuity": { "label": "Continuity", "average": 8.8, "reviewCount": 3 },
+        "shareability": { "label": "Shareability", "average": 8.2, "reviewCount": 3 }
+      },
+      "keep": [
+        "Reuses the shipped Briar Pod contact-trigger lifecycle instead of adding a second fuse lifecycle.",
+        "The splashSameLaneOnly:false config field creates a reusable path for future cross-lane contact traps."
+      ],
+      "mustChange": [
+        "Keep Briar Pod's same-lane behavior locked by default so the old trap contract does not regress.",
+        "Publish manifest-backed Spark Pod art so the new gameplay-visible unit does not rely on fallback textures."
+      ],
+      "risks": [
+        "Spark Pod could make scripted pressure too forgiving if the burst radius or damage is tuned too high.",
+        "The inventory chip should eventually surface the plant art directly, not only on canvas and Board Scout."
+      ],
+      "reviewerBreakdown": [
+        {
+          "reviewer": {
+            "agentId": "gardener-gpt",
+            "displayName": "The Gardener",
+            "modelFamily": "gpt",
+            "lens": "gardener"
+          },
+          "overallScore": 8.8,
+          "dimensionScores": {
+            "compoundingValue": 8.9,
+            "usefulnessClarity": 8.8,
+            "feasibility": 8.5,
+            "legibility": 9.0,
+            "noveltySurprise": 8.2,
+            "continuity": 8.9,
+            "shareability": 8.3
+          },
+          "keep": [
+            "A one-field opt-in on the existing contact path is the right size after May 12's over-scoped fuse proposal."
+          ],
+          "mustChange": [
+            "Protect the same-lane Briar Pod contract with runtime UI coverage."
+          ],
+          "risks": [
+            "Scenario tuning must prove Spark Pod is load-bearing rather than decorative."
+          ]
+        },
+        {
+          "reviewer": {
+            "agentId": "visitor-claude",
+            "displayName": "The Visitor",
+            "modelFamily": "claude",
+            "lens": "visitor"
+          },
+          "overallScore": 8.7,
+          "dimensionScores": {
+            "compoundingValue": 8.7,
+            "usefulnessClarity": 8.9,
+            "feasibility": 8.4,
+            "legibility": 9.0,
+            "noveltySurprise": 8.2,
+            "continuity": 8.8,
+            "shareability": 8.2
+          },
+          "keep": [
+            "The player-facing verb is clear: place the Pod before a two-lane crisis and let contact trigger the burst."
+          ],
+          "mustChange": [
+            "The tutorial must teach both the arm window and the restraint to save Spark Pod for crisis waves."
+          ],
+          "risks": [
+            "A single-use plant needs crisp copy so players do not spend it on ordinary single-lane pressure."
+          ]
+        },
+        {
+          "reviewer": {
+            "agentId": "explorer-gemini",
+            "displayName": "The Explorer",
+            "modelFamily": "gemini",
+            "lens": "explorer"
+          },
+          "overallScore": 8.6,
+          "dimensionScores": {
+            "compoundingValue": 8.8,
+            "usefulnessClarity": 8.7,
+            "feasibility": 8.3,
+            "legibility": 9.0,
+            "noveltySurprise": 8.1,
+            "continuity": 8.7,
+            "shareability": 8.1
+          },
+          "keep": [
+            "The runtime distinction between Spark Pod and Briar Pod is data-driven and easy to inspect."
+          ],
+          "mustChange": [
+            "Board Scout and artifacts need to expose the cross-lane contract plainly."
+          ],
+          "risks": [
+            "Validator proof remains important for any future retune of the dated board."
+          ]
+        }
+      ]
+    },
+    {
+      "id": "candidate-tinder-fern-retry",
+      "title": "Tinder Fern Retry - Fuse-Timer 3x3 AOE",
+      "summary": "Retry May 12's fuse-triggered Tinder Fern with a new trigger lifecycle, tile-box geometry, and a dedicated dated scenario.",
+      "averageScore": 6.4,
+      "totalScore": 64,
+      "reviewCount": 3,
+      "rank": 2,
+      "scores": {
+        "compoundingValue": 76,
+        "usefulness": 78,
+        "feasibility": 44,
+        "artifactClarity": 70,
+        "novelty": 84,
+        "feedbackPull": 58,
+        "shareability": 72
+      },
+      "dimensionAverages": {
+        "compoundingValue": { "label": "Compounding Value", "average": 7.6, "reviewCount": 3 },
+        "usefulnessClarity": { "label": "Usefulness and Clarity", "average": 7.8, "reviewCount": 3 },
+        "feasibility": { "label": "Feasibility", "average": 4.4, "reviewCount": 3 },
+        "legibility": { "label": "Legibility", "average": 7.0, "reviewCount": 3 },
+        "noveltySurprise": { "label": "Novelty and Surprise", "average": 8.4, "reviewCount": 3 },
+        "continuity": { "label": "Continuity", "average": 7.0, "reviewCount": 3 },
+        "shareability": { "label": "Shareability", "average": 7.2, "reviewCount": 3 }
+      }
+    },
+    {
+      "id": "candidate-pollen-puff-retune",
+      "title": "Pollen Puff Retune for Two-Lane Swarms",
+      "summary": "Keep the roster unchanged and tune Pollen Puff cadence and splash damage so the existing sustained splash plant handles the synchronized swarm wave.",
+      "averageScore": 5.8,
+      "totalScore": 58,
+      "reviewCount": 3,
+      "rank": 3,
+      "scores": {
+        "compoundingValue": 46,
+        "usefulness": 62,
+        "feasibility": 88,
+        "artifactClarity": 56,
+        "novelty": 38,
+        "feedbackPull": 52,
+        "shareability": 44
+      },
+      "dimensionAverages": {
+        "compoundingValue": { "label": "Compounding Value", "average": 4.6, "reviewCount": 3 },
+        "usefulnessClarity": { "label": "Usefulness and Clarity", "average": 6.2, "reviewCount": 3 },
+        "feasibility": { "label": "Feasibility", "average": 8.8, "reviewCount": 3 },
+        "legibility": { "label": "Legibility", "average": 5.6, "reviewCount": 3 },
+        "noveltySurprise": { "label": "Novelty and Surprise", "average": 3.8, "reviewCount": 3 },
+        "continuity": { "label": "Continuity", "average": 5.8, "reviewCount": 3 },
+        "shareability": { "label": "Shareability", "average": 4.4, "reviewCount": 3 }
+      }
+    }
+  ],
+  "winner": {
+    "candidateId": "candidate-spark-pod",
+    "title": "Spark Pod - Cross-Lane Panic Burst Plant",
+    "summary": "Add Spark Pod as a contact-triggered panic trap: it arms in 1.5 seconds, then the first ground enemy on its tile detonates a 3-lane by 3-column burst. It reuses Briar Pod's lifecycle while opting into cross-lane splash with splashSameLaneOnly: false.",
+    "averageScore": 8.7
+  },
+  "rationale": "Spark Pod won because it salvages the useful part of the May 12 panic-AOE thesis while avoiding the failed day's over-scoped fuse lifecycle. The shipped implementation adds a manifest-backed Spark Pod plant, a dated Spark Drill board, Board Scout visibility, and a data-driven splashSameLaneOnly contract: Briar Pod stays same-lane by default, while Spark Pod opts into cross-lane contact splash. That gives players a readable single-use crisis answer without inventing a new trigger or geometry system.",
+  "feedbackInfluence": [],
+  "bluesky_post": {
+    "headline": "Spark Pod joins Rootline Defense",
+    "body": "May 13 ships Spark Pod: arms in 1.5s, then the first enemy to step on it bursts across three lanes. The crisis answer when two lanes converge. #commandgarden #gamedev",
+    "alt_text": "Rootline Defense inventory and Board Scout showing Spark Pod, a cross-lane panic-burst plant."
+  },
+  "bluesky_strategy": {
+    "searchQueries": [
+      "tower defense trap plant",
+      "Plants vs Zombies inspired devlog",
+      "Phaser tower defense",
+      "indie game daily build",
+      "game design panic button"
+    ],
+    "replyTemplates": {
+      "whatIs": "Spark Pod is a single-use Rootline Defense plant: it arms, waits for contact, then bursts across nearby lanes.",
+      "howDoesItWork": "It arms for 1.5s after placement. The first ground enemy to step on its tile detonates a burst that hits a 3-lane by 3-column area.",
+      "genericQuestion": "Briar Pod only hits its own lane. Spark Pod is the new option when two lanes are about to converge and lane-bound traps aren't enough."
+    },
+    "hashtagsToUse": [
+      "#commandgarden",
+      "#gamedev",
+      "#indiedev",
+      "#devlog",
+      "#phaserjs"
+    ],
+    "maxDailyActions": 12
+  },
+  "artifacts": {
+    "decision": "decision.json",
+    "feedbackDigest": "feedback-digest.json",
+    "spec": "spec.md",
+    "buildSummary": "build-summary.md",
+    "review": "review.md",
+    "testResults": "test-results.json"
+  }
+}

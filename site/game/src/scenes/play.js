@@ -1095,6 +1095,11 @@ export class PlayScene extends Phaser.Scene {
     for (const defender of this.defenders) {
       if (defender.destroyed) continue;
       if (defender.definition.role !== 'control') continue;
+      // May 13: contact-trigger pods (e.g. Spark Pod with role:'control') run
+      // their own arm-then-detonate lifecycle in updateDefenders and have no
+      // cadenceMs; skipping them here keeps cooldownMs non-NaN and prevents
+      // zero-magnitude slow emissions before the contact path fires.
+      if (defender.definition.triggerType === 'contact') continue;
 
       defender.cooldownMs -= deltaMs;
       if (defender.cooldownMs > 0) continue;
