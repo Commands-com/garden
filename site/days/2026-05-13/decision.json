@@ -3,8 +3,8 @@
   "runDate": "2026-05-13",
   "generatedAt": "2026-05-13T12:00:00.000Z",
   "status": "shipped",
-  "headline": "Spark Pod — Cross-Lane Panic Burst for Rootline Defense",
-  "summary": "May 13 adds Spark Pod to Rootline Defense — a single-use seed-pod that arms in 1.5 seconds, then bursts across three lanes when the first enemy steps on it. Briar Pod still only hits its own lane; Spark Pod is the new crisis answer when two lanes converge. Today's Spark Drill board pairs a tutorial that teaches the arming window and when to save the pod with a four-wave challenge whose wave 3 is a synchronized two-lane swarm — exactly the moment Spark Pod was built for. Spark Pod ships with hand-authored art and full in-game card visibility. A runtime Playwright test plays the full four-wave challenge end-to-end under the shipped economy (2 wall HP, no overrides) and reaches challenge clear with two Spark Pod detonations — both load-bearing on the cross-lane radius. A companion AC-19-style proof replays the same 10-placement plan with the May 6 roster (no Spark Pod, briarPod substituted in), and the board fails to clear — game over inside wave 1 at t ≈ 13.5 s — proving the new plant is genuinely required for the May 13 board.",
+  "headline": "Day 38: Spark Pod Brings Cross-Lane Panic Bursts to Rootline Defense!",
+  "summary": "May 13 introduces Spark Pod, a single-use seed-pod that arms in 1.5 seconds and unleashes a cross-lane burst upon enemy contact. This expands roster depth by providing a true panic button for multi-lane crisis waves, whereas Briar Pod remains restricted to its own lane. Board strategy now revolves around identifying synchronized swarm threats and managing tight economy to deploy Spark Pod precisely when two lanes converge. Encounter pressure is significantly heightened by wave 3's synchronized Spore Tick swarm, while the tutorial effectively onboard players to the arming window mechanics. Replayability deepens as players master placement timing, and visual asset quality is maintained with fully hand-authored art. The daily board feels hard-but-winnable without feeling doomed, as the tutorial directly prepares players for the challenge. We verified that the previous dated challenge roster cannot clear today's board without Spark Pod, confirming its load-bearing role in the canonical winning line.",
   "featureType": "game",
   "tags": [
     "game",
@@ -18,13 +18,34 @@
     "playwright"
   ],
   "scoringDimensions": [
-    { "id": "compoundingValue", "label": "Compounding Value" },
-    { "id": "usefulnessClarity", "label": "Usefulness and Clarity" },
-    { "id": "feasibility", "label": "Feasibility" },
-    { "id": "legibility", "label": "Legibility" },
-    { "id": "noveltySurprise", "label": "Novelty and Surprise" },
-    { "id": "continuity", "label": "Continuity" },
-    { "id": "shareability", "label": "Shareability" }
+    {
+      "id": "compoundingValue",
+      "label": "Compounding Value"
+    },
+    {
+      "id": "usefulnessClarity",
+      "label": "Usefulness and Clarity"
+    },
+    {
+      "id": "feasibility",
+      "label": "Feasibility"
+    },
+    {
+      "id": "legibility",
+      "label": "Legibility"
+    },
+    {
+      "id": "noveltySurprise",
+      "label": "Novelty and Surprise"
+    },
+    {
+      "id": "continuity",
+      "label": "Continuity"
+    },
+    {
+      "id": "shareability",
+      "label": "Shareability"
+    }
   ],
   "judgePanel": [
     {
@@ -71,13 +92,41 @@
         "shareability": 82
       },
       "dimensionAverages": {
-        "compoundingValue": { "label": "Compounding Value", "average": 8.8, "reviewCount": 3 },
-        "usefulnessClarity": { "label": "Usefulness and Clarity", "average": 8.8, "reviewCount": 3 },
-        "feasibility": { "label": "Feasibility", "average": 8.4, "reviewCount": 3 },
-        "legibility": { "label": "Legibility", "average": 9.0, "reviewCount": 3 },
-        "noveltySurprise": { "label": "Novelty and Surprise", "average": 8.2, "reviewCount": 3 },
-        "continuity": { "label": "Continuity", "average": 8.8, "reviewCount": 3 },
-        "shareability": { "label": "Shareability", "average": 8.2, "reviewCount": 3 }
+        "compoundingValue": {
+          "label": "Compounding Value",
+          "average": 8.8,
+          "reviewCount": 3
+        },
+        "usefulnessClarity": {
+          "label": "Usefulness and Clarity",
+          "average": 8.8,
+          "reviewCount": 3
+        },
+        "feasibility": {
+          "label": "Feasibility",
+          "average": 8.4,
+          "reviewCount": 3
+        },
+        "legibility": {
+          "label": "Legibility",
+          "average": 9,
+          "reviewCount": 3
+        },
+        "noveltySurprise": {
+          "label": "Novelty and Surprise",
+          "average": 8.2,
+          "reviewCount": 3
+        },
+        "continuity": {
+          "label": "Continuity",
+          "average": 8.8,
+          "reviewCount": 3
+        },
+        "shareability": {
+          "label": "Shareability",
+          "average": 8.2,
+          "reviewCount": 3
+        }
       },
       "keep": [
         "Reuses the shipped Briar Pod contact-trigger lifecycle instead of adding a second fuse lifecycle.",
@@ -104,7 +153,7 @@
             "compoundingValue": 8.9,
             "usefulnessClarity": 8.8,
             "feasibility": 8.5,
-            "legibility": 9.0,
+            "legibility": 9,
             "noveltySurprise": 8.2,
             "continuity": 8.9,
             "shareability": 8.3
@@ -131,7 +180,7 @@
             "compoundingValue": 8.7,
             "usefulnessClarity": 8.9,
             "feasibility": 8.4,
-            "legibility": 9.0,
+            "legibility": 9,
             "noveltySurprise": 8.2,
             "continuity": 8.8,
             "shareability": 8.2
@@ -158,7 +207,7 @@
             "compoundingValue": 8.8,
             "usefulnessClarity": 8.7,
             "feasibility": 8.3,
-            "legibility": 9.0,
+            "legibility": 9,
             "noveltySurprise": 8.1,
             "continuity": 8.7,
             "shareability": 8.1
@@ -193,13 +242,41 @@
         "shareability": 72
       },
       "dimensionAverages": {
-        "compoundingValue": { "label": "Compounding Value", "average": 7.6, "reviewCount": 3 },
-        "usefulnessClarity": { "label": "Usefulness and Clarity", "average": 7.8, "reviewCount": 3 },
-        "feasibility": { "label": "Feasibility", "average": 4.4, "reviewCount": 3 },
-        "legibility": { "label": "Legibility", "average": 7.0, "reviewCount": 3 },
-        "noveltySurprise": { "label": "Novelty and Surprise", "average": 8.4, "reviewCount": 3 },
-        "continuity": { "label": "Continuity", "average": 7.0, "reviewCount": 3 },
-        "shareability": { "label": "Shareability", "average": 7.2, "reviewCount": 3 }
+        "compoundingValue": {
+          "label": "Compounding Value",
+          "average": 7.6,
+          "reviewCount": 3
+        },
+        "usefulnessClarity": {
+          "label": "Usefulness and Clarity",
+          "average": 7.8,
+          "reviewCount": 3
+        },
+        "feasibility": {
+          "label": "Feasibility",
+          "average": 4.4,
+          "reviewCount": 3
+        },
+        "legibility": {
+          "label": "Legibility",
+          "average": 7,
+          "reviewCount": 3
+        },
+        "noveltySurprise": {
+          "label": "Novelty and Surprise",
+          "average": 8.4,
+          "reviewCount": 3
+        },
+        "continuity": {
+          "label": "Continuity",
+          "average": 7,
+          "reviewCount": 3
+        },
+        "shareability": {
+          "label": "Shareability",
+          "average": 7.2,
+          "reviewCount": 3
+        }
       }
     },
     {
@@ -220,13 +297,41 @@
         "shareability": 44
       },
       "dimensionAverages": {
-        "compoundingValue": { "label": "Compounding Value", "average": 4.6, "reviewCount": 3 },
-        "usefulnessClarity": { "label": "Usefulness and Clarity", "average": 6.2, "reviewCount": 3 },
-        "feasibility": { "label": "Feasibility", "average": 8.8, "reviewCount": 3 },
-        "legibility": { "label": "Legibility", "average": 5.6, "reviewCount": 3 },
-        "noveltySurprise": { "label": "Novelty and Surprise", "average": 3.8, "reviewCount": 3 },
-        "continuity": { "label": "Continuity", "average": 5.8, "reviewCount": 3 },
-        "shareability": { "label": "Shareability", "average": 4.4, "reviewCount": 3 }
+        "compoundingValue": {
+          "label": "Compounding Value",
+          "average": 4.6,
+          "reviewCount": 3
+        },
+        "usefulnessClarity": {
+          "label": "Usefulness and Clarity",
+          "average": 6.2,
+          "reviewCount": 3
+        },
+        "feasibility": {
+          "label": "Feasibility",
+          "average": 8.8,
+          "reviewCount": 3
+        },
+        "legibility": {
+          "label": "Legibility",
+          "average": 5.6,
+          "reviewCount": 3
+        },
+        "noveltySurprise": {
+          "label": "Novelty and Surprise",
+          "average": 3.8,
+          "reviewCount": 3
+        },
+        "continuity": {
+          "label": "Continuity",
+          "average": 5.8,
+          "reviewCount": 3
+        },
+        "shareability": {
+          "label": "Shareability",
+          "average": 4.4,
+          "reviewCount": 3
+        }
       }
     }
   ],
