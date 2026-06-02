@@ -18,3 +18,5 @@ May 13 ships Spark Pod end to end for Rootline Defense.
 ## Validation Notes
 
 The targeted Spark Pod cross-lane panic-burst Playwright test passes. The day-detail artifact validation now covers schema validity, Spark Pod winner copy, artifact links, candidate markup, and adjacent-day navigation.
+
+The offline scenario-difficulty validator was built (contact-trigger model with `splashSameLaneOnly` parity), but it cannot clear multi-wave dated boards — it returns `unwinnable` for 2026-05-13 as well as the already-shipped 2026-04-28 and 2026-05-06 boards. Because of that known beam-search limitation, the board difficulty and the prior-roster differential were established via the no-override runtime Playwright clear (`game-spark-pod-canonical-full-clear-2026-05-13.spec.js`) rather than the offline validator.

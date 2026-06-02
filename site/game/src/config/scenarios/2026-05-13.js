@@ -65,9 +65,9 @@ const scenario_2026_05_13 = {
     id: "spark-drill",
     label: "Today's Challenge",
     intro:
-      "Pollen Puff handles tick clusters; Cottonburr Mortar wears down husks. Two pressure moments — a wave-3 Husk Walker + tick cluster on adjacent lanes, and a wave-4 Glass Ram pressing alongside two tick swarms — where one Spark Pod between lanes 1 and 2 (or 2 and 3) clears the whole bracket in a single burst.",
+      "Two pressure moments need a Spark Pod. Wave 1 opens with a five-tick Spore Tick swarm down lane 2 — spend a Spark Pod there immediately, because its wide burst clears the whole cluster where a same-lane trap catches only the leading few. Wave 3 throws a synchronized two-lane Spore Tick cross on lanes 2 and 3, where one cross-lane Spark Pod between them clears both at once. Pollen Puff and Cottonburr Mortar carry the rest.",
     objective:
-      "Survive four scripted waves with 2 wall HP. The canonical clear is one Spark Pod placed between adjacent pressure lanes in wave 3, and one more on the wave-4 cluster bracket, alongside sustained splash and at least one Pod for the Glass Ram.",
+      "Survive four scripted waves with 2 wall HP. The canonical clear opens with a Spark Pod on the wave-1 lane-2 swarm and spends the second on the wave-3 two-lane cross, alongside sustained Pollen Puff splash and Cottonburr Mortar covering the husks and the wave-4 Glass Ram.",
     startingResources: 110,
     resourcePerTick: 18,
     resourceTickMs: 4000,

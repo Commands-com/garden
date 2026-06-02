@@ -6,7 +6,9 @@
     "totalScenarios": 9,
     "passed": 8,
     "failed": 0,
-    "passRate": 100
+    "skipped": 1,
+    "passRate": 100,
+    "note": "8/8 executed scenarios passed; 1 scenario (the offline scenario-difficulty validator) was skipped because its beam search returns unwinnable for every multi-wave dated board — including the shipped 2026-04-28 and 2026-05-06 boards — so board difficulty and the prior-roster differential were established by the no-override runtime Playwright clear instead."
   },
   "duration": "not recorded",
   "scenarios": [
